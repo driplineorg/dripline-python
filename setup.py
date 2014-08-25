@@ -14,6 +14,6 @@ setup(
     name = 'dripline',
     version = verstr,
     packages = ['dripline'],
-    install_requires = ['pika>=0.9.14'],
+    install_requires = ['pika>=0.9.8'],
     url = 'http://www.github.com/project8/dripline'
 )

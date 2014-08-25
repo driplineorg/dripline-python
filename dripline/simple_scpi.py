@@ -10,9 +10,12 @@ class SimpleSCPIInstrument(Provider):
 		self.endpoints = {}
 		self.ip_addr = ip_addr
 		self.scpi_port = scpi_port
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.sock.connect((ip_addr,scpi_port))
 
 	def add_endpoint(self, endpoint):
 		self.endpoints[endpoint.name] = endpoint
+		endpoint.set_provider(self)
 
 	def list_endpoints(self):
 		return self.endpoints.keys()
@@ -21,6 +24,11 @@ class SimpleSCPIInstrument(Provider):
 		if endpoint in self.list_endpoints():
 			return self.endpoints[endpoint]
 
+	def send_sync(self, to_send):
+		self.sock.send(to_send + '\r\n')
+		data = self.sock.recv(1024)
+		return data
+
 class SimpleSCPISensor(AutoReply):
 	def __init__(self,name,on_get=None,on_set=None):
 		self.name = name
@@ -28,10 +36,18 @@ class SimpleSCPISensor(AutoReply):
 		self._on_set = on_set
 
 	def on_get(self):
-		return self._on_get
+		result = self.provider().send_sync(self._on_get)
+		return result
 
 	def on_set(self, value):
-		return self._on_set.format(value)
+		result = self.provider().send_sync(self._on_set.format(value))
+		return result
+
+	def provider(self):
+		return self.provider
+
+	def set_provider(self, provider):
+		self.provider = provider
 
 reg['simple_scpi_instrument'] = SimpleSCPIInstrument
 reg['simple_scpi_sensor'] = SimpleSCPISensor

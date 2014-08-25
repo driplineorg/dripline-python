@@ -14,8 +14,8 @@ class Connection(object):
 
 		self._setup_amqp()
 
-#	def __del__(self):
-#		self.conn.close()
+	def __del__(self):
+		self.conn.close()
 
 	# ensures all exchanges are present and creates a
 	# response queue.

@@ -11,7 +11,7 @@ class Agilent34461a(Provider):
 		self.ip_addr = ip_addr
 		self.scpi_port = scpi_port
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.sock.connect(('10.0.0.60',5025))
+		self.sock.connect((ip_addr,scpi_port))
 
 	def add_endpoint(self, sensor):
 		self.sensors[sensor.name] = sensor
