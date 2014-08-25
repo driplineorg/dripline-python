@@ -1,0 +1,20 @@
+nodename: baz
+broker: foo.bar.org
+instruments:
+- name: 'dmm0'
+  model: 'agilent34461a'
+  ip_addr: '255.255.255.255'
+  scpi_port: 5025
+  sensors:
+  - name: 'dmm0_dcv'
+    handler: 'agilent34461a_voltage_input'
+- name: 'dmm1'
+  model: 'agilent34461a'
+  ip_addr: '255.255.255.254'
+  scpi_port: 5025
+  sensors:
+  - name: 'dmm1_dcv'
+    handler: 'agilent34461a_voltage_input'
+  - name: 'dmm1_acv'
+    handler: 'simple_scpi_sensor'
+    on_get: 'MEAS:VOLT:AC?'
