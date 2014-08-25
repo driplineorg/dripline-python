@@ -7,7 +7,6 @@ from setuptools.command.test import test as TestCommand
 verstr = "none"
 try:
     verstr = open("VERSION").read().strip().replace(' ','.')
-    open("dripline/__version.py", mode="w").write("'''This file generated automatically'''\n\n__version__ = '" + verstr + "'")
 except EnvironmentError:
     pass
 except:
