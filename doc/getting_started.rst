@@ -6,7 +6,7 @@ Requirements
 
 Libraries
 *********
-The only required librares are `pika <pika.readthedocs.org>`_ and `PyYAML <pyyaml.org>`_.
+The required librares are `pika <pika.readthedocs.org>`_, `PyYAML <pyyaml.org>`_, and `msgpack <msgpack.org>`_.
 To build this documentation, you also need `sphinx <http://sphinx-doc.org/>`_ and `sphinx_rtd_theme <https://github.com/snide/sphinx_rtd_theme>`_.
 All three can be obtained through `pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
 
@@ -22,11 +22,12 @@ Prepare an Environment
 
 The recommended usage is with a `virtual environment <virtualenv.readthedocs.org/en/latest>`_ and the `ipython <ipython.org>`_ interpreter.
 Assuming you have virtualenv installed (most likely available in the package manager for your system) it is relatively simple to get everything going.
-For the complete experience, you would run the following three commands::
+For the complete experience, you would run the following three commands (the last line installs recommended extras).::
 
 $ virtualenv path/to/virt_environments/dripline
 $ source path/to/virt_environments/dripline/bin/activate
-$ pip install ipython pika PyYAML sphinx sphinx_rtd_theme
+$ pip install pika PyYAML msgpack 
+$ pip install ipython sphinx sphinx_rtd_theme
 
 Note that sphinx is only required if you want to (re)build this documentation and sphinx_rtd_theme is purely cosmetic.
 Similarly, ipython is nice for the user but does not change available dripline features.
