@@ -1,3 +1,7 @@
+'''
+    Constant mappings
+'''
+
 # Operation constants.
 OP_SENSOR_SET = 0
 OP_SENSOR_GET = 1
