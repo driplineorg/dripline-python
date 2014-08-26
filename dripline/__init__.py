@@ -1,3 +1,7 @@
+'''
+    Dripline is moving to the AMQP protocol.
+'''
+
 import pkg_resources
 
 from dripline.constants import *
