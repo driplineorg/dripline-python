@@ -13,6 +13,10 @@ Contents:
 
     spec
     getting_started
+    contribute
+
+.. automodule:: dripline
+    :members:
 
 Indices and tables
 ==================
