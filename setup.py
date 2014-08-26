@@ -38,6 +38,9 @@ setup(
     version = verstr,
     packages = ['dripline'],
     install_requires = ['pika>=0.9.8'],
+    extras_require = {
+        'doc': ['sphinx', 'sphinx_rtd_theme'],
+    },
     url = 'http://www.github.com/project8/dripline',
     tests_require=['pytest'],
     cmdclass = {'test': PyTest}
