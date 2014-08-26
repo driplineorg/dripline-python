@@ -13,18 +13,38 @@ def good_get_set():
 	return {'on_get': 'MEAS:VOLT:DC?', 'on_set': 'MEAS:VOLT:DC {}'}
 
 def test_simple_scpi_get(good_get_set):
+	class MockedInstrument(object):
+		def __init__(self):
+			pass
+		def send_sync(self, data):
+			return 'MOCKED'
+
 	s = SimpleSCPISensor('scpi',**good_get_set)
-	assert s.on_get() == 'MEAS:VOLT:DC?'
+	s.set_provider(MockedInstrument())
+	assert s.on_get() == 'MOCKED'
 
 def test_simple_scpi_set(good_get_set):
+	class MockedInstrument(object):
+		def __init__(self):
+			pass
+		def send_sync(self, data):
+			return 'MOCKED'
 	s = SimpleSCPISensor('scpi',**good_get_set)
-	assert s.on_set(1.0) == 'MEAS:VOLT:DC 1.0'
+	s.set_provider(MockedInstrument())
+	assert s.on_set(1.0) == 'MOCKED'
 
 def test_simple_scpi_registry(good_get_set):
+	class MockedInstrument(object):
+		def __init__(self):
+			pass
+		def send_sync(self, data):
+			return 'MOCKED'
+
 	c = constructor_registry['simple_scpi_sensor']
 	s = c('scpi', **good_get_set)
-	assert s.on_get() == 'MEAS:VOLT:DC?'
-	assert s.on_set(9) == 'MEAS:VOLT:DC 9'
+	s.set_provider(MockedInstrument())
+	assert s.on_get() == 'MOCKED'
+	assert s.on_set(9) == 'MOCKED'
 
 def test_simple_scpi_instrument(good_get_set, monkeypatch):
 	class MockedSocket(object):
