@@ -32,22 +32,23 @@ class SimpleSCPIInstrument(Provider):
 class SimpleSCPISensor(AutoReply):
 	def __init__(self,name,on_get=None,on_set=None):
 		self.name = name
+		self._provider = None
 		self._on_get = on_get
 		self._on_set = on_set
 
 	def on_get(self):
-		result = self.provider().send_sync(self._on_get)
+		result = self._provider.send_sync(self._on_get)
 		return result
 
 	def on_set(self, value):
-		result = self.provider().send_sync(self._on_set.format(value))
+		result = self._provider.send_sync(self._on_set.format(value))
 		return result
 
 	def provider(self):
-		return self.provider
+		return self._provider
 
 	def set_provider(self, provider):
-		self.provider = provider
+		self._provider = provider
 
 reg['simple_scpi_instrument'] = SimpleSCPIInstrument
 reg['simple_scpi_sensor'] = SimpleSCPISensor
