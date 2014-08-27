@@ -75,6 +75,13 @@ or invariants that must be true for your code, write them as tests.  If you are 
 API, ensure that it works as you expect it to!  If you have two methods on some object called ``set_x`` and ``get_x``, 
 write a test to make sure that a call to ``get_x`` after ``set_x`` returns what you expect. 
 
+Don't stop there
+================
+Once your tests pass, you've successfully fulfilled the contract - which is not the same as having the code that
+you really want.  This is a great place to stop and refactor your code to be high quality, while still running tests
+after changing things to verify that you haven't broken anything.  Doing things this way means that while you are
+making your code pretty, the chances of making it wrong are dramatically reduced!
+
 Adding Tests
 ============
 If you suspect that some part of the dripline codebase may be fragile or break in some edge case, feel free to add a test
