@@ -37,7 +37,7 @@ setup(
     name = 'dripline',
     version = verstr,
     packages = ['dripline'],
-    install_requires = ['pika>=0.9.8'],
+    install_requires = ['pika>=0.9.8', 'PyYAML', 'msgpack-python'],
     extras_require = {
         'doc': ['sphinx', 'sphinx_rtd_theme'],
     },
