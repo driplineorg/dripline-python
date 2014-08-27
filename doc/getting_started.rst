@@ -67,3 +67,23 @@ belongs to a provider called ``local``.  The name for the dripline node that
 will be started is ``random_node``, and the node will try to connect to
 an AMQP broker running on ``localhost``.
 
+On that note, you need an AMQP broker running to run the example code.  Install
+an instance of RabbitMQ server to the host of your choice, and start it.  No
+configuration is necessary at all - dripline will take care of the rest.
+
+To start the node which is providing the random number generating service,
+simply do the following from the examples directory:
+
+.. code-block:: bash
+
+	$ ./rng_demo_node.py
+
+Now, to start the client which will request a single random number and print it
+to the screen, do
+
+.. code-block:: bash
+
+	$ ./rng_demo_client.py
+
+You should see some log entries about connections, and a random floating point
+number between 0 and 1!
