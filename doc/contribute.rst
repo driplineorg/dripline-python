@@ -43,7 +43,7 @@ immediately:
 
 This is the crux of test driven development: we want to write tests that establish a contract for the code that we
 haven't written yet.  We know how we *want* it to behave - and so we specify that as a test, and have a testing framework
-run our tests for us.  Dripline uses the excellent `py.test <pytest.org>`_ for this, and an extensive number of tests
+run our tests for us.  Dripline uses the excellent `py.test <http://pytest.org>`_ for this, and an extensive number of tests
 is in the ``test`` subdirectory of the dripline source tree.
 
 Contributing with TDD
