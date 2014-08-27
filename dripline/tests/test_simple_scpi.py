@@ -2,8 +2,6 @@ import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
-import mock
-
 import pytest
 from simple_scpi import SimpleSCPISensor, SimpleSCPIInstrument
 from factory import constructor_registry
