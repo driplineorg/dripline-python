@@ -22,47 +22,12 @@ class Message(object):
         self.payload = payload
         self.exceptions = exceptions
     
-    @property
-    def msgop(self):
-        return self._msgop
-    @msgop.setter
-    def msgop(self, value):
-        self._msgop = value
-
-    @property
-    def target(self):
-        return self._target
-    @target.setter
-    def target(self, value):
-        self._target = value
-     
-    @property
-    def timestamp(self):
-        return self._timestamp
-    @timestamp.setter
-    def timestamp(self, value):
-        self._timestamp = value
-
-    @property
-    def payload(self):
-        return self._payload
-    @payload.setter
-    def payload(self, value):
-        self._payload = value
-      
-    @property
-    def exceptions(self):
-        return self._exceptions
-    @exceptions.setter
-    def exceptions(self, value):
-        self._exceptions = value
-
     @classmethod
     def from_dict(cls, msg):
         res = empty_msg_dict.copy()
         res.update(msg)
 
-        msgtype = res.pop('msgtype',None)
+        msgtype = res.pop('msgtype', None)
 
         for case in switch(msgtype):
             if case(constants.T_REPLY):
@@ -78,7 +43,7 @@ class Message(object):
 
     @classmethod
     def from_msgpack(cls, msg):
-        return msgpack.unpackb(msg, object_hook=Message.from_dict)
+        return msgpack.unpackb(msg, object_hook=cls.from_dict)
 
     def to_msgpack(self):
         d = {
