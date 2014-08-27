@@ -11,9 +11,9 @@ sys.path.insert(0, myPath + '/../')
 @pytest.fixture
 def basic_request_msg():
     d = {
-    	'msgtype': dc.T_REQUEST,
-    	'msgop': dc.OP_SENSOR_GET,
-    	'target': 'foo'
+        'msgtype': dc.T_REQUEST,
+        'msgop': dc.OP_SENSOR_GET,
+        'target': 'foo'
     }
     return d
 
