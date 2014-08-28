@@ -52,6 +52,11 @@ dripline.message module
     :undoc-members:
     :show-inheritance:
 
+.. autoclass:: dripline.message.Message
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 dripline.node module
 --------------------
 
