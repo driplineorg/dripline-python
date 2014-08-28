@@ -1,9 +1,18 @@
+'''
+    Meta and derived classes for dripline messages
+'''
+
+__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage']
+
 import constants
 import msgpack
 from abc import ABCMeta, abstractproperty, abstractmethod
 
 
 class Message(dict, object):
+    '''
+        metaclass for dripline messages
+    '''
     __metaclass__ = ABCMeta
 
     def __init__(self, msgop=None, target=None, timestamp=None, payload=None, exceptions=None):
@@ -79,6 +88,9 @@ class Message(dict, object):
         return msgpack.packb(temp_dict)
     
 class ReplyMessage(Message):
+    '''
+        Derrived class for Reply type messages
+    '''
     @property
     def msgtype(self):
         return constants.T_REPLY
