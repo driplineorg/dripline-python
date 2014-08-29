@@ -52,12 +52,12 @@ def identical_names_conf():
     return conf
 
 @pytest.mark.xfail(raises=ValueError)
-def test_identical_names_is_error(identical_names_conf):
+def test_identical_endpoints_error(identical_names_conf):
     """Verify that identically named endpoints are forbidden.
     Should this be a ValueError for the key name?"""
     Config.from_string(identical_names_conf)
 
-def test_identical_names_error_info(identical_names_conf):
+def test_identical_endpoints_info(identical_names_conf):
     """The error should contain information about where in the
     configuration file the error occurred, and why.  In this case,
     the name is already taken by another endpoint which is local
@@ -65,11 +65,25 @@ def test_identical_names_error_info(identical_names_conf):
     `endpoint` is unavailable, because it is already reserved by
     another endpoint.  Furthermore, the endpoint which already has
     the name is called out along with its provider.  The error should
-    contain the string \"(origin provider/endpoint)\"."""
+    contain the string \"(origin endpoint: provider/endpoint)\"."""
     with pytest.raises(ValueError) as excinfo:
         Config.from_string(identical_names_conf)
+        assert "(origin endpoint: boff/endpoint0)" in excinfo.value.message
 
-        assert "(origin boff/endpoint0)" in excinfo.value.message
+@pytest.mark.xfail(raises=ValueError)
+def test_identical_providers_error(identical_names_conf):
+    """Verify that identically named providers are forbidden.
+    Should this be a ValueError for the key name?"""
+    Config.from_string(identical_names_conf)
+
+def test_identical_providers_info(identical_names_conf):
+    """Identical provider names is also an error.  The error message
+    should contain the string \"(origin provider: provider_name)\"."""
+    with pytest.raises(ValueError) as excinfo:
+        Config.from_string(identical_names_conf)
+        assert "(origin provider: provider0)" in excinfo.value.message
+
+
 
 
 
