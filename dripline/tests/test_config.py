@@ -44,6 +44,10 @@ def identical_names_conf():
     """
     conf = """
     broker: foo.bar.baz
+    nodename: boff
+    endpoints:
+    - name: endpoint0
+    - name: endpoint0
     """
     return conf
 
@@ -53,6 +57,19 @@ def test_identical_names_is_error(identical_names_conf):
     Should this be a ValueError for the key name?"""
     Config.from_string(identical_names_conf)
 
+def test_identical_names_error_info(identical_names_conf):
+    """The error should contain information about where in the
+    configuration file the error occurred, and why.  In this case,
+    the name is already taken by another endpoint which is local
+    to this node.  The error should therefore indicate that the name
+    `endpoint` is unavailable, because it is already reserved by
+    another endpoint.  Furthermore, the endpoint which already has
+    the name is called out along with its provider.  The error should
+    contain the string \"(origin provider/endpoint)\"."""
+    with pytest.raises(ValueError) as excinfo:
+        Config.from_string(identical_names_conf)
+
+        assert "(origin boff/endpoint0)" in excinfo.value.message
 
 
 
