@@ -13,9 +13,9 @@ LOGGER = logging.getLogger(__name__)
 STREAM_HANDLER = logging.StreamHandler()
 MSG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 FORMATTER = logging.Formatter(MSG_FORMAT)
-ch.setFormatter(FORMATTER)
-logger.setLevel(logging.INFO)
-logger.addHandler(STREAM_HANDLER)
+STREAM_HANDLER.setFormatter(FORMATTER)
+LOGGER.setLevel(logging.INFO)
+LOGGER.addHandler(STREAM_HANDLER)
 
 
 class Config(object):
