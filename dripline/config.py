@@ -55,24 +55,52 @@ class Config(object):
     For further examples of configuration files, see the configuration.yaml
     file in the examples directory.
     # TODO configuration.yaml file a la rebar.config demo file.
-
     """
 
     def __init__(self, config_file=None):
+        """
+        Construct a Config instance with its configuration data based on the
+        content of the YAML file specified in config_file.  If the configuration
+        data is invalid, various exceptions may be raised:
+
+        * In the case of duplicate names at the provider or endpoint level, a
+        ValueError will be raised with a description of the duplication.
+
+        * If any names contain periods, a ValueError will be raised with a
+        description of the offending datum.
+
+        If __init__ succeeds, the resulting Config object may be used to
+        instantiate a Node object.
+
+        Note: Config has no association with the network whatsoever.  It does
+        not check that e.g. there is an AMQP server available at the address
+        specified in the YAML configuration file.  Therefore, while the
+        connectivity of the graph is guaranteed by the Config class, the
+        correct network configuration cannot be verified until a Node is
+        constructed.
+        """
         self.nodename = None
         self.broker = None
         self.instruments = {}
+        # TODO what happens if the config file is missing?
         if config_file is not None:
-            with open(config_file) as cf:
-                self.from_yaml(cf.read())
+            with open(config_file) as config:
+                self._from_yaml(config.read())
 
     def instrument_count(self):
-        if self.instruments is not None:
-            return len(self.instruments.keys())
-        else:
-            return 0
+        """
+        Returns the number of providers which are associated with the node,
+        exclusive of the node itself.  This means that for a configuration file
+        which contains no providers, provider_count will return zero.
+        """
+        return len(self.instruments.keys())
 
-    def from_yaml(self, yaml_string):
+    def _from_yaml(self, yaml_string):
+        """
+        Generates a dictionary of objects and their relationships from a
+        YAML configuration file.  If the configuration file is invalid for
+        any reason, an exception is thrown.
+        """
         rep = safe_load(yaml_string)
         self.nodename = rep['nodename']
         self.broker = rep['broker']
