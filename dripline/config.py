@@ -6,7 +6,7 @@ class Config(object):
     def __init__(self, config_file=None):
         self.nodename = None
         self.broker = None
-        self.endpoints = {}
+        self.instruments = {}
         if config_file is not None:
             with open(config_file) as cf:
                 self.from_yaml(cf.read())
@@ -22,9 +22,14 @@ class Config(object):
         self.nodename = rep['nodename']
         self.broker = rep['broker']
         if 'instruments' in rep:
-            self.instruments = {}
             for instrument in rep['instruments']:
                 instr_name = instrument.pop('name')
+                if self.instruments.has_key(instr_name):
+                    msg = """
+                    duplicate definition: provider with name {} already defined!
+                    (origin provider: {}/{})
+                    """.format(instr_name, self.nodename, instr_name)
+                    raise ValueError(msg)
                 self.instruments[instr_name] = instrument
         else:
             self.instruments = None
