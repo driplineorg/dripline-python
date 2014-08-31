@@ -1,0 +1,92 @@
+# Dripline uses YAML as its configuration file format.  This allows you to 
+# specify rich hierarchical structures in a readable way.  Every possible
+# configuration flag is represented below, with a full description of what
+# it means and how it is interpreted by the system.
+
+# The first and most basic configuration option is the name that this node
+# will have on the dripline mesh.  The node name must follow the standard
+# allowable naming convention - that is, no periods.
+nodename: some_understandable_name
+
+# Once started, dripline will attempt to connect to a broker which is at the
+# address below.  It assumes the default port for the AMQP server and no other
+# configuration of the server is necessary.  This means that simply downloading
+# and starting e.g. RabbitMQ on a server and providing the address below is all
+# the network configuration which is necessary for dripline.  Note that 
+# of course periods are permitted here.
+broker: amqp.server.address
+
+# There may be endpoints which are attached to the node itself such as 
+# CPU temperature, disk space monitors, and so on and so forth.  To avoid 
+# lexical confusion, it's recommended that the `endpoints' list occur *before*
+# the `providers' list in the configuration file - but by no means is this 
+# required.  If no endpoints are to be registered at the node level, it may
+# be omitted entirely.
+endpoints:
+
+  # The name of the endpoint.  This must be a unique string and must follow the
+  # dripline naming conventions.  Once dripline is started, this will appear on
+  # the dripline mesh as *both* nodename.endpoint and as simply endpoint.  
+  # For the following configuration, dripline will do the following:
+  # 0) verify that some_endpoint_name is unique and valid
+  # 1) look up the type corresponding to endpoint_module_0
+  # 2) call that type's constructor with the following named arguments:
+  #    a) {
+  #        'some_argument': 'whatever_this_is',
+  #        'another_argument': [
+  #               'sure_these_can_have_depth',
+  #				  {
+  #				   'and_even': 'contain_more_k_v_data',
+  #				   'why_not_numeric': 2.5
+  #				  }
+  #        ]
+  #       }
+  # If those arguments don't make sense to the object that's described by a 
+  # configuration datum, dripline will make a lot of noise and let you know.
+- name: some_endpoint_name
+
+  # The module which is responsible for processing requests which are addressed
+  # to this endpoint.  Dripline uses an internal mechanism to map strings to 
+  # types, and uses the module string to construct an object.
+  module: endpoint_module_0
+
+  # The only information that dripline *needs* is the name and module to
+  # refer to an object and present it to the network.  However, that doesn't
+  # make for very interesting systems.  The rest of the key-value arguments that
+  # appear in the configuration item will be presented to the constructor of the
+  # object and can be used to pass arbitrary configuration data.
+  some_argument: whatever_this_is
+  another_argument:
+  - sure_these_can_have_depth
+  - and_even: contain_more_k_v_data
+    why_not_numeric: 2.5
+
+# Dripline is conceptually divided into providers and endpoints.  A node is the
+# simplest type of provider, and may have endpoints attached to it.  It may also
+# have providers attached to it, and the node-level providers are described in 
+# the list called `providers'.
+providers:
+
+# The name of the provider.  This must be a unique string and must follow the
+# dripline naming conventions as described in the documentation.
+- name: some_provider_name
+  # The module string tells dripline how to construct the provider that is
+  # described in this item.  Internal to dripline there is a mapping between
+  # strings and types, and the string below tells dripline which type is
+  # responsible for handling this particular provider.  
+  module: provider_module_0
+
+  # providers may have endpoints.  I'll omit the documentation for the options
+  # here - they are redundant with that above.
+  endpoints:
+  - name: some_attached_endpoint
+    module: mod_0
+  - name: another_attached_endpoint
+    module: mod_1
+    other_data: 
+    - here_it_is
+    - it_could_be:
+    	- arbitrarily_nested
+    	- as_long_as:
+    		- it_makes_sense_to_the_module
+    		- as_initialization_data
