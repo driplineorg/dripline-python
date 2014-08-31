@@ -5,7 +5,17 @@ is the in-memory representation of the configuration of a dripline node.
 
 """
 
+from __future__ import with_statement
 from yaml import safe_load
+
+import logging
+LOGGER = logging.getLogger(__name__)
+STREAM_HANDLER = logging.StreamHandler()
+MSG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+FORMATTER = logging.Formatter(MSG_FORMAT)
+ch.setFormatter(FORMATTER)
+logger.setLevel(logging.INFO)
+logger.addHandler(STREAM_HANDLER)
 
 
 class Config(object):
@@ -82,10 +92,16 @@ class Config(object):
         self.nodename = None
         self.broker = None
         self.instruments = {}
-        # TODO what happens if the config file is missing?
         if config_file is not None:
-            with open(config_file) as config:
-                self._from_yaml(config.read())
+            try:
+                with open(config_file) as config:
+                    self._from_yaml(config.read())
+            except IOError, err:
+                msg = """
+                couldn't open config file {} (io error occurred: {})
+                """.format(config_file, err.message)
+                LOGGER.error(msg)
+                raise err
 
     def instrument_count(self):
         """
@@ -94,6 +110,12 @@ class Config(object):
         which contains no providers, provider_count will return zero.
         """
         return len(self.instruments.keys())
+
+    def get_provider(self, provider_name):
+        """
+        Return the data associated with a given provider.
+        """
+        return self[provider_name]
 
     def _from_yaml(self, yaml_string):
         """
