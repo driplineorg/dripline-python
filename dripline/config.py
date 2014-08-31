@@ -1,3 +1,10 @@
+""" config.py
+
+This module contains the definition of the Config class.  The Config class
+is the in-memory representation of the configuration of a dripline node.
+
+"""
+
 from yaml import safe_load
 
 
@@ -30,6 +37,9 @@ class Config(object):
                     (origin provider: {}/{})
                     """.format(instr_name, self.nodename, instr_name)
                     raise ValueError(msg)
+
+                # TODO repeat the check inside the provider to catch duplicate
+                # endpoint names.
                 self.instruments[instr_name] = instrument
         else:
             self.instruments = None
