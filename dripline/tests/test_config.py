@@ -34,11 +34,11 @@ def test_config_instrument_2(good_conf):
 
 # This section tests that various bad configurations return
 # the expected (very informative) errors.
-@pytest.mark.xfail(raises=ValueError)
 def test_identical_endpoints_error():
     """Verify that identically named endpoints are forbidden.
     Should this be a ValueError for the key name?"""
-    c = Config(myPath + "/identical_names_conf.yaml")
+    with pytest.raises(ValueError):
+        Config(myPath + "/identical_names_conf.yaml")
 
 def test_identical_endpoints_info():
     """The error should contain information about where in the
@@ -50,18 +50,5 @@ def test_identical_endpoints_info():
     the name is called out along with its provider.  The error should
     contain the string \"(origin endpoint: provider/endpoint)\"."""
     with pytest.raises(ValueError) as excinfo:
-        c = Config(myPath + "/identical_names_conf.yaml")
-        assert "(origin endpoint: boff/endpoint0)" in excinfo.value.message
-
-@pytest.mark.xfail(raises=ValueError)
-def test_identical_providers_error():
-    """Verify that identically named providers are forbidden.
-    Should this be a ValueError for the key name?"""
-    c = Config(myPath + "/identical_names_conf.yaml")
-
-def test_identical_providers_info():
-    """Identical provider names is also an error.  The error message
-    should contain the string \"(origin provider: provider_name)\"."""
-    with pytest.raises(ValueError) as excinfo:
-        c = Config(myPath + "/identical_names_conf.yaml")
-        assert "(origin provider: provider0)" in excinfo.value.message
+        Config(myPath + "/identical_names_conf.yaml")
+    assert "(origin provider: abc/a_provider)" in excinfo.value.message
