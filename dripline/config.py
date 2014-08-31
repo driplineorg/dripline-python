@@ -7,6 +7,7 @@ is the in-memory representation of the configuration of a dripline node.
 
 from __future__ import with_statement
 from yaml import safe_load
+from sets import Set
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -17,6 +18,10 @@ STREAM_HANDLER.setFormatter(FORMATTER)
 LOGGER.setLevel(logging.INFO)
 LOGGER.addHandler(STREAM_HANDLER)
 
+DUP_MESSAGE = """
+            duplicate definition: {category} with name {name} already
+            defined!  (origin {category}: {node}/{provider}/{endpoint})
+            """
 
 class Config(object):
     """
@@ -64,7 +69,6 @@ class Config(object):
 
     For further examples of configuration files, see the configuration.yaml
     file in the examples directory.
-    # TODO configuration.yaml file a la rebar.config demo file.
     """
 
     def __init__(self, config_file=None):
@@ -91,7 +95,8 @@ class Config(object):
         """
         self.nodename = None
         self.broker = None
-        self.instruments = {}
+        self.providers = {}
+        self.names = Set()
         if config_file is not None:
             try:
                 with open(config_file) as config:
@@ -103,13 +108,13 @@ class Config(object):
                 LOGGER.error(msg)
                 raise err
 
-    def instrument_count(self):
+    def provider_count(self):
         """
         Returns the number of providers which are associated with the node,
         exclusive of the node itself.  This means that for a configuration file
         which contains no providers, provider_count will return zero.
         """
-        return len(self.instruments.keys())
+        return len(self.providers.keys())
 
     def get_provider(self, provider_name):
         """
@@ -125,19 +130,30 @@ class Config(object):
         """
         rep = safe_load(yaml_string)
         self.nodename = rep['nodename']
+        self.names.add(self.nodename)
         self.broker = rep['broker']
-        if 'instruments' in rep:
-            for instrument in rep['instruments']:
-                instr_name = instrument.pop('name')
-                if self.instruments.has_key(instr_name):
-                    msg = """
-                    duplicate definition: provider with name {} already defined!
-                    (origin provider: {}/{})
-                    """.format(instr_name, self.nodename, instr_name)
+        if 'providers' in rep:
+            for provider in rep['providers']:
+                prov_name = provider.pop('name')
+                if prov_name in self.names:
+                    msg = DUP_MESSAGE.format(category="provider",
+                                             name=prov_name,
+                                             node=self.nodename,
+                                             provider=prov_name,
+                                             endpoint="none")
                     raise ValueError(msg)
+                else:
+                    self.names.add(prov_name)
 
-                # TODO repeat the check inside the provider to catch duplicate
-                # endpoint names.
-                self.instruments[instr_name] = instrument
-        else:
-            self.instruments = None
+                if provider.has_key('endpoints'):
+                    for endpoint in provider['endpoints']:
+                        if endpoint['name'] in self.names:
+                            msg = DUP_MESSAGE.format(category="endpoint",
+                                                     name=endpoint['name'],
+                                                     node=self.nodename,
+                                                     provider=prov_name,
+                                                     endpoint=endpoint['name']
+                                                    )
+
+                # all good, let's adopt the provider.
+                self.providers[prov_name] = provider
