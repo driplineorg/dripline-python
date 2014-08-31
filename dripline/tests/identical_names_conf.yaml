@@ -1,5 +1,5 @@
 broker: foo.bar.baz
 nodename: abc
-instruments:
+providers:
 - name: a_provider
 - name: a_provider

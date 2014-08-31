@@ -1,5 +1,5 @@
 nodename: baz
 broker: foo.bar.org
-instruments:
+providers:
 - {'name': 'box_with_knobs', 'model': 'black_magic_12'}
 - {'name': 'another_box_with_knobs', 'model': 'black_magic_13'}

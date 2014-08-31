@@ -22,19 +22,19 @@ class Node(object):
 		return self.conf.nodename
 
 	def _build_object_graph(self):
-		if self.conf.instrument_count() > 0:
-			for name, items in self.conf.instruments.iteritems():
-				instr_model = items['model']
-				constructor = cr[instr_model]
+		if self.conf.provider_count() > 0:
+			for name, items in self.conf.providers.iteritems():
+				provider_module = items['module']
+				constructor = cr[provider_module]
 
-				logger.info('adding instrument {}'.format(name))
+				logger.info('adding provider {}'.format(name))
 				obj = constructor(name, items)
-				
-				for sensor in items['sensors']:
-					handler = sensor.pop('handler')
-					sensor_name = sensor.pop('name')
-					s = cr[handler](sensor_name, **sensor)
-					logger.info('adding sensor {} to instrument {}'.format(sensor_name, name))
+
+				for endpoint in items['endpoints']:
+					handler = endpoint.pop('module')
+					endpoint_name = endpoint.pop('name')
+					s = cr[handler](endpoint_name, **endpoint)
+					logger.info('adding sensor {} to provider {}'.format(endpoint_name, name))
 					obj.add_endpoint(s)
 
 					# oh god

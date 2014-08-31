@@ -22,14 +22,14 @@ def test_host_config(good_conf):
     assert good_conf.broker == 'foo.bar.org'
 
 def test_config_has_instruments(good_conf):
-    assert good_conf.instrument_count() == 2
+    assert good_conf.provider_count() == 2
 
 def test_config_instrument_1(good_conf):
-    instrument = good_conf.instruments['box_with_knobs']
+    instrument = good_conf.providers['box_with_knobs']
     assert instrument['model'] == 'black_magic_12'
 
 def test_config_instrument_2(good_conf):
-    instrument = good_conf.instruments['another_box_with_knobs']
+    instrument = good_conf.providers['another_box_with_knobs']
     assert instrument['model'] == 'black_magic_13'
 
 # This section tests that various bad configurations return
@@ -51,4 +51,4 @@ def test_identical_endpoints_info():
     contain the string \"(origin endpoint: provider/endpoint)\"."""
     with pytest.raises(ValueError) as excinfo:
         Config(myPath + "/identical_names_conf.yaml")
-    assert "(origin provider: abc/a_provider)" in excinfo.value.message
+    assert "(origin provider: abc/a_provider/none)" in excinfo.value.message
