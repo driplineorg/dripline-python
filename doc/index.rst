@@ -19,7 +19,7 @@ Contents:
 Indices and tables
 ==================
 
+* :ref:`parlance`
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
