@@ -19,7 +19,7 @@ class Connection(object):
 
     def _setup_amqp(self):
         '''
-            ensures all exchanges are present and creates a response queue.
+        ensures all exchanges are present and creates a response queue.
         '''
         self.chan.exchange_declare(exchange='requests',type='topic')
         self.queue = self.chan.queue_declare(exclusive=True)
@@ -35,9 +35,9 @@ class Connection(object):
 
     def bind(self, to_bind):
         '''
-            bind a sensor to the connection.  this forwards requests which are
-            intended for that sensor to the object which is bound by this
-            method.
+        bind a sensor to the connection.  this forwards requests which are
+        intended for that sensor to the object which is bound by this
+        method.
         '''
         if isinstance(to_bind, Sensor):
             self._bind_sensor(to_bind)
@@ -63,7 +63,7 @@ class Connection(object):
 
     def send_request(self, target, request):
         '''
-            send a request to a specific consumer.
+        send a request to a specific consumer.
         '''
         self.response = None
         self.corr_id = str(uuid.uuid4())
