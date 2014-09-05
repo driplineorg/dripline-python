@@ -44,6 +44,9 @@ class SimpleSCPISensor(AutoReply):
 		result = self._provider.send_sync(self._on_set.format(value))
 		return result
 
+	def on_config(self):
+		raise NotImplementedError
+
 	def provider(self):
 		return self._provider
 
