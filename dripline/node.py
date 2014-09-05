@@ -60,11 +60,11 @@ class Node(object):
                 for endpoint in items['endpoints']:
                     handler = endpoint.pop('module')
                     endpoint_name = endpoint.pop('name')
-                    s = cr[handler](endpoint_name, **endpoint)
-                    logger.info('adding endpoint {} to provider {}'.format(endpoint_name, name))
-                    obj.add_endpoint(s)
-
-                    self.conn.bind(s)
+                    endpoint_instance = cr[handler](endpoint_name, **endpoint)
+                    log_msg = 'adding endpoint {} to provider {}'
+                    logger.info(log_msg.format(endpoint_name, name))
+                    obj.add_endpoint(endpoint_instance)
+                    self.conn.bind(endpoint_instance)
 
                 self.add_provider(obj)
 
