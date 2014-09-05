@@ -154,6 +154,7 @@ class Config(object):
                                                      provider=prov_name,
                                                      endpoint=endpoint['name']
                                                     )
+                            raise ValueError(msg)
 
                 # all good, let's adopt the provider.
                 self.providers[prov_name] = provider
