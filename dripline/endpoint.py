@@ -12,6 +12,18 @@ class Endpoint(object):
     def handle_request(self, channel, method, properties, request):
         pass
 
+    @abstractmethod
+    def on_get(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def on_set(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def on_config(self):
+        raise NotImplementedError
+        
 class AutoReply(Endpoint):
     __metaclass__ = ABCMeta
 
@@ -30,10 +42,3 @@ class AutoReply(Endpoint):
             self.send_reply(channel, properties, result)
             channel.basic_ack(delivery_tag=method.delivery_tag)
 
-    @abstractmethod
-    def on_get(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def on_set(self):
-        raise NotImplementedError
