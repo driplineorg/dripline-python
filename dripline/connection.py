@@ -34,32 +34,6 @@ class Connection(object):
         if self.corr_id == props.correlation_id:
             self.response = response
 
-    def bind(self, to_bind):
-        '''
-        bind a sensor to the connection.  this forwards requests which are
-        intended for that sensor to the object which is bound by this
-        method.
-        '''
-        # TODO: need to back this up in terms of complexity.  do we really need
-        # multiple type checks?  I doubt it.
-        if isinstance(to_bind, Sensor) or isinstance(to_bind, Endpoint):
-            self._bind_sensor(to_bind)
-        else:
-            raise TypeError("expected instance of abstract class Sensor")
-
-    def _bind_sensor(self, sensor):
-        sensor_queue = self.chan.queue_declare(exclusive=True)
-
-        self.chan.queue_bind(exchange='requests',
-                            queue=sensor_queue.method.queue,
-                            routing_key=sensor.name)
-        self.chan.queue_bind(exchange='requests',
-                            queue=sensor_queue.method.queue,
-                            routing_key='sensors.'+sensor.name)
-
-        self.chan.basic_consume(sensor.handle_request,
-                                queue=sensor_queue.method.queue)
-
     def start(self):
         while True:
             self.conn.process_data_events()
