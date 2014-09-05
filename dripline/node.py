@@ -18,9 +18,9 @@ class Node(object):
         self.conn = Connection(self.conf.broker)
 
         # TODO: bind nodename/providers/endpoints to connection
-        self.bind_endpoint('nodename', on_get=self.nodename)
-        self.bind_endpoint('providers', on_get=self.provider_list)
-        self.bind_endpoint('endpoints', on_get=self.provider_endpoints)
+        self.bind('nodename', on_get=self.nodename)
+        self.bind('providers', on_get=self.provider_list)
+        self.bind('endpoints', on_get=self.provider_endpoints)
 
         self.providers = {}
 
@@ -49,11 +49,13 @@ class Node(object):
 
                 self.add_provider(obj)
 
-    def bind_endpoint(self, name, on_get=None, on_set=None, on_config=None):
+    # TODO: what happens when some params are None?
+    def bind(self, name, on_get=None, on_set=None, on_config=None):
         """
-        Bind an endpoint to the dripline node.  Once an endpoint is bound by
-        name, it has an address and may be found on the dripline node by
-        that name.
+        Bind an arbitrary set of set/get/config functions to the
+        dripline node.  Note that currently this cannot be called
+        directly in a configuration file!  It is only used internally
+        by dripline.
         """
         ep_queue = self.conn.chan.queue_declare(exclusive=True)
         binding = Binding(name, on_get, on_set, on_config)
@@ -63,6 +65,17 @@ class Node(object):
                                   routing_key=name)
         self.conn.chan.basic_consume(binding.handle_request,
                                      queue=ep_queue.method.queue)
+
+    def bind_endpoint(self, endpoint):
+        """
+        Bind an endpoint to the dripline node.  Once an endpoint is bound by
+        name, it has an address and may be found on the dripline node by
+        that name.
+        """
+        self.bind(endpoint.name,
+                  on_get=endpoint.on_get,
+                  on_set=endpoint.on_set,
+                  on_config=endpoint.on_config)
 
     def provider_list(self):
         return self.providers.keys()
