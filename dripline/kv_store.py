@@ -9,8 +9,11 @@ providers:
       module: kv_store
       endpoints:
         -name: 'foo'
+         module: 'kv_store_key'
         -name: 'bar'
+         module: 'kv_store_key'
         -name: 'baz'
+         module: 'kv_store_key'
 Then the KV store will have three keys, foo, bar, and
 baz, which are associated with it.  They can be addressed
 as such on the network, or can also be addressed using their
