@@ -72,14 +72,26 @@ def good_node(good_conf, monkeypatch):
         def __init__(self,a):
             pass
         def channel(self):
-            return None
+            def queue_declare(*args, **kwargs):
+                class MockedMethod(object):
+                    queue = None
+                return type('__queue',(),{'method': MockedMethod()})()
+            def queue_bind(*args, **kwargs):
+                return None
+            def basic_consume(*args, **kwargs):
+                return None
+            return type('__chan',(),{'queue_declare': queue_declare,
+                                     'queue_bind': queue_bind,
+                                     'basic_consume': basic_consume})()
         def close(self):
             return None
+
 
     monkeypatch.setattr('pika.BlockingConnection', MockedBlockingConnection)
     monkeypatch.setattr('pika.BlockingConnection.channel', MockedBlockingConnection.channel)
     monkeypatch.setattr('connection.Connection._setup_amqp',lambda x: None)
     monkeypatch.setattr('connection.Connection._bind_sensor',lambda x, y: None)
+
     node = Node(good_conf)
     return node
 
@@ -104,7 +116,17 @@ def bare_node(bare_conf, monkeypatch):
         def __init__(self,a):
             pass
         def channel(self):
-            return None
+            def queue_declare(*args, **kwargs):
+                class MockedMethod(object):
+                    queue = None
+                return type('__queue',(),{'method': MockedMethod()})()
+            def queue_bind(*args, **kwargs):
+                return None
+            def basic_consume(*args, **kwargs):
+                return None
+            return type('__chan',(),{'queue_declare': queue_declare,
+                                     'queue_bind': queue_bind,
+                                     'basic_consume': basic_consume})()
         def close(self):
             return None
 
