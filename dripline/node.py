@@ -27,6 +27,9 @@ class Node(object):
         self._build_object_graph()
 
     def nodename(self):
+        """
+        Returns the name of the node on the dripline mesh.
+        """
         return self.conf.nodename
 
     def _build_object_graph(self):
