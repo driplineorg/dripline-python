@@ -30,6 +30,15 @@ class Node(object):
         return self.conf.nodename
 
     def _build_object_graph(self):
+        """
+        From the configuration data, this method constructs an object graph in
+        memory.  The object graph connects objects which are related by a
+        provider -> endpoint relationship.  During the process of building
+        the object graph, class instances which are responsible for the
+        providers and endpoints are instantiated.  Bindings are also created
+        for endpoints during this process.  Once this method returns, all
+        providers and endpoints have been bound to the node.
+        """
         if self.conf.provider_count() > 0:
             for name, items in self.conf.providers.iteritems():
                 provider_module = items['module']
