@@ -39,6 +39,9 @@ class VoltageInput(AutoReply):
 	def on_set(self):
 		raise NotImplementedError
 
+	def on_config(self):
+		raise NotImplementedError
+
 	def provider(self):
 		return self.provider
 
