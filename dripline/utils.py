@@ -1,3 +1,12 @@
+""" utils.py
+Various useful functions, classes, and decorators are defined in this module
+for use throughout dripline.
+"""
+import pika
+import constants
+from message import Message
+from endpoint import Endpoint
+
 # This is stolen from the internet.
 class switch(object):
     def __init__(self, value):
@@ -8,7 +17,7 @@ class switch(object):
         """Return the match method once, then stop"""
         yield self.match
         raise StopIteration
-    
+
     def match(self, *args):
         """Indicate whether or not to enter a case suite"""
         if self.fall or not args:
