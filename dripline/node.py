@@ -11,6 +11,13 @@ logger.addHandler(ch)
 
 
 class Node(object):
+    """
+    The Node is the core abstraction in the dripline model.  A Node object
+    represents an entity on the dripline mesh which can send and receive
+    messages.  Providers 'belong' to the Node, and endpoints are attached
+    to the Node through the bind and bind_endpoint methods for a given Node
+    instance.
+    """
     def __init__(self, configuration):
         self.conf = configuration
         logger.info('connecting to broker {}'.format(self.conf.broker))
@@ -89,6 +96,7 @@ class Node(object):
                   on_set=endpoint.on_set,
                   on_config=endpoint.on_config)
 
+    # TODO: god these names are awkward, who came up with this???
     def provider_list(self):
         return self.providers.keys()
 
