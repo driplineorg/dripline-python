@@ -90,7 +90,6 @@ def good_node(good_conf, monkeypatch):
     monkeypatch.setattr('pika.BlockingConnection', MockedBlockingConnection)
     monkeypatch.setattr('pika.BlockingConnection.channel', MockedBlockingConnection.channel)
     monkeypatch.setattr('connection.Connection._setup_amqp',lambda x: None)
-    monkeypatch.setattr('connection.Connection._bind_sensor',lambda x, y: None)
 
     node = Node(good_conf)
     return node
@@ -133,7 +132,6 @@ def bare_node(bare_conf, monkeypatch):
     monkeypatch.setattr('pika.BlockingConnection', MockedBlockingConnection)
     monkeypatch.setattr('pika.BlockingConnection.channel', MockedBlockingConnection.channel)
     monkeypatch.setattr('connection.Connection._setup_amqp',lambda x: None)
-    monkeypatch.setattr('connection.Connection._bind_sensor',lambda x, y: None)
     node = Node(bare_conf)
     return node
 
