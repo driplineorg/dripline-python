@@ -6,18 +6,12 @@ import pika
 class Endpoint(object):
     __metaclass__ = ABCMeta
 
-    # when a endpoint is bound to a connection, it will receive requests
-    # in its handle_request method.
-    @abstractmethod
-    def handle_request(self, channel, method, properties, request):
-        pass
-
     @abstractmethod
     def on_get(self):
         raise NotImplementedError
 
     @abstractmethod
-    def on_set(self):
+    def on_set(self, value):
         raise NotImplementedError
 
     @abstractmethod
