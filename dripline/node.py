@@ -64,7 +64,7 @@ class Node(object):
                     log_msg = 'adding endpoint {} to provider {}'
                     logger.info(log_msg.format(endpoint_name, name))
                     obj.add_endpoint(endpoint_instance)
-                    self.conn.bind(endpoint_instance)
+                    self.bind_endpoint(endpoint_instance)
 
                 self.add_provider(obj)
 
