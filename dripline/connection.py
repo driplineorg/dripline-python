@@ -1,5 +1,6 @@
 import pika
 import uuid
+from endpoint import Endpoint
 from sensor import Sensor
 
 import logging
@@ -39,7 +40,9 @@ class Connection(object):
         intended for that sensor to the object which is bound by this
         method.
         '''
-        if isinstance(to_bind, Sensor):
+        # TODO: need to back this up in terms of complexity.  do we really need
+        # multiple type checks?  I doubt it.
+        if isinstance(to_bind, Sensor) or isinstance(to_bind, Endpoint):
             self._bind_sensor(to_bind)
         else:
             raise TypeError("expected instance of abstract class Sensor")
@@ -69,6 +72,7 @@ class Connection(object):
         self.corr_id = str(uuid.uuid4())
         self.chan.basic_publish(exchange='requests',
                                 routing_key=target,
+                                mandatory=True,
                                 properties=pika.BasicProperties(
                                     reply_to=self.queue.method.queue,
                                     correlation_id=self.corr_id),
