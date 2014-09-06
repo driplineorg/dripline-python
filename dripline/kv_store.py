@@ -21,7 +21,6 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 """
 from provider import Provider
 from endpoint import Endpoint
-from factory import constructor_registry as cr
 
 class KVStore(Provider):
     """
@@ -30,6 +29,7 @@ class KVStore(Provider):
     def __init__(self, name):
         self.name = name
         self.dict = {}
+        self.endpoints = {}
 
     def add_endpoint(self, endpoint):
         """
@@ -38,14 +38,14 @@ class KVStore(Provider):
         of the value, and the endpoint itself.
         """
         endpoint.provider = self
-        self.dict[endpoint.name] = (endpoint.initial_value, endpoint)
+        self.endpoints[endpoint.name] = endpoint
+        self.dict[endpoint.name] = endpoint.initial_value
 
     def endpoint(self, endpoint):
         """
         Return the endpoint associated with some key.
         """
-        _, cached_ep = self[endpoint]
-        return cached_ep
+        return self.endpoints[endpoint]
 
     def list_endpoints(self):
         """
@@ -92,5 +92,3 @@ class KVStoreKey(Endpoint):
         """
         return NotImplementedError
 
-cr['kv_store'] = KVStore
-cr['kv_store_key'] = KVStoreKey
