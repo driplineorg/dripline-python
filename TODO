@@ -1,3 +1,6 @@
+* Authentication.  We could definitely use authentication if we want to
+continue to support off-site detector operation.
+
 * If a broker isn't actually at the address that's provided, you get a
 traceback - it should be an error message.
 
