@@ -65,7 +65,6 @@ class KVStoreKey(Endpoint):
     """
     A key in the KV store.
     """
-    # TODO: initial_value keyword arg would be nifty
     def __init__(self, name, initial_value=None):
         self.name = name
         self.provider = None
