@@ -42,3 +42,11 @@ the best way to go is right now.
 * it seems like having an entire Node created for a simple agent is too 
 heavyweight, but maybe it's necessary.  Think about that.
 
+* it's clear that in the near future, a threaded Node will be necessary.  
+currently you can only kill a Node with a keyboard interrupt, which isn't
+actually caught by anything - so no cleanup is done.  
+
+** a threaded node that looks at some semaphore to determine if it should
+stop is probably the way to go here.  it's simple and could be controlled by 
+the main thread, which could catch ctrl+c and use the semaphore to signal
+the Node thread.
