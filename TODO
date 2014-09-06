@@ -1,0 +1,33 @@
+* If a broker isn't actually at the address that's provided, you get a
+traceback - it should be an error message.
+
+* In factory.py, currently every module that defines a factory method
+has to be imported for the constructor registry to work correctly.  That
+is ultimately a little ugly if we want client code to be decoupled from the
+library - the client code would have to modify factory.py which is a library
+module.  In other words, another way of doing this needs to be figured out.
+
+* Every __init__ *has* to take an args parameter, or else the keyword args
+that are passed in as part of the construction process will make it barf.
+Obviously this is undesirable, but is demanding that __init__ takes an *args
+parameter also undesirable?  I think it probably is, but then again how
+many modules can really function without some config data...
+
+** Maybe this could be done with an __init__ that just takes a name parameter,
+and some function (extra_config?) that accepts the other arguments after
+construction.
+
+* name collisions are currently not detected _at all_, except for duplicate
+endpoint or provider names.  Network names are blithely accepted.
+
+* fully qualified names don't actually work yet.  This should just be an issue
+of adding other binding keys when we're binding the endpoint to the node.
+
+** this is a different issue from wildcard matches.  it would be really cool
+to be able to do get nodename.kv_store.* and get a list of all the keys, but
+currently we can't do that.  one day.
+
+* that reminds me, it would also be nice to be able to get all of the nodenames
+that are currently attached to the network.  there's a dumb way to do this
+with a timeout, probably, or a smart way to do it with gossip.  not sure what
+the best way to go is right now.
