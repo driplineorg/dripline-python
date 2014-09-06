@@ -62,3 +62,11 @@ endpoints too?  and get/set doesn't really map well to what they do.  i wanted
 to get away from doing runtime type checking to determine the bound methods
 that an endpoint has, but it may be a necessary evil unless we can figure 
 something else out.
+
+* dripline_agent needs to be way smarter.  for example, the third argument is
+only there if a user calls "set", not "get".  needs fixing but i don't have
+enough internet to figure out how.
+
+* i think dripline_agent should support "describe" as an operation, where it
+can tell you all about a registered node - what providers it has, what 
+endpoints, and how they are all connected.  it would be a great discovery tool.
