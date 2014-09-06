@@ -84,7 +84,11 @@ class KVStoreKey(Endpoint):
         Set the value associated with this key
         to some new value.
         """
-        self.provider[self.name] = value
+        try:
+            value = float(value)
+            self.provider[self.name] = value
+        except ValueError:
+            raise ValueError('argument to set must be a float!')
 
     def on_config(self):
         """
