@@ -20,6 +20,13 @@ construction.
 * name collisions are currently not detected _at all_, except for duplicate
 endpoint or provider names.  Network names are blithely accepted.
 
+** why is this a problem?  firing up two dripline nodes with the _exact same_ 
+config files works.  imagine doing a 'get' on such a mesh, where does the 
+answer actually come from?  i think it's a bad idea probably to do a full
+scan of the network when you start up, as that will take absolutely ages.  
+maybe using gossip is a good idea.  then a brief period of gossip at startup 
+would resolve the issue (with some probability).
+
 * fully qualified names don't actually work yet.  This should just be an issue
 of adding other binding keys when we're binding the endpoint to the node.
 
@@ -31,3 +38,7 @@ currently we can't do that.  one day.
 that are currently attached to the network.  there's a dumb way to do this
 with a timeout, probably, or a smart way to do it with gossip.  not sure what
 the best way to go is right now.
+
+* it seems like having an entire Node created for a simple agent is too 
+heavyweight, but maybe it's necessary.  Think about that.
+
