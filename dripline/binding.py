@@ -39,3 +39,13 @@ class Binding(object):
             result = self.on_get()
             self._send_reply(channel, properties, result)
             channel.basic_ack(delivery_tag=method.delivery_tag)
+        elif msg.msgop == constants.OP_SENSOR_SET:
+            result = None
+            try:
+                value = msg.payload
+                self.on_set(value)
+                result = 'complete'
+            except ValueError as err:
+                result = err.message
+            self._send_reply(channel, properties, result)
+            channel.basic_ack(delivery_tag=method.delivery_tag)
