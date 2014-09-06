@@ -16,21 +16,28 @@ PARSER.add_argument('-c',
                     required=True)
 PARSER.add_argument('verb')
 PARSER.add_argument('target')
+PARSER.add_argument('value')
 
 def main():
     # TODO: we shouldn't have to start an entire node to do this, should we?
     # a connection should suffice...
     args = PARSER.parse_args()
+    conf = Config(args.config)
+    node = Node(conf)
 
     if args.verb == 'get':
-        conf = Config(args.config)
-        node = Node(conf)
-
         request = message.RequestMessage(target=args.target,
                                  msgop=constants.OP_SENSOR_GET).to_msgpack()
 
         reply = node.conn.send_request(args.target,request)
         print(message.Message.from_msgpack(reply).payload)
+    elif args.verb == 'set':
+        request = message.RequestMessage(target=args.target,
+                                         msgop=constants.OP_SENSOR_SET,
+                                         payload=args.value).to_msgpack()
+        reply = node.conn.send_request(args.target, request)
+        print(message.Message.from_msgpack(reply).payload)
+
     else:
         print("sorry!  only get is supported for now.")
 
