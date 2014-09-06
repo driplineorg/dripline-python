@@ -70,3 +70,5 @@ enough internet to figure out how.
 * i think dripline_agent should support "describe" as an operation, where it
 can tell you all about a registered node - what providers it has, what 
 endpoints, and how they are all connected.  it would be a great discovery tool.
+
+* the output from dripline_agent is stupid, it should be nicer somehow.
