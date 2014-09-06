@@ -50,3 +50,15 @@ actually caught by anything - so no cleanup is done.
 stop is probably the way to go here.  it's simple and could be controlled by 
 the main thread, which could catch ctrl+c and use the semaphore to signal
 the Node thread.
+
+* raising errors from the getters and setters seems like a great way to go -
+is it?  the only concern i can imagine would be confusion about why the error
+got raised in the first place, but using types and messages judiciously might
+clear this up.  clearly *some* error checking must be done here, as we can't
+just accept anything for most modules.
+
+* get/set on endpoint is an extremely leaky abstraction.  aren't services 
+endpoints too?  and get/set doesn't really map well to what they do.  i wanted
+to get away from doing runtime type checking to determine the bound methods
+that an endpoint has, but it may be a necessary evil unless we can figure 
+something else out.
