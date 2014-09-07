@@ -76,3 +76,8 @@ can tell you all about a registered node - what providers it has, what
 endpoints, and how they are all connected.  it would be a great discovery tool.
 
 * the output from dripline_agent is stupid, it should be nicer somehow.
+
+* the in-memory representation of Config should be better.  it's weird to parse
+the YAML and then change what it looks like.  much better would be to keep the
+entire parsed thing in memory and have Config provide a 'view' to it.  then
+it could get modified in memory, serialized and sent around, etc etc.
