@@ -22,7 +22,11 @@ class Node(object):
         self.conf = configuration
         logger.info('connecting to broker {}'.format(self.conf.broker))
         # TODO: what happens if the connection fails
-        self.conn = Connection(self.conf.broker)
+        try:
+            self.conn = Connection(self.conf.broker)
+        except Exception as err:
+            logger.error('connection to broker failed!')
+            raise err
 
         # TODO: bind nodename/providers/endpoints to connection
         self.bind('nodename', on_get=self.nodename)
