@@ -97,10 +97,14 @@ class Config(object):
         self.broker = None
         self.providers = {}
         self.names = Set()
+        self.yaml_conf = None
         if config_file is not None:
             try:
                 with open(config_file) as config:
-                    self._from_yaml(config.read())
+                    yaml_string = config.read()
+                    self._from_yaml(yaml_string)
+                    self.yaml_conf = yaml_string
+
             except IOError, err:
                 msg = """
                 couldn't open config file {} (io error occurred: {})
