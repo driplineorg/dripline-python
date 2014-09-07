@@ -64,7 +64,8 @@ just accept anything for most modules.
 endpoints too?  and get/set doesn't really map well to what they do.  i wanted
 to get away from doing runtime type checking to determine the bound methods
 that an endpoint has, but it may be a necessary evil unless we can figure 
-something else out.
+something else out.  the client doesn't need to know that something is a 
+sensor or a service or whatever.
 
 * dripline_agent needs to be way smarter.  for example, the third argument is
 only there if a user calls "set", not "get".  needs fixing but i don't have
