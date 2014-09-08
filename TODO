@@ -82,4 +82,9 @@ the YAML and then change what it looks like.  much better would be to keep the
 entire parsed thing in memory and have Config provide a 'view' to it.  then
 it could get modified in memory, serialized and sent around, etc etc.
 
+** hand-in-hand with this: we should be able to ask a node to sync its config
+to disk if it changes in memory.  when we call config() on a node, we expect
+to get whatever config currently exists, not whatever config was used to start
+the node.  
+
 * dripline_agent needs a usage() function
