@@ -99,9 +99,43 @@ the node.
 * dripline_agent needs a usage() function
 
 * in a configuration file, we should always be sure that every endpoint is 
-declared in an endpoints: block, and every provider is declared in a providers:
+declared in an endpoints: block, and every provider is declared in a 
+providers:
 block.  this should always be an error if this rule is violated.
 
 * we should catch keyword arguments that are passed to objects that don't know
 what to do with them, and log it as an error instead of just winding up with
 a traceback.
+
+* logging looks really goofy right now, every module that uses logging has the
+same boilerplate at the beginning.  that should get put into some other 
+module.
+
+* user defined modules.  aside from writing code, people should be able to 
+just write YAML.  i can imagine a file that looks like this:
+
+conf.yaml
+---------
+nodename: foo
+broker: bar
+providers:
+  - name: agilent_whatever
+    module: ethernet_scpi
+    endpoints:
+    - name: dcv
+      module: user_defined
+      definition: my_dcv.yaml
+
+my_dcv.yaml
+-----------
+on_get: "meas:volt:dcv?"
+on_set: "appl #value" <- #value gets mapped to the argument value
+on_config:
+  - range: "meas:volt:range p6v #value"
+  - averaging: "meas:volt:aperture p6v #value"
+
+now you don't have to write any code at all!  it's now completely language
+agnostic, you can literally write a simple instrument module with wikipedia
+and the instrument manual.  
+
+* hooks.  how will we implement hooks?
