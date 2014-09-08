@@ -135,3 +135,10 @@ class Node(object):
         """
         reply = self.conn.send_request(to_send.target, to_send.to_msgpack())
         return message.Message.from_msgpack(reply)
+
+    def config(self):
+        """
+        Return the YAML string representation of this dripline Node's
+        configuration.
+        """
+        return self.conf.yaml_conf
