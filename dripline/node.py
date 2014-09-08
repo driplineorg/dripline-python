@@ -1,6 +1,7 @@
 from connection import Connection
 from factory import constructor_registry as cr
 from binding import Binding
+import message
 import logging
 logger = logging.getLogger(__name__)
 ch = logging.StreamHandler()
@@ -122,3 +123,15 @@ class Node(object):
         """
         logger.info('starting event loop for node {}'.format(self.nodename()))
         self.conn.start()
+
+    def send_sync(self, to_send):
+        """
+        Send a message synchronously to an endpoint which is connected
+        to the dripline mesh.  This method will wait for a reply and return
+        it synchronously to the caller.  The provided message to be sent
+        should subclass dripline.Message such that it can be serialized to
+        msgpack via a to_msgpack method.  The result of calling this function
+        will also subclass Message.
+        """
+        reply = self.conn.send_request(to_send.target, to_send.to_msgpack())
+        return message.Message.from_msgpack(reply)
