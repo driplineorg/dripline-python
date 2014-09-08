@@ -1,0 +1,15 @@
+nodename: my_store
+broker: localhost
+providers:
+  - name: my_price_list
+    module: kv_store
+    endpoints:
+      - name: peaches
+        module: kv_store_key
+        initial_value: 0.75
+      - name: chips
+        module: kv_store_key
+        initial_value: 1.75
+      - name: waffles
+        module: kv_store_key
+        initial_value: 4.00

@@ -15,6 +15,7 @@ Contents:
     spec
     getting_started
     contribute
+    tutorials
 
 Indices and tables
 ==================
