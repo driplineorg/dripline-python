@@ -88,3 +88,11 @@ to get whatever config currently exists, not whatever config was used to start
 the node.  
 
 * dripline_agent needs a usage() function
+
+* in a configuration file, we should always be sure that every endpoint is 
+declared in an endpoints: block, and every provider is declared in a providers:
+block.  this should always be an error if this rule is violated.
+
+* we should catch keyword arguments that are passed to objects that don't know
+what to do with them, and log it as an error instead of just winding up with
+a traceback.
