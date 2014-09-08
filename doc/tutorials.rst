@@ -163,7 +163,3 @@ chips->1.79: complete
 $ python dripline_agent.py -b localhost get chips 0
 2014-09-08 13:53:59,768 - node - INFO - connecting to broker localhost
 chips: 1.79
-
-Being a very simple example, this is the entire functionality that is 
-provided by this tutorial.  Read on to find out what the code itself looks
-like and is doing.
