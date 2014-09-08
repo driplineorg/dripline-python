@@ -71,7 +71,7 @@ class Config(object):
     file in the examples directory.
     """
 
-    def __init__(self, config_file=None):
+    def __init__(self, config_file=None, yaml_string=None):
         """
         Construct a Config instance with its configuration data based on the
         content of the YAML file specified in config_file.  If the configuration
@@ -109,6 +109,16 @@ class Config(object):
                 msg = """
                 couldn't open config file {} (io error occurred: {})
                 """.format(config_file, err.message)
+                LOGGER.error(msg)
+                raise err
+        elif yaml_string is not None:
+            try:
+                self._from_yaml(yaml_string)
+                self.yaml_conf = yaml_string
+            except Exception as err:
+                msg = """
+                couldn't create config from provided string! ({})
+                """.format(yaml_string)
                 LOGGER.error(msg)
                 raise err
 
