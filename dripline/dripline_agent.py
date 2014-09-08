@@ -2,6 +2,7 @@
 Do simple stuff like gets and sets.
 """
 import argparse
+import uuid
 from node import Node
 from config import Config
 import message
@@ -12,8 +13,11 @@ PARSER = argparse.ArgumentParser(description='Start a dripline node.')
 PARSER.add_argument('-c',
                     '--config',
                     metavar='configuration file',
-                    help='full path to a dripline YAML configuration file.',
-                    required=True)
+                    help='full path to a dripline YAML configuration file.')
+PARSER.add_argument('-b',
+                    '--broker',
+                    metavar='AMQP broker address',
+                    help='the address of the AMQP broker dripline should use')
 PARSER.add_argument('verb')
 PARSER.add_argument('target')
 PARSER.add_argument('value')
@@ -36,7 +40,16 @@ def main():
         print("ERROR: verb argument must be one of: get, set, or describe.")
         return -1
 
-    conf = Config(args.config)
+    conf = None
+    if args.broker is not None:
+        nodename = uuid.uuid4().hex[1:8]
+        yaml_conf = """
+        'broker': {}\n
+        'nodename': {}
+        """.format(args.broker, nodename)
+        conf = Config(yaml_string=yaml_conf)
+    else:
+        conf = Config(config_file=args.config)
     node = Node(conf)
 
     if request_verb == 'get':
@@ -44,13 +57,13 @@ def main():
                                          msgop=constants.OP_SENSOR_GET)
 
         reply = node.send_sync(request)
-        print(reply.payload)
+        print(args.target + ': ' + str(reply.payload))
     elif request_verb == 'set':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_SET,
                                          payload=args.value)
         reply = node.send_sync(request)
-        print(reply.payload)
+        print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
 
 if __name__ == '__main__':
     main()
