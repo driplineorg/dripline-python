@@ -27,16 +27,16 @@ def main():
 
     if args.verb == 'get':
         request = message.RequestMessage(target=args.target,
-                                 msgop=constants.OP_SENSOR_GET).to_msgpack()
+                                         msgop=constants.OP_SENSOR_GET)
 
-        reply = node.conn.send_request(args.target,request)
-        print(message.Message.from_msgpack(reply).payload)
+        reply = node.send_sync(request)
+        print(reply.payload)
     elif args.verb == 'set':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_SET,
-                                         payload=args.value).to_msgpack()
-        reply = node.conn.send_request(args.target, request)
-        print(message.Message.from_msgpack(reply).payload)
+                                         payload=args.value)
+        reply = node.send_sync(request)
+        print(reply.payload)
 
     else:
         print("sorry!  only get is supported for now.")
