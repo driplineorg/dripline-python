@@ -45,6 +45,13 @@ the best way to go is right now.
 * it seems like having an entire Node created for a simple agent is too 
 heavyweight, but maybe it's necessary.  Think about that.
 
+** OK, it seems totally possible to do this.  basically the thing that
+takes forever is binding - there's a lot of heavyweight AMQP communication
+going on there.  However for an agent, the only binding that needs to happen
+is in setup_amqp where we make sure we can receive responses.  maybe there's 
+some nice way to do this... maybe Node should also be an abstract base
+class?  Then ProviderNode and AgentNode could subclass Node?
+
 * it's clear that in the near future, a threaded Node will be necessary.  
 currently you can only kill a Node with a keyboard interrupt, which isn't
 actually caught by anything - so no cleanup is done.  
@@ -73,11 +80,13 @@ enough internet to figure out how.
 
 * i think dripline_agent should support "describe" as an operation, where it
 can tell you all about a registered node - what providers it has, what 
-endpoints, and how they are all connected.  it would be a great discovery tool.
+endpoints, and how they are all connected.  it would be a great discovery 
+tool.
 
 * the output from dripline_agent is stupid, it should be nicer somehow.
 
-* the in-memory representation of Config should be better.  it's weird to parse
+* the in-memory representation of Config should be better.  it's weird to 
+parse
 the YAML and then change what it looks like.  much better would be to keep the
 entire parsed thing in memory and have Config provide a 'view' to it.  then
 it could get modified in memory, serialized and sent around, etc etc.
