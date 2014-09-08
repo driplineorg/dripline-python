@@ -182,3 +182,12 @@ def test_object_graph_building_getters(good_node):
     assert s0.on_get() == 'MOCKED'
     assert s1.on_get() == 'MOCKED'
     assert s2.on_get() == 'MOCKED'
+
+def test_node_config(good_node):
+    """
+    Test that the config which is returned by calling config()
+    on a constructed node is equal to the contents of the file
+    that created it.
+    """
+    with open(myPath + '/test_graph.yaml') as yaml_file:
+        assert good_node.config() == yaml_file.read()
