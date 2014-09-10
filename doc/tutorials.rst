@@ -91,7 +91,7 @@ The only new thing here is the ``initial_value`` parameter, which you notice
 is equal in each case to the initial price of the object of the same name
 as the endpoint.  Dripline considers every parameter which isn't called 
 ``name`` or ``module`` to be *specific to the object* and passes it along to
-the object for it to do with as it likes.  In this instance, the constructor
+the object for it to do with as it likes.  In this instance, the initializer
 of the ``KVStoreKey`` object looks like this:
 
 .. code-block:: python
