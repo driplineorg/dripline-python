@@ -59,21 +59,22 @@ examples/kv_store_tutorial.yaml``) that looks like this and represents our
 pricelist in a very recognizable way:
 
 .. code-block:: yaml
-nodename: my_store
-broker: localhost
-providers:
-  - name: my_price_list
-    module: kv_store
-    endpoints:
-      - name: peaches
-        module: kv_store_key
-        initial_value: 0.75
-      - name: chips
-        module: kv_store_key
-        initial_value: 1.75
-      - name: waffles
-        module: kv_store_key
-        initial_value: 4.00
+
+  nodename: my_store
+  broker: localhost
+  providers:
+    - name: my_price_list
+      module: kv_store
+      endpoints:
+        - name: peaches
+          module: kv_store_key
+          initial_value: 0.75
+        - name: chips
+          module: kv_store_key
+          initial_value: 1.75
+        - name: waffles
+          module: kv_store_key
+          initial_value: 4.00
 
 That's it.  The ``nodename`` parameter is simply telling dripline that we want
 our dripline node to be called ``my_store``.  The ``broker`` is telling 
@@ -114,18 +115,20 @@ We point it to our configuration file (if you are intrepid enough to make your
 own, point to whatever you created), and fire it up:
 
 .. code-block:: bash
-$ python start_node.py -c examples/kv_store_tutorial.yaml
+
+ $ python start_node.py -c examples/kv_store_tutorial.yaml
 
 You should see output that looks like this:
 
 .. code-block:: bash
-$ python start_node.py -c examples/kv_store_tutorial.yaml
-2014-09-08 13:28:57,201 - node - INFO - connecting to broker localhost
-2014-09-08 13:29:00,746 - node - INFO - adding provider my_price_list
-2014-09-08 13:29:00,746 - node - INFO - adding endpoint peaches to provider my_price_list
-2014-09-08 13:29:01,504 - node - INFO - adding endpoint chips to provider my_price_list
-2014-09-08 13:29:02,262 - node - INFO - adding endpoint waffles to provider my_price_list
-2014-09-08 13:29:03,020 - node - INFO - starting event loop for node my_store
+
+ $ python start_node.py -c examples/kv_store_tutorial.yaml
+ 2014-09-08 13:28:57,201 - node - INFO - connecting to broker localhost
+ 2014-09-08 13:29:00,746 - node - INFO - adding provider my_price_list
+ 2014-09-08 13:29:00,746 - node - INFO - adding endpoint peaches to provider my_price_list
+ 2014-09-08 13:29:01,504 - node - INFO - adding endpoint chips to provider my_price_list
+ 2014-09-08 13:29:02,262 - node - INFO - adding endpoint waffles to provider my_price_list
+ 2014-09-08 13:29:03,020 - node - INFO - starting event loop for node my_store
 
 This isn't too hard to follow - dripline starts up, connects to the broker
 you told it to, adds a provider and the endpoints, and is ready to go.
@@ -136,30 +139,34 @@ endpoints from the command line.  First of all, let's check the current
 price of peaches:
 
 .. code-block:: bash
-$ python dripline_agent.py -b localhost get peaches
-2014-09-08 13:45:57,905 - node - INFO - connecting to broker localhost
-peaches: 0.75
+
+    $ python dripline_agent.py -b localhost get peaches
+    2014-09-08 13:45:57,905 - node - INFO - connecting to broker localhost
+    peaches: 0.75
 
 Nice.  So the current price of peaches in our store is 0.75.  What about
 waffles?
 
 .. code-block:: bash
-$ python dripline_agent.py -b localhost get waffles 0
-2014-09-08 13:52:26,597 - node - INFO - connecting to broker localhost
-waffles: 4.0
+
+    $ python dripline_agent.py -b localhost get waffles
+    2014-09-08 13:52:26,597 - node - INFO - connecting to broker localhost
+    waffles: 4.0
 
 Now let's say that there's been a global rush on chips and the price we
 have to charge has skyrocketed from 1.75 to 1.79.  We can use 
 ``dripline_agent.py`` to set the new value:
 
-$ python dripline_agent.py -b localhost get chips 0
-2014-09-08 13:53:57,432 - node - INFO - connecting to broker localhost
-chips: 1.75
+.. code-block:: bash
 
-$ python dripline_agent.py -b localhost set chips 1.79
-2014-09-08 13:53:38,545 - node - INFO - connecting to broker localhost
-chips->1.79: complete
-
-$ python dripline_agent.py -b localhost get chips 0
-2014-09-08 13:53:59,768 - node - INFO - connecting to broker localhost
-chips: 1.79
+  $ python dripline_agent.py -b localhost get chips 0
+  2014-09-08 13:53:57,432 - node - INFO - connecting to broker localhost
+  chips: 1.75
+  
+  $ python dripline_agent.py -b localhost set chips 1.79
+  2014-09-08 13:53:38,545 - node - INFO - connecting to broker localhost
+  chips->1.79: complete
+  
+  $ python dripline_agent.py -b localhost get chips 0
+  2014-09-08 13:53:59,768 - node - INFO - connecting to broker localhost
+  chips: 1.79
