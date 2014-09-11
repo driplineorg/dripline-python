@@ -3,6 +3,8 @@ from message import Message, RequestMessage
 import constants
 import pika
 
+__all__ = ['Endpoint', 'AutoReply']
+
 class Endpoint(object):
     __metaclass__ = ABCMeta
 
