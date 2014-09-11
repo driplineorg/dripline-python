@@ -8,5 +8,5 @@ from agilent34461a import Agilent34461a
 from factory import constructor_registry
 
 def test_reg_factory():
-	c = constructor_registry['agilent34461a']
-	assert c == Agilent34461a
+    c = constructor_registry['agilent34461a']
+    assert c == Agilent34461a

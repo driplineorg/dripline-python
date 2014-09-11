@@ -35,10 +35,10 @@ endpoints:
   #        'some_argument': 'whatever_this_is',
   #        'another_argument': [
   #               'sure_these_can_have_depth',
-  #				  {
-  #				   'and_even': 'contain_more_k_v_data',
-  #				   'why_not_numeric': 2.5
-  #				  }
+  #                  {
+  #                   'and_even': 'contain_more_k_v_data',
+  #                   'why_not_numeric': 2.5
+  #                  }
   #        ]
   #       }
   # If those arguments don't make sense to the object that's described by a 
@@ -86,7 +86,7 @@ providers:
     other_data: 
     - here_it_is
     - it_could_be:
-    	- arbitrarily_nested
-    	- as_long_as:
-    		- it_makes_sense_to_the_module
-    		- as_initialization_data
+        - arbitrarily_nested
+        - as_long_as:
+            - it_makes_sense_to_the_module
+            - as_initialization_data
