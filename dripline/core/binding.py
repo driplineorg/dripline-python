@@ -7,6 +7,8 @@ import message
 import constants
 import pika
 
+__all__ = ['Binding']
+
 class Binding(object):
     """
     Represents the binding between dripline names and local functions.

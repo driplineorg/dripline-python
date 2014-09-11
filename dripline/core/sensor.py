@@ -3,6 +3,8 @@ from message import Message, RequestMessage
 import constants
 import pika
 
+__all__ = ['Sensor', 'AutoReply']
+
 class Sensor(object):
     __metaclass__ = ABCMeta
 
