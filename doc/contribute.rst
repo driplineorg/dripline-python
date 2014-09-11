@@ -18,12 +18,12 @@ Consider a very simple piece of code shown below:
 
 .. code-block:: python
 
-	class Adder(object):
-		def __init__(self, x):
-			self.x = x
+    class Adder(object):
+        def __init__(self, x):
+            self.x = x
 
-		def add(self, y):
-			return self.x - y
+        def add(self, y):
+            return self.x - y
 
 The above code has an obvious typo - we are subtracting in the ``add`` method where we clearly meant to add.  If we 
 deployed this code in production, at some point it would break, and we would have to do some extensive debugging to 
@@ -35,11 +35,11 @@ immediately:
 
 .. code-block:: python
 
-	def test_my_adder():
-		for i in range(10):
-			for j in range(10):
-				an_adder = Adder(i)
-				assert an_adder.add(j) == i + j
+    def test_my_adder():
+        for i in range(10):
+            for j in range(10):
+                an_adder = Adder(i)
+                assert an_adder.add(j) == i + j
 
 This is the crux of test driven development: we want to write tests that establish a contract for the code that we
 haven't written yet.  We know how we *want* it to behave - and so we specify that as a test, and have a testing framework
@@ -58,13 +58,13 @@ as the code is extremely simple and highlights the basic idea:
 
 .. code-block:: python
 
-	import pytest
-	from agilent34461a import Agilent34461a
-	from factory import constructor_registry
+    import pytest
+    from agilent34461a import Agilent34461a
+    from factory import constructor_registry
 
-	def test_reg_factory():
-		c = constructor_registry['agilent34461a']
-		assert c == Agilent34461a
+    def test_reg_factory():
+        c = constructor_registry['agilent34461a']
+        assert c == Agilent34461a
 
 This is extremely simple and verifies the core functionality of a piece of the dripline code.  Note that the test is
 completely disinterested in the *internal* way in which the constructor_registry is built - all it cares about is that

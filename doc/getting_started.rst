@@ -51,13 +51,13 @@ look like this:
 
 .. code-block:: yaml
 
-	broker: localhost
-	nodename: random_node
-	providers:
-	- name: local
-	  endpoints:
-	  - name: rng
-	    module: random_float
+    broker: localhost
+    nodename: random_node
+    providers:
+    - name: local
+      endpoints:
+      - name: rng
+        module: random_float
 
 When this configuration file is loaded by dripline, it will construct an 
 `object graph` from the list of providers and endpoints that appear.  This
@@ -77,14 +77,14 @@ simply do the following from the examples directory:
 
 .. code-block:: bash
 
-	$ ./rng_demo_node.py
+    $ ./rng_demo_node.py
 
 Now, to start the client which will request a single random number and print it
 to the screen, do
 
 .. code-block:: bash
 
-	$ ./rng_demo_client.py
+    $ ./rng_demo_client.py
 
 You should see some log entries about connections, and a random floating point
 number between 0 and 1!
