@@ -1,10 +1,14 @@
-from sensor import AutoReply
-from factory import constructor_registry as reg
+#from sensor import AutoReply
+#from factory import constructor_registry as reg
+
+from __future__ import absolute_import
 
 import socket
-from provider import Provider
+from ..core import Provider, AutoReply
 
-class SimpleSCPIInstrument(Provider):
+__all__ = ['simple_scpi_instrument', 'simple_scpi_sensor']
+
+class simple_scpi_instrument(Provider):
     def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025):
         self.name = name
         self.endpoints = {}
@@ -29,7 +33,7 @@ class SimpleSCPIInstrument(Provider):
         data = self.sock.recv(1024)
         return data
 
-class SimpleSCPISensor(AutoReply):
+class simple_scpi_sensor(AutoReply):
     def __init__(self,name,on_get=None,on_set=None):
         self.name = name
         self._provider = None
@@ -53,5 +57,5 @@ class SimpleSCPISensor(AutoReply):
     def set_provider(self, provider):
         self._provider = provider
 
-reg['simple_scpi_instrument'] = SimpleSCPIInstrument
-reg['simple_scpi_sensor'] = SimpleSCPISensor
+#reg['simple_scpi_instrument'] = SimpleSCPIInstrument
+#reg['simple_scpi_sensor'] = SimpleSCPISensor

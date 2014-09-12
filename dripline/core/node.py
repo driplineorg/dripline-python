@@ -1,5 +1,5 @@
 from connection import Connection
-from factory import constructor_registry as cr
+#from factory import constructor_registry as cr
 from binding import Binding
 import message
 import logging
@@ -10,6 +10,7 @@ ch.setFormatter(formatter)
 logger.setLevel(logging.INFO)
 logger.addHandler(ch)
 
+__all__ = ['Node']
 
 class Node(object):
     """
@@ -36,7 +37,7 @@ class Node(object):
 
         self.providers = {}
 
-        self._build_object_graph()
+        #self._build_object_graph()
 
     def nodename(self):
         """
@@ -72,6 +73,19 @@ class Node(object):
                     self.bind_endpoint(endpoint_instance)
 
                 self.add_provider(obj)
+
+    def extend_object_graph(self, provider, endpoints=[]):
+        '''
+        Add a provider and its endpoints, extend the object graph.
+
+        The object graph connects objects which are related by a provider
+        -> endpoint relationship. During the process of building the
+        object graph, bindings are created for endpoints.
+        '''
+        for endpoint in endpoints:
+            provider.add_endpoint(endpoint)
+            self.bind_endpoint(endpoint)
+        self.add_provider(provider)
 
     # TODO: what happens when some params are None?
     def bind(self, name, on_get=None, on_set=None, on_config=None):

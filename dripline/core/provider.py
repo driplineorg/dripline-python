@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+__all__ = ['Provider']
+
 class Provider(object):
     __metaclass__ = ABCMeta
 

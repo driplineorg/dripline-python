@@ -1,10 +1,17 @@
-from sensor import AutoReply
-from factory import constructor_registry as reg
+'''
+Implementation for the agilent 34461 DMM
+'''
 
+from __future__ import absolute_import
 import socket
-from provider import Provider
 
-class Agilent34461a(Provider):
+from ..core import AutoReply, Provider
+
+__all__ = ['agilent34461a', 'agilent34461a_voltage_input']
+
+
+class agilent34461a(Provider):
+    module_key = 'agilent34461a'
     def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025):
         self.name = name
         self.sensors = {}
@@ -28,7 +35,9 @@ class Agilent34461a(Provider):
         data = self.sock.recv(1024)
         return data
 
-class VoltageInput(AutoReply):
+
+class agilent34461a_voltage_input(AutoReply):
+    module_key = 'agilent34461a_voltage_input'
     def __init__(self,name,*args,**kwargs):
         self.name = name
 
@@ -48,5 +57,5 @@ class VoltageInput(AutoReply):
     def set_provider(self, provider):
         self.provider = provider
 
-reg['agilent34461a'] = Agilent34461a
-reg['agilent34461a_voltage_input'] = VoltageInput
+#reg['agilent34461a'] = Agilent34461a
+#reg['agilent34461a_voltage_input'] = VoltageInput

@@ -23,6 +23,8 @@ DUP_MESSAGE = """
             defined!  (origin {category}: {node}/{provider}/{endpoint})
             """
 
+__all__ = ['Config']
+
 class Config(object):
     """
     The Config class contains all of the configuration data that is relevant

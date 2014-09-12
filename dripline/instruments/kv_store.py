@@ -19,10 +19,14 @@ baz, which are associated with it.  They can be addressed
 as such on the network, or can also be addressed using their
 fully qualified hierarchical address e.g. somenode.kv.foo.
 """
-from provider import Provider
-from endpoint import Endpoint
 
-class KVStore(Provider):
+from __future__ import absolute_import
+
+from ..core import Provider, Endpoint
+
+__all__ = ['kv_store', 'kv_store_key']
+
+class kv_store(Provider):
     """
     The KV store.  This is just a wrapper around a dict.
     """
@@ -61,7 +65,8 @@ class KVStore(Provider):
     def __setitem__(self, name, value):
         self.dict[name] = value
 
-class KVStoreKey(Endpoint):
+
+class kv_store_key(Endpoint):
     """
     A key in the KV store.
     """

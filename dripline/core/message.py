@@ -2,7 +2,7 @@
 Meta and derived classes for dripline messages
 '''
 
-__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage']
+__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage', 'Message']
 
 import constants
 import msgpack
