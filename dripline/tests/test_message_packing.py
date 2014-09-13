@@ -1,7 +1,7 @@
 import pytest
 import msgpack
-import constants as dc
-from message import RequestMessage, Message
+import dripline.core.constants as dc
+from dripline.core import RequestMessage, Message
 
 # boilerplate needed to get paths right
 import sys, os

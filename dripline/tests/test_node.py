@@ -4,10 +4,11 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 import pytest
-from config import Config
-from factory import constructor_registry
-from node import Node
-from simple_scpi import SimpleSCPISensor
+from dripline.core import Config, Node
+#from config import Config
+#from factory import constructor_registry
+#from node import Node
+from instruments.simple_scpi import simple_scpi_sensor
 
 @pytest.fixture
 def good_conf():
@@ -23,7 +24,7 @@ def bare_conf():
 
 @pytest.fixture
 def abc_sensor():
-    s = SimpleSCPISensor('abc')
+    s = simple_scpi_sensor('abc')
     return s
 
 @pytest.fixture

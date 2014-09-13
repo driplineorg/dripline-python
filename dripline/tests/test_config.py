@@ -4,7 +4,7 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 import pytest
-from config import Config
+from dripline.core import Config
 
 # This section tests that a "good" configuration, where "good" means
 # that a sane configuration can be generated from the yaml file,
