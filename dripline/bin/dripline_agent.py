@@ -3,10 +3,12 @@ Do simple stuff like gets and sets.
 """
 import argparse
 import uuid
-from node import Node
-from config import Config
-import message
-import constants
+
+from dripline.core import Node, Config, message, constants
+#from node import Node
+#from config import Config
+#import message
+#import constants
 
 # Argument parser setup
 PARSER = argparse.ArgumentParser(description='Start a dripline node.')
