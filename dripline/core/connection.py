@@ -1,7 +1,14 @@
+'''
+A connection to the AMQP broker
+'''
+
+
+from __future__ import absolute_import
+
 import pika
 import uuid
-from endpoint import Endpoint
-from sensor import Sensor
+from .endpoint import Endpoint
+from .sensor import Sensor
 
 import logging
 logger = logging.getLogger(__name__)

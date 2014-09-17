@@ -1,8 +1,10 @@
-from connection import Connection
-#from factory import constructor_registry as cr
-from binding import Binding
-import message
+from __future__ import absolute_import
+
+from .connection import Connection
+from .binding import Binding
+from . import message
 import logging
+
 logger = logging.getLogger(__name__)
 ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -36,8 +38,6 @@ class Node(object):
         self.bind('endpoints', on_get=self.provider_endpoints)
 
         self.providers = {}
-
-        #self._build_object_graph()
 
     def nodename(self):
         """

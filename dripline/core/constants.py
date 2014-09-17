@@ -1,5 +1,5 @@
 '''
-    Constant mappings
+Constant mappings
 '''
 
 # Operation constants.

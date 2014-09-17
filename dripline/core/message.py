@@ -2,9 +2,11 @@
 Meta and derived classes for dripline messages
 '''
 
+from __future__ import absolute_import
+
 __all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage', 'Message']
 
-import constants
+from . import constants
 import msgpack
 from abc import ABCMeta, abstractproperty, abstractmethod
 
