@@ -9,7 +9,7 @@ from dripline.core import Config, Node, connection
 from dripline.instruments.simple_scpi import simple_scpi_sensor
 
 @pytest.fixture
-def good_cons ():
+def good_conf ():
     filename = myPath + '/test_graph.yaml'
     c = Config(filename)
     return c
@@ -32,6 +32,10 @@ def dmm0(monkeypatch):
             pass
         def connect(self, a):
             return None
+        def send(self, x):
+            return None
+        def recv(self, x):
+            return 'MOCKED'
     monkeypatch.setattr('socket.socket', MockedSocket)
     monkeypatch.setattr('socket.socket.connect', MockedSocket.connect)
     return dripline.instruments.agilent34461a('dmm0')
@@ -43,13 +47,17 @@ def dmm1(monkeypatch):
             pass
         def connect(self, a):
             return None
+        def send(self, x):
+            return None
+        def recv(self, x):
+            return 'MOCKED'
 
     monkeypatch.setattr('socket.socket', MockedSocket)
     monkeypatch.setattr('socket.socket.connect', MockedSocket.connect)
     return dripline.instruments.agilent34461a('dmm1')
 
 @pytest.fixture
-def good_node(good_conf, monkeypatch):
+def good_node(good_conf, dmm0, dmm1, monkeypatch):
     class MockedSocket(object):
         def __init__(self, *args):
             pass
@@ -89,23 +97,14 @@ def good_node(good_conf, monkeypatch):
     monkeypatch.setattr('dripline.core.connection.Connection._setup_amqp',lambda x: None)
 
     node = Node(good_conf)
-    #provider: dmm0
-    #module: agilent34461a
-    #ip_addr: '255.255.255.255'
-    #scpi_port: 5025
-    #endpoints:
-    #- name: 'dmm0_dcv'
-    #  module: 'agilent34461a_voltage_input'
-    #provider: dmm1
-    #module: agilent34461a
-    #ip_addr: '255.255.255.255'
-    #scpi_port: 5025
-    #endpoints:
-    #- name: 'dmm1_dcv'
-    #  module: 'agilent34461a_voltage_input'
-    #- name: 'dmm1_acv'
-    #  module: 'simple_scpi_sensor'
-    #  on_get: 'MEAS:VOLT:AC?'
+    endpoints_dmm0 = [dripline.instruments.agilent34461a_voltage_input('dmm0_dcv')]
+    endpoints_dmm1 = [
+        dripline.instruments.agilent34461a_voltage_input('dmm1_dcv'),
+        dripline.instruments.simple_scpi_sensor('dmm1_acv',
+                                                on_get='MEAS:VOLT:AC?'),
+                     ]
+    node.extend_object_graph(dmm0, endpoints_dmm0)
+    node.extend_object_graph(dmm1, endpoints_dmm1)
     return node
 
 @pytest.fixture
@@ -183,6 +182,7 @@ def test_object_graph_building_sensors(good_node):
     p0 = good_node.locate_provider('dmm0_dcv')
     p1 = good_node.locate_provider('dmm1_dcv')
     assert p0.name == 'dmm0'
+    assert good_node.provider_list() == ['dmm0', 'dmm1']
     assert p1.name == 'dmm1'
 
 def test_object_graph_building_getters(good_node):
@@ -192,6 +192,7 @@ def test_object_graph_building_getters(good_node):
     s1 = p1.endpoint('dmm1_dcv')
     p2 = good_node.locate_provider('dmm1_acv')
     s2 = p2.endpoint('dmm1_acv')
+    print(s0.on_get())
     assert s0.on_get() == 'MOCKED'
     assert s1.on_get() == 'MOCKED'
     assert s2.on_get() == 'MOCKED'
