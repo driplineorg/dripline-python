@@ -1,6 +1,3 @@
-#from sensor import AutoReply
-#from factory import constructor_registry as reg
-
 from __future__ import absolute_import
 
 import socket
@@ -56,6 +53,3 @@ class simple_scpi_sensor(AutoReply):
 
     def set_provider(self, provider):
         self._provider = provider
-
-#reg['simple_scpi_instrument'] = SimpleSCPIInstrument
-#reg['simple_scpi_sensor'] = SimpleSCPISensor

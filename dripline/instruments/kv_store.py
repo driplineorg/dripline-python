@@ -26,6 +26,7 @@ from ..core import Provider, Endpoint
 
 __all__ = ['kv_store', 'kv_store_key']
 
+
 class kv_store(Provider):
     """
     The KV store.  This is just a wrapper around a dict.

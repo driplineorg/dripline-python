@@ -56,6 +56,3 @@ class agilent34461a_voltage_input(AutoReply):
 
     def set_provider(self, provider):
         self.provider = provider
-
-#reg['agilent34461a'] = Agilent34461a
-#reg['agilent34461a_voltage_input'] = VoltageInput
