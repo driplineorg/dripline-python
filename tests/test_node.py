@@ -9,7 +9,7 @@ from dripline.core import Config, Node, connection
 from dripline.instruments.simple_scpi import simple_scpi_sensor
 
 @pytest.fixture
-def good_conf():
+def good_cons ():
     filename = myPath + '/test_graph.yaml'
     c = Config(filename)
     return c
@@ -34,8 +34,7 @@ def dmm0(monkeypatch):
             return None
     monkeypatch.setattr('socket.socket', MockedSocket)
     monkeypatch.setattr('socket.socket.connect', MockedSocket.connect)
-    c = constructor_registry['agilent34461a']
-    return c('dmm0')
+    return dripline.instruments.agilent34461a('dmm0')
 
 @pytest.fixture
 def dmm1(monkeypatch):
@@ -47,8 +46,7 @@ def dmm1(monkeypatch):
 
     monkeypatch.setattr('socket.socket', MockedSocket)
     monkeypatch.setattr('socket.socket.connect', MockedSocket.connect)
-    c = constructor_registry['agilent34461a']
-    return c('dmm1')
+    return dripline.instruments.agilent34461a('dmm1')
 
 @pytest.fixture
 def good_node(good_conf, monkeypatch):
@@ -91,6 +89,23 @@ def good_node(good_conf, monkeypatch):
     monkeypatch.setattr('dripline.core.connection.Connection._setup_amqp',lambda x: None)
 
     node = Node(good_conf)
+    #provider: dmm0
+    #module: agilent34461a
+    #ip_addr: '255.255.255.255'
+    #scpi_port: 5025
+    #endpoints:
+    #- name: 'dmm0_dcv'
+    #  module: 'agilent34461a_voltage_input'
+    #provider: dmm1
+    #module: agilent34461a
+    #ip_addr: '255.255.255.255'
+    #scpi_port: 5025
+    #endpoints:
+    #- name: 'dmm1_dcv'
+    #  module: 'agilent34461a_voltage_input'
+    #- name: 'dmm1_acv'
+    #  module: 'simple_scpi_sensor'
+    #  on_get: 'MEAS:VOLT:AC?'
     return node
 
 @pytest.fixture
@@ -130,19 +145,18 @@ def bare_node(bare_conf, monkeypatch):
 
     monkeypatch.setattr('pika.BlockingConnection', MockedBlockingConnection)
     monkeypatch.setattr('pika.BlockingConnection.channel', MockedBlockingConnection.channel)
-    monkeypatch.setattr('connection.Connection._setup_amqp',lambda x: None)
+    monkeypatch.setattr('dripline.core.connection.Connection._setup_amqp',lambda x: None)
     node = Node(bare_conf)
     return node
 
 @pytest.fixture
-def dcv():#
-    c = constructor_registry['agilent34461a_voltage_input']
-    return c('dcv')
+def dcv():
+    return dripline.instruments.agilent34461a_voltage_input('dcv')
 
 def test_node_building_basic(good_node):
     assert good_node.nodename() == 'baz'
 
-def test_node_provider_add(bare_node,dmm0):
+def test_node_provider_add(bare_node, dmm0):
     bare_node.add_provider(dmm0)
     assert bare_node.provider_list() == ['dmm0']
 
@@ -161,9 +175,9 @@ def test_find_endpoint(bare_node, dmm0, abc_sensor):
     bare_node.add_provider(dmm0)
     assert bare_node.locate_provider('abc') == dmm0
 
-def test_object_graph_building_instruments(good_node):
-    assert 'dmm0' in good_node.provider_list()
-    assert 'dmm1' in good_node.provider_list()
+#def test_object_graph_building_instruments(good_node):
+#    assert 'dmm0' in good_node.provider_list()
+#    assert 'dmm1' in good_node.provider_list()
 
 def test_object_graph_building_sensors(good_node):
     p0 = good_node.locate_provider('dmm0_dcv')
