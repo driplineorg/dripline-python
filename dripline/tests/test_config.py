@@ -1,17 +1,17 @@
-# boilerplate needed to get paths right
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
-
 import pytest
 from dripline.core import Config
 
 # This section tests that a "good" configuration, where "good" means
 # that a sane configuration can be generated from the yaml file,
 # generates a sane instance of Config.
+
 @pytest.fixture
-def good_conf():
-    filename = myPath + '/test_config.yaml'
+def testPath():
+    return __file__[:__file__.rfind('/')]
+
+@pytest.fixture
+def good_conf(testPath):
+    filename = testPath + '/test_config.yaml'
     c = Config(filename)
     return c
 
@@ -34,13 +34,13 @@ def test_config_instrument_2(good_conf):
 
 # This section tests that various bad configurations return
 # the expected (very informative) errors.
-def test_identical_endpoints_error():
+def test_identical_endpoints_error(testPath):
     """Verify that identically named endpoints are forbidden.
     Should this be a ValueError for the key name?"""
     with pytest.raises(ValueError):
-        Config(myPath + "/identical_names_conf.yaml")
+        Config(testPath + "/identical_names_conf.yaml")
 
-def test_identical_endpoints_info():
+def test_identical_endpoints_info(testPath):
     """The error should contain information about where in the
     configuration file the error occurred, and why.  In this case,
     the name is already taken by another endpoint which is local
@@ -50,5 +50,5 @@ def test_identical_endpoints_info():
     the name is called out along with its provider.  The error should
     contain the string \"(origin endpoint: provider/endpoint)\"."""
     with pytest.raises(ValueError) as excinfo:
-        Config(myPath + "/identical_names_conf.yaml")
+        Config(testPath + "/identical_names_conf.yaml")
     assert "(origin provider: abc/a_provider/none)" in excinfo.value.message

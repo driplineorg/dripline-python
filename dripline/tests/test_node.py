@@ -1,22 +1,21 @@
-# boilerplate needed to get paths right
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
-
 import pytest
 import dripline
 from dripline.core import Config, Node, connection
 from dripline.instruments.simple_scpi import simple_scpi_sensor
 
 @pytest.fixture
-def good_conf ():
-    filename = myPath + '/test_graph.yaml'
+def testPath():
+    return __file__[:__file__.rfind('/')]
+
+@pytest.fixture
+def good_conf (testPath):
+    filename = testPath + '/test_graph.yaml'
     c = Config(filename)
     return c
 
 @pytest.fixture
-def bare_conf():
-    filename = myPath + '/bare_config.yaml'
+def bare_conf(testPath):
+    filename = testPath + '/bare_config.yaml'
     c = Config(filename)
     return c
 
@@ -197,11 +196,11 @@ def test_object_graph_building_getters(good_node):
     assert s1.on_get() == 'MOCKED'
     assert s2.on_get() == 'MOCKED'
 
-def test_node_config(good_node):
+def test_node_config(good_node, testPath):
     """
     Test that the config which is returned by calling config()
     on a constructed node is equal to the contents of the file
     that created it.
     """
-    with open(myPath + '/test_graph.yaml') as yaml_file:
+    with open(testPath + '/test_graph.yaml') as yaml_file:
         assert good_node.config() == yaml_file.read()

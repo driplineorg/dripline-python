@@ -3,11 +3,6 @@ import msgpack
 import dripline.core.constants as dc
 from dripline.core import RequestMessage, Message
 
-# boilerplate needed to get paths right
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
-
 @pytest.fixture
 def basic_request_msg():
     d = {
