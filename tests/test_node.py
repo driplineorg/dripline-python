@@ -4,11 +4,9 @@ myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
 
 import pytest
-from dripline.core import Config, Node
-#from config import Config
-#from factory import constructor_registry
-#from node import Node
-from instruments.simple_scpi import simple_scpi_sensor
+import dripline
+from dripline.core import Config, Node, connection
+from dripline.instruments.simple_scpi import simple_scpi_sensor
 
 @pytest.fixture
 def good_conf():
@@ -90,7 +88,7 @@ def good_node(good_conf, monkeypatch):
 
     monkeypatch.setattr('pika.BlockingConnection', MockedBlockingConnection)
     monkeypatch.setattr('pika.BlockingConnection.channel', MockedBlockingConnection.channel)
-    monkeypatch.setattr('connection.Connection._setup_amqp',lambda x: None)
+    monkeypatch.setattr('dripline.core.connection.Connection._setup_amqp',lambda x: None)
 
     node = Node(good_conf)
     return node
