@@ -56,18 +56,6 @@ def test_kv_store_value_retrieval(basic_kv_store):
     test_ep.on_set(0.3)
     assert test_ep.on_get() == 0.3
 
-#def test_constructor_reg_kv_store():
-#    """
-#    Make sure the kv_store constructor is in the registry.
-#    """
-#    assert cr['kv_store'] == kv_store.kv_store
-
-#def test_constructor_reg_kv_key():
-#    """
-#    Make sure the kv_store_key constructor is in the registry.
-#    """
-#    assert cr['kv_store_key'] == kv_store.kv_store_key
-
 def test_kv_key_initial_value(basic_kv_store):
     """
     Test that the initial value keyword works when passed

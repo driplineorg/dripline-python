@@ -174,9 +174,9 @@ def test_find_endpoint(bare_node, dmm0, abc_sensor):
     bare_node.add_provider(dmm0)
     assert bare_node.locate_provider('abc') == dmm0
 
-#def test_object_graph_building_instruments(good_node):
-#    assert 'dmm0' in good_node.provider_list()
-#    assert 'dmm1' in good_node.provider_list()
+def test_object_graph_building_instruments(good_node):
+    assert 'dmm0' in good_node.provider_list()
+    assert 'dmm1' in good_node.provider_list()
 
 def test_object_graph_building_sensors(good_node):
     p0 = good_node.locate_provider('dmm0_dcv')
