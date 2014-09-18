@@ -1,0 +1,18 @@
+nodename: higgsino_cpu
+broker: localhost
+providers:
+  - name: cpu_shell
+    module: simple_shell_instrument
+    endpoints:
+      - name: cpu0_temp
+        module: sensors_command_temp
+        core: 0
+      - name: cpu1_temp
+        module: sensors_command_temp
+        core: 1
+      - name: cpu2_temp
+        module: sensors_command_temp
+        core: 2
+      - name: cpu3_temp
+        module: sensors_command_temp
+        core: 3
