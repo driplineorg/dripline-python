@@ -56,7 +56,13 @@ class simple_shell_command(AutoReply):
         self._provider = provider
 
 
+# WARNING, this is not even close to portable
 class sensors_command_temp(AutoReply):
+    '''
+    Temperature sensors on higgsino
+    
+    This assumes that the "sensors" command is installed, which it probably isn't.
+    '''
     def __init__(self, name, core=0):  # , on_get='sensors', on_set=None):
         self.name = name
         self._provider = None
