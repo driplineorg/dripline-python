@@ -6,10 +6,6 @@ import argparse
 import uuid
 
 from dripline.core import Node, Config, message, constants
-#from node import Node
-#from config import Config
-#import message
-#import constants
 
 # Argument parser setup
 PARSER = argparse.ArgumentParser(description='Start a dripline node.')
@@ -25,11 +21,13 @@ PARSER.add_argument('verb')
 PARSER.add_argument('target')
 PARSER.add_argument('value')
 
+
 def verb_list():
     """
     A list of acceptable verb arguments.
     """
     return ['get', 'set', 'describe']
+
 
 def main():
     # TODO: we shouldn't have to start an entire node to do this, should we?
@@ -70,4 +68,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
