@@ -140,7 +140,7 @@ price of peaches:
 
 .. code-block:: bash
 
-    $ python dripline_agent.py -b localhost get peaches
+    $ python dripline_agent.py -b localhost get peaches 0
     2014-09-08 13:45:57,905 - node - INFO - connecting to broker localhost
     peaches: 0.75
 
@@ -149,7 +149,7 @@ waffles?
 
 .. code-block:: bash
 
-    $ python dripline_agent.py -b localhost get waffles
+    $ python dripline_agent.py -b localhost get waffles 0
     2014-09-08 13:52:26,597 - node - INFO - connecting to broker localhost
     waffles: 4.0
 
