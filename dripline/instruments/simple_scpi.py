@@ -31,7 +31,7 @@ class simple_scpi_instrument(Provider):
         return data
 
 class simple_scpi_sensor(AutoReply):
-    def __init__(self,name,on_get=None,on_set=None):
+    def __init__(self, name, on_get=None, on_set=None):
         self.name = name
         self._provider = None
         self._on_get = on_get
