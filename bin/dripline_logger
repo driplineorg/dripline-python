@@ -1,0 +1,75 @@
+#!/usr/bin/python
+'''
+A brute force first pass version of a logger.
+'''
+
+import argparse
+import sqlite3
+import uuid
+import yaml
+
+import dripline
+
+
+def add_to_log(connection, name, payload, time):
+    cursor = connection.cursor()
+    insert_str = 'INSERT INTO {} VALUES (?, ?)'.format(name)
+    cursor.execute('insert_str', (time, payload))
+    connection.commit()
+
+class LogManager:
+    '''
+    Management of many parallel/independent brute force loggers
+    '''
+
+    def __init__(self, conf):
+        self.conn = sqlite3.connect(conf['dbfile'])
+        self.endpoints = {d['name']:d['interval'] for d in conf['endpoints']}
+
+    def _EnsureLoggers(self):
+        for endpoint in self.endpoints.keys():
+            cur = self.con.cursor()
+            cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            existing = cur.fetchall()
+            if (endpoint,) in existing:
+                continue
+            new_str = 'CREATE TABLE {} (date text, value text)'.format(endpoint)
+            cur.execute(new_str)
+            self.conn.commit()
+
+class BruteLogger:
+    '''
+    A class to do brute force logging of a single endpoint.
+    '''
+
+    def __init__(self, endpoint_name, interval):
+        '''
+        endpoint_name: name of an active endpoint
+        interval: time, in seconds, between logging of values
+        '''
+        self.end_name = endpoint_name
+        self.interval = interval
+
+        node_name = uuid.uuid4().hex[1:9]
+
+    def StartLogLoop(self):
+        while True:
+            self._LogChannel()
+            sleep(self.interval)
+
+    def _LogChannel():
+        req = dripline.core.RequestMessage(target=self.end_name,
+                                           msgop=dripline.core.OP_SENSOR_GET,
+                                           )
+        resp = self.node.send_sync(req)
+        add_to_log(self.end_name, resp.payload, datetime.now())
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Start logging endpoints')
+    parser.add_argument('-c', '--config',
+                        metavar='configuration file',
+                        help='path to YAML configuration file',
+                        )
+    parsed = parser.parse_args()
+    conf = yaml.safe_load(open(parsed.config).read())
+    log_manage = LogManager(conf)

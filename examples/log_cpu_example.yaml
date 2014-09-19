@@ -1,0 +1,11 @@
+broker: localhost
+dbfile: /home/laroque/fooSQL.db
+endpoints:
+  - name: cpu0_temp
+    interval: 10
+  - name: cpu1_temp
+    interval: 12
+  - name: cpu2_temp
+    interval: 17
+  - name: cpu3_temp
+    interval: 15
