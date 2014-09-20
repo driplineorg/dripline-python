@@ -4,6 +4,7 @@ A brute force first pass version of a logger.
 '''
 
 import argparse
+import code
 import datetime
 import sqlite3
 from multiprocessing import Process
@@ -119,3 +120,8 @@ if __name__ == '__main__':
     conf = yaml.safe_load(open(parsed.config).read())
     log_manage = LogManager.from_yaml(conf)
     log_manage.StartLoggers()
+    context = globals()
+    context.update({'log_manager':log_manage})
+    welcome_str = 'Welcome to the brute force logger.\n'
+    info_str = 'you can stop with log_manager.StopLoggers()'
+    code.InteractiveConsole(context).interact(welcome_str+info_str)
