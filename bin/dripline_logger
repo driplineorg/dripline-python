@@ -108,7 +108,7 @@ class BruteLogger:
                                            msgop=dripline.core.OP_SENSOR_GET,
                                            )
         resp = self.node.send_sync(req)
-        add_to_log(self.conn, self.end_name, resp.payload, datetime.datetime.now())
+        add_to_log(self.conn, self.end_name, resp.payload, resp.timestamp) #datetime.datetime.now())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start logging endpoints')
