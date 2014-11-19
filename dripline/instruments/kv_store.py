@@ -21,6 +21,8 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 """
 
 from __future__ import absolute_import
+import logging
+logger = logging.getLogger('dripline')
 
 from ..core import Provider, Endpoint
 
