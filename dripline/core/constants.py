@@ -5,6 +5,7 @@ Constant mappings
 # Operation constants.
 OP_SENSOR_SET = 0
 OP_SENSOR_GET = 1
+OP_SENSOR_CONFIG = 6
 
 # Message type constants.
 T_REPLY = 2

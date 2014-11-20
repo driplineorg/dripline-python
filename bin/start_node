@@ -5,8 +5,15 @@ Starts a dripline node and connects to a dripline mesh based on a configuration
 file passed in with the 'c' flag, or '--config'.
 """
 import argparse
+#import logging
+#rt_log = logging.getLogger()
+#console_handler = logging.StreamHandler()
+#console_handler.setLevel(logging.DEBUG)
+#rt_log.addHandler(console_handler)
+
 from dripline.core import Config, Node
 from dripline import instruments
+from dripline.core import status_logger
 
 # Argument parser setup
 PARSER = argparse.ArgumentParser(description='Start a dripline node.')

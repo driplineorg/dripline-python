@@ -6,13 +6,13 @@ from __future__ import print_function, absolute_import
 import logging
 
 # crate logger for 'dripline'
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
 # create the console log handler
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s(%(lineno)d) -> %(message)s')
 
 # apply formatter and add handlers tot he loggers
 console_handler.setFormatter(formatter)

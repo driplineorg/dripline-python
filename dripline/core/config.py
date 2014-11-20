@@ -11,12 +11,12 @@ from sets import Set
 
 import logging
 LOGGER = logging.getLogger(__name__)
-STREAM_HANDLER = logging.StreamHandler()
-MSG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-FORMATTER = logging.Formatter(MSG_FORMAT)
-STREAM_HANDLER.setFormatter(FORMATTER)
-LOGGER.setLevel(logging.INFO)
-LOGGER.addHandler(STREAM_HANDLER)
+#STREAM_HANDLER = logging.StreamHandler()
+#MSG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+#FORMATTER = logging.Formatter(MSG_FORMAT)
+#STREAM_HANDLER.setFormatter(FORMATTER)
+#LOGGER.setLevel(logging.INFO)
+#LOGGER.addHandler(STREAM_HANDLER)
 
 DUP_MESSAGE = """
             duplicate definition: {category} with name {name} already

@@ -22,13 +22,13 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 
 from __future__ import absolute_import
 import logging
-logger = logging.getLogger(__name__)
 
 from ..core import Provider, Endpoint, DataLogger
 
 __all__ = ['kv_store', 'kv_store_key']
 
 
+logger = logging.getLogger(__name__)
 class kv_store(Provider):
     """
     The KV store.  This is just a wrapper around a dict.
