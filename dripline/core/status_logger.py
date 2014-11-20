@@ -6,7 +6,7 @@ from __future__ import print_function, absolute_import
 import logging
 
 # crate logger for 'dripline'
-logger = logging.getLogger('dripline')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # create the console log handler
 console_handler = logging.StreamHandler()
