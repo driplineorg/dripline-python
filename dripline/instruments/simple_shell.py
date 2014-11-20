@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
 from subprocess import check_output
+import logging
 
-from ..core import Provider, AutoReply
+from ..core import Provider, AutoReply, DataLogger
 
 __all__ = ['simple_shell_instrument', 'simple_shell_command',
            'sensors_command_temp']
-
+logger = logging.getLogger(__name__)
 
 class simple_shell_instrument(Provider):
     def __init__(self, name, *args):
@@ -57,18 +58,27 @@ class simple_shell_command(AutoReply):
 
 
 # WARNING, this is not even close to portable
-class sensors_command_temp(AutoReply):
+class sensors_command_temp(AutoReply, DataLogger):
     '''
     Temperature sensors on higgsino
     
     This assumes that the "sensors" command is installed, which it probably isn't.
     '''
     def __init__(self, name, core=0):  # , on_get='sensors', on_set=None):
+        # DataLogger stuff
+        super(sensors_command_temp, self).__init__()
+        self.get_value = self.on_get
+        self.store_value = self.report_log
+
+        # local stuff
         self.name = name
         self._provider = None
         self._on_get = ['sensors']  # on_get
         self._on_set = None  # on_set
         self._core = core
+    @staticmethod
+    def report_log(value):
+        logger.info("\n\nShould be logging value: {}\n\n".format(value))
 
     def on_get(self):
         result = None
@@ -82,8 +92,12 @@ class sensors_command_temp(AutoReply):
         result = self._provider.send_sync(self._on_set.format(value))
         return result
 
-    def on_config(self):
-        raise NotImplementedError
+    def on_config(self, attribute, value):
+        if hasattr(self, attribute):
+            setattr(self, attribute, value)
+            logger.info('set {} to {}'.format(attribute, value))
+        else:
+            raise AttributeError("No attribute: {}".format(attribute))
 
     def provider(self):
         return self._provider

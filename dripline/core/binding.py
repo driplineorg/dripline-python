@@ -3,11 +3,16 @@ A class which represents the binding between dripline name
 and the functions which are called when that name is addressed
 on the dripline mesh.
 """
-import message
-import constants
+from __future__ import absolute_import
+
 import pika
+import logging
+
+from ..core import message
+from ..core import constants
 
 __all__ = ['Binding']
+logger = logging.getLogger(__name__)
 
 class Binding(object):
     """
@@ -37,6 +42,12 @@ class Binding(object):
         endpoint which is bound by this binding.
         """
         msg = message.Message.from_msgpack(request)
+        # TODO: this is a really messy abstraction, the endpoint baseclass 
+        # should be able to handle this with with a dict mapping constant values
+        # to abstract methods
+        # (ie add OP_SENSOR_<whatever> to constants, add a abstract method for
+        # it, and add an entry to the constant->method dict)
+        logger.info('got a {} request'.format(msg.msgop))
         if msg.msgop == constants.OP_SENSOR_GET:
             result = self.on_get()
             self._send_reply(channel, properties, result)
@@ -45,9 +56,24 @@ class Binding(object):
             result = None
             try:
                 value = msg.payload
-                self.on_set(value)
+                result = self.on_set(value)
+                logger.info('set returned: {}'.format(result))
                 result = 'complete'
             except ValueError as err:
+                logger.error('got: {}'.format(err.message))
                 result = err.message
             self._send_reply(channel, properties, result)
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        elif msg.msgop == constants.OP_SENSOR_CONFIG:
+            result = None
+            try:
+                value = msg.payload
+                result = self.on_config(*value.split(':'))
+            except Exception as err:
+                result = err.message
+            self._send_reply(channel, properties, result)
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        else:
+            logger.warning('Got an operation request of unsupported type')
+            self._send_reply(channel, properties, "operation unknown")
             channel.basic_ack(delivery_tag=method.delivery_tag)

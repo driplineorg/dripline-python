@@ -24,7 +24,7 @@ class DataLogger(object):
         raise NotImplementedError('get value in derrived class')
 
 #    @abc.abstractmethod
-    def store_value(self):
+    def store_value(self, value):
         raise NotImplementedError('store value in derrived class')
 
     @property
@@ -32,13 +32,14 @@ class DataLogger(object):
         return self._log_interval
     @log_interval.setter
     def log_interval(self, value):
+        value = int(value)
         if value < 0:
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
 
     def _log_loop(self):
         while True:
-            self.store_value(self.get_value)
+            self.store_value(self.get_value())
             time.sleep(self._log_interval)
 
     def _stop_loop(self):
@@ -53,7 +54,7 @@ class DataLogger(object):
         elif not self._log_interval:
             raise Exception("log interval must be > 0")
         else:
-            self._loop_process = Process(target=self._log_loop)
+            self._loop_process = multiprocessing.Process(target=self._log_loop)
             self._loop_process.start()
 
     def _restart_loop(self):
@@ -62,3 +63,20 @@ class DataLogger(object):
         except Warning:
             pass
         self._start_loop()
+
+    @property
+    def logging_status(self):
+        translator = {True: 'running',
+                      False: 'stopped'
+                     }
+        return translator[self._loop_process.is_alive()]
+    @logging_status.setter
+    def logging_status(self, value):
+        if value in ['start', 'on']:
+            self._start_loop()
+        elif value in ['stop', 'off']:
+            self._stop_loop()
+        elif value in ['restart']:
+            self._restart_loop()
+        else:
+            raise ValueError('unrecognized logger status setting')

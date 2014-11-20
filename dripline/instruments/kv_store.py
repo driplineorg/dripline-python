@@ -77,11 +77,16 @@ class kv_store_key(Endpoint, DataLogger):
         # DataLogger stuff
         super(kv_store_key, self).__init__()
         self.get_value = self.on_get
+        self.store_value = self.report_log
 
         # derrived class stuff
         self.name = name
         self.provider = None
         self.initial_value = initial_value
+
+    @staticmethod
+    def report_log(value):  
+        logger.info("\n\nShould be logging value: {}\n\n".format(value))
 
     def on_get(self):
         """
@@ -108,5 +113,6 @@ class kv_store_key(Endpoint, DataLogger):
         """
         if hasattr(self, attribute):
             setattr(self, attribute, value)
+            logger.info('set {} to {}'.format(attribute, value))
         else:
             raise AttributeError("No attribute: {}".format(attribute))

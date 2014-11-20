@@ -22,11 +22,12 @@ PARSER.add_argument('target')
 PARSER.add_argument('value')
 
 
+# TODO: this should be by introspection
 def verb_list():
     """
     A list of acceptable verb arguments.
     """
-    return ['get', 'set', 'describe']
+    return ['get', 'set', 'config', 'describe']
 
 
 def main():
@@ -38,7 +39,7 @@ def main():
     # if the request verb is not one of the accepted verbs, barf here.
     request_verb = args.verb
     if request_verb not in verb_list():
-        print("ERROR: verb argument must be one of: get, set, or describe.")
+        print("ERROR: verb argument must be one of: {}".format(verb_list()))
         return -1
 
     conf = None
@@ -53,15 +54,22 @@ def main():
         conf = Config(config_file=args.config)
     node = Node(conf)
 
+    # TODO: this block makes me sad, a dict can do this in a way that is way more flexible
     if request_verb == 'get':
         request = message.RequestMessage(target=args.target,
-                                         msgop=constants.OP_SENSOR_GET)
-
+                                         msgop=constants.OP_SENSOR_GET,
+                                         payload=args.value)
         reply = node.send_sync(request)
         print(args.target + ': ' + str(reply.payload))
     elif request_verb == 'set':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_SET,
+                                         payload=args.value)
+        reply = node.send_sync(request)
+        print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
+    elif request_verb == 'config':
+        request = message.RequestMessage(target=args.target,
+                                         msgop=constants.OP_SENSOR_CONFIG,
                                          payload=args.value)
         reply = node.send_sync(request)
         print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
