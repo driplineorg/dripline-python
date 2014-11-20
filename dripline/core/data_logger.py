@@ -9,9 +9,9 @@ import abc
 import multiprocessing
 import time
 
-__all__ = ['data_logger']
+__all__ = ['DataLogger']
 
-class data_logger(object):
+class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
