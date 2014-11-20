@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import
 import logging
-logger = logging.getLogger('dripline')
+logger = logging.getLogger(__name__)
 
 import abc
 import multiprocessing
@@ -15,16 +15,17 @@ class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
+        logger.debug('in data_logger init')
         self._log_interval = 0
         self._loop_process = multiprocessing.Process()
 
-    @abc.abstractmethod
+#    @abc.abstractmethod
     def get_value(self):
-        raise NotImplementedError
+        raise NotImplementedError('get value in derrived class')
 
-    @abc.abstractmethod
+#    @abc.abstractmethod
     def store_value(self):
-        raise NotImplementedError
+        raise NotImplementedError('store value in derrived class')
 
     @property
     def log_interval(self):
