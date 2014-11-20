@@ -22,9 +22,9 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 
 from __future__ import absolute_import
 import logging
-logger = logging.getLogger('dripline')
+logger = logging.getLogger(__name__)
 
-from ..core import Provider, Endpoint
+from ..core import Provider, Endpoint, DataLogger
 
 __all__ = ['kv_store', 'kv_store_key']
 
@@ -69,11 +69,16 @@ class kv_store(Provider):
         self.dict[name] = value
 
 
-class kv_store_key(Endpoint):
+class kv_store_key(Endpoint, DataLogger):
     """
     A key in the KV store.
     """
     def __init__(self, name, initial_value=None):
+        # DataLogger stuff
+        super(kv_store_key, self).__init__()
+        self.get_value = self.on_get
+
+        # derrived class stuff
         self.name = name
         self.provider = None
         self.initial_value = initial_value
@@ -97,9 +102,11 @@ class kv_store_key(Endpoint):
         except ValueError:
             raise ValueError('argument to set must be a float!')
 
-    def on_config(self):
+    def on_config(self, attribute, value):
         """
         Configuring a key is not defined.
         """
-        raise NotImplementedError
-
+        if hasattr(self, attribute):
+            setattr(self, attribute, value)
+        else:
+            raise AttributeError("No attribute: {}".format(attribute))
