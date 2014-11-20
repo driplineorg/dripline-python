@@ -101,5 +101,5 @@ class kv_store_key(Endpoint):
         """
         Configuring a key is not defined.
         """
-        return NotImplementedError
+        raise NotImplementedError
 
