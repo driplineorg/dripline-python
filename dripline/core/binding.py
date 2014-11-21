@@ -47,7 +47,7 @@ class Binding(object):
         # to abstract methods
         # (ie add OP_SENSOR_<whatever> to constants, add a abstract method for
         # it, and add an entry to the constant->method dict)
-        logger.info('got a {} request'.format(msg.msgop))
+        logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
         if msg.msgop == constants.OP_SENSOR_GET:
             result = self.on_get()
             self._send_reply(channel, properties, result)
