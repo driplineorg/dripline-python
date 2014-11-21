@@ -33,7 +33,7 @@ class DataLogger(object):
         return self._log_interval
     @log_interval.setter
     def log_interval(self, value):
-        value = int(value)
+        value = float(value)
         if value < 0:
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
