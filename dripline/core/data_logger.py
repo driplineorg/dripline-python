@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import abc
-import multiprocessing
+import threading
 import time
 
 __all__ = ['DataLogger']
@@ -17,7 +17,8 @@ class DataLogger(object):
     def __init__(self):
         logger.debug('in data_logger init')
         self._log_interval = 0
-        self._loop_process = multiprocessing.Process()
+        self._is_logging = False
+        self._loop_process = threading.Timer([], {})
 
 #    @abc.abstractmethod
     def get_value(self):
@@ -37,24 +38,33 @@ class DataLogger(object):
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
 
-    def _log_loop(self):
-        while True:
-            self.store_value(self.get_value())
-            time.sleep(self._log_interval)
+    def _log_a_value(self):
+        self.store_value(self.get_value())
+        if (self._log_interval <= 0) or (not self._is_logging):
+            return
+        self._loop_process = Timer(self._log_interval, self._log_a_value, ())
+        self._loop_process.start()
+
+#    def _log_loop(self):
+#        while True:
+#            self.store_value(self.get_value())
+#            time.sleep(self._log_interval)
 
     def _stop_loop(self):
+        self.is_logging = False
         if self._loop_process.is_alive():
-            self._loop_process.terminate()
+            self._loop_process.cancel()
         else:
             raise Warning("loop process not running")
 
     def _start_loop(self):
+        self.is_logging = True
         if self._loop_process.is_alive():
             raise Warning("loop process already started")
-        elif not self._log_interval:
+        elif self._log_interval <= 0:
             raise Exception("log interval must be > 0")
         else:
-            self._loop_process = multiprocessing.Process(target=self._log_loop)
+            self._loop_process = threading.Timer(self._log_interval, self.log_a_value, ())
             self._loop_process.start()
 
     def _restart_loop(self):
