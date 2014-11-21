@@ -3,13 +3,13 @@
 
 from __future__ import absolute_import
 import logging
-logger = logging.getLogger(__name__)
 
 import abc
 import threading
 import time
 
 __all__ = ['DataLogger']
+logger = logging.getLogger(__name__)
 
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta

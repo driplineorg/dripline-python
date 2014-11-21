@@ -5,16 +5,9 @@ from .binding import Binding
 from . import message
 import logging
 
-#from ..core import status_logger
-
-logger = logging.getLogger(__name__)
-#ch = logging.StreamHandler()
-#formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#ch.setFormatter(formatter)
-#logger.setLevel(logging.INFO)
-#logger.addHandler(ch)
-
 __all__ = ['Node']
+logger = logging.getLogger(__name__)
+
 
 class Node(object):
     """
