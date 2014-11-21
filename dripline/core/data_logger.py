@@ -15,7 +15,6 @@ class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
-        logger.debug('in data_logger init')
         self._log_interval = 0
         self._is_logging = False
         self._loop_process = threading.Timer([], {})
