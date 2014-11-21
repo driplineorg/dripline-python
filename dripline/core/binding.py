@@ -70,6 +70,7 @@ class Binding(object):
                 value = msg.payload
                 result = self.on_config(*value.split(':'))
             except Exception as err:
+                logger.warning("config failed: {}".format(err.message))
                 result = err.message
             self._send_reply(channel, properties, result)
             channel.basic_ack(delivery_tag=method.delivery_tag)
