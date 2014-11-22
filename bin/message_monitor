@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import pika
 import argparse
+import msgpack
 
 from dripline.core import Message
 
@@ -50,6 +51,7 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
     
     def callback(ch, method, properties, body):
         message = Message.from_msgpack(body)
+        message.payload = msgpack.unpackb(message.payload)
         print(" [x] {}:{}".format(method.routing_key, message,))
     
     channel.basic_consume(callback,
