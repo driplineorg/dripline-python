@@ -35,7 +35,7 @@ class kv_store(Provider):
     """
     def __init__(self, name, *args):
         self.name = name
-        self.dict = {}
+        self.conf = {}
         self.endpoints = {}
 
     def add_endpoint(self, endpoint):
@@ -46,7 +46,7 @@ class kv_store(Provider):
         """
         endpoint.provider = self
         self.endpoints[endpoint.name] = endpoint
-        self.dict[endpoint.name] = endpoint.initial_value
+        self.conf[endpoint.name] = endpoint.initial_value
 
     def endpoint(self, endpoint):
         """
@@ -60,22 +60,25 @@ class kv_store(Provider):
         This is the same as enumerating the keys in the
         dict.
         """
-        return self.dict.keys()
+        return self.conf.keys()
 
+    # TODO: is there a reason for this, rather than inherit from dict?
+    # I'll need to think about that
     def __getitem__(self, name):
-        return self.dict[name]
+        return self.conf[name]
 
     def __setitem__(self, name, value):
-        self.dict[name] = value
+        self.conf[name] = value
 
 
 class kv_store_key(Endpoint, DataLogger):
     """
     A key in the KV store.
     """
-    def __init__(self, name, initial_value=None):
+    def __init__(self, name, initial_value=None, log_interval=0.):
         # DataLogger stuff
         super(kv_store_key, self).__init__()
+        self.log_interval = log_interval
         self.get_value = self.on_get
         self.store_value = self.report_log
 
