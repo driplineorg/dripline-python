@@ -7,6 +7,7 @@ import logging
 import abc
 import threading
 import time
+import msgpack
 
 __all__ = ['DataLogger']
 logger = logging.getLogger(__name__)
@@ -38,7 +39,10 @@ class DataLogger(object):
         self._log_interval = value
 
     def _log_a_value(self):
-        self.store_value(self.get_value(), severity='sensor_value')
+        to_send = {'from':self.name,
+                   'value':self.get_value(),
+                  }
+        self.store_value(msgpack.packb(to_send), severity='sensor_value')
         if (self._log_interval <= 0) or (not self._is_logging):
             return
         self._loop_process = threading.Timer(self._log_interval, self._log_a_value, ())
