@@ -109,6 +109,8 @@ class Node(object):
                   on_get=endpoint.on_get,
                   on_set=endpoint.on_set,
                   on_config=endpoint.on_config)
+        setattr(endpoint, 'store_value', self.conn.send_alert)
+        endpoint.report_log = self.conn.send_alert
 
     # TODO: god these names are awkward, who came up with this???
     def provider_list(self):

@@ -86,7 +86,7 @@ class kv_store_key(Endpoint, DataLogger):
 
     @staticmethod
     def report_log(value):  
-        logger.info("\n\nShould be logging value: {}\n\n".format(value))
+        logger.info("Should be logging value: {}\n".format(value))
 
     def on_get(self):
         """

@@ -9,6 +9,7 @@ import pika
 import uuid
 from .endpoint import Endpoint
 from .sensor import Sensor
+from .message import AlertMessage
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,11 +30,18 @@ class Connection(object):
         '''
         ensures all exchanges are present and creates a response queue.
         '''
-        self.chan.exchange_declare(exchange='requests',type='topic')
+        self.chan.exchange_declare(exchange='requests', type='topic')
         self.queue = self.chan.queue_declare(exclusive=True)
         self.chan.queue_bind(exchange='requests',
-            queue=self.queue.method.queue,
-            routing_key=self.queue.method.queue)
+                             queue=self.queue.method.queue,
+                             routing_key=self.queue.method.queue)
+
+        self.chan.exchange_declare(exchange='alerts', type='topic')
+        self.all_alert_queue = self.chan.queue_declare()
+        self.chan.queue_bind(exchange='alerts',
+                             queue=self.all_alert_queue.method.queue,
+                             routing_key='#',
+                            )
 
         self.chan.basic_consume(self._on_response, queue=self.queue.method.queue)
 
@@ -61,3 +69,15 @@ class Connection(object):
         while self.response is None:
             self.conn.process_data_events()
         return self.response
+
+    def send_alert(self, alert, severity):
+        '''
+        send an alert
+        '''
+        message = AlertMessage()
+        message.update({'target':severity, 'payload':alert})
+        self.chan.basic_publish(exchange='alerts',
+                               routing_key=severity,
+                               mandatory=True,
+                               body=message.to_msgpack(),
+                              )
