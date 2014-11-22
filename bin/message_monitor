@@ -1,0 +1,63 @@
+#!/usr/bin/python
+
+'''
+Utility app for printing all of the messages through some exchange
+'''
+
+from __future__ import print_function
+
+import pika
+import argparse
+
+from dripline.core import Message
+
+PARSER = argparse.ArgumentParser(description='Print messages from an exchange.')
+PARSER.add_argument('-a',
+                    '--amqp',
+                    metavar='amqp server host address',
+                    help='full network name of amqp host',
+                    default='localhost',
+                   )
+PARSER.add_argument('-e',
+                    '--exchange',
+                    metavar='exchange name',
+                    help='amqp name of the exchange to monitor',
+                    default='alerts',
+                   )
+PARSER.add_argument('-k',
+                    '--keys',
+                    metavar='binding keys',
+                    help='amqp binding keys to follow',
+                    default='#',
+                    nargs='*',
+                   )
+
+def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=amqp))
+    channel = connection.channel()
+#    channel.exchange_declare(exchange='alerts', type='topic')
+    
+    result = channel.queue_declare(exclusive=True)
+    queue_name = result.method.queue
+    
+    for severity in keys:
+        channel.queue_bind(exchange=exchange,
+                           queue=queue_name,
+                           routing_key=severity,
+                          )
+    
+    print(' [*] Waiting for logs. To exit press CTRL+C')
+    
+    def callback(ch, method, properties, body):
+        message = Message.from_msgpack(body)
+        print(" [x] {}:{}".format(method.routing_key, message,))
+    
+    channel.basic_consume(callback,
+                          queue=queue_name,
+                          no_ack=True)
+    
+    channel.start_consuming()
+
+if __name__ == '__main__':
+    kwargs = PARSER.parse_args()
+    start_monitoring(**vars(kwargs))
