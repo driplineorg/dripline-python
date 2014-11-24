@@ -59,7 +59,7 @@ class Binding(object):
                 result = self.on_set(*value)
                 logger.info('set returned: {}'.format(result))
                 result = 'complete'
-            except ValueError as err:
+            except Exception as err:
                 logger.error('got: {}'.format(err.message))
                 result = err.message
             self._send_reply(channel, properties, result)
