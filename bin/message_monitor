@@ -12,31 +12,35 @@ import msgpack
 
 from dripline.core import Message
 
-PARSER = argparse.ArgumentParser(description='Print messages from an exchange.')
-PARSER.add_argument('-a',
-                    '--amqp',
-                    metavar='amqp server host address',
-                    help='full network name of amqp host',
-                    default='localhost',
-                   )
-PARSER.add_argument('-e',
-                    '--exchange',
-                    metavar='exchange name',
-                    help='amqp name of the exchange to monitor',
-                    default='alerts',
-                   )
-PARSER.add_argument('-k',
-                    '--keys',
-                    metavar='binding keys',
-                    help='amqp binding keys to follow',
-                    default='#',
-                    nargs='*',
-                   )
+
+def make_parser():
+    parser = argparse.ArgumentParser(description='Print messages from an exchange.')
+    parser.add_argument('-a',
+                        '--amqp',
+                        metavar='amqp server host address',
+                        help='full network name of amqp host',
+                        default='localhost',
+                       )
+    parser.add_argument('-e',
+                        '--exchange',
+                        metavar='exchange name',
+                        help='amqp name of the exchange to monitor',
+                        default='alerts',
+                       )
+    parser.add_argument('-k',
+                        '--keys',
+                        metavar='binding keys',
+                        help='amqp binding keys to follow',
+                        default='#',
+                        nargs='*',
+                       )
+    return parser
+
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=amqp))
     channel = connection.channel()
-#    channel.exchange_declare(exchange='alerts', type='topic')
+    #channel.exchange_declare(exchange='alerts', type='topic')
     
     result = channel.queue_declare(exclusive=True)
     queue_name = result.method.queue
@@ -61,7 +65,7 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
     channel.start_consuming()
 
 if __name__ == '__main__':
-    kwargs = PARSER.parse_args()
+    kwargs = make_parser().parse_args()
     try:
         start_monitoring(**vars(kwargs))
     except KeyboardInterrupt:
