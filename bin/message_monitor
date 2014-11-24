@@ -62,4 +62,7 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
 
 if __name__ == '__main__':
     kwargs = PARSER.parse_args()
-    start_monitoring(**vars(kwargs))
+    try:
+        start_monitoring(**vars(kwargs))
+    except KeyboardInterrupt:
+        print(' [*] exiting')

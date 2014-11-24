@@ -116,13 +116,13 @@ own, point to whatever you created), and fire it up:
 
 .. code-block:: bash
 
- $ python start_node.py -c examples/kv_store_tutorial.yaml
+ $ start_node -c examples/kv_store_tutorial.yaml
 
 You should see output that looks like this:
 
 .. code-block:: bash
 
- $ python start_node.py -c examples/kv_store_tutorial.yaml
+ $ start_node -c examples/kv_store_tutorial.yaml
  2014-09-08 13:28:57,201 - node - INFO - connecting to broker localhost
  2014-09-08 13:29:00,746 - node - INFO - adding provider my_price_list
  2014-09-08 13:29:00,746 - node - INFO - adding endpoint peaches to provider my_price_list
@@ -133,14 +133,14 @@ You should see output that looks like this:
 This isn't too hard to follow - dripline starts up, connects to the broker
 you told it to, adds a provider and the endpoints, and is ready to go.
 
-Now let's start getting some prices.  We're going to use ``dripline_agent.py``
+Now let's start getting some prices.  We're going to use ``dripline_agent``
 to do this, as it gives us a very easy way to interact with dripline 
 endpoints from the command line.  First of all, let's check the current
 price of peaches:
 
 .. code-block:: bash
 
-    $ python dripline_agent.py -b localhost get peaches 0
+    $ dripline_agent -b localhost get peaches
     2014-09-08 13:45:57,905 - node - INFO - connecting to broker localhost
     peaches: 0.75
 
@@ -149,24 +149,24 @@ waffles?
 
 .. code-block:: bash
 
-    $ python dripline_agent.py -b localhost get waffles 0
+    $ dripline_agent -b localhost get waffles
     2014-09-08 13:52:26,597 - node - INFO - connecting to broker localhost
     waffles: 4.0
 
 Now let's say that there's been a global rush on chips and the price we
 have to charge has skyrocketed from 1.75 to 1.79.  We can use 
-``dripline_agent.py`` to set the new value:
+``dripline_agent`` to set the new value:
 
 .. code-block:: bash
 
-  $ python dripline_agent.py -b localhost get chips 0
+  $ dripline_agent -b localhost get chips
   2014-09-08 13:53:57,432 - node - INFO - connecting to broker localhost
   chips: 1.75
   
-  $ python dripline_agent.py -b localhost set chips 1.79
+  $ dripline_agent -b localhost set chips 1.79
   2014-09-08 13:53:38,545 - node - INFO - connecting to broker localhost
   chips->1.79: complete
   
-  $ python dripline_agent.py -b localhost get chips 0
+  $ dripline_agent -b localhost get chips
   2014-09-08 13:53:59,768 - node - INFO - connecting to broker localhost
   chips: 1.79

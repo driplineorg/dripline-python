@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" dripline_agent.py
+""" dripline_agent
 Do simple stuff like gets and sets.
 """
 import argparse
@@ -7,19 +7,24 @@ import uuid
 
 from dripline.core import Node, Config, message, constants
 
-# Argument parser setup
-PARSER = argparse.ArgumentParser(description='Start a dripline node.')
-PARSER.add_argument('-c',
-                    '--config',
-                    metavar='configuration file',
-                    help='full path to a dripline YAML configuration file.')
-PARSER.add_argument('-b',
-                    '--broker',
-                    metavar='AMQP broker address',
-                    help='the address of the AMQP broker dripline should use')
-PARSER.add_argument('verb')
-PARSER.add_argument('target')
-PARSER.add_argument('value')
+# Argument parser setup$a
+def get_args():
+    agent_doc = '''
+                dripline_agent provides basic a CLI to the dripline system.
+                '''
+    parser = argparse.ArgumentParser(description=agent_doc)
+    parser.add_argument('-c',
+                        '--config',
+                        metavar='configuration file',
+                        help='full path to a dripline YAML configuration file.')
+    parser.add_argument('-b',
+                        '--broker',
+                        metavar='AMQP broker address',
+                        help='the address of the AMQP broker dripline should use')
+    parser.add_argument('verb')
+    parser.add_argument('target')
+    parser.add_argument('value', nargs='*')
+    return parser
 
 
 # TODO: this should be by introspection
@@ -30,10 +35,8 @@ def verb_list():
     return ['get', 'set', 'config', 'describe']
 
 
-def main():
+def main(args):
     # TODO: we shouldn't have to start an entire node to do this, should we?
-    # a connection should suffice...
-    args = PARSER.parse_args()
 
     # TODO: can't we use argparse to do this somehow?
     # if the request verb is not one of the accepted verbs, barf here.
@@ -75,4 +78,5 @@ def main():
         print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
 
 if __name__ == '__main__':
-    main()
+    args = get_args().parse_args()
+    main(args)

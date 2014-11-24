@@ -56,7 +56,7 @@ class Binding(object):
             result = None
             try:
                 value = msg.payload
-                result = self.on_set(value)
+                result = self.on_set(*value)
                 logger.info('set returned: {}'.format(result))
                 result = 'complete'
             except ValueError as err:
@@ -68,7 +68,7 @@ class Binding(object):
             result = None
             try:
                 value = msg.payload
-                result = self.on_config(*value.split(':'))
+                result = self.on_config(*value)
             except Exception as err:
                 logger.warning("config failed: {}".format(err.message))
                 result = err.message

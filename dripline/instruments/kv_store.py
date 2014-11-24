@@ -105,6 +105,7 @@ class kv_store_key(Endpoint, DataLogger):
         to some new value.
         """
         try:
+            print('value received is {} of type {}'.format(value, type(value)))
             value = float(value)
             self.provider[self.name] = value
         except ValueError:
