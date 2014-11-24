@@ -32,7 +32,8 @@ For the complete experience, you would run the following three commands (the las
 $ virtualenv path/to/virt_environments/dripline
 $ source path/to/virt_environments/dripline/bin/activate
 $ pip install pika PyYAML msgpack-python 
-$ pip install ipython sphinx sphinx_rtd_theme
+$ pip install ipython sphinx sphinx_rtd_theme sphinxcontrib-programoutput
+.. sphinx-argparse is not used for now
 
 Note that sphinx is only required if you want to (re)build this documentation and sphinx_rtd_theme is purely cosmetic.
 Similarly, ipython is nice for the user but does not change available dripline features.

@@ -16,6 +16,7 @@ Contents:
     getting_started
     contribute
     tutorials
+    cli_tools
 
 Indices and tables
 ==================

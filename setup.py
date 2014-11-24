@@ -41,7 +41,7 @@ setup(
     scripts=glob('bin/*'),
     install_requires=['pika>=0.9.8', 'PyYAML', 'msgpack-python'],
     extras_require={
-        'doc': ['sphinx', 'sphinx_rtd_theme'],
+        'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],# sphinx-argparse
     },
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],
