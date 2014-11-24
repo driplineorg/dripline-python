@@ -49,9 +49,12 @@ class Binding(object):
         # it, and add an entry to the constant->method dict)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
         if msg.msgop == constants.OP_SENSOR_GET:
-            result = self.on_get()
-            self._send_reply(channel, properties, result)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+            try:
+                result = self.on_get()
+                self._send_reply(channel, properties, result)
+            except Exception as err:
+                logger.error('got: {}'.format(err.message))
+                result = err.message
         elif msg.msgop == constants.OP_SENSOR_SET:
             result = None
             try:
@@ -63,7 +66,6 @@ class Binding(object):
                 logger.error('got: {}'.format(err.message))
                 result = err.message
             self._send_reply(channel, properties, result)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
         elif msg.msgop == constants.OP_SENSOR_CONFIG:
             result = None
             try:
@@ -73,8 +75,7 @@ class Binding(object):
                 logger.warning("config failed: {}".format(err.message))
                 result = err.message
             self._send_reply(channel, properties, result)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
         else:
             logger.warning('Got an operation request of unsupported type')
             self._send_reply(channel, properties, "operation unknown")
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+        channel.basic_ack(delivery_tag=method.delivery_tag)
