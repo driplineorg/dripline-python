@@ -20,7 +20,12 @@ class AlertConsumer:
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']):
         self.dripline_connection = Connection(broker_host=broker_host)
         self.dripline_connection._setup_amqp()
-        self.queue = self.dripline_connection.conne
+        self.queue = self.dripline_connection.chan.queue_declare()
+        for key in keys:
+            self.dripline_connection.chan.queue_bind(exchange=exchange,
+                                                     queue=self.queue.method.queue,
+                                                     routing_key=key,
+                                                    )
 
     @staticmethod
     def custom_consume(message):

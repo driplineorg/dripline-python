@@ -39,6 +39,13 @@ def make_parser():
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
     consumer = AlertConsumer(broker_host=amqp)
+    def just_print(message):
+        logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
+    consumer.custom_consume=just_print
+    try:
+        consumer.start()
+    except Exception as err:
+        pass
 #    connection = pika.BlockingConnection(pika.ConnectionParameters(host=amqp))
 #    channel = connection.channel()
 #    #channel.exchange_declare(exchange='alerts', type='topic')
