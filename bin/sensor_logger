@@ -6,14 +6,24 @@ Utility app for printing all of the messages through some exchange
 
 from __future__ import print_function
 
+import sys
 import pika
 import argparse
 import msgpack
 
+import sqlite3
+
 from dripline.core import AlertConsumer
+
+import logging
+from dripline.core import status_logger
+logger = logging.getLogger('sensor_logger')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(status_logger.console_handler)
 
 
 def make_parser():
+    logger.info("Making argument parser object")
     parser = argparse.ArgumentParser(description='Print messages from an exchange.')
     parser.add_argument('-a',
                         '--amqp',
@@ -36,41 +46,19 @@ def make_parser():
                        )
     return parser
 
+def just_print(message):
+    logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
-    consumer = AlertConsumer(broker_host=amqp)
-    def just_print(message):
-        logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
+    logger.info('making connections')
+    consumer = AlertConsumer(broker_host=amqp, exchange='alerts', keys=['sensor_value'])
     consumer.custom_consume=just_print
     try:
+        logger.info("starting message consumption")
         consumer.start()
-    except Exception as err:
-        pass
-#    connection = pika.BlockingConnection(pika.ConnectionParameters(host=amqp))
-#    channel = connection.channel()
-#    #channel.exchange_declare(exchange='alerts', type='topic')
-#    
-#    result = channel.queue_declare(exclusive=True)
-#    queue_name = result.method.queue
-#    
-#    for severity in keys:
-#        channel.queue_bind(exchange=exchange,
-#                           queue=queue_name,
-#                           routing_key=severity,
-#                          )
-#    
-#    print(' [*] Waiting for logs. To exit press CTRL+C')
-#    
-#    def callback(ch, method, properties, body):
-#        message = Message.from_msgpack(body)
-#        message.payload = msgpack.unpackb(message.payload)
-#        print(" [x] {}:{}".format(method.routing_key, message,))
-#    
-#    channel.basic_consume(callback,
-#                          queue=queue_name,
-#                          no_ack=True)
-#    
-#    channel.start_consuming()
+    except KeyboardInterrupt as err:
+        logger.info('exiting')
+        sys.exit()
 
 if __name__ == '__main__':
     kwargs = make_parser().parse_args()

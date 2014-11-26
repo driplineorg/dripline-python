@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 class AlertConsumer:
    
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']):
+        logger.debug('AlertConsumer initializing')
         self.dripline_connection = Connection(broker_host=broker_host)
         self.dripline_connection._setup_amqp()
-        self.queue = self.dripline_connection.chan.queue_declare()
+        self.queue = self.dripline_connection.chan.queue_declare(auto_delete=True)
         for key in keys:
             self.dripline_connection.chan.queue_bind(exchange=exchange,
                                                      queue=self.queue.method.queue,
@@ -29,16 +30,18 @@ class AlertConsumer:
 
     @staticmethod
     def custom_consume(message):
+        logger.debug('using default message consumption')
         logger.info('{}'.format(message))
 
     def start(self):
+        logger.debug("AlertConsmer consume starting")
         def process_message(channel, method, properties, message):
+            logger.debug('in process_message callback')
             message_unpacked = Message.from_msgpack(message)
             message_unpacked.payload = msgpack.unpackb(message_unpacked.payload)
-            message.payload.name = method.routing_key
-            self.custom_consume(message)
+            self.custom_consume(message_unpacked)
         self.dripline_connection.chan.basic_consume(process_message,
-                                                     queue=self.queue_name,
+                                                     queue=self.queue.method.queue,
                                                      no_ack=True
                                                    )
         self.dripline_connection.chan.start_consuming()
