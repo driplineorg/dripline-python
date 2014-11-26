@@ -29,7 +29,7 @@ def make_parser():
                        )
     parser.add_argument('-k',
                         '--keys',
-                        metavar='binding keys',
+                        metavar='key',
                         help='amqp binding keys to follow',
                         default='#',
                         nargs='*',
