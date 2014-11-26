@@ -110,7 +110,7 @@ Interacting with it
 -------------------
 OK, enough details.  To fire up our key-value store and start interacting with
 it, we want to start a dripline node which will use our configuration file.
-To do that, we will use ``start_node.py`` located in the dripline directory.
+To do that, we will use :ref:`start_node` located in the bin directory.
 We point it to our configuration file (if you are intrepid enough to make your
 own, point to whatever you created), and fire it up:
 

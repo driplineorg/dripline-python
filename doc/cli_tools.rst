@@ -10,13 +10,21 @@ Command Line Tools
         :ref: bin.start_node.PARSER
         :prog: start_node
 
+.. _dripline_agent:
+
 dripline_agent
 --------------
 .. program-output:: dripline_agent --help
 
+
+.. _start_node:
+
 start_node
 ----------
 .. program-output:: start_node --help
+
+
+.. _message_monitor:
 
 message_monitor
 ---------------
