@@ -13,7 +13,6 @@ Contents:
 
     getting_started
     spec
-    getting_started
     contribute
     tutorials
     cli_tools

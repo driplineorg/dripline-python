@@ -25,7 +25,7 @@ We will try to keep the codebase compatible with both, but use of older versions
 Prepare an Environment
 ----------------------
 
-The recommended usage is with a `virtual environment <virtualenv.readthedocs.org/en/latest>`_ and the `ipython <ipython.org>`_ interpreter.
+The recommended usage is with a `virtual environment <http://virtualenv.readthedocs.org/en/latest>`_ and the `ipython <http://ipython.org>`_ interpreter.
 Assuming you have virtualenv installed (most likely available in the package manager for your system) it is relatively simple to get everything going.
 For the complete experience, you would run the following three commands (the last line installs recommended extras).::
 
