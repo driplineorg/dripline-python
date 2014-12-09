@@ -31,13 +31,13 @@ class Connection(object):
         ensures all exchanges are present and creates a response queue.
         '''
         self.chan.exchange_declare(exchange='requests', type='topic')
-        self.queue = self.chan.queue_declare(exclusive=True)
+        self.queue = self.chan.queue_declare(exclusive=True, auto_delete=True)
         self.chan.queue_bind(exchange='requests',
                              queue=self.queue.method.queue,
                              routing_key=self.queue.method.queue)
 
         self.chan.exchange_declare(exchange='alerts', type='topic')
-        self.all_alert_queue = self.chan.queue_declare()
+        self.all_alert_queue = self.chan.queue_declare(auto_delete=True)
         self.chan.queue_bind(exchange='alerts',
                              queue=self.all_alert_queue.method.queue,
                              routing_key='#',

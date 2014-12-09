@@ -90,7 +90,7 @@ class Node(object):
         directly in a configuration file!  It is only used internally
         by dripline.
         """
-        ep_queue = self.conn.chan.queue_declare(exclusive=True)
+        ep_queue = self.conn.chan.queue_declare(exclusive=True, auto_delete=True)
         binding = Binding(name, on_get, on_set, on_config)
 
         self.conn.chan.queue_bind(exchange='requests',

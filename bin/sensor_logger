@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+'''
+Utility app for printing all of the messages through some exchange
+'''
+
+from __future__ import print_function
+
+import sys
+import pika
+import argparse
+import msgpack
+
+import sqlite3
+
+from dripline.core import AlertConsumer
+
+import logging
+from dripline.core import status_logger
+logger = logging.getLogger('sensor_logger')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(status_logger.console_handler)
+
+
+def make_parser():
+    logger.info("Making argument parser object")
+    parser = argparse.ArgumentParser(description='Print messages from an exchange.')
+    parser.add_argument('-a',
+                        '--amqp',
+                        metavar='amqp server host address',
+                        help='full network name of amqp host',
+                        default='localhost',
+                       )
+    parser.add_argument('-e',
+                        '--exchange',
+                        metavar='exchange name',
+                        help='amqp name of the exchange to monitor',
+                        default='alerts',
+                       )
+    parser.add_argument('-k',
+                        '--keys',
+                        metavar='binding keys',
+                        help='amqp binding keys to follow',
+                        default='#',
+                        nargs='*',
+                       )
+    return parser
+
+def just_print(message):
+    logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
+
+def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
+    logger.info('making connections')
+    consumer = AlertConsumer(broker_host=amqp, exchange='alerts', keys=['sensor_value'])
+    consumer.custom_consume=just_print
+    try:
+        logger.info("starting message consumption")
+        consumer.start()
+    except KeyboardInterrupt as err:
+        logger.info('exiting')
+        sys.exit()
+
+if __name__ == '__main__':
+    kwargs = make_parser().parse_args()
+    try:
+        start_monitoring(**vars(kwargs))
+    except KeyboardInterrupt:
+        print(' [*] exiting')
