@@ -49,7 +49,7 @@ class PrologixSpimescape(Provider):
         self._devices = device_dict
         self._device_cycle = itertools.cycle(self._devices.keys())
         self._queue_next_check()
-    def add_spime(self, spime):
+    def add_endpoint(self, spime):
         if spime.name in self.devices:
             logger.warning('spime "{}" already present'.format(spime.name))
             return
@@ -115,7 +115,7 @@ class GPIBInstrument(Provider):
         self._cmd_term = '\n'
         self.spimes = {}
 
-    def add_spime(self, spime):
+    def add_endpoint(self, spime):
         self.spimes.update({spime.name:spime})
         spime.provider = self
 
@@ -132,57 +132,31 @@ class SimpleGetSpime(Spime):
     def on_get(self):
         return self.provider.send(self.cmd_base)
 
-## the following bits are left from development, shouldn't be needed once amqp is setup
-
-def do_some_stuff():
-    logger.info("okay, let's see how this goes...")
-    prologix_box = PrologixSpimescape(socket_info=('10.0.0.107', 1234))
-    logger.info("well, the init worked")
-    prologix_box.reconnect()
-    logger.info("and it should be connected")
-    prologix_box.socket.send("++addr\r")
-    logger.info("starting at addr:{}".format(prologix_box.socket.recv(1024)))
-    prologix_box
-    import gpib_device
-    prologix_box.add_spime(gpib_device.GPIBInstrument('spime1', 3))
-    time.sleep(10)
-    prologix_box.add_spime(gpib_device.GPIBInstrument('spime2', 1))
-
-def setup_handler(handler='file'):
-    date_form = '%Y-%m-%dT%H:%M:%S'
-    try:
-        import colorlog
-        formatter = colorlog.ColoredFormatter(
-            "%(log_color)s%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d] %(purple)s%(message)s",
-            datefmt = date_form,
-            reset=True,
-            log_colors={
-                    'DEBUG': 'cyan',
-                    'INFO': 'green',
-                    'WARNING': 'yellow',
-                    'ERROR': 'red',
-                    'CRITICAL': 'red',
-            }
-        )
-    except:
-        formatter = logging.Formatter("%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d]%(message)s")
-    if handler == 'file':
-        new_handler = logging.FileHandler('prologix.log')
-    elif handler == 'console':
-        new_handler = logging.StreamHandler()
-    else:
-        raise ValueError('handler:{} not recognized'.format(handler))
-    new_handler.setFormatter(formatter)
-    new_handler.setLevel(logging.DEBUG)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(new_handler)
-
- 
-if __name__ == '__main__':
-    setup_handler('file')
-    logger.setLevel(logging.DEBUG)
-    try:
-        do_some_stuff()
-    except KeyboardInterrupt:
-        logger.warning('got keyboard interrupt')
-        pass
+#def setup_handler(handler='file'):
+#    date_form = '%Y-%m-%dT%H:%M:%S'
+#    try:
+#        import colorlog
+#        formatter = colorlog.ColoredFormatter(
+#            "%(log_color)s%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d] %(purple)s%(message)s",
+#            datefmt = date_form,
+#            reset=True,
+#            log_colors={
+#                    'DEBUG': 'cyan',
+#                    'INFO': 'green',
+#                    'WARNING': 'yellow',
+#                    'ERROR': 'red',
+#                    'CRITICAL': 'red',
+#            }
+#        )
+#    except:
+#        formatter = logging.Formatter("%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d]%(message)s")
+#    if handler == 'file':
+#        new_handler = logging.FileHandler('prologix.log')
+#    elif handler == 'console':
+#        new_handler = logging.StreamHandler()
+#    else:
+#        raise ValueError('handler:{} not recognized'.format(handler))
+#    new_handler.setFormatter(formatter)
+#    new_handler.setLevel(logging.DEBUG)
+#    logger.setLevel(logging.DEBUG)
+#    logger.addHandler(new_handler)

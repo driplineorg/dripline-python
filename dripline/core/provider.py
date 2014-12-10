@@ -5,8 +5,12 @@ __all__ = ['Provider']
 class Provider(object):
     __metaclass__ = ABCMeta
 
+    def __init__(self):
+        self._endpoints = []
+
     def add_endpoint(self, endpoint):
-        raise NotImplementedError
+        endpoint.provider = self
+        self._endpoints.append(endpoint)
 
     def endpoint(self, endpoint):
         raise NotImplementedError
