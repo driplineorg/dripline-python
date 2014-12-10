@@ -9,22 +9,25 @@ import threading
 import time
 import msgpack
 
-__all__ = ['DataLogger']
+from .endpoint import Endpoint
+
+__all__ = ['DataLogger',
+           'Spime',
+          ]
 logger = logging.getLogger(__name__)
+
 
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        self._log_interval = 0
+    def __init__(self, log_interval=0.):
+        self._log_interval = log_interval
         self._is_logging = False
         self._loop_process = threading.Timer([], {})
 
-#    @abc.abstractmethod
     def get_value(self):
         raise NotImplementedError('get value in derrived class')
 
-#    @abc.abstractmethod
     def store_value(self, value, severity='sensor_value'):
         raise NotImplementedError('store value in derrived class')
 
@@ -62,7 +65,8 @@ class DataLogger(object):
         elif self._log_interval <= 0:
             raise Exception("log interval must be > 0")
         else:
-            self._loop_process = threading.Timer(self._log_interval, self._log_a_value, ())
+            self._loop_process = threading.Timer(self._log_interval,
+                                                 self._log_a_value, ())
             self._loop_process.start()
 
     def _restart_loop(self):
@@ -88,3 +92,27 @@ class DataLogger(object):
             self._restart_loop()
         else:
             raise ValueError('unrecognized logger status setting')
+
+
+class Spime(Endpoint, DataLogger):
+    '''
+    '''
+
+    def __init__(self, name, log_interval=0.):
+        # DataLogger stuff
+        DataLogger.__init__(self, log_interval=log_interval)
+        self.get_value = self.on_get
+        self.store_value = self.report_log
+        # Endpoint stuff
+        self.name = name
+        self.provider = None
+
+    @staticmethod
+    def report_log(value):
+        logger.info("Should be logging value: {}".format(value))
+
+    def on_config(self, attribute, value):
+        '''
+        simple access to setting attributes
+        '''
+        pass
