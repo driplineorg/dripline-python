@@ -23,8 +23,7 @@ PARSER.add_argument('-c',
                     help='full path to a dripline YAML configuration file.')
 
 
-def main():
-    args = PARSER.parse_args()
+def main(args):
 
     if args.config is not None:
         conf = Config(args.config)
@@ -44,4 +43,10 @@ def main():
         print("oh")
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Start a dripline node.')
+    parser.add_argument('-c',
+                        '--config',
+                        metavar='configuration file',
+                        help='full path to a dripline YAML configuration file.')
+    args = PARSER.parse_args()
+    main(args)
