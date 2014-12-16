@@ -139,9 +139,8 @@ class GPIBInstrument(Provider):
 
 class SimpleGetSpime(Spime):
     def __init__(self, name, base_str):
-        self.name = name
         self.cmd_base = base_str
-        self.provider=None
+        Spime.__init__(self, name)
 
     def on_get(self):
         return self.provider.send(self.cmd_base)
