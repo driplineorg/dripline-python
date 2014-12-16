@@ -1,0 +1,57 @@
+#!/usr/bin/python
+'''
+Script to replace start_node using the spimescape abstraction upgrades
+'''
+
+from __future__ import print_function
+
+import yaml
+
+import dripline
+from dripline.core import status_logger
+
+import logging
+logger = logging.getLogger('portal')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(status_logger.console_handler)
+status_logger.console_handler.setLevel(logging.DEBUG)
+
+print = logger.info # now calls to print() issue info logs
+
+def open_spimescape_portal(nodename, broker, **kwargs):
+    '''
+    '''
+    # create the portal:
+    portal = dripline.core.Portal(nodename, broker)
+    logger.info('starting {}'.format(nodename))
+    ##### need to fix the node class here...
+    for provider in kwargs['providers']:
+        portal.add_provider(create_child(provider))
+    logger.info('spimescapes created and populated')
+    logger.info('creating bindings')
+    portal.create_bindings()
+    logger.info('starting consumption')
+    portal.start_event_loop()
+
+def create_child(conf_dict):
+    module = conf_dict.pop('module')
+    child_confs = conf_dict.pop('endpoints', [])
+    print('creating a <{}> with args:\n{}'.format(module, conf_dict))
+    this_child = getattr(dripline.instruments, module)(**conf_dict)
+
+    for child_dict in child_confs:
+        this_child.add_endpoint(create_child(child_dict))
+    return this_child
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Start a dripline spimescape')
+    parser.add_argument('-c',
+                        '--config',
+                        metavar='configuration file',
+                        help='full path to yaml config file',
+                        required=True,
+                       )
+    args = parser.parse_args()
+    conf_dict = yaml.load(open(args.config).read())
+    open_spimescape_portal(**conf_dict)

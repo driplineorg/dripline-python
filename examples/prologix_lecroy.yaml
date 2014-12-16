@@ -1,0 +1,27 @@
+nodename: prologix_one
+broker: localhost
+providers:
+  - name: prologix_box
+    module: PrologixSpimescape
+    socket_info: ("10.0.0.107", 1234)
+    endpoints:
+      - name: lecroy_box
+        module: GPIBInstrument
+        addr: 1
+        endpoints:
+          - name: lecroy_id
+            module: SimpleGetSpime
+            base_str: "*IDN?"
+          - name: lecroy_ese
+            module: SimpleGetSpime
+            base_str: "*ESE?"
+      - name: agilent_box
+        module: GPIBInstrument
+        addr: 3
+        endpoints:
+          - name: agilent_id
+            module: SimpleGetSpime
+            base_str: "*IDN?"
+          - name: agilent_ese
+            module: SimpleGetSpime
+            base_str: "*ESE?"

@@ -34,12 +34,26 @@ class PrologixSpimescape(Provider):
         self._devices = {}
         for k,v in kwargs.items():
             setattr(self, k, v)
+        if type(self.socket_info) is str:
+            import re
+            re_str = "\([\"'](\S+)[\"'], (\d+)\)"
+            (ip, port) = re.findall(re_str, self.socket_info)[0]
+            self.socket_info = (ip, int(port))
+        self.reconnect()
 
     def reconnect(self):
         self.socket.close()
         self.socket = socket.socket()
-        self.socket.connect(self.socket_info)
+        try:
+            self.socket.connect(self.socket_info)
+        except:
+            logger.warning('connection with info: {} refused'.format(self.socket_info))
+            raise
         self.socket.settimeout(self.socket_timeout)
+
+    @property
+    def spimes(self):
+        return self._devices
 
     @property
     def devices(self):
