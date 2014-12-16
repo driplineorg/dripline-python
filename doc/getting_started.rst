@@ -1,4 +1,3 @@
-===============
 Getting Started
 ===============
 
@@ -35,8 +34,27 @@ $ pip install pika PyYAML msgpack-python sqlalchemy
 $ pip install ipython sphinx sphinx_rtd_theme sphinxcontrib-programoutput colorlog
 .. sphinx-argparse is not used for now
 
+
 Note that sphinx is only required if you want to (re)build this documentation and sphinx_rtd_theme is purely cosmetic.
 Similarly, ipython is nice for the user but does not change available dripline features.
+
+If you just want to run dripline you would run the following commands:
+
+.. code-block:: bash
+		
+		$cd /path/to/dripline/repo
+	       $ cd python
+	       $ python setup.py install
+
+This will install the local dripline source into your same virtual environment. If you are going to develop on the source replace the last line with 
+
+.. code-block:: bash
+		
+		$ python setup.py develop
+
+That will install the local dripline source into your same virtual environment rather than actually installing. This way as you make changes to the source you don't have to rerun the 
+$ python setup.py install 
+step. More details can be found in the documentation for python's `setup tools <http://pythonhosted.org//setuptools/>`_.  
 
 
 First Steps
