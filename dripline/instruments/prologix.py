@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 __all__ = ['PrologixSpimescape',
            'GPIBInstrument',
            'SimpleGetSpime',
+           'SimpleGetSetSpime',
           ]
 
 
@@ -119,6 +120,13 @@ class PrologixSpimescape(Provider):
 
 
 class GPIBInstrument(Provider):
+    '''
+    A Provider class intended for GPIB devices.
+
+    It expects to have a set of Simple*Spime endpoints which return SCPI commands.
+    The _cmd_term attribute is appended to those commands before being passed up to
+    the higher level provider which actually maintains a connection (eg PrologixSpimescape).
+    '''
     def __init__(self, name, addr):
         self.name = name
         self.addr = addr
@@ -138,6 +146,15 @@ class GPIBInstrument(Provider):
 
 
 class SimpleGetSpime(Spime):
+    '''
+    A generic Spime for SCPI commands which take no arguments (ie queries).
+
+    It is assumed that the command will:
+        1) return something
+        2) return quickly
+
+    If either assumption is wrong then you need a different Spime derived class
+    '''
     def __init__(self, name, base_str):
         self.cmd_base = base_str
         Spime.__init__(self, name)
@@ -145,31 +162,27 @@ class SimpleGetSpime(Spime):
     def on_get(self):
         return self.provider.send(self.cmd_base)
 
-#def setup_handler(handler='file'):
-#    date_form = '%Y-%m-%dT%H:%M:%S'
-#    try:
-#        import colorlog
-#        formatter = colorlog.ColoredFormatter(
-#            "%(log_color)s%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d] %(purple)s%(message)s",
-#            datefmt = date_form,
-#            reset=True,
-#            log_colors={
-#                    'DEBUG': 'cyan',
-#                    'INFO': 'green',
-#                    'WARNING': 'yellow',
-#                    'ERROR': 'red',
-#                    'CRITICAL': 'red',
-#            }
-#        )
-#    except:
-#        formatter = logging.Formatter("%(levelname)-8s%(asctime)s[%(name)s:%(lineno)d]%(message)s")
-#    if handler == 'file':
-#        new_handler = logging.FileHandler('prologix.log')
-#    elif handler == 'console':
-#        new_handler = logging.StreamHandler()
-#    else:
-#        raise ValueError('handler:{} not recognized'.format(handler))
-#    new_handler.setFormatter(formatter)
-#    new_handler.setLevel(logging.DEBUG)
-#    logger.setLevel(logging.DEBUG)
-#    logger.addHandler(new_handler)
+
+class SimpleGetSetSpime(Spime):
+    '''
+    A generic Spime for SCPI commands using a standard pattern for query and assignment.
+
+    The pattern looks like the following. Consider a command "CMD"...
+        ~To request the current value, the SCPI command would be: "CMD?"
+        ~To assign a new value, the SCPI command would be "CMD <value>;*OPC?"
+
+    It is assumed that both of the above constructions will:
+        1) return something
+        2) return quickly
+
+    If either of those assumptions is wrong then you want a different Spime derived class
+    '''
+    def __init__(self, name, base_str):
+        self.cmd_base = base_str
+        Spime.__init__(self, name)
+
+    def on_get(self):
+        return self.provider.send(self.cmd_base + '?')
+
+    def on_set(self, value):
+        return self.provider.send(self.cmd_base + ' {};*OPC'.format(value))
