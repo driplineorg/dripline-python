@@ -167,7 +167,7 @@ class SimpleGetSetSpime(Spime):
     '''
     A generic Spime for SCPI commands using a standard pattern for query and assignment.
 
-    The pattern looks like the following. Consider a command "CMD"...
+    The pattern looks like the following. Consider a command "CMD"
         ~To request the current value, the SCPI command would be: "CMD?"
         ~To assign a new value, the SCPI command would be "CMD <value>;*OPC?"
 
