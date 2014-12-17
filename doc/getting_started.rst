@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-Libraries
+Libraries!
 *********
 The required librares are `pika <pika.readthedocs.org>`_, `PyYAML <pyyaml.org>`_, and `msgpack <msgpack.org>`_.
 To build this documentation, you also need `sphinx <http://sphinx-doc.org/>`_ and `sphinx_rtd_theme <https://github.com/snide/sphinx_rtd_theme>`_.
