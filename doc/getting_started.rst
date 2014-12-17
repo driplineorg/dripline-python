@@ -42,9 +42,9 @@ If you just want to run dripline you would run the following commands:
 
 .. code-block:: bash
 
-		$cd /path/to/dripline/repo
-		$cd python
-		$python setup.py  install
+		$ cd /path/to/dripline/repo
+		$ cd python
+		$ python setup.py  install
 
 This will install the local dripline source into your same virtual environment. If you are going to develop on the source replace the last line with 
 
