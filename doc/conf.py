@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'dripline'
-copyright = '2014, Jared Kofron, Ben LaRoque'
+copyright = '2014, The Project 8 Collaboration'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
