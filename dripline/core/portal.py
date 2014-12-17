@@ -25,7 +25,7 @@ class Portal(object):
         try:
             self.conn = Connection(broker)
         except Exception as err:
-            logger.error('connection to broker failed!')
+            logger.error('connection to broker failed!!')
             raise err
 
         self.providers = {}
