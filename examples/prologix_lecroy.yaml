@@ -15,13 +15,6 @@ providers:
           - name: lecroy_ese
             module: SimpleGetSpime
             base_str: "*ESE?"
-      - name: agilent_box
-        module: GPIBInstrument
-        addr: 3
-        endpoints:
-          - name: agilent_id
-            module: SimpleGetSpime
-            base_str: "*IDN?"
-          - name: agilent_ese
-            module: SimpleGetSpime
-            base_str: "*ESE?"
+          - name: tickler_pulse_width
+            module: SimpleGetSetSpime
+            base_str: "A:WID"
