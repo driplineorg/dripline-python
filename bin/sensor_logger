@@ -11,7 +11,8 @@ import pika
 import argparse
 import msgpack
 
-import sqlite3
+#import sqlite3
+import sqlalchemy
 
 from dripline.core import AlertConsumer
 
@@ -44,15 +45,44 @@ def make_parser():
                         default='#',
                         nargs='*',
                        )
+    parser.add_argument('-u',
+                        '--user',
+                        metavar='postgres_user',
+                        help='username on posgres'
+                       )
+    parser.add_argument('-p',
+                        '--passwd',
+                        metavar='postgres_password',
+                        help="user's postgres password"
+                       )
+    parser.add_argument('-s',
+                        '--sql_server',
+                        metavar='postgres_server',
+                        help="fully qualified network path for postgres server"
+                       )
     return parser
 
 def just_print(message):
     logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
 
-def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
+def log_to_postgres(table, name, timestap, value_key, value):
+    insert_dict = {'endpoint_name': name,
+                   'timestamp': timestamp,
+                   value_key: value,
+                  }
+    ins = table.insert().values(**insert_dict)
+    ins.execute()
+
+def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
+                     user=None, passwd=None, sql_server=None):
     logger.info('making connections')
     consumer = AlertConsumer(broker_host=amqp, exchange='alerts', keys=['sensor_value'])
-    consumer.custom_consume=just_print
+
+    engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/p8_sc_db'.format(user, passwd, sql_server))
+    meta = sqlalchemy.MetaData(engine)
+    num_table = sqlalchemy.Table("numeric_data", meta, autoload=True)
+
+    consumer.custom_consume=log_to_postgres
     try:
         logger.info("starting message consumption")
         consumer.start()
