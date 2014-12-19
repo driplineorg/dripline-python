@@ -1,7 +1,7 @@
 Contribute
 ##########
 
-Part of the motivation for moving to this incarnation is dripline is to make it easier for anyone to contribute.
+Part of the motivation for moving to this incarnation of dripline is to make it easier for anyone to contribute.
 We're trying to keep test coverage high, so a recommended test driven development workflow is (going to be soon, hopefully,) described below.
 
 As always, `dripline is on github <github.com/project8/dripline>`_.

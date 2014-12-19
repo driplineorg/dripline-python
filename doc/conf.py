@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'dripline'
-copyright = '2014, Jared Kofron, Ben LaRoque'
+copyright = '2014, The Project 8 Collaboration'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -212,7 +212,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'dripline.tex', 'dripline Documentation',
-   'Jared Kofron, Ben LaRoque', 'manual'),
+   'The Project 8 Collaboration', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -242,7 +242,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'dripline', 'dripline Documentation',
-     ['Jared Kofron, Ben LaRoque'], 1)
+     ['The Project 8 Collaboration'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,7 +256,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'dripline', 'dripline Documentation',
-   'Jared Kofron, Ben LaRoque', 'dripline', 'One line description of project.',
+   'The Project 8 Collaboration', 'dripline', 'One line description of project.',
    'Miscellaneous'),
 ]
 
