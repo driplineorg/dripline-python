@@ -17,7 +17,7 @@ The Lecroy 9210, like any GPIB device, uses SCPI commands for configuration and 
 By reading through the manual, we find many useful commands which we may want to add.
 In this example, we will consider two:
 
-    1) \*IDN? is a command which instructs the device to return a comman separated list of identifying information (including make, model, serial number, etc.). It is used as a query, but does not accept configuration.
+    1) *IDN? is a command which instructs the device to return a comman separated list of identifying information (including make, model, serial number, etc.). It is used as a query, but does not accept configuration.
     2) A:WID is a command which sets the width of an output pulse in seconds. It supports both a query mode ``A:WID?`` and a configuration mode ``A:WID <value>``.
 
 There are many further commands available for the 9210, they can be added in the same way as these two.
@@ -105,7 +105,7 @@ They follow the same pattern as the last two.
             endpoints:
               - name: tickler_pulser_info
                 module: SimpleGetSpime
-                base_str: "\*IDN?"
+                base_str: "*IDN?"
               - name: tickler_pulse_width
                 module: SimpleGetSetSpime
                 base_str: "A:WID"
