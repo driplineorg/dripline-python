@@ -1,7 +1,3 @@
-===============
-Tutorials
-===============
-
 A Dripline powered key-value store
 **********************************
 As a way to explore how dripline creates sensors that we can interact with
