@@ -65,13 +65,21 @@ def make_parser():
 def just_print(message):
     logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
 
-def log_to_postgres(table, name, timestap, value_key, value):
-    insert_dict = {'endpoint_name': name,
-                   'timestamp': timestamp,
-                   value_key: value,
-                  }
-    ins = table.insert().values(**insert_dict)
-    ins.execute()
+#def log_to_postgres(alert_consumer, message):#name, timestap, value_key, value):
+#    name = message['payload']['from']
+#    timestamp = message['timestamp']
+#    value = message['payload']['value']
+#    try:
+#        value = float(value)
+#    except:
+#        pass
+#    value_key = 'value_raw'
+#    insert_dict = {'endpoint_name': name,
+#                   'timestamp': timestamp,
+#                   value_key: value,
+#                  }
+#    ins = alert_consumer.table.insert().values(**insert_dict)
+#    ins.execute()
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
                      user=None, passwd=None, sql_server=None):
@@ -81,8 +89,9 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
     engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/p8_sc_db'.format(user, passwd, sql_server))
     meta = sqlalchemy.MetaData(engine)
     num_table = sqlalchemy.Table("numeric_data", meta, autoload=True)
+    consumer.table = num_table
 
-    consumer.custom_consume=log_to_postgres
+    consumer.this_consume=consumer._postgres_consume
     try:
         logger.info("starting message consumption")
         consumer.start()
