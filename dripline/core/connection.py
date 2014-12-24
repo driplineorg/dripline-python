@@ -24,7 +24,8 @@ class Connection(object):
         self._setup_amqp()
 
     def __del__(self):
-        self.conn.close()
+        if self.conn.is_open:
+            self.conn.close()
 
     def _setup_amqp(self):
         '''
