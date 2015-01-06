@@ -3,15 +3,57 @@ Getting Started
 
 Libraries!
 *********
-The required librares are `pika <pika.readthedocs.org>`_, `PyYAML <pyyaml.org>`_, and `msgpack <msgpack.org>`_.
+There are quite a few dependencies for dripline, some required and many optional (though needed for certain features).
+
+Required
+--------
+
+`Pika <http://pika.readthedocs.org>`_ is an amqp library for python 2 (not 3.x).
+
+`msgpack <http://msgpack.org>`_ is used to store payloads in messages transferred via amqp.
+
+Optional
+--------
+
+`PyYAML <http://pyyaml.org>`_ is used to read yaml formatted configuration files.
+While not required, configuration input files are used heavily and so it will be needed in nearly all cases.
+
+`SQLAlchemy <http://www.sqlalchemy.org>`_ is used to talk to our postgresql database.
+It is only required for builds which will be used to log sensor values.
+For use with postgres, it requires **I need to look this up** which usually needs to be installed via package manager as it is not pure python and wraps other language library files.
+
+`Colorlog <http://pypi.python.org/pypi/colorlog>`_ is completely aesthetic.
+The logging module is used throughout dripline and this allows for colorized format of log messages.
+
+Helpful Python Packages
+-----------------------
+
+`ipython <http://ipython.org>`_ is not actually a dependency at all, but is highly recommended.
+The expanded tab completion, command and output history, and doc access make it a powerful python interpretor for developing or manually interacting with dripline components.
+
+`virtualenv <http://virtualenv.readthedocs.org/en/latest>`_ provides a clean way to install python libraries without polluting the system python install (or if you don't have permission to modify the system).
+
+For Building Documentation
+--------------------------
+
+`Sphinx <http://sphinx-doc.org/>`_ is required to compile this documentation.
+
+`Sphinx-rdc-theme <https://github.com/snide/sphinx_rtd_theme>`_ is used by Sphinx for a nicer look.
+
+`Sphinx-contrib-programoutput <http://pythonhosted.org/sphinxcontrib-programoutput/>`_ Is used to automatically include the --help for the various utility programs.
+
 To build this documentation, you also need `sphinx <http://sphinx-doc.org/>`_ and `sphinx_rtd_theme <https://github.com/snide/sphinx_rtd_theme>`_.
 All three can be obtained through `pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
 
-*Note*:
-The steps above will give you a fully functioning dripline client, but
-without a message broker to communicate with, the client won't do you much
-good.  We recommend using a standard AMQP broker such as 
-`RabbitMQ <https://www.rabbitmq.com>`_
+
+External
+--------
+`AMQP <http://www.amqp.org>`_ is completely external to dripline.
+One such service must be operating or dripline components will have no means to communicate.
+If developing for dripline, you are encouraged to install your own broker so that you can test locally.
+The slow control administrator must maintain this service for use in the production system, others shouldn't need to interact with it other than to provide the host url to services.
+Dripline is developed with `rabbitMQ <https://www.rabbitmq.com>`_ and a standard install of that service is recommended.
+Other AMQP systems make work but are untested.
 
 Operating System & Python
 *************************

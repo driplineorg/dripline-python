@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from .connection import Connection
 from .binding import Binding
-from . import message
+from .message import Message
 import logging
 
 __all__ = ['Node']
@@ -145,7 +145,7 @@ class Node(object):
         will also subclass Message.
         """
         reply = self.conn.send_request(to_send.target, to_send.to_msgpack())
-        return message.Message.from_msgpack(reply)
+        return Message.from_msgpack(reply)
 
     def config(self):
         """

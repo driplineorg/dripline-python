@@ -10,15 +10,15 @@ __all__ = ['Endpoint', 'AutoReply']
 class Endpoint(object):
     __metaclass__ = ABCMeta
 
-    @abstractmethod
+    # @abstractmethod
     def on_get(self):
         raise NotImplementedError
 
-    @abstractmethod
+    # @abstractmethod
     def on_set(self, value):
         raise NotImplementedError
 
-    @abstractmethod
+    # @abstractmethod
     def on_config(self):
         raise NotImplementedError
         

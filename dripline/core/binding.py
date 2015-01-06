@@ -47,8 +47,8 @@ class Binding(object):
         # to abstract methods
         # (ie add OP_SENSOR_<whatever> to constants, add a abstract method for
         # it, and add an entry to the constant->method dict)
-        logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
         if msg.msgop == constants.OP_SENSOR_GET:
+            logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
             try:
                 result = self.on_get()
                 self._send_reply(channel, properties, result)
@@ -56,6 +56,7 @@ class Binding(object):
                 logger.error('got: {}'.format(err.message))
                 result = err.message
         elif msg.msgop == constants.OP_SENSOR_SET:
+            logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
             result = None
             try:
                 value = msg.payload
@@ -67,6 +68,7 @@ class Binding(object):
                 result = err.message
             self._send_reply(channel, properties, result)
         elif msg.msgop == constants.OP_SENSOR_CONFIG:
+            logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
             result = None
             try:
                 value = msg.payload

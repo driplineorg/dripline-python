@@ -14,7 +14,7 @@ Contents:
     getting_started
     spec
     contribute
-    tutorials
+    tutorials/tutorials
     cli_tools
 
 Indices and tables

@@ -14,5 +14,6 @@ from .data_logger import *
 from .endpoint import *
 from .message import *
 from .node import *
+from .portal import *
 from .provider import *
 from .sensor import *
