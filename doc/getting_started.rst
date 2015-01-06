@@ -8,30 +8,30 @@ There are quite a few dependencies for dripline, some required and many optional
 Required
 --------
 
-`Pika <pika.readthedocs.org>`_ is an amqp library for python 2 (not 3.x).
+`Pika <http://pika.readthedocs.org>`_ is an amqp library for python 2 (not 3.x).
 
-`msgpack <msgpack.org>`_ is used to store payloads in messages transferred via amqp.
+`msgpack <http://msgpack.org>`_ is used to store payloads in messages transferred via amqp.
 
 Optional
 --------
 
-`PyYAML <pyyaml.org>`_ is used to read yaml formatted configuration files.
+`PyYAML <http://pyyaml.org>`_ is used to read yaml formatted configuration files.
 While not required, configuration input files are used heavily and so it will be needed in nearly all cases.
 
-`SQLAlchemy <unknown>`_ is used to talk to our postgresql database.
+`SQLAlchemy <http://www.sqlalchemy.org>`_ is used to talk to our postgresql database.
 It is only required for builds which will be used to log sensor values.
 For use with postgres, it requires **I need to look this up** which usually needs to be installed via package manager as it is not pure python and wraps other language library files.
 
-`Colorlog <unknown>`_ is completely aesthetic.
+`Colorlog <http://pypi.python.org/pypi/colorlog>`_ is completely aesthetic.
 The logging module is used throughout dripline and this allows for colorized format of log messages.
 
 Helpful Python Packages
 -----------------------
 
-`ipython <unknown>`_ is not actually a dependency at all, but is highly recommended.
+`ipython <http://ipython.org>`_ is not actually a dependency at all, but is highly recommended.
 The expanded tab completion, command and output history, and doc access make it a powerful python interpretor for developing or manually interacting with dripline components.
 
-`virtualenv <unknown>`_ provides a clean way to install python libraries without polluting the system python install (or if you don't have permission to modify the system).
+`virtualenv <http://virtualenv.readthedocs.org/en/latest>`_ provides a clean way to install python libraries without polluting the system python install (or if you don't have permission to modify the system).
 
 For Building Documentation
 --------------------------
@@ -40,7 +40,7 @@ For Building Documentation
 
 `Sphinx-rdc-theme <https://github.com/snide/sphinx_rtd_theme>`_ is used by Sphinx for a nicer look.
 
-`Sphinx-contrib-programoutput <unknown>`_ Is used to automatically include the --help for the various utility programs.
+`Sphinx-contrib-programoutput <http://pythonhosted.org/sphinxcontrib-programoutput/>`_ Is used to automatically include the --help for the various utility programs.
 
 To build this documentation, you also need `sphinx <http://sphinx-doc.org/>`_ and `sphinx_rtd_theme <https://github.com/snide/sphinx_rtd_theme>`_.
 All three can be obtained through `pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
@@ -48,7 +48,7 @@ All three can be obtained through `pip <http://pip.readthedocs.org/en/latest/ins
 
 External
 --------
-`AMQP <unknown>`_ is completely external to dripline.
+`AMQP <http://www.amqp.org>`_ is completely external to dripline.
 One such service must be operating or dripline components will have no means to communicate.
 If developing for dripline, you are encouraged to install your own broker so that you can test locally.
 The slow control administrator must maintain this service for use in the production system, others shouldn't need to interact with it other than to provide the host url to services.
