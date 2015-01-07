@@ -10,8 +10,8 @@ __all__ = ['simple_shell_instrument', 'simple_shell_command',
 logger = logging.getLogger(__name__)
 
 class simple_shell_instrument(Provider):
-    def __init__(self, name, *args):
-        self.name = name
+    def __init__(self, name, **kwargs):
+        Provider.__init__(self, name=name, **kwargs)
         self.endpoints = {}
 
     def add_endpoint(self, endpoint):

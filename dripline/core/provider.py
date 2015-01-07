@@ -5,7 +5,8 @@ __all__ = ['Provider']
 class Provider(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self._endpoints = []
 
     def add_endpoint(self, endpoint):

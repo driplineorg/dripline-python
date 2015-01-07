@@ -29,6 +29,7 @@ class PrologixSpimescape(Provider):
                 ):
         '''
         '''
+        Provider.__init__(self, name=name, **kwargs)
         self.alock = threading.Lock()
         self._keep_polling = True
         self._poll_interval = 0.5
@@ -38,8 +39,8 @@ class PrologixSpimescape(Provider):
         self.poll_thread = threading.Timer([], {})
         self.socket = socket.socket()
         self._devices = {}
-        for k,v in kwargs.items():
-            setattr(self, k, v)
+#        for k,v in kwargs.items():
+#            setattr(self, k, v)
         if type(self.socket_info) is str:
             import re
             re_str = "\([\"'](\S+)[\"'], (\d+)\)"
@@ -133,8 +134,9 @@ class GPIBInstrument(Provider):
     The _cmd_term attribute is appended to those commands before being passed up to
     the higher level provider which actually maintains a connection (eg PrologixSpimescape).
     '''
-    def __init__(self, name, addr):
-        self.name = name
+    def __init__(self, name, addr, **kwargs):
+        Provider.__init__(self, name=name, **kwargs)
+        #self.name = name
         self.addr = addr
         self.queue = []
         self.expecting = False

@@ -6,8 +6,8 @@ from ..core import Provider, AutoReply
 __all__ = ['simple_scpi_instrument', 'simple_scpi_sensor']
 
 class simple_scpi_instrument(Provider):
-    def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025):
-        self.name = name
+    def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025, **kwargs):
+        Provider.__init__(self, name=name)
         self.endpoints = {}
         self.ip_addr = ip_addr
         self.scpi_port = scpi_port

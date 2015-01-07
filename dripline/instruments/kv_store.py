@@ -33,8 +33,9 @@ class kv_store(Provider):
     """
     The KV store.  This is just a wrapper around a dict.
     """
-    def __init__(self, name, *args):
-        self.name = name
+    def __init__(self, name, **kwargs):
+        #self.name = name
+        Provider.__init__(self, name=name, **kwargs)
         self.conf = {}
         self.endpoints = {}
 

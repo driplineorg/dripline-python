@@ -12,8 +12,9 @@ __all__ = ['agilent34461a', 'agilent34461a_voltage_input']
 
 class agilent34461a(Provider):
     module_key = 'agilent34461a'
-    def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025):
-        self.name = name
+    def __init__(self, name, ip_addr='10.0.0.60', scpi_port=5025, **kwargs):
+        #self.name = name
+        Provider.__init__(self, name=name, **kwargs)
         self.sensors = {}
         self.ip_addr = ip_addr
         self.scpi_port = scpi_port

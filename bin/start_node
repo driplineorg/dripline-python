@@ -30,10 +30,11 @@ def main(args):
         node = Node(conf)
         if conf.provider_count() > 0:
             for name, items in conf.providers.iteritems():
-                provider_cls = getattr(instruments, items['module'])
+                provider_cls = getattr(instruments, items.pop('module'))
+                endpoint_confs = items.pop('endpoints')
                 provider = provider_cls(name=name, **items)
                 endpoints = []
-                for endpoint in items['endpoints']:
+                for endpoint in endpoint_confs:
                     end_cls = getattr(instruments, endpoint.pop('module'))
                     end_name = endpoint.pop('name')
                     endpoints.append(end_cls(end_name, **endpoint))
@@ -49,4 +50,5 @@ if __name__ == '__main__':
                         metavar='configuration file',
                         help='full path to a dripline YAML configuration file.')
     args = PARSER.parse_args()
+    print("\n**WARNING** This script has mostly been replaced with open_spimescape_portal, are you sure you didn't want that?\nAttempting to continue...")
     main(args)
