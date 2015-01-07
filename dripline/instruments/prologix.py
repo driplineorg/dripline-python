@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 __all__ = ['PrologixSpimescape',
            'GPIBInstrument',
            'SimpleGetSpime',
+           'MuxerGetSpime',
            'SimpleGetSetSpime',
           ]
 
@@ -163,12 +164,22 @@ class SimpleGetSpime(Spime):
 
     If either assumption is wrong then you need a different Spime derived class
     '''
-    def __init__(self, name, base_str):
+    def __init__(self, name, base_str, **kwargs):
         self.cmd_base = base_str
-        Spime.__init__(self, name)
+        Spime.__init__(self, name, **kwargs)
 
     def on_get(self):
         return self.provider.send(self.cmd_base)
+
+
+class MuxerGetSpime(SimpleGetSpime):
+    def __init__(self, name, **kwargs):
+        SimpleGetSpime.__init__(self, name=name, **kwargs)
+        self.get_value = self.get_parsed_value
+
+    def get_parsed_value(self):
+        raw_data = self.on_get()
+        return raw_data.split()[0]
 
 
 class SimpleGetSetSpime(Spime):
@@ -185,9 +196,9 @@ class SimpleGetSetSpime(Spime):
 
     If either of those assumptions is wrong then you want a different Spime derived class
     '''
-    def __init__(self, name, base_str):
+    def __init__(self, name, base_str, **kwargs):
         self.cmd_base = base_str
-        Spime.__init__(self, name)
+        Spime.__init__(self, name, **kwargs)
 
     def on_get(self):
         return self.provider.send(self.cmd_base + '?')

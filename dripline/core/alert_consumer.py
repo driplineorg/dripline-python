@@ -37,13 +37,13 @@ class AlertConsumer:
         logger.info('{}'.format(message))
     def _postgres_consume(self, message):
         try:
-            value = float(value)
+            value = float(message['payload']['value'])
         except:
             pass
         value_key = 'value_raw'
         insert_dict = {'endpoint_name': message['payload']['from'],
                        'timestamp': message['timestamp'],
-                       'value_raw': message['payload']['value'],
+                       'value_raw': value,
                       }
         ins = self.table.insert().values(**insert_dict)
         ins.execute()
