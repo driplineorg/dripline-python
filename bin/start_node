@@ -31,7 +31,7 @@ def main(args):
         if conf.provider_count() > 0:
             for name, items in conf.providers.iteritems():
                 provider_cls = getattr(instruments, items['module'])
-                provider = provider_cls(name, items)
+                provider = provider_cls(name=name, **items)
                 endpoints = []
                 for endpoint in items['endpoints']:
                     end_cls = getattr(instruments, endpoint.pop('module'))

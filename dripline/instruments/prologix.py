@@ -21,15 +21,20 @@ __all__ = ['PrologixSpimescape',
 
 
 class PrologixSpimescape(Provider):
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 name,
+                 socket_timeout=1.0,
+                 socket_info=("localhost", 1234),
+                 **kwargs
+                ):
         '''
         '''
         self.alock = threading.Lock()
         self._keep_polling = True
         self._poll_interval = 0.5
-        self.socket_timeout = 1.0
+        self.socket_timeout = float(socket_timeout)
         self.expecting = False
-        self.socket_info = ("localhost", 1234)
+        self.socket_info = socket_info
         self.poll_thread = threading.Timer([], {})
         self.socket = socket.socket()
         self._devices = {}
@@ -40,6 +45,7 @@ class PrologixSpimescape(Provider):
             re_str = "\([\"'](\S+)[\"'], (\d+)\)"
             (ip, port) = re.findall(re_str, self.socket_info)[0]
             self.socket_info = (ip, int(port))
+        logger.debug('socket info is {}'.format(self.socket_info))
         self.reconnect()
 
     def reconnect(self):
