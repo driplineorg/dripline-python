@@ -17,69 +17,14 @@ import sqlalchemy
 from dripline.core import AlertConsumer
 
 import logging
-from dripline.core import status_logger
-logger = logging.getLogger('sensor_logger')
+from dripline.core import DriplineParser#status_logger
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-logger.addHandler(status_logger.console_handler)
+#logger.addHandler(status_logger.console_handler)
 
-
-def make_parser():
-    logger.info("Making argument parser object")
-    parser = argparse.ArgumentParser(description='Print messages from an exchange.')
-    parser.add_argument('-a',
-                        '--amqp',
-                        metavar='amqp server host address',
-                        help='full network name of amqp host',
-                        default='localhost',
-                       )
-    parser.add_argument('-e',
-                        '--exchange',
-                        metavar='exchange name',
-                        help='amqp name of the exchange to monitor',
-                        default='alerts',
-                       )
-    parser.add_argument('-k',
-                        '--keys',
-                        metavar='binding keys',
-                        help='amqp binding keys to follow',
-                        default='#',
-                        nargs='*',
-                       )
-    parser.add_argument('-u',
-                        '--user',
-                        metavar='postgres_user',
-                        help='username on posgres'
-                       )
-    parser.add_argument('-p',
-                        '--passwd',
-                        metavar='postgres_password',
-                        help="user's postgres password"
-                       )
-    parser.add_argument('-s',
-                        '--sql_server',
-                        metavar='postgres_server',
-                        help="fully qualified network path for postgres server"
-                       )
-    return parser
 
 def just_print(message):
     logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
-
-#def log_to_postgres(alert_consumer, message):#name, timestap, value_key, value):
-#    name = message['payload']['from']
-#    timestamp = message['timestamp']
-#    value = message['payload']['value']
-#    try:
-#        value = float(value)
-#    except:
-#        pass
-#    value_key = 'value_raw'
-#    insert_dict = {'endpoint_name': name,
-#                   'timestamp': timestamp,
-#                   value_key: value,
-#                  }
-#    ins = alert_consumer.table.insert().values(**insert_dict)
-#    ins.execute()
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
                      user=None, passwd=None, sql_server=None):
@@ -100,7 +45,36 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
         sys.exit()
 
 if __name__ == '__main__':
-    kwargs = make_parser().parse_args()
+    parser = DriplineParser(extra_logger=logger,
+                            amqp_broker=True,
+                           )
+    parser.add_argument('-e',
+                        '--exchange',
+                        help='name of the amqp exchange to monitor',
+                        default='alerts',
+                       )
+    parser.add_argument('-k',
+                        '--keys',
+                        metavar='BINDING_KEYS',
+                        help='amqp binding keys to follow',
+                        default='#',
+                        nargs='*',
+                       )
+    parser.add_argument('-u',
+                        '--user',
+                        help='username on posgres'
+                       )
+    parser.add_argument('-p',
+                        '--passwd',
+                        help="user's postgres password"
+                       )
+    parser.add_argument('-s',
+                        '--sql_server',
+                        metavar='POSTGRES_SERVER',
+                        help="fully qualified network path for postgres server"
+                       )
+    kwargs = parser.parse_args()
+#    kwargs = make_parser().parse_args()
     try:
         start_monitoring(**vars(kwargs))
     except KeyboardInterrupt:

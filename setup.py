@@ -37,7 +37,7 @@ class PyTest(TestCommand):
 setup(
     name='dripline',
     version=verstr,
-    packages=['dripline'],
+    packages=['dripline','dripline/core','dripline/instruments'],
     scripts=glob('bin/*'),
     install_requires=['pika>=0.9.8', 'PyYAML', 'msgpack-python'],
     extras_require={
