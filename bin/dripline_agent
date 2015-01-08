@@ -5,26 +5,8 @@ Do simple stuff like gets and sets.
 import argparse
 import uuid
 
-from dripline.core import Node, Config, message, constants
+from dripline.core import Node, Config, message, constants, DriplineParser
 
-# Argument parser setup$a
-def get_args():
-    agent_doc = '''
-                dripline_agent provides basic a CLI to the dripline system.
-                '''
-    parser = argparse.ArgumentParser(description=agent_doc)
-    parser.add_argument('-c',
-                        '--config',
-                        metavar='configuration file',
-                        help='full path to a dripline YAML configuration file.')
-    parser.add_argument('-b',
-                        '--broker',
-                        metavar='AMQP broker address',
-                        help='the address of the AMQP broker dripline should use')
-    parser.add_argument('verb')
-    parser.add_argument('target')
-    parser.add_argument('value', nargs='*')
-    return parser
 
 
 # TODO: this should be by introspection
@@ -77,6 +59,18 @@ def main(args):
         reply = node.send_sync(request)
         print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
 
+
 if __name__ == '__main__':
-    args = get_args().parse_args()
+    agent_doc = '''
+                dripline_agent provides basic a CLI to the dripline system.
+                '''
+    parser = DriplineParser(description=agent_doc,
+                            amqp_broker=True,
+                            config_file=True,
+                           )
+    parser.add_argument('verb')
+    parser.add_argument('target')
+    parser.add_argument('value', nargs='*')
+
+    args = parser.parse_args()
     main(args)

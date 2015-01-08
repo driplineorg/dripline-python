@@ -10,35 +10,11 @@ import pika
 import argparse
 import msgpack
 
-from dripline.core import Message
+from dripline.core import Message, DriplineParser
 
 
-def make_parser():
-    parser = argparse.ArgumentParser(description='Print messages from an exchange.')
-    parser.add_argument('-a',
-                        '--amqp',
-                        metavar='amqp server host address',
-                        help='full network name of amqp host',
-                        default='localhost',
-                       )
-    parser.add_argument('-e',
-                        '--exchange',
-                        metavar='exchange name',
-                        help='amqp name of the exchange to monitor',
-                        default='alerts',
-                       )
-    parser.add_argument('-k',
-                        '--keys',
-                        metavar='key',
-                        help='amqp binding keys to follow',
-                        default='#',
-                        nargs='*',
-                       )
-    return parser
-
-
-def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=amqp))
+def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
     channel = connection.channel()
     #channel.exchange_declare(exchange='alerts', type='topic')
     
@@ -65,7 +41,25 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys='#'):
     channel.start_consuming()
 
 if __name__ == '__main__':
-    kwargs = make_parser().parse_args()
+    parser = DriplineParser(
+                            description='Print messages from an exchange',
+                            amqp_broker=True,
+                           )
+    parser.add_argument('-e',
+                        '--exchange',
+                        metavar='exchange name',
+                        help='amqp name of the exchange to monitor',
+                        default='alerts',
+                       )
+    parser.add_argument('-k',
+                        '--keys',
+                        metavar='key',
+                        help='amqp binding keys to follow',
+                        default='#',
+                        nargs='*',
+                       )
+    
+    kwargs = parser.parse_args()
     try:
         start_monitoring(**vars(kwargs))
     except KeyboardInterrupt:
