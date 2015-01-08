@@ -27,7 +27,7 @@ def just_print(message):
     logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys='#',
-                     user=None, passwd=None, sql_server=None):
+                     user=None, passwd=None, sql_server=None, **kwargs):
     logger.info('making connections')
     consumer = AlertConsumer(broker_host=amqp, exchange='alerts', keys=['sensor_value'])
 
