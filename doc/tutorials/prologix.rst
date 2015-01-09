@@ -17,7 +17,7 @@ The Lecroy 9210, like any GPIB device, uses SCPI commands for configuration and 
 By reading through the manual, we find many useful commands which we may want to add.
 In this example, we will consider two:
 
-    1) *IDN? is a command which instructs the device to return a comman separated list of identifying information (including make, model, serial number, etc.). It is used as a query, but does not accept configuration.
+    1) ``*IDN?`` is a command which instructs the device to return a comman separated list of identifying information (including make, model, serial number, etc.). It is used as a query, but does not accept configuration.
     2) A:WID is a command which sets the width of an output pulse in seconds. It supports both a query mode ``A:WID?`` and a configuration mode ``A:WID <value>``.
 
 There are many further commands available for the 9210, they can be added in the same way as these two.
@@ -36,10 +36,10 @@ The service must be configured with a name, a network path to the amqp server, a
 We create a new configuration file and add that content, it should look like this:
 (!!! I should be able to actually just ref line numbers in the source, rather than duplicate them in the rst...)
 
-.. code-block:: yaml
-    
-    nodename: prologix_tutorial
-    broker: localhost
+.. literalinclude:: ../../examples/prologix_lecroy.yaml
+    :language: yaml
+    :lines: 1-2
+    :emphasize-lines: 1-2
 
 Here I've named the service prologix_tutorial, since that's what we're doing.
 I've set broker to localhost, this implies that there is an amqp server running on my local system.
@@ -49,14 +49,10 @@ Prologix Controller
 Our service will own one provider, a single prologix controller.
 We therefore add a (one element long) list of providers to the above servce, with the requisite configuration details.
 
-.. code-block:: yaml
-
-    nodename: prologix_tutorial
-    broker: localhost
-    providers:
-      - name: prologix_controller
-        module: PrologixSpimescape
-        socket_info: ("lagavoulin.local", 1234)
+.. literalinclude:: ../../examples/prologix_lecroy.yaml
+    :language: yaml
+    :lines: 1-6
+    :emphasize-lines: 3-6
 
 Note that in addition to a name, I've assigned configuration values for module and socket_info.
 The module is the name of a class within dripline.instrument (that should be linked) which our service will create.
@@ -68,18 +64,10 @@ Now that we have the controller itself configured we want to add and configure t
 In this example, that is another one element list with only the Lecroy 9210.
 That now looks like:
 
-.. code-block:: yaml
-
-    nodename: prologix_tutorial
-    broker: localhost
-    providers:
-      - name: prologix_controller
-        module: PrologixSpimescape
-        socket_info: ("lagavoulin.local", 1234)
-        endpoints:
-          - name: lecroy_pulser
-            module: GPIBInstrument
-            addr: 1
+.. literalinclude:: ../../examples/prologix_lecroy.yaml
+    :language: yaml
+    :lines: 1-10
+    :emphasize-lines: 7-10
 
 Hopefully the pattern is starting to be clear.
 There is a name assigned to the instrument, and a module which is another class in dripline.instrument.
@@ -90,45 +78,24 @@ Endpoints
 Finally, we'll add the actual commands that we want to be able to access via the slow controls.
 They follow the same pattern as the last two.
 
-.. code-block:: yaml
-
-    nodename: prologix_tutorial
-    broker: localhost
-    providers:
-      - name: prologix_controller
-        module: PrologixSpimescape
-        socket_info: ("lagavoulin.local", 1234)
-        endpoints:
-          - name: lecroy_pulser
-            module: GPIBInstrument
-            addr: 1
-            endpoints:
-              - name: tickler_pulser_info
-                module: SimpleGetSpime
-                base_str: "*IDN?"
-              - name: tickler_pulse_width
-                module: SimpleGetSetSpime
-                base_str: "A:WID"
+.. literalinclude:: ../../examples/prologix_lecroy.yaml
+    :language: yaml
+    :lines: 1-20
+    :emphasize-lines: 11-20
 
 And there we have it, a configuration to let us remind ourselves just what the pulser is, and set how long the pulses last.
-To start it we use the open_spimescape_portal utility script (link to the help for it), if everything works, it should look something like:
+To start it we use the :ref:`open_spimescape_portal` utility script, if everything works, it should look something like:
 
-.. code-block:: bash
-
-    $ open_spimescape_portal -c /path/to/prologix_example.yaml
+.. literalinclude:: open_portal_output.log
+    :language: bash
 
 You can then open another terminal and interact with your endpoints:
 
 .. code-block:: bash
 
-    something to get the identity
-    -with an output
-    and the initial pulse widht
-    -output
-    then something to set the pulse width
-    -with output
-    and finally get that pulse width to see it is set
-    -output
+    $ dripline_agent -b myrna.local get tickler_pulse_width
+    tickler_pulse_width: 1.00000E-3
+
 
 Logging
 -------

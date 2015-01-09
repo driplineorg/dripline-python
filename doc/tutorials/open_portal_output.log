@@ -1,0 +1,29 @@
+$ open_spimescape_portal -c /path/to/prologix_example.yaml
+
+2015-01-08T17:00:28Z[32m[INFO    ] portal(45) -> [35margs parsed, reading config[0m
+2015-01-08T17:00:28Z[32m[INFO    ] portal(47) -> [35mconfig parsed[0m
+2015-01-08T17:00:28Z[32m[INFO    ] dripline.core.portal(24) -> [35mconnecting to broker localhost[0m
+2015-01-08T17:00:28Z[32m[INFO    ] portal(22) -> [35mstarting prologix_one[0m
+2015-01-08T17:00:28Z[32m[INFO    ] portal(35) -> [35mcreating a <PrologixSpimescape> with args:
+{'name': 'prologix_box', 'socket_info': '("wolfburn.local", 1234)'}[0m
+2015-01-08T17:00:28Z[37m[DEBUG   ] dripline.instruments.prologix(50) -> [35msocket info is ('wolfburn.local', 1234)[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(35) -> [35mcreating a <GPIBInstrument> with args:
+{'name': 'lecroy_box', 'addr': 1}[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(35) -> [35mcreating a <SimpleGetSpime> with args:
+{'base_str': '*IDN?', 'name': 'lecroy_id'}[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(35) -> [35mcreating a <SimpleGetSpime> with args:
+{'base_str': '*ESE?', 'name': 'lecroy_ese'}[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(35) -> [35mcreating a <SimpleGetSetSpime> with args:
+{'base_str': 'A:WID', 'name': 'tickler_pulse_width'}[0m
+2015-01-08T17:00:29Z[32m[INFO    ] dripline.instruments.prologix(81) -> [35mspime list is now: ['lecroy_box'][0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(26) -> [35mspimescapes created and populated[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(27) -> [35mcreating bindings[0m
+2015-01-08T17:00:29Z[37m[DEBUG   ] dripline.core.portal(53) -> [35mcreating binding for: tickler_pulse_width[0m
+2015-01-08T17:00:29Z[37m[DEBUG   ] dripline.core.portal(53) -> [35mcreating binding for: lecroy_id[0m
+2015-01-08T17:00:29Z[37m[DEBUG   ] dripline.core.portal(53) -> [35mcreating binding for: lecroy_ese[0m
+2015-01-08T17:00:29Z[32m[INFO    ] portal(29) -> [35mstarting consumption[0m
+2015-01-08T17:00:29Z[32m[INFO    ] dripline.core.portal(103) -> [35mstarting event loop for node prologix_one[0m
+2015-01-08T17:00:29Z[37m[DEBUG   ] dripline.instruments.prologix(125) -> [35msync: '*ESR?\n' -> '0\n'[0m
+2015-01-08T17:00:30Z[37m[DEBUG   ] dripline.instruments.prologix(125) -> [35msync: '*ESR?\n' -> '0\n'[0m
+2015-01-08T17:00:30Z[37m[DEBUG   ] dripline.instruments.prologix(125) -> [35msync: '*ESR?\n' -> '0\n'[0m
+2015-01-08T17:00:31Z[37m[DEBUG   ] dripline.instruments.prologix(125) -> [35msync: '*ESR?\n' -> '0\n'[0m

@@ -19,9 +19,15 @@ dripline_agent
 
 .. _start_node:
 
-start_node
-----------
+start_node:
+-----------
 .. program-output:: start_node --help
+
+.. _open_spimescape_portal:
+
+open_spimescap_portal
+---------------------
+.. program-output:: open_spimescape_portal --help
 
 
 .. _message_monitor:
