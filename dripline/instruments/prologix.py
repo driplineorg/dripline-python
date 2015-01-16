@@ -40,8 +40,6 @@ class PrologixSpimescape(Provider):
         self.poll_thread = threading.Timer([], {})
         self.socket = socket.socket()
         self._devices = {}
-#        for k,v in kwargs.items():
-#            setattr(self, k, v)
         if type(self.socket_info) is str:
             import re
             re_str = "\([\"'](\S+)[\"'], (\d+)\)"
@@ -62,6 +60,10 @@ class PrologixSpimescape(Provider):
 
     @property
     def spimes(self):
+        return self._devices
+
+    @property
+    def endpoints(self):
         return self._devices
 
     @property
@@ -144,10 +146,10 @@ class GPIBInstrument(Provider):
         self.status = 0
         self.provider = None
         self._cmd_term = '\n'
-        self.spimes = {}
+        self.endpoints = {}
 
     def add_endpoint(self, spime):
-        self.spimes.update({spime.name:spime})
+        self.endpoints.update({spime.name:spime})
         spime.provider = self
 
     def send(self, cmd):

@@ -47,8 +47,8 @@ class Portal(object):
         '''
         '''
         if isinstance(instance, Provider):
-            for child in instance.spimes.keys():
-                self._bind_endpoints(instance.spimes[child])
+            for child in instance.endpoints.keys():
+                self._bind_endpoints(instance.endpoints[child])
         else:
             logger.debug('creating binding for: {}'.format(instance.name))
             self.bind_endpoint(instance)

@@ -106,25 +106,21 @@ Interacting with it
 -------------------
 OK, enough details.  To fire up our key-value store and start interacting with
 it, we want to start a dripline node which will use our configuration file.
-To do that, we will use :ref:`start_node` located in the bin directory.
+To do that, we will use :ref:`open_spimescape_portal` located in the bin directory.
 We point it to our configuration file (if you are intrepid enough to make your
 own, point to whatever you created), and fire it up:
 
 .. code-block:: bash
 
- $ start_node -c examples/kv_store_tutorial.yaml
+  $ open_spimescape_portal -c examples/kv_store_tutorial.yaml -vvv
 
-You should see output that looks like this:
+Notice the ``-vvv`` which sets the output to its most verbose. For each "v" you
+omit, one logging severity level will be omited. If no ``-v`` option is given,
+normal operation should produce no terminal output. If you do the above, you should
+see output that looks like this:
 
-.. code-block:: bash
-
- $ start_node -c examples/kv_store_tutorial.yaml
- 2014-09-08 13:28:57,201 - node - INFO - connecting to broker localhost
- 2014-09-08 13:29:00,746 - node - INFO - adding provider my_price_list
- 2014-09-08 13:29:00,746 - node - INFO - adding endpoint peaches to provider my_price_list
- 2014-09-08 13:29:01,504 - node - INFO - adding endpoint chips to provider my_price_list
- 2014-09-08 13:29:02,262 - node - INFO - adding endpoint waffles to provider my_price_list
- 2014-09-08 13:29:03,020 - node - INFO - starting event loop for node my_store
+.. literalinclude:: kv_store_service_startup_output.log
+    :language: bash
 
 This isn't too hard to follow - dripline starts up, connects to the broker
 you told it to, adds a provider and the endpoints, and is ready to go.
@@ -148,6 +144,20 @@ waffles?
     $ dripline_agent -b localhost get waffles
     2014-09-08 13:52:26,597 - node - INFO - connecting to broker localhost
     waffles: 4.0
+
+If you have another computer on your local network (or any network that can see
+your amqp broker) then you can do the same thing from there:
+
+.. code-block:: bash
+   
+    (on_amqp_server) $ dripline_agent -vvv get waffles
+    2015-01-15T13:00:30Z[INFO    ] dripline.core.node(22) -> connecting to broker None
+    waffles: 4.0
+    
+    (on_some_other_server) $ dripline_agent -b <amqp.broker.server.address> get peaches
+    peaches: 0.75
+
+Note again that the ``-v`` option can be given to increase the output verbosity.
 
 Now let's say that there's been a global rush on chips and the price we
 have to charge has skyrocketed from 1.75 to 1.79.  We can use 
