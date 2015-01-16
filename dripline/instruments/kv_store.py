@@ -77,13 +77,10 @@ class kv_store_key(Spime):
     A key in the KV store.
     """
     def __init__(self, name, initial_value=None, **kwargs):
-        # DataLogger stuff
-        #super(kv_store_key, self).__init__()
         Spime.__init__(self, name=name, **kwargs)
         self.get_value = self.on_get
         self.store_value = self.report_log
 
-        # derrived class stuff
         self.name = name
         self.provider = None
         self.initial_value = initial_value
