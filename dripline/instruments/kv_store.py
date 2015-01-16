@@ -23,7 +23,7 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 from __future__ import absolute_import
 import logging
 
-from ..core import Provider, Endpoint, DataLogger
+from ..core import Provider, Spime
 
 __all__ = ['kv_store', 'kv_store_key']
 
@@ -72,14 +72,14 @@ class kv_store(Provider):
         self.conf[name] = value
 
 
-class kv_store_key(Endpoint, DataLogger):
+class kv_store_key(Spime):
     """
     A key in the KV store.
     """
-    def __init__(self, name, initial_value=None, log_interval=0.):
+    def __init__(self, name, initial_value=None, **kwargs):
         # DataLogger stuff
-        super(kv_store_key, self).__init__()
-        self.log_interval = log_interval
+        #super(kv_store_key, self).__init__()
+        Spime.__init__(self, name=name, **kwargs)
         self.get_value = self.on_get
         self.store_value = self.report_log
 

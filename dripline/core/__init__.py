@@ -18,3 +18,4 @@ from .node import *
 from .portal import *
 from .provider import *
 from .sensor import *
+from .spime import *
