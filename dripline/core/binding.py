@@ -55,6 +55,7 @@ class Binding(object):
             except Exception as err:
                 logger.error('got: {}'.format(err.message))
                 result = err.message
+            self._send_reply(channel, properties, result)
         elif msg.msgop == constants.OP_SENSOR_SET:
             logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
             result = None
