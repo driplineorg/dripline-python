@@ -206,4 +206,4 @@ class SimpleGetSetSpime(Spime):
         return self.provider.send(self.cmd_base + '?')
 
     def on_set(self, value):
-        return self.provider.send(self.cmd_base + ' {};*OPC'.format(value))
+        return self.provider.send(self.cmd_base + ' {};*ESR?'.format(value))
