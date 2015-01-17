@@ -51,7 +51,6 @@ class Binding(object):
             logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
             try:
                 result = self.on_get()
-                self._send_reply(channel, properties, result)
             except Exception as err:
                 logger.error('got: {}'.format(err.message))
                 result = err.message
