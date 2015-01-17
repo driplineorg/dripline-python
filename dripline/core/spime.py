@@ -21,7 +21,10 @@ class Spime(Endpoint, DataLogger):
     '''
     '''
 
-    def __init__(self, name, log_interval=0.):
+    def __init__(self, name,
+                 cal_str={},
+                 log_interval=0.,
+                ):
         # DataLogger stuff
         DataLogger.__init__(self, log_interval=log_interval)
         self.get_value = self.on_get
@@ -29,6 +32,8 @@ class Spime(Endpoint, DataLogger):
         # Endpoint stuff
         self.name = name
         self.provider = None
+
+        self._calib_str = cal_str
 
     @staticmethod
     def report_log(value):
@@ -41,6 +46,15 @@ class Spime(Endpoint, DataLogger):
         logger.info('setting attribute')
         setattr(self, attribute, value)
 
+    def _calibrate(self, raw):
+        logger.info('calibrating value')
+        globals = {"__builtins__": None,
+                   "math": math,
+                  }
+        locals = {}
+        result = eval(self._calib_str.format(raw), globals, locals)
+        return result
+        
 
 class SimpleSCPISpime(Spime):
     '''
@@ -48,34 +62,26 @@ class SimpleSCPISpime(Spime):
 
     def __init__(self,
                  base_str,
-                 cal_str='{}',
                  **kwargs):
         '''
         '''
-        self._calib_str = cal_str
         self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
 
     def on_get(self):
         result = self.provider.send(self.cmd_base + '?')
+        logger.debug('result is: {}'.format(result))
         return result
 
     def on_set(self, value):
-        return self.provider.send(self.cmd_base + ' {};*OPC').format(value))
-
-    def _calibrate(self, raw):
-        globals = {"__builtins__": None,
-                   "math": math,
-                  }
-        locals = {}
-        result = eval(self._calib_str.format(raw), globals, locals)
+        return self.provider.send(self.cmd_base + ' {};*OPC'.format(value))
 
 
 class SimpleSCPIGetSpime(SimpleSCPISpime):
     '''
     '''
 
-    def __init__(self, base_str, **kwargs)
+    def __init__(self, base_str, **kwargs):
         SimpleSCPISpime.__init__(self,
                                  base_str=base_str.rstrip('?'),
                                  **kwargs)
@@ -89,7 +95,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     '''
     '''
 
-    def __init__(self, base_str, **kwargs)
+    def __init__(self, base_str, **kwargs):
         SimpleSCPISpime.__init__(self,
                                  base_str=base_str,
                                  **kwargs)
