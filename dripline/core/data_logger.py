@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, log_interval=0.):
+    def __init__(self, log_interval=0., **kwargs):
         self._log_interval = log_interval
         self._is_logging = False
         self._loop_process = threading.Timer([], {})

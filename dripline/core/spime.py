@@ -21,19 +21,18 @@ class Spime(Endpoint, DataLogger):
     '''
     '''
 
-    def __init__(self, name,
-                 cal_str={},
+    def __init__(self, 
                  log_interval=0.,
+                 **kwargs
                 ):
         # DataLogger stuff
         DataLogger.__init__(self, log_interval=log_interval)
         self.get_value = self.on_get
         self.store_value = self.report_log
         # Endpoint stuff
-        self.name = name
-        self.provider = None
-
-        self._calib_str = cal_str
+        Endpoint.__init__(self, **kwargs)
+        #self.provider = None
+        #self._calib_str = cal_str
 
     @staticmethod
     def report_log(value):
@@ -46,14 +45,14 @@ class Spime(Endpoint, DataLogger):
         logger.info('setting attribute')
         setattr(self, attribute, value)
 
-    def _calibrate(self, raw):
-        logger.info('calibrating value')
-        globals = {"__builtins__": None,
-                   "math": math,
-                  }
-        locals = {}
-        result = eval(self._calib_str.format(raw), globals, locals)
-        return result
+#    def _calibrate(self, raw):
+#        logger.info('calibrating value')
+#        globals = {"__builtins__": None,
+#                   "math": math,
+#                  }
+#        locals = {}
+#        result = eval(self._calib_str.format(raw), globals, locals)
+#        return result
         
 
 class SimpleSCPISpime(Spime):
@@ -103,6 +102,3 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     @staticmethod
     def on_get():
         raise NotImplementedError('getting not available for {}'.format(self.name))
-
-class Foo:
-    pass
