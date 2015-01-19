@@ -38,7 +38,7 @@ class Connection(object):
                              routing_key=self.queue.method.queue)
 
         self.chan.exchange_declare(exchange='alerts', type='topic')
-        self.all_alert_queue = self.chan.queue_declare(auto_delete=True)
+        self.all_alert_queue = self.chan.queue_declare(exclusive=True, auto_delete=True)
         self.chan.queue_bind(exchange='alerts',
                              queue=self.all_alert_queue.method.queue,
                              routing_key='#',
