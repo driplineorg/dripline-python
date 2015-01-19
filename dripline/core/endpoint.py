@@ -67,9 +67,12 @@ class Endpoint(object):
                 method_dict[getattr(constants, key)] = 'on_'+key.lstrip('OP_SENSOR_').lower()
                 
         result = None
+        logger.debug('going to call: {}'.format(method_dict[msg.msgop]))
         try:
+            logger.debug('about to try')
             value = msg.payload
             result = method_dict[msg.msgop](*value)
+            logger.debug('result received')
             if not self._calibration_str is None:
                 result = self._calibrate(result)
             if result is None:
