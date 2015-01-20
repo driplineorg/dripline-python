@@ -19,13 +19,9 @@ def verb_list():
 
 def main(args):
     # TODO: we shouldn't have to start an entire node to do this, should we?
+    # no, a connection should work
 
-    # TODO: can't we use argparse to do this somehow?
-    # if the request verb is not one of the accepted verbs, barf here.
     request_verb = args.verb
-    if request_verb not in verb_list():
-        print("ERROR: verb argument must be one of: {}".format(verb_list()))
-        return -1
 
     conf = None
     if args.broker is not None:
@@ -68,7 +64,7 @@ if __name__ == '__main__':
                             amqp_broker=True,
                             config_file=True,
                            )
-    parser.add_argument('verb')
+    parser.add_argument('verb', choices=verb_list())
     parser.add_argument('target')
     parser.add_argument('value', nargs='*')
 
