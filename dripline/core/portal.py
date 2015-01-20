@@ -6,7 +6,6 @@ I don't like the way it works and am going to try and make something that is cle
 from __future__ import absolute_import
 
 from .connection import Connection
-from .binding import Binding
 from .message import Message
 from .provider import Provider
 import logging
@@ -59,15 +58,11 @@ class Portal(object):
         name, it has an address and may be found on the dripline node by
         that name.
         """
-        self.bind(endpoint.name,
-                  on_get=endpoint.on_get,
-                  on_set=endpoint.on_set,
-                  on_config=endpoint.on_config)
+        self.bind(endpoint)
         setattr(endpoint, 'store_value', self.conn.send_alert)
         endpoint.report_log = self.conn.send_alert
 
-    # TODO: what happens when some params are None?
-    def bind(self, name, on_get=None, on_set=None, on_config=None):
+    def bind(self, endpoint):
         """
         Bind an arbitrary set of set/get/config functions to the
         dripline node.  Note that currently this cannot be called
@@ -75,12 +70,11 @@ class Portal(object):
         by dripline.
         """
         ep_queue = self.conn.chan.queue_declare(exclusive=True, auto_delete=True)
-        binding = Binding(name, on_get, on_set, on_config)
 
         self.conn.chan.queue_bind(exchange='requests',
                                   queue=ep_queue.method.queue,
-                                  routing_key=name)
-        self.conn.chan.basic_consume(binding.handle_request,
+                                  routing_key=endpoint.name)
+        self.conn.chan.basic_consume(endpoint.handle_request,
                                      queue=ep_queue.method.queue)
 
     # TODO: god these names are awkward, who came up with this???

@@ -7,12 +7,15 @@ from __future__ import absolute_import
 __all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
            'Message']
 
+from abc import ABCMeta
 from datetime import datetime
 import msgpack
-from abc import ABCMeta
+import logging
 
 from . import constants
 
+
+logger = logging.getLogger(__name__)
 
 class Message(dict, object):
     '''
@@ -79,8 +82,9 @@ class Message(dict, object):
     def msgtype(self, value):
         raise AttributeError('msgtype cannot be changed')
 
-    @staticmethod
-    def from_dict(msg_dict):
+    @classmethod
+    def from_dict(cls, msg_dict):
+        logger.debug('from_dict is: {}'.format(msg_dict))
         subclasses_dict = {
             constants.T_REPLY: ReplyMessage,
             constants.T_REQUEST: RequestMessage,
@@ -91,11 +95,14 @@ class Message(dict, object):
             msg_type = msg_dict.pop('msgtype')
             return subclasses_dict[msg_type](**msg_dict)
         except KeyError:
+            logger.debug('present keys are: {}'.format(msg_dict.keys()))
             raise ValueError('msgtype must be defined as in spec!')
 
-    @staticmethod
-    def from_msgpack(msg):
-        return msgpack.unpackb(msg, object_hook=Message.from_dict)
+    @classmethod
+    def from_msgpack(cls, msg):
+        message_dict = msgpack.unpackb(msg)
+        message = cls.from_dict(message_dict)
+        return message
 
     def to_msgpack(self):
         temp_dict = self.copy()

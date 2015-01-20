@@ -44,15 +44,6 @@ class Spime(Endpoint, DataLogger):
         '''
         logger.info('setting attribute')
         setattr(self, attribute, value)
-
-#    def _calibrate(self, raw):
-#        logger.info('calibrating value')
-#        globals = {"__builtins__": None,
-#                   "math": math,
-#                  }
-#        locals = {}
-#        result = eval(self._calib_str.format(raw), globals, locals)
-#        return result
         
 
 class SimpleSCPISpime(Spime):
