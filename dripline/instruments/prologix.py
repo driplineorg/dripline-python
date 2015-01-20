@@ -120,6 +120,7 @@ class PrologixSpimescape(Provider):
             tosend = command
         else:
             tosend = '++addr {}\r{}'.format(from_spime.addr, command)
+        logger.debug('sending: {}'.format(tosend))
         self.socket.send(tosend)
         data = self.socket.recv(1024)
         self.expecting = False
@@ -166,7 +167,7 @@ class SimpleGetSpime(SimpleSCPIGetSpime):
     If either assumption is wrong then you need a different Spime derived class
     '''
     def on_get(self):
-        return self.provider.send(self.cmd_base)
+        return self.provider.send(self.cmd_base+'?')
 
 
 class MuxerGetSpime(SimpleGetSpime):
