@@ -45,4 +45,8 @@ if __name__ == '__main__':
     logger.info('args parsed, reading config')
     conf_dict = yaml.load(open(args.config).read())
     logger.info('config parsed')
-    open_spimescape_portal(**conf_dict)
+    try:
+        open_spimescape_portal(**conf_dict)
+    except KeyboardInterrupt:
+        import sys
+        sys.exit()
