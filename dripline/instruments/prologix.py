@@ -23,14 +23,13 @@ __all__ = ['PrologixSpimescape',
 
 class PrologixSpimescape(Provider):
     def __init__(self,
-                 name,
                  socket_timeout=1.0,
                  socket_info=("localhost", 1234),
                  **kwargs
                 ):
         '''
         '''
-        Provider.__init__(self, name=name, **kwargs)
+        Provider.__init__(self, **kwargs)
         self.alock = threading.Lock()
         self._keep_polling = True
         self._poll_interval = 0.5
@@ -195,9 +194,9 @@ class SimpleGetSetSpime(Spime):
 
     If either of those assumptions is wrong then you want a different Spime derived class
     '''
-    def __init__(self, name, base_str, **kwargs):
+    def __init__(self, base_str, **kwargs):
         self.cmd_base = base_str
-        Spime.__init__(self, name, **kwargs)
+        Spime.__init__(self, **kwargs)
 
     def on_get(self):
         return self.provider.send(self.cmd_base + '?')
