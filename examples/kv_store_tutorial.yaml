@@ -7,6 +7,7 @@ providers:
       - name: peaches
         module: kv_store_key
         initial_value: 0.75
+        cal_str: '2*{}'
       - name: chips
         module: kv_store_key
         initial_value: 1.75
