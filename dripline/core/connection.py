@@ -7,9 +7,10 @@ from __future__ import absolute_import
 
 import pika
 import uuid
+
 from .endpoint import Endpoint
 from .sensor import Sensor
-from .message import AlertMessage
+from .message import AlertMessage, ReplyMessage
 
 __all__ = ['Connection']
 
@@ -22,6 +23,7 @@ class Connection(object):
         conn_params = pika.ConnectionParameters(broker_host)
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
+        self.chan.confirm_delivery()
 
         self._setup_amqp()
 
@@ -67,11 +69,13 @@ class Connection(object):
                                      mandatory=True,
                                      immediate=True,
                                      properties=pika.BasicProperties(
-                                      reply_to=self.queue.method.queue,
-                                      correlation_id=self.corr_id),
+                                       reply_to=self.queue.method.queue,
+                                       correlation_id=self.corr_id),
                                      body=request
                                     )
         logger.debug('publish success is: {}'.format(pr))
+        if not pr:
+            self.response = ReplyMessage(exceptions='no such queue', payload='key: {} not matched'.format(target)).to_msgpack()
         while self.response is None:
             self.conn.process_data_events()
         return self.response

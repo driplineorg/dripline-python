@@ -5,7 +5,7 @@ Do simple stuff like gets and sets.
 import argparse
 import uuid
 
-from dripline.core import Node, Config, message, constants, DriplineParser, Connection
+from dripline.core import Node, Config, message, constants, DriplineParser, Connection, Message
 
 
 
@@ -23,17 +23,17 @@ def main(args):
 
     request_verb = args.verb
 
-    conf = None
-    if args.broker is not None:
-        nodename = uuid.uuid4().hex[1:8]
-        yaml_conf = """
-        'broker': {}\n
-        'nodename': {}
-        """.format(args.broker, nodename)
-        conf = Config(yaml_string=yaml_conf)
-    else:
-        conf = Config(config_file=args.config)
-    node = Node(conf)
+#    conf = None
+#    if args.broker is not None:
+#        nodename = uuid.uuid4().hex[1:8]
+#        yaml_conf = """
+#        'broker': {}\n
+#        'nodename': {}
+#        """.format(args.broker, nodename)
+#        conf = Config(yaml_string=yaml_conf)
+#    else:
+#        conf = Config(config_file=args.config)
+#    node = Node(conf)
 
     conn = Connection(args.broker)
 
@@ -44,20 +44,24 @@ def main(args):
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())
-        result = reply.from_msgpack(reply)
+        result = Message.from_msgpack(reply)
         print(args.target + ': ' + str(result.payload))
     elif request_verb == 'set':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_SET,
                                          payload=args.value)
-        reply = node.send_sync(request)
-        print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
+        #reply = node.send_sync(request)
+        reply = conn.send_request(args.target, request.to_msgpack())
+        result = Message.from_msgpack(reply)
+        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
     elif request_verb == 'config':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_CONFIG,
                                          payload=args.value)
-        reply = node.send_sync(request)
-        print(args.target + '->' + str(args.value) + ': ' + str(reply.payload))
+        #reply = node.send_sync(request)
+        reply = conn.send_request(args.target, request.to_msgpack())
+        result = Message.from_msgpack(reply)
+        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
 
 
 if __name__ == '__main__':
