@@ -31,6 +31,7 @@ class Binding(object):
         reply = message.ReplyMessage(payload=result).to_msgpack()
         channel.basic_publish(exchange='requests',
                               routing_key=properties.reply_to,
+                              immediate=True,
                               properties=pika.BasicProperties(
                                   correlation_id=properties.correlation_id
                                   ),

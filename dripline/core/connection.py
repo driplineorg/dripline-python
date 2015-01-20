@@ -63,6 +63,7 @@ class Connection(object):
         self.chan.basic_publish(exchange='requests',
                                 routing_key=target,
                                 mandatory=True,
+                                immediate=True,
                                 properties=pika.BasicProperties(
                                     reply_to=self.queue.method.queue,
                                     correlation_id=self.corr_id),
@@ -80,5 +81,6 @@ class Connection(object):
         self.chan.basic_publish(exchange='alerts',
                                routing_key=severity,
                                mandatory=True,
+                               immediate=True,
                                body=message.to_msgpack(),
                               )

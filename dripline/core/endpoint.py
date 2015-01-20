@@ -49,6 +49,8 @@ class Endpoint(object):
             logger.warn('should be providing a ReplyMessage')
             reply = ReplyMessage(payload=reply)
         channel.basic_publish(exchange='requests',
+                              immediate=True,
+                              mandatory=True,
                               routing_key=properties.reply_to,
                               properties=pika.BasicProperties(
                                 correlation_id=properties.correlation_id
