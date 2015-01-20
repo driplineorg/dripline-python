@@ -6,6 +6,7 @@ providers:
     endpoints:
       - name: peaches
         module: kv_store_key
+        cal_str: '2*{}'
         initial_value: 0.75
       - name: chips
         module: kv_store_key
