@@ -79,9 +79,11 @@ class Endpoint(object):
         try:
             value = msg.payload
             result = self.methods[msg.msgop](*value)
-            if ((not self._calibration_str is None) and
-                (msg.msgop == constants.OP_SENSOR_GET)):
-                result = self._calibrate(result)
+            if (msg.msgop == constants.OP_SENSOR_GET):
+                if (not self._calibration_str is None):
+                    result = self._calibrate(result)
+                else:
+                    result = {'value_raw': result}
             if result is None:
                 result = "operation returned None"
         except Exception as err:
