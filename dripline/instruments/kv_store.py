@@ -23,7 +23,7 @@ fully qualified hierarchical address e.g. somenode.kv.foo.
 from __future__ import absolute_import
 import logging
 
-from ..core import Provider, Spime
+from ..core import Provider, Spime, calibrate
 
 __all__ = ['kv_store', 'kv_store_key']
 
@@ -89,6 +89,7 @@ class kv_store_key(Spime):
     def report_log(value):  
         logger.info("Should be logging value: {}\n".format(value))
 
+    @calibrate
     def on_get(self):
         """
         Return the value associated with this

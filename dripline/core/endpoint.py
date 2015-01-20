@@ -8,10 +8,25 @@ import math
 import traceback
 import pika
 
-__all__ = ['Endpoint', 'AutoReply']
+__all__ = ['Endpoint', 'AutoReply', 'calibrate']
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+def calibrate(fun):
+    def wrapper(self):
+        val_dict = {'value_raw':fun(self)}
+        if not self._calibration_str is None:
+            logger.debug('adding calibrated value')
+            globals = {"__builtins__": None,
+                       "math": math,
+                      }
+            locals = {}
+            val_dict['value_cal'] = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
+        return val_dict
+    return wrapper
+
 
 class Endpoint(object):
     __metaclass__ = ABCMeta
@@ -49,25 +64,14 @@ class Endpoint(object):
             logger.warn('should be providing a ReplyMessage')
             reply = ReplyMessage(payload=reply)
         channel.basic_publish(exchange='requests',
+                              immediate=True,
+                              mandatory=True,
                               routing_key=properties.reply_to,
                               properties=pika.BasicProperties(
                                 correlation_id=properties.correlation_id
                               ),
                               body=reply.to_msgpack(),
                              )
-
-    def _calibrate(self, raw):
-        '''
-        '''
-        val_dict = {'value_raw':raw}
-        if not self._calibration_str is None:
-            logger.debug('adding calibrated value')
-            globals = {"__builtins__": None,
-                       "math": math,
-                      }
-            locals = {}
-            val_dict['value_cal'] = eval(self._calibration_str.format(raw), globals, locals)
-        return val_dict
 
     def handle_request(self, channel, method, properties, request):
         '''
@@ -79,8 +83,6 @@ class Endpoint(object):
         try:
             value = msg.payload
             result = self.methods[msg.msgop](*value)
-            if not self._calibration_str is None:
-                result = self._calibrate(result)
             if result is None:
                 result = "operation returned None"
         except Exception as err:

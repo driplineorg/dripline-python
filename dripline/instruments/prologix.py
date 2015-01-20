@@ -8,7 +8,7 @@ import time
 import json
 import socket
 
-from ..core import Spime, Provider
+from ..core import Spime, Provider, SimpleSCPIGetSpime, calibrate
 
 import logging
 logger = logging.getLogger(__name__)
@@ -156,7 +156,7 @@ class GPIBInstrument(Provider):
         return self.provider.send(cmd+self._cmd_term, self)
 
 
-class SimpleGetSpime(Spime):
+class SimpleGetSpime(SimpleSCPIGetSpime):
     '''
     A generic Spime for SCPI commands which take no arguments (ie queries).
 
@@ -166,10 +166,6 @@ class SimpleGetSpime(Spime):
 
     If either assumption is wrong then you need a different Spime derived class
     '''
-    def __init__(self, name, base_str, **kwargs):
-        self.cmd_base = base_str
-        Spime.__init__(self, name, **kwargs)
-
     def on_get(self):
         return self.provider.send(self.cmd_base)
 
@@ -178,7 +174,8 @@ class MuxerGetSpime(SimpleGetSpime):
     def __init__(self, name, **kwargs):
         SimpleGetSpime.__init__(self, name=name, **kwargs)
         self.get_value = self.get_parsed_value
-
+    
+    @calibrate
     def get_parsed_value(self):
         raw_data = self.on_get()
         return raw_data.split()[0]

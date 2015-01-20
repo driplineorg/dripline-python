@@ -36,15 +36,18 @@ class AlertConsumer:
         logger.debug('using default message consumption')
         logger.info('{}'.format(message))
     def _postgres_consume(self, message):
-        try:
-            value = float(message['payload']['value'])
-        except:
-            pass
-        value_key = 'value_raw'
+        data = {}
+        for key in ['value_raw', 'value_cal', 'memo']:
+            try:
+                data[key] = message['payload']['value'][key]
+            except:
+                pass
+            
         insert_dict = {'endpoint_name': message['payload']['from'],
                        'timestamp': message['timestamp'],
-                       'value_raw': value,
+                       #'value_raw': value,
                       }
+        insert_dict.update(data)
         ins = self.table.insert().values(**insert_dict)
         ins.execute()
 

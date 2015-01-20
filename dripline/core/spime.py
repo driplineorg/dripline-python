@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import logging
 import math
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, calibrate
 from .data_logger import DataLogger
 
 __all__ = ['Spime',
@@ -58,6 +58,7 @@ class SimpleSCPISpime(Spime):
         self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
 
+    @calibrate
     def on_get(self):
         result = self.provider.send(self.cmd_base + '?')
         logger.debug('result is: {}'.format(result))
