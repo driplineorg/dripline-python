@@ -10,6 +10,7 @@ from .alert_consumer import *
 from .arg_parser import *
 from .binding import *
 from .config import *
+from .connection import *
 from .constants import *
 from .data_logger import *
 from .endpoint import *

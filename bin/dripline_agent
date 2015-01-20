@@ -5,7 +5,7 @@ Do simple stuff like gets and sets.
 import argparse
 import uuid
 
-from dripline.core import Node, Config, message, constants, DriplineParser
+from dripline.core import Node, Config, message, constants, DriplineParser, Connection
 
 
 
@@ -35,13 +35,17 @@ def main(args):
         conf = Config(config_file=args.config)
     node = Node(conf)
 
+    conn = Connection(args.broker)
+
     # TODO: this block makes me sad, a dict can do this in a way that is way more flexible
     if request_verb == 'get':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_GET,
                                          payload=args.value)
-        reply = node.send_sync(request)
-        print(args.target + ': ' + str(reply.payload))
+        #reply = node.send_sync(request)
+        reply = conn.send_request(args.target, request.to_msgpack())
+        result = reply.from_msgpack(reply)
+        print(args.target + ': ' + str(result.payload))
     elif request_verb == 'set':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_SET,

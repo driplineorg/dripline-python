@@ -11,6 +11,8 @@ from .endpoint import Endpoint
 from .sensor import Sensor
 from .message import AlertMessage
 
+__all__ = ['Connection']
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -60,14 +62,16 @@ class Connection(object):
         '''
         self.response = None
         self.corr_id = str(uuid.uuid4())
-        self.chan.basic_publish(exchange='requests',
-                                routing_key=target,
-                                mandatory=True,
-                                immediate=True,
-                                properties=pika.BasicProperties(
-                                    reply_to=self.queue.method.queue,
-                                    correlation_id=self.corr_id),
-                                body=request)
+        pr = self.chan.basic_publish(exchange='requests',
+                                     routing_key=target,
+                                     mandatory=True,
+                                     immediate=True,
+                                     properties=pika.BasicProperties(
+                                      reply_to=self.queue.method.queue,
+                                      correlation_id=self.corr_id),
+                                     body=request
+                                    )
+        logger.debug('publish success is: {}'.format(pr))
         while self.response is None:
             self.conn.process_data_events()
         return self.response
