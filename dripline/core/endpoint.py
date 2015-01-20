@@ -89,6 +89,7 @@ class Endpoint(object):
             result = err.message
         reply = ReplyMessage(payload=result)
         self._send_reply(channel, properties, reply)
+        channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
 
         
