@@ -48,7 +48,6 @@ class Endpoint(object):
         if not isinstance(reply, ReplyMessage):
             logger.warn('should be providing a ReplyMessage')
             reply = ReplyMessage(payload=reply)
-        logger.debug('reply is: {}'.format(reply))
         channel.basic_publish(exchange='requests',
                               routing_key=properties.reply_to,
                               properties=pika.BasicProperties(
@@ -62,7 +61,7 @@ class Endpoint(object):
         '''
         val_dict = {'value_raw':raw}
         if not self._calibration_str is None:
-            logger.info('adding calibrated value')
+            logger.debug('adding calibrated value')
             globals = {"__builtins__": None,
                        "math": math,
                       }
@@ -88,9 +87,7 @@ class Endpoint(object):
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
-        logger.debug('result is: {}'.format(result))
         reply = ReplyMessage(payload=result)
-        logger.debug('reply_message is: {}'.format(reply))
         self._send_reply(channel, properties, reply)
         logger.debug('reply sent')
 
