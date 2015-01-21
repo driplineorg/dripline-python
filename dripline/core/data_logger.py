@@ -83,7 +83,7 @@ class DataLogger(object):
         return translator[self._loop_process.is_alive()]
     @logging_status.setter
     def logging_status(self, value):
-        logger.warning('setting logging state to: {}'.format(value))
+        logger.info('setting logging state to: {}'.format(value))
         if value in ['start', 'on']:
             self._start_loop()
         elif value in ['stop', 'off']:
