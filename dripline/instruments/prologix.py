@@ -184,7 +184,7 @@ class MuxerGetSpime(SimpleGetSpime):
     @calibrate
     def get_parsed_value(self):
         parsed_data = self.on_get()
-        return raw_data
+        return parsed_data
 
 
 class SimpleGetSetSpime(Spime):
