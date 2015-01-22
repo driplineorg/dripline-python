@@ -6,6 +6,7 @@ A connection to the AMQP broker
 from __future__ import absolute_import
 
 import pika
+import threading
 import uuid
 
 from .endpoint import Endpoint
@@ -24,6 +25,7 @@ class Connection(object):
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
         self.chan.confirm_delivery()
+        self.__alert_lock = threading.Lock()
 
         self._setup_amqp()
 
@@ -84,11 +86,20 @@ class Connection(object):
         '''
         send an alert
         '''
-        message = AlertMessage()
-        message.update({'target':severity, 'payload':alert})
-        self.chan.basic_publish(exchange='alerts',
-                               routing_key=severity,
-                               mandatory=True,
-                               immediate=True,
-                               body=message.to_msgpack(),
-                              )
+        self.__alert_lock.acquire()
+        try:
+            logger.info('sending an alert message: {}'.format(repr(alert)))
+            message = AlertMessage()
+            message.update({'target':severity, 'payload':alert})
+            pr = self.chan.basic_publish(exchange='alerts',
+                                         routing_key=severity,
+                                         mandatory=True,
+                                         #immediate=True,
+                                         body=message.to_msgpack(),
+                                        )
+            if not pr:
+                logger.error('alert unable to send')
+            self.__alert_lock.release()
+        except:
+            self.__alert_lock.release()
+            raise
