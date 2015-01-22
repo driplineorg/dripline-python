@@ -7,6 +7,7 @@ import logging
 import abc
 import threading
 import time
+import traceback
 import msgpack
 
 from .endpoint import Endpoint
@@ -41,10 +42,16 @@ class DataLogger(object):
         self._log_interval = value
 
     def _log_a_value(self):
-        to_send = {'from':self.name,
-                   'value':self.get_value(),
-                  }
-        self.store_value(msgpack.packb(to_send), severity='sensor_value')
+        try:
+            val = self.get_value()
+            to_send = {'from':self.name,
+                       'value':val,
+                      }
+            to_send_msgpack = msgpack.packb(to_send)
+            self.store_value(to_send_msgpack, severity='sensor_value')
+        except Exception as err:
+            logger.error('error logging {} for {}'.format(val, self.name))
+            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
         if (self._log_interval <= 0) or (not self._is_logging):
             return
         self._loop_process = threading.Timer(self._log_interval, self._log_a_value, ())
