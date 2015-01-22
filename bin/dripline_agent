@@ -5,7 +5,7 @@ Do simple stuff like gets and sets.
 import argparse
 import uuid
 
-from dripline.core import Node, Config, message, constants, DriplineParser, Connection, Message
+from dripline.core import Node, message, constants, DriplineParser, Connection, Message
 
 
 
