@@ -15,5 +15,4 @@ from .endpoint import *
 from .message import *
 from .portal import *
 from .provider import *
-from .sensor import *
 from .spime import *

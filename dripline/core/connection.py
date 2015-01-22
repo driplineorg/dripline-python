@@ -10,7 +10,6 @@ import threading
 import uuid
 
 from .endpoint import Endpoint
-from .sensor import Sensor
 from .message import AlertMessage, ReplyMessage
 
 __all__ = ['Connection']
