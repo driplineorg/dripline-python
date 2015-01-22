@@ -35,8 +35,8 @@ class Spime(Endpoint, DataLogger):
         #self._calib_str = cal_str
 
     @staticmethod
-    def report_log(value):
-        logger.info("Should be logging value: {}".format(value))
+    def report_log(value, severity):
+        logger.info("Should be logging (value,severity): ({},{})".format(value, severity))
 
     def on_config(self, attribute, value):
         '''
