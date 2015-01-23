@@ -14,6 +14,32 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# This doesn't belong in core... at all;
+# but i haven't figured out how to reasonably pass it
+# into the calibration decorator in a way doesn't suck
+def cernox_calibration(resistance, serial_number):
+    data = {87821:[(68.7, 305), (218, 77), (1764, 4.2)],
+            87820:[(69.2, 305), (212, 77), (1522, 4.2)],
+           }
+    this_data = data[serial_number]
+    this_data.sort()
+    last = ()
+    next = ()
+    for pt in this_data:
+        if pt[0] < resistance:
+            last = pt
+        elif pt[0] == resistance:
+            return pt[1]
+        else:
+            next = pt
+            break
+    if not next or not last:
+        return None
+    m = (math.log(next[1])-math.log(last[1])) / (math.log(next[0])-math.log(last[0]))
+    b = math.log(next[1]) - m * math.log(next[0])
+    return math.exp(math.log(resistance)*m+b)
+
+
 def calibrate(fun):
     def wrapper(self):
         val_dict = {'value_raw':fun(self)}
@@ -21,9 +47,12 @@ def calibrate(fun):
             logger.debug('adding calibrated value')
             globals = {"__builtins__": None,
                        "math": math,
+                       "cernox_calibration": cernox_calibration,
                       }
             locals = {}
-            val_dict['value_cal'] = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
+            cal = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
+            if cal is not None:
+                val_dict['value_cal'] = cal
         return val_dict
     return wrapper
 
