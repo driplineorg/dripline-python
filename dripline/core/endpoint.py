@@ -60,7 +60,7 @@ def pt100_calibration(resistance):
         (50.788 <= r and r < 71.0110) *((71.0110-r)*(25.82396+r/0.409)/20.2230 + (r-50.788)*(22.47250+r/.400)/20.2230) +
         (71.011 <= r and r < 90.8450) *((90.8450-r)*(22.47250+r/0.400)/19.8340 + (r-71.011)*(18.84224+r/.393)/19.8340) +
         (90.845 <= r and r < 110.354) *((110.354-r)*(18.84224+r/0.393)/19.5090 + (r-90.845)*(14.84755+r/.387)/19.5090) +
-        (110.354 <= r and r < 185) * (14.84755+r/.387)
+        (110.354 <= r and r < 185) * (14.84755+r/.387) +
         (185. <= r) * (0))
     if value == 0:
         value = None
@@ -71,13 +71,13 @@ def calibrate(fun):
     def wrapper(self):
         val_dict = {'value_raw':fun(self)}
         if not self._calibration_str is None:
-            logger.debug('adding calibrated value')
             globals = {"__builtins__": None,
                        "math": math,
                        "cernox_calibration": cernox_calibration,
                        "pt100_calibration": pt100_calibration,
                       }
             locals = {}
+            logger.warning('about to call cal')
             cal = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
             if cal is not None:
                 val_dict['value_cal'] = cal
