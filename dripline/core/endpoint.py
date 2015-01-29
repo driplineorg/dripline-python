@@ -77,7 +77,6 @@ def calibrate(fun):
                        "pt100_calibration": pt100_calibration,
                       }
             locals = {}
-            logger.warning('about to call cal')
             cal = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
             if cal is not None:
                 val_dict['value_cal'] = cal
