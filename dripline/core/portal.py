@@ -78,6 +78,7 @@ class Portal(object):
                                      queue=ep_queue.method.queue)
 
     # TODO: god these names are awkward, who came up with this???
+    # do these even ever get used?
     def provider_list(self):
         return self.providers.keys()
 

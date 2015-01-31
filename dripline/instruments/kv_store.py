@@ -63,8 +63,6 @@ class kv_store(Provider):
         """
         return self.conf.keys()
 
-    # TODO: is there a reason for this, rather than inherit from dict?
-    # I'll need to think about that
     def __getitem__(self, name):
         return self.conf[name]
 
