@@ -95,7 +95,7 @@ class Connection(object):
             pr = self.chan.basic_publish(exchange='alerts',
                                          properties=pika.BasicProperties(
                                            content_encoding='application/msgpack',
-                                         )
+                                         ),
                                          routing_key=severity,
                                          mandatory=True,
                                          #immediate=True,
