@@ -71,7 +71,9 @@ class Connection(object):
                                      immediate=True,
                                      properties=pika.BasicProperties(
                                        reply_to=self.queue.method.queue,
-                                       correlation_id=self.corr_id),
+                                       content_encoding='application/msgpack',
+                                       correlation_id=self.corr_id,
+                                     ),
                                      body=request
                                     )
         logger.debug('publish success is: {}'.format(pr))
@@ -91,6 +93,9 @@ class Connection(object):
             message = AlertMessage()
             message.update({'target':severity, 'payload':alert})
             pr = self.chan.basic_publish(exchange='alerts',
+                                         properties=pika.BasicProperties(
+                                           content_encoding='application/msgpack',
+                                         )
                                          routing_key=severity,
                                          mandatory=True,
                                          #immediate=True,
