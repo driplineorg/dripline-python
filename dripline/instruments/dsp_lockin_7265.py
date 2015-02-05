@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 __all__ = [
             'DSPLockin7265',
-            'DSP_curves',
+            'RawSendEndpoint',
+            'CallProviderMethod',
           ]
 
 class DSPLockin7265(GPIBInstrument):
@@ -19,11 +20,14 @@ class DSPLockin7265(GPIBInstrument):
 
     def _confirm_setup(self):
         # set the external ADC trigger mode
-        self.provider.send("TADC 0")
+        value = self.provider.send("TADC 0;TADC")
+        logger.info('trig: {}'.format(value))
         # select the curves to sample
-        self.provider.send("CBD 55")
+        value = self.provider.send("CBD 55;CBD")
+        logger.info('curve buffer: {}'.format(value))
         # set the status byte to include all options
-        self.provider.send("MSK 255")
+        value = self.provider.send("MSK 255;MSK")
+        logger.info('status mask: {}'.format(value))
 
     def _check_status(self):
         data = int(self.provider.send("ST"))
@@ -73,6 +77,27 @@ class DSPLockin7265(GPIBInstrument):
         if not status == 1:
             raise ValueError("got an error status code")
 
-class DSP_curves(Endpoint):
+class RawSendEndpoint(Endpoint):
+
+    def __init__(self, base_str, **kwargs):
+        Endpoint.__init__(self, **kwargs)
+        self.base_str = base_str
+
     def on_get(self):
-        return self.provider.send("M")
+        return self.provider.send(self.base_str)
+    
+    def on_set(self, value):
+        return self.provider.send(self.base_str + " " + value)
+
+class CallProviderMethod(Endpoint):
+    def __init__(self, method_name, **kwargs):
+        Endpoint.__init__(self, **kwargs)
+        self.target_method_name = method_name
+
+    def on_get(self):
+        method = getattr(self.provider, self.target_method_name)
+        return method()
+
+    def on_set(self, value):
+        method = getattr(self.provider, self.target_method_name)
+        return method(value)
