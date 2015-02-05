@@ -1,0 +1,41 @@
+nodename: gosh_darn_lockin
+broker: higgsino.physics.ucsb.edu
+providers:
+  - name: freaking_prologix
+    module: PrologixSpimescape
+    socket_info: ("10.0.0.110", 1234)
+    endpoints:
+      - name: lockin
+        module: DSPLockin7265
+        addr: 12
+        endpoints:
+          - name: lockin_curve_status
+            module: RawSendEndpoint
+            base_str: "M"
+          - name: lockin_ensure_setup
+            module: CallProviderMethod
+            method_name: "_confirm_setup"
+          - name: lockin_status
+            module: CallProviderMethod
+            method_name: "_taking_data_status"
+          - name: lockin_take_data
+            module: RawSendEndpoint
+            base_str: "TD;M"
+          - name: lockin_n_points
+            module: CallProviderMethod
+            method_name: number_of_points
+          - name: lockin_x_data
+            module: RawSendEndpoint
+            base_str: "X."
+          - name: lockin_y_data
+            module: RawSendEndpoint
+            base_str: "Y."
+          - name: lockin_mag_data
+            module: RawSendEndpoint
+            base_str: "MAG."
+          - name: lockin_phase_data
+            module: RawSendEndpoint
+            base_str: "PHA."
+          - name: lockin_adc_data
+            module: RawSendEndpoint
+            base_str: "DC. 5"
