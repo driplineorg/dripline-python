@@ -101,11 +101,13 @@ class PrologixSpimescape(Provider):
             self.poll_thread.start()
         
     def _check_next_status(self):
-        device = self._device_cycle.next()
-        resp = self.send('*ESR?\n', from_spime=self._devices[device])
-        self._devices[device].status = int(resp)
-        if resp==1:
-            self._devices[device]['opc']=1
+        device_name = self._device_cycle.next()
+        device = self._devices[device_name]
+        resp = device._check_status()
+        #resp = self.send('*ESR?\n', from_spime=device)
+        device.status = resp
+        #if resp==1:
+        #    self._devices[device]['opc']=1
         self._queue_next_check(from_check=True)
 
     def send(self, command, from_spime=None):
@@ -117,9 +119,9 @@ class PrologixSpimescape(Provider):
             continue
         self.expecting = True
         if not from_spime:
-            tosend = command
+            tosend = command + '\n'
         else:
-            tosend = '++addr {}\r{}'.format(from_spime.addr, command)
+            tosend = '++addr {}\r{}\n'.format(from_spime.addr, command)
         logger.debug('sending: {}'.format(tosend))
         self.socket.send(tosend)
         data = self.socket.recv(1024)
