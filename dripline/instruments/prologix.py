@@ -124,7 +124,12 @@ class PrologixSpimescape(Provider):
             tosend = '++addr {}\r{}\n'.format(from_spime.addr, command)
         logger.debug('sending: {}'.format(tosend))
         self.socket.send(tosend)
-        data = self.socket.recv(1024)
+        data = ""
+        try:
+            while True:
+                data += self.socket.recv(1024)
+        except socket.timeout:
+            pass
         self.expecting = False
         logger.debug('sync: {} -> {}'.format(repr(command), repr(data)))
         self.alock.release()
