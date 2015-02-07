@@ -3,7 +3,7 @@ broker: higgsino.physics.ucsb.edu
 providers:
   - name: freaking_prologix
     module: PrologixSpimescape
-    socket_info: ("10.0.0.110", 1234)
+    socket_info: ("10.0.0.106", 1234)
     endpoints:
       - name: lockin
         module: DSPLockin7265
@@ -26,16 +26,16 @@ providers:
             method_name: number_of_points
           - name: lockin_x_data
             module: RawSendEndpoint
-            base_str: "X."
+            base_str: "DC. 0"
           - name: lockin_y_data
             module: RawSendEndpoint
-            base_str: "Y."
+            base_str: "DC. 1"
           - name: lockin_mag_data
             module: RawSendEndpoint
-            base_str: "MAG."
+            base_str: "DC. 2"
           - name: lockin_phase_data
             module: RawSendEndpoint
-            base_str: "PHA."
+            base_str: "DC. 3"
           - name: lockin_adc_data
             module: RawSendEndpoint
             base_str: "DC. 5"
