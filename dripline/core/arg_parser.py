@@ -37,12 +37,14 @@ class DriplineParser(argparse.ArgumentParser):
         #self._stream_handler = logging.StreamHandler()
         logger.addHandler(self._handlers[0])
         if extra_logger:
+            extra_logger.setLevel(logging.DEBUG)
             extra_logger.addHandler(self._handlers[0])
         self.__set_format()
         if amqp_broker:
             self.add_argument('-b',
                               '--broker',
                               help='network path for the AMQP broker',
+                              default='localhost',
                              )
         if config_file:
             self.add_argument('-c',
