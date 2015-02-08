@@ -1,0 +1,72 @@
+#!/usr/bin/python
+''' dpph_scan
+Make a dpph based field measurement
+'''
+
+from numpy import exp, multiply
+from scipy import fftpack
+
+from dripline.core import DriplineParser
+
+import logging
+logger = logging.getLogger('dpph_scan')
+
+
+def get_data():
+    pass
+
+
+def WeinerFilter(freq_data, amp_data, width=3.):
+    data = zip(freq_data, amp_data)
+    data.sort()
+    f,v= zip(*data)
+    frequencies = numpy.array(f, dtype=float)
+    voltages = numpy.array(v, dtype=float)
+    x1 = (f - frequencies[0]) / width
+    x2 = (f - frequencies[-1]) / width
+    gderiv1 = x1 * exp(-x1 * x1 / 2.)
+    gderiv2 = x2 * exp(-x2 * x2 / 2.)
+    target_signal = 0.00001 * (gderiv1 + gderiv2)
+    target_fft = fftpack.fft(target_signal)
+    data_fft = fftpack.fft(voltages)
+    data_fft[0] = 0
+    filtered = fftpack.ifft(data_fft * target_fft)
+    return {'freqs': frequencies,
+            'result': abs(filtered),
+            'filter': target_signal
+           }
+
+
+def FrequencyToField(frequency):
+    geff = 2.0036
+    charge_over_mass = 1.758e11
+    tesla = (4 * pi * 10**7 / (geff * charge_over_mass) * frequency)
+    return tesla
+
+
+def main(broker, **kwargs):
+    logger.info('broker is: {}'.format(broker))
+    # get data
+    # map adc values to frequencies
+    # pass data to filter
+    # save raw output to file if requested
+    # make plot if requested
+    # prompt user for approval to log if requested
+    # print field result
+
+
+
+if __name__ == '__main__':
+    scan_doc = '''
+               dpph_scan performs a dpph scan and field estimate
+               '''
+    parser = DriplineParser(description=scan_doc,
+                            extra_logger=logger,
+                            amqp_broker=True,
+                           )
+    # an option for outputting raw data
+    # an option for outputting a grahic
+    # an option for passing in the sweeper limits
+    # an option to log the result (have this prompt the user first?)
+    args = parser.parse_args()
+    main(**vars(args))

@@ -119,6 +119,7 @@ class PrologixSpimescape(Provider):
             continue
         self.expecting = True
         if not from_spime:
+            logger.warning("no from provided")
             tosend = command + '\n'
         else:
             tosend = '++addr {}\r{}\n'.format(from_spime.addr, command)

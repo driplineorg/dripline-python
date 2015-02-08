@@ -30,7 +30,11 @@ class DSPLockin7265(GPIBInstrument):
         logger.info('status mask: {}'.format(value))
 
     def _check_status(self):
-        data = int(self.provider.send("ST"))
+        raw = self.provider.send("ST", from_spime=self)
+        if raw:
+            data = int(raw)
+        else:
+            return "No response"
         status = ""
         if data & 0b00000010:
             ";".join([status, "invalid command"])
@@ -39,7 +43,7 @@ class DSPLockin7265(GPIBInstrument):
         return status
 
     def _taking_data_status(self):
-        curve_status = self.provider.send("M").split(';')[0]
+        curve_status = self.provider.send("M", from_spime=self).split(';')[0]
         status  = None
         if curve_status == '0':
             status = 'done'
@@ -51,12 +55,12 @@ class DSPLockin7265(GPIBInstrument):
 
     @property
     def number_of_points(self):
-        return self.provider.send("LEN")
+        return self.provider.send("LEN", from_spime=self)
     @number_of_points.setter
     def number_of_points(self, value):
         if not isinstance(value, int):
             raise TypeError('value must be an int')
-        status = self.provider.send("len {};ST".format(value))
+        status = self.provider.send("len {};ST".format(value), from_spime=self)
         if not status == 1:
             raise ValueError("got an error status code")
 
@@ -65,7 +69,7 @@ class DSPLockin7265(GPIBInstrument):
         '''
         Returns the sampling interval in ms
         '''
-        return self.provider.send("STR")
+        return self.provider.send("STR", from_spime=self)
     @sampling_interval.setter
     def sampling_interval(self, value):
         '''
@@ -73,7 +77,7 @@ class DSPLockin7265(GPIBInstrument):
         '''
         if not isinstance(value, int):
             raise TypeError('value must be an int')
-        status = self.provider.send("STR {};ST".format(value))
+        status = self.provider.send("STR {};ST".format(value), from_spime=self)
         if not status == 1:
             raise ValueError("got an error status code")
 
