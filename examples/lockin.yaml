@@ -3,7 +3,7 @@ broker: higgsino.physics.ucsb.edu
 providers:
   - name: freaking_prologix
     module: PrologixSpimescape
-    socket_info: ("10.0.0.105", 1234)
+    socket_info: ("wolfburn.local", 1234)
     endpoints:
       - name: lockin
         module: DSPLockin7265
