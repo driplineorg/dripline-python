@@ -56,6 +56,7 @@ class PrologixSpimescape(Provider):
             logger.warning('connection with info: {} refused'.format(self.socket_info))
             raise
         self.socket.settimeout(self.socket_timeout)
+        self.socket.send("++auto 1\r")
 
     @property
     def spimes(self):
@@ -120,9 +121,9 @@ class PrologixSpimescape(Provider):
         self.expecting = True
         if not from_spime:
             logger.warning("no from provided")
-            tosend = command + '\n'
+            tosend = command + '\r\n'
         else:
-            tosend = '++addr {}\r{}\n'.format(from_spime.addr, command)
+            tosend = '++addr {}\r{}\r\n'.format(from_spime.addr, command)
         logger.debug('sending: {}'.format(tosend))
         self.socket.send(tosend)
         data = ""
