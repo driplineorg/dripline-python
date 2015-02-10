@@ -20,13 +20,13 @@ class DSPLockin7265(GPIBInstrument):
 
     def _confirm_setup(self):
         # set the external ADC trigger mode
-        value = self.provider.send("TADC 0;TADC")
+        value = self.provider.send("TADC 0;TADC", from_spime=self)
         logger.info('trig: {}'.format(value))
         # select the curves to sample
-        value = self.provider.send("CBD 55;CBD")
+        value = self.provider.send("CBD 55;CBD", from_spime=self)
         logger.info('curve buffer: {}'.format(value))
         # set the status byte to include all options
-        value = self.provider.send("MSK 255;MSK")
+        value = self.provider.send("MSK 255;MSK", from_spime=self)
         logger.info('status mask: {}'.format(value))
 
     def _check_status(self):

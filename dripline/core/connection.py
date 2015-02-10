@@ -29,7 +29,7 @@ class Connection(object):
         self._setup_amqp()
 
     def __del__(self):
-        if self.conn.is_open:
+        if hasattr(self, 'conn') and self.conn.is_open:
             self.conn.close()
 
     def _setup_amqp(self):
