@@ -3,17 +3,51 @@
 Make a dpph based field measurement
 '''
 
-from numpy import exp, multiply
+from __future__ import absolute_import
+
+import numpy
 from scipy import fftpack
 
-from dripline.core import DriplineParser
+import pika
+import time
+
+from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage
 
 import logging
 logger = logging.getLogger('dpph_scan')
 
 
-def get_data():
-    pass
+def _get(name, connection):
+    request = RequestMessage(target=name,
+                             msgop=constants.OP_SENSOR_GET,
+                             payload='',
+                            )
+    result = connection.send_request(name, request.to_msgpack())
+    result_message = Message.from_msgpack(result).payload
+    logger.info("{}-> {}".format(name, result_message))
+    return result_message
+
+
+def get_data(connection):
+    if not connection:
+        logger.warning("no connection, can't get data")
+        return {'amplitude':numpy.array([1,2,1,2,3,0,-3,-1,1,0,1], dtype=float),
+                'sweep_out':numpy.array([1,2,3,4,5,6,7,8,8,10,11], dtype=float)}
+    data = {}
+    # ensure lockin config
+    _get('lockin_ensure_setup', connection)
+    # trigger taking data
+    result = _get('lockin_take_data', connection)
+    # wait for data taking to finish
+    while not result.split(';')[0] == 0:
+        time.sleep(0.2)
+        result = _get('lockin_status', connection)
+    # get data
+    result = _get('lockin_mag_data', connection)
+    data['amplitude'] = numpy.array(result.split(), dtype=float)
+    result = _get('lockin_adc_data', connection)
+    data['sweep_out'] = numpy.array(result.split(), dtype=float)
+    return data
 
 
 def WeinerFilter(freq_data, amp_data, width=3.):
@@ -24,8 +58,8 @@ def WeinerFilter(freq_data, amp_data, width=3.):
     voltages = numpy.array(v, dtype=float)
     x1 = (f - frequencies[0]) / width
     x2 = (f - frequencies[-1]) / width
-    gderiv1 = x1 * exp(-x1 * x1 / 2.)
-    gderiv2 = x2 * exp(-x2 * x2 / 2.)
+    gderiv1 = x1 * numpy.exp(-x1 * x1 / 2.)
+    gderiv2 = x2 * numpy.exp(-x2 * x2 / 2.)
     target_signal = 0.00001 * (gderiv1 + gderiv2)
     target_fft = fftpack.fft(target_signal)
     data_fft = fftpack.fft(voltages)
@@ -40,20 +74,41 @@ def WeinerFilter(freq_data, amp_data, width=3.):
 def FrequencyToField(frequency):
     geff = 2.0036
     charge_over_mass = 1.758e11
-    tesla = (4 * pi * 10**7 / (geff * charge_over_mass) * frequency)
+    tesla = (4 * numpy.pi * 10**7 / (geff * charge_over_mass) * frequency)
     return tesla
 
 
-def main(broker, **kwargs):
+def main(broker, frequency_limits, **kwargs):
     logger.info('broker is: {}'.format(broker))
+    try:
+        connection = Connection(broker)
+    except pika.exceptions.AMQPConnectionError:
+        logger.error('unable to connect to broker')
+        #return
+        connection = False
+    # confirm frequency limits
+    logger.info('frequency limits are: {}'.format(frequency_limits))
+    if not frequency_limits:
+        pass
+        # something to get them from the sweeper
+        logger.warning("don't know how to get freq limits automatically")
+    else:
+        start_freq = min(map(float, frequency_limits))
+        stop_freq = max(map(float, frequency_limits))
     # get data
+    lockin_data = get_data(connection)
     # map adc values to frequencies
+    m = (stop_freq - start_freq) / (10. * 1000.)
+    lockin_data['frequencies'] = start_freq + m * lockin_data['sweep_out']
     # pass data to filter
+    filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
+    res_freq = filter_data['freqs'][filter_data['result']==filter_data['result'].max()]
     # save raw output to file if requested
     # make plot if requested
     # prompt user for approval to log if requested
     # print field result
-
+    field = FrequencyToField(filter_data['freqs'][filter_data['result']==filter_data['result'].max()])
+    print('value is: {}'.format(field))
 
 
 if __name__ == '__main__':
@@ -65,8 +120,10 @@ if __name__ == '__main__':
                             amqp_broker=True,
                            )
     # an option for outputting raw data
+    parser.add_argument('-o', '--output', default=False)
     # an option for outputting a grahic
     # an option for passing in the sweeper limits
+    parser.add_argument('-f', '--frequency-limits', nargs=2, default=[])
     # an option to log the result (have this prompt the user first?)
     args = parser.parse_args()
     main(**vars(args))
