@@ -43,13 +43,15 @@ class DSPLockin7265(GPIBInstrument):
         return status
 
     def _taking_data_status(self):
-        curve_status = self.provider.send("M", from_spime=self).split(';')[0]
+        result = self.provider.send("M", from_spime=self)
+        curve_status = result.split(';')[0]
         status  = None
         if curve_status == '0':
             status = 'done'
         elif curve_status == '1':
             status = 'running'
         else:
+            logger.error("unexpected status byte: {}".format(curve_status))
             raise ValueError('unexpected status byte value')
         return status
 

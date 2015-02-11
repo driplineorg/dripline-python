@@ -41,10 +41,16 @@ def create_child(conf_dict):
 
 if __name__ == '__main__':
     parser = dripline.core.DriplineParser(extra_logger=logger, config_file=True)
+    parser.add_argument('-b',
+                        '--broker',
+                        help='network path for the AMQP broker',
+                       )
     args = parser.parse_args()
     logger.info('args parsed, reading config')
     conf_dict = yaml.load(open(args.config).read())
     logger.info('config parsed')
+    if args.broker:
+        conf_dict.update({'broker':args.broker})
     try:
         open_spimescape_portal(**conf_dict)
     except KeyboardInterrupt:

@@ -24,7 +24,7 @@ def _get(name, connection):
                             )
     result = connection.send_request(name, request.to_msgpack())
     result_message = Message.from_msgpack(result).payload
-    logger.info("{}-> {}".format(name, result_message))
+    logger.debug("{}-> {}".format(name, result_message))
     return result_message
 
 
@@ -39,7 +39,7 @@ def get_data(connection):
     # trigger taking data
     result = _get('lockin_take_data', connection)
     # wait for data taking to finish
-    while not result.split(';')[0] == 0:
+    while not result == 'done':
         time.sleep(0.2)
         result = _get('lockin_status', connection)
     # get data
@@ -96,17 +96,21 @@ def main(broker, frequency_limits, **kwargs):
         start_freq = min(map(float, frequency_limits))
         stop_freq = max(map(float, frequency_limits))
     # get data
+    logger.info('now get data from lockin')
     lockin_data = get_data(connection)
     # map adc values to frequencies
+    logger.info('map sweep out to frequencies')
     m = (stop_freq - start_freq) / (10. * 1000.)
     lockin_data['frequencies'] = start_freq + m * lockin_data['sweep_out']
     # pass data to filter
+    logger.info('do optimal filter on output')
     filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
     res_freq = filter_data['freqs'][filter_data['result']==filter_data['result'].max()]
     # save raw output to file if requested
     # make plot if requested
     # prompt user for approval to log if requested
     # print field result
+    logger.info("compute field")
     field = FrequencyToField(filter_data['freqs'][filter_data['result']==filter_data['result'].max()])
     print('value is: {}'.format(field))
 
