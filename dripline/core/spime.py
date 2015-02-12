@@ -65,7 +65,7 @@ class SimpleSCPISpime(Spime):
         return result
 
     def on_set(self, value):
-        return self.provider.send(self.cmd_base + ' {};*OPC'.format(value))
+        return self.provider.send(self.cmd_base + ' {};*OPC?'.format(value))
 
 
 class SimpleSCPIGetSpime(SimpleSCPISpime):

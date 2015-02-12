@@ -140,7 +140,8 @@ class PrologixSpimescape(Provider):
 
 class GPIBInstrument(Provider):
     '''
-    A Provider class intended for GPIB devices.
+    A Provider class intended for GPIB devices that implement the full
+    IEEE 488.2 (488.1 or 488 need to use some other class).
 
     It expects to have a set of Simple*Spime endpoints which return SCPI commands.
     The _cmd_term attribute is appended to those commands before being passed up to
@@ -156,6 +157,24 @@ class GPIBInstrument(Provider):
         self.provider = None
         self._cmd_term = '\n'
         self.endpoints = {}
+
+    def _check_status(self):
+        raw = self.provider.send('*ESR?', from_spime=self)
+        if raw:
+            data = int(raw)
+        else:
+            return "No response"
+        status = ""
+        if data & 0b00000100:
+            ";".join([status, "query error"])
+        if data & 0b00001000:
+            ";".join([status, "device error"])
+        if data & 0b00010000:
+            ";".join([status, "execution error"])
+        if data & 0b00100000:
+            ";".join([status, "command error"])
+        return status
+            
 
     def add_endpoint(self, spime):
         self.endpoints.update({spime.name:spime})
