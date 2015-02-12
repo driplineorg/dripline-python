@@ -33,7 +33,12 @@ def create_child(conf_dict):
     module = conf_dict.pop('module')
     child_confs = conf_dict.pop('endpoints', [])
     logger.info('creating a <{}> with args:\n{}'.format(module, conf_dict))
-    this_child = getattr(dripline.instruments, module)(**conf_dict)
+    if hasattr(dripline.instruments, module):
+        this_child = getattr(dripline.instruments, module)(**conf_dict)
+    elif hasattr(dripline.core, module):
+        this_child = getattr(dripline.core, module)(**conf_dict)
+    else:
+        raise NameError('no module "{}" in dripline.core or dripline.instruments'.format(module))
 
     for child_dict in child_confs:
         this_child.add_endpoint(create_child(child_dict))
