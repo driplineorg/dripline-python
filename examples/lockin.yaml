@@ -39,3 +39,10 @@ providers:
           - name: lockin_adc_data
             module: RawSendEndpoint
             base_str: "DC. 5"
+      - name: lf_lo
+        module: GPIBInstrument
+        addr: 19
+        endpoints:
+          - name: lf_lo_cw_freq
+            module: SimpleSCPISpime
+            base_str: "FREQ:CW"
