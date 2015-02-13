@@ -74,6 +74,7 @@ class DataLogger(object):
         else:
             self._loop_process = threading.Timer(self._log_interval,
                                                  self._log_a_value, ())
+            logger.info("log loop started")
             self._loop_process.start()
 
     def _restart_loop(self):

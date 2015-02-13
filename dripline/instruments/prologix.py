@@ -73,7 +73,7 @@ class PrologixSpimescape(Provider):
     def devices(self, device_dict):
         self._devices = device_dict
         self._device_cycle = itertools.cycle(self._devices.keys())
-        self._queue_next_check()
+        #self._queue_next_check()
     def add_endpoint(self, spime):
         if spime.name in self.devices:
             logger.warning('spime "{}" already present'.format(spime.name))
