@@ -11,3 +11,4 @@ from .prologix import *
 from .random_sensor import *
 from .simple_scpi import *
 from .simple_shell import *
+from .ethernet_scpi import *

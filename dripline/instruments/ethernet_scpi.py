@@ -46,7 +46,7 @@ class EthernetSCPI(Provider):
             logger.warning('connection with info: {} refused'.format(self.socket_info))
             raise
         self.socket.settimeout(self.socket_timeout)
-        self.get()
+        self.send("")
 
     def send(self, command):
         '''
