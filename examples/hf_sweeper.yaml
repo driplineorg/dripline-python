@@ -1,0 +1,15 @@
+nodename: ardbeg
+broker: localhost
+providers:
+  - name: agilent5183B
+    module: EthernetSCPI
+    socket_info: ("ardbeg.local",5024)
+    command_terminator: "\r\n"
+    response_terminator: "\r\nSCPI>"
+    endpoints:
+      - name: hf_stop_freq
+        module: SimpleSCPISpime
+        base_str: "SOUR:FREQ:STOP"
+      - name: hf_start_freq
+        module: SimpleSCPISpime
+        base_str: "SOUR:FREQ:STAR"
