@@ -75,3 +75,15 @@ class EthernetSCPI(Provider):
         if self.response_terminator is not None:
             data = data.rsplit(self.response_terminator,1)[0]
         return data
+
+    @property
+    def spimes(self):
+        return self.endpoints
+
+    def add_endpoint(self,spime):
+        if spime.name in self.endpoints.keys():
+            logger.warning('spime "{}" already present'.format(spime.name))
+            return
+        self.endpoints.update({spime.name:spime})
+        spime.provider = self
+        logger.info('spime list is now: {}'.format(self.endpoints.keys()))
