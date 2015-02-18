@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import numpy
 from scipy import fftpack
 
+import csv
 import pika
 import time
 
@@ -31,8 +32,7 @@ def _get(name, connection):
 def get_data(connection):
     if not connection:
         logger.warning("no connection, can't get data")
-        return {'amplitude':numpy.array([1,2,1,2,3,0,-3,-1,1,0,1], dtype=float),
-                'sweep_out':numpy.array([1,2,3,4,5,6,7,8,8,10,11], dtype=float)}
+        raise ValueError('no connection')
     data = {}
     # ensure lockin config
     _get('lockin_ensure_setup', connection)
@@ -50,24 +50,34 @@ def get_data(connection):
     return data
 
 
-def WeinerFilter(freq_data, amp_data, width=3.):
+def WeinerFilter(freq_data, amp_data, width=False):
+    if not width:
+        base_width = 4
+        if max(freq_data) < 30: # assume GHz
+            width = base_width * 1e-3
+        elif max(freq_data) < 30000: # assume MHz
+            width = base_width * 1
+        elif max(freq_data) < 30000000: # assume kHz
+            width = base_width * 1e3
+        else: # assume Hz
+            width = base_width * 1e6
     data = zip(freq_data, amp_data)
     data.sort()
     f,v= zip(*data)
     frequencies = numpy.array(f, dtype=float)
     voltages = numpy.array(v, dtype=float)
-    x1 = (f - frequencies[0]) / width
-    x2 = (f - frequencies[-1]) / width
+    x1 = (frequencies - frequencies[0]) / width
+    x2 = (frequencies - frequencies[-1]) / width
     gderiv1 = x1 * numpy.exp(-x1 * x1 / 2.)
     gderiv2 = x2 * numpy.exp(-x2 * x2 / 2.)
-    target_signal = 0.00001 * (gderiv1 + gderiv2)
+    target_signal = (gderiv1 + gderiv2)
     target_fft = fftpack.fft(target_signal)
     data_fft = fftpack.fft(voltages)
     data_fft[0] = 0
     filtered = fftpack.ifft(data_fft * target_fft)
     return {'freqs': frequencies,
             'result': abs(filtered),
-            'filter': target_signal
+            'target': target_signal
            }
 
 
@@ -78,7 +88,7 @@ def FrequencyToField(frequency):
     return tesla
 
 
-def main(broker, frequency_limits, **kwargs):
+def main(broker, frequency_limits, output, **kwargs):
     logger.info('broker is: {}'.format(broker))
     try:
         connection = Connection(broker)
@@ -100,13 +110,31 @@ def main(broker, frequency_limits, **kwargs):
     lockin_data = get_data(connection)
     # map adc values to frequencies
     logger.info('map sweep out to frequencies')
-    m = (stop_freq - start_freq) / (10. * 1000.)
+    m = (stop_freq - start_freq) / (10.)
     lockin_data['frequencies'] = start_freq + m * lockin_data['sweep_out']
     # pass data to filter
     logger.info('do optimal filter on output')
     filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
     res_freq = filter_data['freqs'][filter_data['result']==filter_data['result'].max()]
     # save raw output to file if requested
+    if output:
+        output_file = open(output, 'w')
+        csv_writer = csv.writer(output_file)
+        csv_writer.writerow(['sweep_out',
+                             'sweep_freqs',
+                             'lockin_signal',
+                             'filter_freqs',
+                             'filter_target',
+                             'filter_result',
+                            ])
+        csv_writer.writerows(zip(lockin_data['sweep_out'],
+                                 lockin_data['frequencies'],
+                                 lockin_data['amplitude'],
+                                 filter_data['freqs'],
+                                 filter_data['target'],
+                                 filter_data['result'],
+                                ))
+        output_file.close()
     # make plot if requested
     # prompt user for approval to log if requested
     # print field result
