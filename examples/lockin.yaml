@@ -22,8 +22,11 @@ providers:
             module: RawSendEndpoint
             base_str: "TD;M"
           - name: lockin_n_points
-            module: CallProviderMethod
-            method_name: number_of_points
+            module: ProviderProperty
+            property_name: number_of_points
+          - name: lockin_sampling_interval
+            module: ProviderProperty
+            property_name: sampling_interval
           - name: lockin_x_data
             module: RawSendEndpoint
             base_str: "DC. 0"
