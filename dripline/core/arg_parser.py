@@ -102,7 +102,7 @@ class DriplineParser(argparse.ArgumentParser):
                 ind = new_argv.index('--tmux')
                 new_argv.pop(ind)
                 new_argv.pop(ind)
-        session_exists = 0 == subprocess.call('tmux has-session -t {}'.format(session_name),
+        session_exists = 0 == subprocess.call('tmux has-session -t {}'.format(session_name).split(),
                                          stdout=open('/dev/null'),
                                          stderr=subprocess.STDOUT,
                                         )
@@ -115,10 +115,7 @@ class DriplineParser(argparse.ArgumentParser):
                                   stderr=subprocess.STDOUT,
                                  )
             if hasattr(sys, 'real_prefix'):
-                subprocess.check_call('source {}/bin/activate'.format(sys.prefix).split(),
-                                      stdout=open('/dev/null'),
-                                      stderr=subprocess.STDOUT,
-                                     )
+                subprocess.call(['tmux', 'send-keys', 'source {}/bin/activate\n'.format(sys.prefix)])
             subprocess.check_call(['tmux', 'send-keys', ' '.join(new_argv+['\n'])],
                                   stdout=open('/dev/null'),
                                   stderr=subprocess.STDOUT,
@@ -142,6 +139,7 @@ class DriplineParser(argparse.ArgumentParser):
             if self.extra_logger:
                 self.extra_logger.addHandler(_file_handler)
             self._handlers.append(_file_handler)
-        if not args.tmux is None:
-            self.__process_tmux(args)
+        if hasattr(args, 'tmux'):
+            if not args.tmux is None:
+                self.__process_tmux(args)
         return args

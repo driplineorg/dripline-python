@@ -150,6 +150,7 @@ if __name__ == '__main__':
     parser = DriplineParser(description=scan_doc,
                             extra_logger=logger,
                             amqp_broker=True,
+                            tmux_support=True,
                            )
     # an option for outputting raw data
     parser.add_argument('-o', '--output', default=False)

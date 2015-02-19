@@ -45,7 +45,7 @@ def create_child(conf_dict):
     return this_child
 
 if __name__ == '__main__':
-    parser = dripline.core.DriplineParser(extra_logger=logger, config_file=True)
+    parser = dripline.core.DriplineParser(extra_logger=logger, config_file=True, tmux_support=True)
     parser.add_argument('-b',
                         '--broker',
                         help='network path for the AMQP broker',

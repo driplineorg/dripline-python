@@ -44,6 +44,7 @@ if __name__ == '__main__':
     parser = DriplineParser(
                             description='Print messages from an exchange',
                             amqp_broker=True,
+                            tmux_support=True,
                            )
     parser.add_argument('-e',
                         '--exchange',
