@@ -10,6 +10,7 @@ __all__ = [
             'DSPLockin7265',
             'RawSendEndpoint',
             'CallProviderMethod',
+            'ProviderProperty',
           ]
 
 class DSPLockin7265(GPIBInstrument):
@@ -102,8 +103,24 @@ class CallProviderMethod(Endpoint):
 
     def on_get(self):
         method = getattr(self.provider, self.target_method_name)
+        logger.debug('method is: {}'.format(method))
         return method()
 
     def on_set(self, value):
         method = getattr(self.provider, self.target_method_name)
         return method(value)
+
+class ProviderProperty(Endpoint):
+    def __init__(self, property_name, **kwargs):
+        Endpoint.__init__(self, **kwargs)
+        self.target_property = property_name
+
+    def on_get(self):
+        prop = getattr(self.provider, self.target_property)
+        return prop
+
+    def on_set(self, value):
+        if hasattr(self.provider, self.target_property):
+            setattr(self.provider, self.target_property, value)
+        else:
+            raise AttributeError

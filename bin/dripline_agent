@@ -55,6 +55,7 @@ if __name__ == '__main__':
     parser = DriplineParser(description=agent_doc,
                             amqp_broker=True,
                             config_file=True,
+                            tmux_support=True,
                            )
     parser.add_argument('verb', choices=verb_list())
     parser.add_argument('target')
