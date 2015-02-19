@@ -1,4 +1,7 @@
 import argparse
+import os
+import subprocess
+import sys
 
 from dripline.core import constants
 
@@ -17,6 +20,7 @@ class DriplineParser(argparse.ArgumentParser):
                  extra_logger=None,
                  amqp_broker=False,
                  config_file=False,
+                 tmux_support=False,
                  **kwargs):
         '''
         '''
@@ -34,7 +38,6 @@ class DriplineParser(argparse.ArgumentParser):
                          )
         self._handlers = []
         self._handlers.append(logging.StreamHandler())
-        #self._stream_handler = logging.StreamHandler()
         logger.addHandler(self._handlers[0])
         if extra_logger:
             extra_logger.setLevel(logging.DEBUG)
@@ -50,6 +53,14 @@ class DriplineParser(argparse.ArgumentParser):
             self.add_argument('-c',
                               '--config',
                               help='path (absolute or relative) to configuration file',
+                             )
+        if tmux_support:
+            self.add_argument('-t',
+                              '--tmux',
+                              help='enable running in, and optionally naming, a tmux session',
+                              nargs='?',
+                              default=None, # value if option not given
+                              const=False, # value if option given with no argument
                              )
 
     def __set_format(self):
@@ -68,6 +79,53 @@ class DriplineParser(argparse.ArgumentParser):
                     )
         self._handlers[0].setFormatter(self.fmt)
 
+    def __process_tmux(self, args):
+        new_argv = list(sys.argv)
+        if not args.tmux:
+            if hasattr(args, 'config'):
+                session_name = args.config.split('/')[-1].split('.')[0]
+            else:
+                raise AttributeError('one of a config file or tmux session name is required')
+            if '-t' in new_argv:
+                new_argv.pop(new_argv.index('-t'))
+            elif '--tmux' in new_argv:
+                new_argv.pop(new_argv.index('--tmux'))
+            else:
+                raise Exception
+        else:
+            session_name = args.tmux
+            if '-t' in new_argv:
+                ind = new_argv.index('-t')
+                new_argv.pop(ind)
+                new_argv.pop(ind)
+            if '--tmux' in new_argv:
+                ind = new_argv.index('--tmux')
+                new_argv.pop(ind)
+                new_argv.pop(ind)
+        session_exists = 0 == subprocess.call('tmux has-session -t {}'.format(session_name),
+                                         stdout=open('/dev/null'),
+                                         stderr=subprocess.STDOUT,
+                                        )
+        if session_exists:
+            print('session already exists')
+            sys.exit()
+        else:
+            subprocess.check_call('tmux new-session -d -s {}'.format(session_name).split(),
+                                  stdout=open('/dev/null'),
+                                  stderr=subprocess.STDOUT,
+                                 )
+            if hasattr(sys, 'real_prefix'):
+                subprocess.check_call('source {}/bin/activate'.format(sys.prefix).split(),
+                                      stdout=open('/dev/null'),
+                                      stderr=subprocess.STDOUT,
+                                     )
+            subprocess.check_call(['tmux', 'send-keys', ' '.join(new_argv+['\n'])],
+                                  stdout=open('/dev/null'),
+                                  stderr=subprocess.STDOUT,
+                                 )
+            print('tmux session {} created'.format(session_name))
+            sys.exit()
+
     def parse_args(self):
         '''
         '''
@@ -84,4 +142,6 @@ class DriplineParser(argparse.ArgumentParser):
             if self.extra_logger:
                 self.extra_logger.addHandler(_file_handler)
             self._handlers.append(_file_handler)
+        if not args.tmux is None:
+            self.__process_tmux(args)
         return args
