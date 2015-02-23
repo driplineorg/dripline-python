@@ -45,11 +45,13 @@ class AlertConsumer:
             
         insert_dict = {'endpoint_name': message['payload']['from'],
                        'timestamp': message['timestamp'],
-                       #'value_raw': value,
                       }
         insert_dict.update(data)
-        ins = self.table.insert().values(**insert_dict)
-        ins.execute()
+        try:
+            ins = self.table.insert().values(**insert_dict)
+            ins.execute()
+        except:
+            logger.warning('unknown error during sqlalchemy insert')
 
     def start(self):
         logger.debug("AlertConsmer consume starting")
