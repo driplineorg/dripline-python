@@ -45,11 +45,8 @@ def create_child(conf_dict):
     return this_child
 
 if __name__ == '__main__':
-    parser = dripline.core.DriplineParser(extra_logger=logger, config_file=True, tmux_support=True)
-    parser.add_argument('-b',
-                        '--broker',
-                        help='network path for the AMQP broker',
-                       )
+    parser = dripline.core.DriplineParser(extra_logger=logger, amqp_broker=True, config_file=True, tmux_support=True)
+    
     args = parser.parse_args()
     logger.info('args parsed, reading config')
     conf_dict = yaml.load(open(args.config).read())
