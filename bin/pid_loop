@@ -1,0 +1,155 @@
+#!/usr/bin/python
+
+'''
+Utility app for doing PID control
+'''
+
+from __future__ import print_function
+
+import datetime
+import pika
+import argparse
+import msgpack
+
+import dripline
+from dripline.core import Message, DriplineParser, constants
+
+import logging
+logger = logging.getLogger('pid_loop')
+logger.setLevel(logging.DEBUG)
+
+# this probably wants to move elsewhere eventually...
+class pid_controller(object):
+    '''
+    '''
+
+    def __init__(self,
+                 target_temp=110,
+                 Kp=0.005, Ki=0.0002, Kd=3.0,
+                 output_channel='', I_max=1.0, delta_I_min= 0.001,
+                 dripline_connection=None,
+                ):
+        '''
+        '''
+        self.conn = dripline_connection
+        self._current_channel = output_channel
+
+        self.target_temp = target_temp
+
+        self.Kproportional = Kp
+        self.Kintegral = Ki
+        self.Kdifferential = Kd
+
+        self._integral= 0
+        self._old_current = 0
+
+        self.max_current = I_max
+        self.min_current_change = delta_I_min
+
+    @property
+    def target_temp(self):
+        return self._target_temp
+    @target_temp.setter
+    def target_temp(self, value):
+        self._target_temp = value
+        self._integral = 0
+        self._last_data = {'delta':None,'time':datetime.datetime(1970,1,1)}
+
+    def process_new_value(self, value, timestamp):
+        delta = self.target_temp - value
+        this_time = datetime.datetime.strptime(timestamp, constants.TIME_FORMAT)
+        self._integral += delta
+        if (this_time - self._last_data['time']).seconds < (5 * 60):
+            derivative = (delta - self._last_data['delta']) / (this_time - self._last_data['time']).seconds
+        else:
+            derivative = 0.
+        self._last_data = {'delta': delta, 'time': this_time}
+            
+        new_current = (self.Kproportional * delta +
+                       self.Kintegral * self._integral +
+                       self.Kdifferential * derivative
+                      )
+        logger.debug('computed new current to be: {}'.format(new_current))
+        if new_current > self.max_current:
+            new_current = self.max_current
+        if new_current < 0.:
+            new_current = 0.
+        if abs(new_current - self._old_current) < self.min_current_change:
+            return
+        else:
+            self.set_current(new_current)
+        self._old_current = new_current
+
+    def set_current(self, value):
+        logger.debug('would set new current to: {}'.format(value))
+        m = dripline.core.RequestMessage(target=self._current_channel,
+                                         msgop=constants.OP_SENSOR_SET,
+                                         payload=[str(value)]
+                                        )
+        logger.debug('request will be: {}'.format(m))
+        reply = self.conn.send_request(self._current_channel, m.to_msgpack())
+        result = Message.from_msgpack(reply)
+        logger.debug('response was: {}'.format(result))
+
+
+def start_monitoring(sensor, broker='localhost', **kwargs):
+    exchange = 'alerts' # this is always alerts
+    keys = ['sensor_value'] # this is always a sensor value
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
+    channel = connection.channel()
+    #channel.exchange_declare(exchange='alerts', type='topic')
+    
+    result = channel.queue_declare(exclusive=True)
+    queue_name = result.method.queue
+    
+    for severity in keys:
+        channel.queue_bind(exchange=exchange,
+                           queue=queue_name,
+                           routing_key=severity,
+                          )
+    
+    logger.warning(' [*] Waiting for logs. To exit press CTRL+C')
+
+    dripline_connection = dripline.core.Connection(broker)
+    pid = pid_controller(target_temp=110, Kp=0.005, Ki=0.0002, Kd=3.0, I_max=1.0, delta_I_min=0.001, dripline_connection=dripline_connection, output_channel=kwargs['output_channel'])
+    
+    def callback(ch, method, properties, body):
+        message = Message.from_msgpack(body)
+        message.payload = msgpack.unpackb(message.payload)
+        logger.warning(" [x] {}:{}".format(method.routing_key, message,))
+        if message['payload']['from'] == 'peaches':
+            if 'value_cal' in message['payload']['value']:
+                pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_raw'])
+            else:
+                logger.warning('no calibrated value')
+    
+    channel.basic_consume(callback,
+                          queue=queue_name,
+                          no_ack=True)
+    
+    channel.start_consuming()
+
+if __name__ == '__main__':
+    parser = DriplineParser(
+                            description='Print messages from an exchange',
+                            extra_logger=logger,
+                            amqp_broker=True,
+                            tmux_support=True,
+                           )
+    parser.add_argument('-s',
+                        '--sensor',
+                        help='name of the temperature sensor to listen for',
+                        required=True,
+                       )
+    parser.add_argument('-o',
+                        '--output_channel',
+                        help='name of the current limit to change',
+                        required=True,
+                       )
+        
+    kwargs = parser.parse_args()
+    try:
+        start_monitoring(**vars(kwargs))
+    except KeyboardInterrupt:
+        logger.warning(' [*] exiting')
