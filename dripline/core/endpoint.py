@@ -143,7 +143,7 @@ class Endpoint(object):
                 result = "operation returned None"
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
-            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
         reply = ReplyMessage(payload=result)
         self._send_reply(channel, properties, reply)
