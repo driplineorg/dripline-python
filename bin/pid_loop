@@ -24,21 +24,23 @@ class pid_controller(object):
     '''
 
     def __init__(self,
-                 target_temp=110,
-                 Kp=0.005, Ki=0.0002, Kd=3.0,
-                 output_channel='', I_max=1.0, delta_I_min= 0.001,
-                 dripline_connection=None,
+                 dripline_connection,
+                 output_channel,
+                 goal=110,
+                 proportional=0.005, integral=0.0002, differential=3.0,
+                 I_max=1.0, delta_I_min= 0.001,
+                 **kwargs
                 ):
         '''
         '''
         self.conn = dripline_connection
         self._current_channel = output_channel
 
-        self.target_temp = target_temp
+        self.target_temp = goal
 
-        self.Kproportional = Kp
-        self.Kintegral = Ki
-        self.Kdifferential = Kd
+        self.Kproportional = proportional
+        self.Kintegral = integral
+        self.Kdifferential = differential
 
         self._integral= 0
         self._old_current = 0
@@ -112,7 +114,7 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     logger.warning(' [*] Waiting for logs. To exit press CTRL+C')
 
     dripline_connection = dripline.core.Connection(broker)
-    pid = pid_controller(target_temp=110, Kp=0.005, Ki=0.0002, Kd=3.0, I_max=1.0, delta_I_min=0.001, dripline_connection=dripline_connection, output_channel=kwargs['output_channel'])
+    pid = pid_controller(dripline_connection=dripline_connection, **kwargs)
     
     def callback(ch, method, properties, body):
         message = Message.from_msgpack(body)
@@ -146,6 +148,30 @@ if __name__ == '__main__':
                         '--output_channel',
                         help='name of the current limit to change',
                         required=True,
+                       )
+    parser.add_argument('-g',
+                        '--goal',
+                        help='set point temperature',
+                        type=float,
+                        required=True,
+                       )
+    parser.add_argument('-p',
+                        '--proportional',
+                        help='proportional PID term weighting',
+                        default=0.005,
+                        type=float,
+                       )
+    parser.add_argument('-i',
+                        '--integral',
+                        default=0.0002,
+                        type=float,
+                        help='integral PID term weighting',
+                       )
+    parser.add_argument('-d',
+                        '--differential',
+                        default=3.0,
+                        type=float,
+                        help='differential PID term weighting',
                        )
         
     kwargs = parser.parse_args()
