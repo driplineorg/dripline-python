@@ -40,7 +40,7 @@ class PrologixSpimescape(Provider):
         self.socket_info = socket_info
         self.poll_thread = threading.Timer([], {})
         self.socket = socket.socket()
-        self._devices = {}
+        #self._devices = {}
         if type(self.socket_info) is str:
             import re
             re_str = "\([\"'](\S+)[\"'], (\d+)\)"
@@ -48,6 +48,10 @@ class PrologixSpimescape(Provider):
             self.socket_info = (ip, int(port))
         logger.debug('socket info is {}'.format(self.socket_info))
         self.reconnect()
+
+    @property
+    def _devices(self):
+        return self._endpoints
 
     def reconnect(self):
         self.socket.close()
@@ -65,10 +69,6 @@ class PrologixSpimescape(Provider):
         return self._devices
 
     @property
-    def endpoints(self):
-        return self._devices
-
-    @property
     def devices(self):
         return self._devices.keys()
     @devices.setter
@@ -76,13 +76,6 @@ class PrologixSpimescape(Provider):
         self._devices = device_dict
         self._device_cycle = itertools.cycle(self._devices.keys())
         #self._queue_next_check()
-    def add_endpoint(self, spime):
-        if spime.name in self.devices:
-            logger.warning('spime "{}" already present'.format(spime.name))
-            return
-        self.devices = dict(self._devices.items()+[(spime.name, spime)])
-        spime.provider = self
-        logger.info('spime list is now: {}'.format(self.devices))
 
     @property
     def keep_polling(self):
@@ -158,7 +151,6 @@ class GPIBInstrument(Provider):
         self.status = 0
         self.provider = None
         self._cmd_term = '\n'
-        self.endpoints = {}
 
     def _check_status(self):
         raw = self.provider.send('*ESR?', from_spime=self)
@@ -177,10 +169,6 @@ class GPIBInstrument(Provider):
             ";".join([status, "command error"])
         return status
             
-
-    def add_endpoint(self, spime):
-        self.endpoints.update({spime.name:spime})
-        spime.provider = self
 
     def send(self, cmd):
         return self.provider.send(cmd+self._cmd_term, self)

@@ -37,17 +37,6 @@ class kv_store(Provider):
         self.name = name
         Provider.__init__(self, name=name, **kwargs)
         self.conf = {}
-        self.endpoints = {}
-
-    def add_endpoint(self, endpoint):
-        """
-        Add an endpoint to the KV store.  The keys are
-        the endpoint names, and the values are a tuple
-        of the value, and the endpoint itself.
-        """
-        endpoint.provider = self
-        self.endpoints[endpoint.name] = endpoint
-        self.conf[endpoint.name] = endpoint.initial_value
 
     def endpoint(self, endpoint):
         """

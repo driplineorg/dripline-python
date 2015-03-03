@@ -30,7 +30,6 @@ class EthernetSCPI(Provider):
         self.socket = socket.socket()
         self.response_terminator = response_terminator
         self.command_terminator = command_terminator
-        self.endpoints = {}
         if type(self.socket_info) is str:
             import re
             re_str = "\([\"'](\S+)[\"'],(\d+)\)"
@@ -82,13 +81,6 @@ class EthernetSCPI(Provider):
     def spimes(self):
         return self.endpoints
 
-    def add_endpoint(self,spime):
-        if spime.name in self.endpoints.keys():
-            logger.warning('spime "{}" already present'.format(spime.name))
-            return
-        self.endpoints.update({spime.name:spime})
-        spime.provider = self
-        logger.info('spime list is now: {}'.format(self.endpoints.keys()))
 
 class EthernetRepeater(EthernetSCPI, Endpoint):
     '''

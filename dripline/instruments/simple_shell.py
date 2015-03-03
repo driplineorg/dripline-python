@@ -12,11 +12,6 @@ logger = logging.getLogger(__name__)
 class simple_shell_instrument(Provider):
     def __init__(self, name, **kwargs):
         Provider.__init__(self, name=name, **kwargs)
-        self.endpoints = {}
-
-    def add_endpoint(self, endpoint):
-        self.endpoints[endpoint.name] = endpoint
-        endpoint.set_provider(self)
 
     def list_endpoints(self):
         return self.endpoints.keys()
