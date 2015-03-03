@@ -94,8 +94,8 @@ class Endpoint(object):
 
         method_dict = {}
         for key in dir(constants):
-            if key.startswith('OP_SENSOR_'):
-                method_name = 'on_'+key.replace('OP_SENSOR_','').lower()
+            if key.startswith('OP_'):
+                method_name = 'on_' + key.split('_')[-1].lower()
                 method = getattr(self, method_name)
                 method_dict[getattr(constants, key)] = method
         self.methods = method_dict
@@ -110,6 +110,10 @@ class Endpoint(object):
 
     # @abstractmethod
     def on_config(self, attribute, value):
+        raise NotImplementedError
+
+    # @abstractmethod
+    def on_send(self, to_send):
         raise NotImplementedError
 
     def _send_reply(self, channel, properties, reply):

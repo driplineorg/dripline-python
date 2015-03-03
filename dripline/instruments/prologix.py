@@ -2,6 +2,8 @@
 <this should say something useful>
 '''
 
+from __future__ import absolute_import
+
 import itertools
 import threading
 import time

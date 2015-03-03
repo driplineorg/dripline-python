@@ -1,14 +1,15 @@
 
 
+from __future__ import absolute_import
 import socket, threading
 
-from ..core import Provider
+from ..core import Provider, Endpoint
 
 import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['EthernetSCPI',
-           ]
+          ]
 
 class EthernetSCPI(Provider):
     def __init__(self,
@@ -20,7 +21,7 @@ class EthernetSCPI(Provider):
                  ):
         '''
         '''
-        Provider.__init__(self,**kwargs)
+        Provider.__init__(self, **kwargs)
         self.alock = threading.Lock()
         self.socket_timeout = float(socket_timeout)
         self.socket_info = socket_info
@@ -87,3 +88,14 @@ class EthernetSCPI(Provider):
         self.endpoints.update({spime.name:spime})
         spime.provider = self
         logger.info('spime list is now: {}'.format(self.endpoints.keys()))
+
+class EthernetRepeater(EthernetSCPI, Endpoint):
+    '''
+    '''
+
+    def __init__(self, **kwargs):
+        Endpoint.__init__(self, **kwargs)
+        EthernetSCPI.__init__(self, **kwargs)
+
+    def on_send(self, to_send):
+        self.send(to_send)
