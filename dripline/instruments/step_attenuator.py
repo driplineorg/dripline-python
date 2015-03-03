@@ -10,10 +10,6 @@ from ..core import Endpoint
 
 logger = logging.getLogger(__name__)
 
-spi = spidev.SpiDev()
-spi.open(0, 0)
-spi.xfer([10])
-
 __all__= ['StepAttenuator']
 ##this is what classes are exported when you try to use this file so that they go to the global namespace. Since StepAttenuator is the only class you've made this should be the only name in the list. 
 
@@ -37,11 +33,17 @@ class StepAttenuator(Endpoint):
 ##This opens up the temp file, which can be called/put where the user wants, and recalls the last line of the file
 
     def on_set(self, value):      
-        f= open(self.file_name, "a")        
         self.value=value
+        spi= spidev.SpiDev()
+        spi.open(0, 0)
+        logger.debug('value[type] is: {}[{}]'.format(value,type(value)))
+        spi.xfer([int(value)])
+        spi.close()           
+        f= open(self.file_name, "a")
         string=str(value)
-        f.write(string)
+        f.write(string + '\n')
         f.close()
-        return string 
+        return string
 
+##First creates spi object and then opens a spi port 0, device 0. Xfer performs a SPI transaction. So return the value that you want to set the attenuation as. Without the SPI lines the actual attenuation will not change but your new values will be written in a file--that doens't actually do anything useful.  
 ##This sets the new value for the SA but rewrites the file and deletes the old content. This is fine for now but it something to fix in the future. 
