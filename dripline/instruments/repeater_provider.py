@@ -1,9 +1,9 @@
 '''
 '''
-
-from ..core import Connection, message, constants
-
 from __future__ import absolute_import
+
+from ..core import Provider, Connection, message, constants
+
 
 import logging
 logger = logging.getLogger(__name__)
