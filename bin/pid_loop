@@ -28,7 +28,7 @@ class pid_controller(object):
                  output_channel,
                  goal=110,
                  proportional=0.005, integral=0.0002, differential=3.0,
-                 I_max=1.0, delta_I_min= 0.001,
+                 maximum=1.0, delta_I_min= 0.001,
                  **kwargs
                 ):
         '''
@@ -171,6 +171,12 @@ if __name__ == '__main__':
                         default=3.0,
                         type=float,
                         help='differential PID term weighting',
+                       )
+    parser.add_argument('-m',
+                        '--maximum',
+                        default=0.0,
+                        type=float,
+                        help='maximum current value to set',
                        )
         
     kwargs = parser.parse_args()
