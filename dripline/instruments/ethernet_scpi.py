@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['EthernetSCPI',
+           'EthernetRepeater',
           ]
 
 class EthernetSCPI(Provider):
