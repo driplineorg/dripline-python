@@ -27,7 +27,7 @@ class pid_controller(object):
                  dripline_connection,
                  output_channel,
                  goal=110,
-                 proportional=0.005, integral=0.0002, differential=3.0,
+                 proportional=0.0, integral=0.0, differential=0.0,
                  maximum=1.0, delta_I_min= 0.001,
                  **kwargs
                 ):
@@ -167,18 +167,18 @@ if __name__ == '__main__':
     parser.add_argument('-p',
                         '--proportional',
                         help='proportional PID term weighting',
-                        default=0.005,
+                        default=0.0,
                         type=float,
                        )
     parser.add_argument('-i',
                         '--integral',
-                        default=0.0002,
+                        default=0.0,
                         type=float,
                         help='integral PID term weighting',
                        )
     parser.add_argument('-d',
                         '--differential',
-                        default=3.0,
+                        default=0.0,
                         type=float,
                         help='differential PID term weighting',
                        )
