@@ -67,6 +67,9 @@ class pid_controller(object):
             derivative = 0.
         self._last_data = {'delta': delta, 'time': this_time}
             
+        logger.info("proportional: {}".format(self.Kproportional*delta))
+        logger.info("integral: {}".format(self.Kintegral*self._integral))
+        logger.info("differential: {}".format(self.Kdifferential * derivative))
         new_current = (self.Kproportional * delta +
                        self.Kintegral * self._integral +
                        self.Kdifferential * derivative
