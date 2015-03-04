@@ -58,7 +58,7 @@ class pid_controller(object):
         self._last_data = {'delta':None,'time':datetime.datetime(1970,1,1)}
 
     def process_new_value(self, value, timestamp):
-        delta = self.target_temp - value
+        delta = self.target_temp - float(value)
         this_time = datetime.datetime.strptime(timestamp, constants.TIME_FORMAT)
         self._integral += delta
         if (this_time - self._last_data['time']).seconds < (5 * 60):
@@ -71,7 +71,7 @@ class pid_controller(object):
                        self.Kintegral * self._integral +
                        self.Kdifferential * derivative
                       )
-        logger.debug('computed new current to be: {}'.format(new_current))
+        logger.info('computed new current to be: {}'.format(new_current))
         if new_current > self.max_current:
             new_current = self.max_current
         if new_current < 0.:
@@ -80,6 +80,7 @@ class pid_controller(object):
             return
         else:
             self.set_current(new_current)
+        logger.info("actual set is: {}".format(new_current))
         self._old_current = new_current
 
     def set_current(self, value):
