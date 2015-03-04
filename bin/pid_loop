@@ -43,7 +43,7 @@ class pid_controller(object):
         self.Kdifferential = differential
 
         self._integral= 0
-        self._old_current = 0
+        self._old_current = None
 
         self.max_current = maximum
         self.min_current_change = delta_I_min
@@ -78,10 +78,11 @@ class pid_controller(object):
         if new_current < 0.:
             logger.info("new current < 0")
             new_current = 0.
-        if abs(new_current - self._old_current) < self.min_current_change:
-            logger.info("current change less than min delta")
-            logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
-            return
+        if self._old_current is not None:
+            if abs(new_current - self._old_current) < self.min_current_change:
+                logger.info("current change less than min delta")
+                logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
+                return
         else:
             self.set_current(new_current)
         logger.info("actual set is: {}".format(new_current))
