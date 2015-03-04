@@ -73,10 +73,13 @@ class pid_controller(object):
                       )
         logger.info('computed new current to be: {}'.format(new_current))
         if new_current > self.max_current:
+            logger.info("new current above max")
             new_current = self.max_current
         if new_current < 0.:
+            logger.info("new current < 0")
             new_current = 0.
         if abs(new_current - self._old_current) < self.min_current_change:
+            logger.info("current change less than min delta")
             return
         else:
             self.set_current(new_current)
