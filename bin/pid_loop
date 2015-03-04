@@ -133,7 +133,7 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
         if message['payload']['from'] == sensor:
             logger.info('got a value for sensor')
             if 'value_cal' in message['payload']['value']:
-                pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_raw'])
+                pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_cal'])
             else:
                 logger.warning('no calibrated value')
     
