@@ -58,7 +58,9 @@ class pid_controller(object):
         self._last_data = {'delta':None,'time':datetime.datetime(1970,1,1)}
 
     def process_new_value(self, value, timestamp):
+        logger.info('value is: {}'.format(value))
         delta = self.target_temp - float(value)
+        logger.info("delta is: {}".format(delta))
         this_time = datetime.datetime.strptime(timestamp, constants.TIME_FORMAT)
         self._integral += delta
         if (this_time - self._last_data['time']).seconds < (5 * 60):
