@@ -119,7 +119,8 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     def callback(ch, method, properties, body):
         message = Message.from_msgpack(body)
         message.payload = msgpack.unpackb(message.payload)
-        if message['payload']['from'] == 'peaches':
+        if message['payload']['from'] == sensor:
+            logger.info('got a value for sensor')
             if 'value_cal' in message['payload']['value']:
                 pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_raw'])
             else:
