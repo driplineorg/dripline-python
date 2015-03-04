@@ -80,6 +80,7 @@ class pid_controller(object):
             new_current = 0.
         if abs(new_current - self._old_current) < self.min_current_change:
             logger.info("current change less than min delta")
+            logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
             return
         else:
             self.set_current(new_current)
