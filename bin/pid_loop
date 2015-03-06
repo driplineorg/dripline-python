@@ -88,8 +88,7 @@ class pid_controller(object):
         if new_current < 0.:
             logger.info("new current < 0")
             new_current = 0.
-        else:
-            self.set_current(new_current)
+        self.set_current(new_current)
         logger.info("actual set is: {}".format(new_current))
         self._old_current = new_current
 
