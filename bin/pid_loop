@@ -72,10 +72,15 @@ class pid_controller(object):
         logger.info("proportional: {}".format(self.Kproportional*delta))
         logger.info("integral: {}".format(self.Kintegral*self._integral))
         logger.info("differential: {}".format(self.Kdifferential * derivative))
-        new_current = (self.Kproportional * delta +
-                       self.Kintegral * self._integral +
-                       self.Kdifferential * derivative
-                      )
+        change_to_current = (self.Kproportional * delta +
+                             self.Kintegral * self._integral +
+                             self.Kdifferential * derivative
+                            )
+        new_current = (self._old_current or 0) + change_to_current
+        if abs(change_to_current) < self.min_current_change:
+            logger.info("current change less than min delta")
+            logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
+            return
         logger.info('computed new current to be: {}'.format(new_current))
         if new_current > self.max_current:
             logger.info("new current above max")
@@ -83,11 +88,6 @@ class pid_controller(object):
         if new_current < 0.:
             logger.info("new current < 0")
             new_current = 0.
-        if self._old_current is not None:
-            if abs(new_current - self._old_current) < self.min_current_change:
-                logger.info("current change less than min delta")
-                logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
-                return
         else:
             self.set_current(new_current)
         logger.info("actual set is: {}".format(new_current))
