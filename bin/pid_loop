@@ -10,6 +10,7 @@ import datetime
 import pika
 import argparse
 import msgpack
+import uuid
 
 import dripline
 from dripline.core import Message, DriplineParser, constants
@@ -101,7 +102,7 @@ class pid_controller(object):
         logger.debug('request will be: {}'.format(m))
         reply = self.conn.send_request(self._current_channel, m.to_msgpack())
         result = Message.from_msgpack(reply)
-        logger.debug('response was: {}'.format(result))
+        logger.info('set response was: {}'.format(result))
 
 
 def start_monitoring(sensor, broker='localhost', **kwargs):
@@ -112,7 +113,10 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     channel = connection.channel()
     #channel.exchange_declare(exchange='alerts', type='topic')
     
-    result = channel.queue_declare(exclusive=True)
+    result = channel.queue_declare(queue='PID-'+uuid.uuid1().hex[:12],
+                                   auto_delete=True,
+                                   exclusive=True,
+                                  )
     queue_name = result.method.queue
     
     for severity in keys:
@@ -138,7 +142,8 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     
     channel.basic_consume(callback,
                           queue=queue_name,
-                          no_ack=True)
+                          no_ack=True,
+                         )
     
     channel.start_consuming()
 

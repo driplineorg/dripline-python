@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import pika
 import threading
+import traceback
 import uuid
 
 from .endpoint import Endpoint
@@ -92,18 +93,26 @@ class Connection(object):
             logger.info('sending an alert message: {}'.format(repr(alert)))
             message = AlertMessage()
             message.update({'target':severity, 'payload':alert})
+            packed = message.to_msgpack()
             pr = self.chan.basic_publish(exchange='alerts',
                                          properties=pika.BasicProperties(
                                            content_encoding='application/msgpack',
                                          ),
                                          routing_key=severity,
                                          mandatory=True,
-                                         #immediate=True,
-                                         body=message.to_msgpack(),
+                                         body=packed,
                                         )
             if not pr:
                 logger.error('alert unable to send')
-            self.__alert_lock.release()
-        except:
-            self.__alert_lock.release()
+            logger.info('alert sent, returned:{}'.format(pr))
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning("pika screwed up...\nit's probably fine")
+            else:
+                raise
+        except Exception as err:
+            logger.error('an error while sending alert')
+            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
             raise
+        finally:
+            self.__alert_lock.release()

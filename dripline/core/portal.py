@@ -75,7 +75,9 @@ class Portal(object):
                                   queue=ep_queue.method.queue,
                                   routing_key=endpoint.name)
         self.conn.chan.basic_consume(endpoint.handle_request,
-                                     queue=ep_queue.method.queue)
+                                     queue=ep_queue.method.queue,
+                                     no_ack=True,
+                                    )
 
     # TODO: god these names are awkward, who came up with this???
     # do these even ever get used?
