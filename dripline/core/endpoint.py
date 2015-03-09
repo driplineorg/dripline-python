@@ -123,15 +123,21 @@ class Endpoint(object):
         if not isinstance(reply, ReplyMessage):
             logger.warn('should be providing a ReplyMessage')
             reply = ReplyMessage(payload=reply)
-        channel.basic_publish(exchange='requests',
-                              immediate=True,
-                              mandatory=True,
-                              routing_key=properties.reply_to,
-                              properties=pika.BasicProperties(
-                                correlation_id=properties.correlation_id
-                              ),
-                              body=reply.to_msgpack(),
-                             )
+        try:
+            channel.basic_publish(exchange='requests',
+                                  immediate=True,
+                                  mandatory=True,
+                                  routing_key=properties.reply_to,
+                                  properties=pika.BasicProperties(
+                                    correlation_id=properties.correlation_id
+                                  ),
+                                  body=reply.to_msgpack(),
+                                 )
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning("pika screwed up maybe")
+            else:
+                raise
 
     def handle_request(self, channel, method, properties, request):
         '''
@@ -151,7 +157,7 @@ class Endpoint(object):
             result = err.message
         reply = ReplyMessage(payload=result)
         self._send_reply(channel, properties, reply)
-        channel.basic_ack(delivery_tag = method.delivery_tag)
+        #channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
 
         
@@ -172,5 +178,5 @@ class AutoReply(Endpoint):
         if msg.msgop == constants.OP_SENSOR_GET:
             result = self.on_get()
             self.send_reply(channel, properties, result)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+            #channel.basic_ack(delivery_tag=method.delivery_tag)
 

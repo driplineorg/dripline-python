@@ -10,6 +10,7 @@ import datetime
 import pika
 import argparse
 import msgpack
+import uuid
 
 import dripline
 from dripline.core import Message, DriplineParser, constants
@@ -27,8 +28,8 @@ class pid_controller(object):
                  dripline_connection,
                  output_channel,
                  goal=110,
-                 proportional=0.005, integral=0.0002, differential=3.0,
-                 I_max=1.0, delta_I_min= 0.001,
+                 proportional=0.0, integral=0.0, differential=0.0,
+                 maximum=1.0, delta_I_min= 0.001,
                  **kwargs
                 ):
         '''
@@ -43,9 +44,9 @@ class pid_controller(object):
         self.Kdifferential = differential
 
         self._integral= 0
-        self._old_current = 0
+        self._old_current = None
 
-        self.max_current = I_max
+        self.max_current = maximum
         self.min_current_change = delta_I_min
 
     @property
@@ -58,7 +59,9 @@ class pid_controller(object):
         self._last_data = {'delta':None,'time':datetime.datetime(1970,1,1)}
 
     def process_new_value(self, value, timestamp):
-        delta = self.target_temp - value
+        logger.info('value is: {}'.format(value))
+        delta = self.target_temp - float(value)
+        logger.info("delta is: {}".format(delta))
         this_time = datetime.datetime.strptime(timestamp, constants.TIME_FORMAT)
         self._integral += delta
         if (this_time - self._last_data['time']).seconds < (5 * 60):
@@ -67,19 +70,27 @@ class pid_controller(object):
             derivative = 0.
         self._last_data = {'delta': delta, 'time': this_time}
             
-        new_current = (self.Kproportional * delta +
-                       self.Kintegral * self._integral +
-                       self.Kdifferential * derivative
-                      )
-        logger.debug('computed new current to be: {}'.format(new_current))
+        logger.info("proportional: {}".format(self.Kproportional*delta))
+        logger.info("integral: {}".format(self.Kintegral*self._integral))
+        logger.info("differential: {}".format(self.Kdifferential * derivative))
+        change_to_current = (self.Kproportional * delta +
+                             self.Kintegral * self._integral +
+                             self.Kdifferential * derivative
+                            )
+        new_current = (self._old_current or 0) + change_to_current
+        if abs(change_to_current) < self.min_current_change:
+            logger.info("current change less than min delta")
+            logger.info("old[new] are: {}[{}]".format(self._old_current,new_current))
+            return
+        logger.info('computed new current to be: {}'.format(new_current))
         if new_current > self.max_current:
+            logger.info("new current above max")
             new_current = self.max_current
         if new_current < 0.:
+            logger.info("new current < 0")
             new_current = 0.
-        if abs(new_current - self._old_current) < self.min_current_change:
-            return
-        else:
-            self.set_current(new_current)
+        self.set_current(new_current)
+        logger.info("actual set is: {}".format(new_current))
         self._old_current = new_current
 
     def set_current(self, value):
@@ -91,7 +102,7 @@ class pid_controller(object):
         logger.debug('request will be: {}'.format(m))
         reply = self.conn.send_request(self._current_channel, m.to_msgpack())
         result = Message.from_msgpack(reply)
-        logger.debug('response was: {}'.format(result))
+        logger.info('set response was: {}'.format(result))
 
 
 def start_monitoring(sensor, broker='localhost', **kwargs):
@@ -102,7 +113,10 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     channel = connection.channel()
     #channel.exchange_declare(exchange='alerts', type='topic')
     
-    result = channel.queue_declare(exclusive=True)
+    result = channel.queue_declare(queue='PID-'+uuid.uuid1().hex[:12],
+                                   auto_delete=True,
+                                   exclusive=True,
+                                  )
     queue_name = result.method.queue
     
     for severity in keys:
@@ -113,21 +127,23 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     
     logger.info(' [*] Waiting for logs. To exit press CTRL+C')
 
-    dripline_connection = dripline.core.Connection(broker)
+    dripline_connection = dripline.core.Connection(broker,queue_name='PID_unused_reply-{}'.format(uuid.uuid1().hex[:12]))
     pid = pid_controller(dripline_connection=dripline_connection, **kwargs)
     
     def callback(ch, method, properties, body):
         message = Message.from_msgpack(body)
         message.payload = msgpack.unpackb(message.payload)
-        if message['payload']['from'] == 'peaches':
+        if message['payload']['from'] == sensor:
+            logger.info('got a value for sensor')
             if 'value_cal' in message['payload']['value']:
-                pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_raw'])
+                pid.process_new_value(timestamp=message['timestamp'], value=message['payload']['value']['value_cal'])
             else:
                 logger.warning('no calibrated value')
     
     channel.basic_consume(callback,
                           queue=queue_name,
-                          no_ack=True)
+                          no_ack=True,
+                         )
     
     channel.start_consuming()
 
@@ -157,20 +173,26 @@ if __name__ == '__main__':
     parser.add_argument('-p',
                         '--proportional',
                         help='proportional PID term weighting',
-                        default=0.005,
+                        default=0.0,
                         type=float,
                        )
     parser.add_argument('-i',
                         '--integral',
-                        default=0.0002,
+                        default=0.0,
                         type=float,
                         help='integral PID term weighting',
                        )
     parser.add_argument('-d',
                         '--differential',
-                        default=3.0,
+                        default=0.0,
                         type=float,
                         help='differential PID term weighting',
+                       )
+    parser.add_argument('-m',
+                        '--maximum',
+                        default=0.0,
+                        type=float,
+                        help='maximum current value to set',
                        )
         
     kwargs = parser.parse_args()
