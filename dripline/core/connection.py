@@ -19,7 +19,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Connection(object):
-    def __init__(self, broker_host='localhost'):
+    def __init__(self, broker_host='localhost', queue_name=None):
+        if queue_name is None:
+            queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])
+        self._queue_name = queue_name
         self.broker_host = broker_host
         conn_params = pika.ConnectionParameters(broker_host)
         self.conn = pika.BlockingConnection(conn_params)
@@ -38,7 +41,7 @@ class Connection(object):
         ensures all exchanges are present and creates a response queue.
         '''
         self.chan.exchange_declare(exchange='requests', type='topic')
-        self.queue = self.chan.queue_declare(queue='reply_queue'+uuid.uuid1().hex[:12],
+        self.queue = self.chan.queue_declare(queue=self._queue_name,
                                              exclusive=True,
                                              auto_delete=True,
                                             )

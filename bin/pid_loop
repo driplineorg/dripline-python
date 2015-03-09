@@ -127,7 +127,7 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     
     logger.info(' [*] Waiting for logs. To exit press CTRL+C')
 
-    dripline_connection = dripline.core.Connection(broker)
+    dripline_connection = dripline.core.Connection(broker,queue_name='PID_unused_reply-{}'.format(uuid.uuid1().hex[:12]))
     pid = pid_controller(dripline_connection=dripline_connection, **kwargs)
     
     def callback(ch, method, properties, body):

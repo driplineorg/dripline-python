@@ -24,7 +24,7 @@ class Portal(object):
         self.name = name
         logger.info('connecting to broker {}'.format(broker))
         try:
-            self.conn = Connection(broker)
+            self.conn = Connection(broker, queue_name='reply-{}-{}'.format(self.name,uuid.uuid1().hex[:12]))
         except Exception as err:
             logger.error('connection to broker failed!!')
             raise err
@@ -71,7 +71,10 @@ class Portal(object):
         directly in a configuration file!  It is only used internally
         by dripline.
         """
-        ep_queue = self.conn.chan.queue_declare(queue=__file__+'-'+uuid.uuid1().hex[:12],
+        ep_queue = self.conn.chan.queue_declare('portal-{}:{}-{}'.format(self.name,
+                                                                         endpoint.name,
+                                                                         uuid.uuid1().hex[:12]
+                                                                        ),
                                                 exclusive=True,
                                                 auto_delete=True,
                                                )
