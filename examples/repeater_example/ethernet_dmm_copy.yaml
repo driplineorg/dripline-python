@@ -1,0 +1,11 @@
+nodename: dmm_copy
+broker: localhost
+providers:
+  - name: agilent5183B_copy
+    module: RepeaterProvider
+    repeat_target: dmm_repeater_provider
+    broker: higgsino.physics.ucsb.edu
+    endpoints:
+      - name: dmm_id_copy
+        module: SimpleSCPIGetSpime
+        base_str: "*IDN"
