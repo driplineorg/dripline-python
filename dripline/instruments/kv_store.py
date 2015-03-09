@@ -33,10 +33,8 @@ class kv_store(Provider):
     """
     The KV store.  This is just a wrapper around a dict.
     """
-    def __init__(self, name, **kwargs):
-        self.name = name
-        Provider.__init__(self, name=name, **kwargs)
-        self.conf = {}
+    def __init__(self, **kwargs):
+        Provider.__init__(self, **kwargs)
 
     def endpoint(self, endpoint):
         """
@@ -50,27 +48,18 @@ class kv_store(Provider):
         This is the same as enumerating the keys in the
         dict.
         """
-        return self.conf.keys()
-
-    def __getitem__(self, name):
-        return self.conf[name]
-
-    def __setitem__(self, name, value):
-        self.conf[name] = value
+        return self.keys()
 
 
 class kv_store_key(Spime):
     """
     A key in the KV store.
     """
-    def __init__(self, name, initial_value=None, **kwargs):
-        Spime.__init__(self, name=name, **kwargs)
+    def __init__(self, initial_value=None, **kwargs):
+        Spime.__init__(self, **kwargs)
+        self._value = initial_value
         self.get_value = self.on_get
         self.store_value = self.report_log
-
-        self.name = name
-        self.provider = None
-        self.initial_value = initial_value
 
     @staticmethod
     def report_log(value):  
@@ -82,7 +71,7 @@ class kv_store_key(Spime):
         Return the value associated with this
         key.
         """
-        value = self.provider[self.name]
+        value = self._value
         return value
 
     def on_set(self, value):
@@ -92,7 +81,7 @@ class kv_store_key(Spime):
         """
         try:
             value = float(value)
-            self.provider[self.name] = value
+            self._value = value
         except ValueError:
             raise ValueError('argument to set must be a float!')
 
