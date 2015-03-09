@@ -129,8 +129,11 @@ class Endpoint(object):
                                   ),
                                   body=reply.to_msgpack(),
                                  )
-        except KeyError:
-            logger.error("pika screwed up maybe")
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning("pika screwed up maybe")
+            else
+                raise
 
     def handle_request(self, channel, method, properties, request):
         '''

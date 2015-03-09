@@ -5,6 +5,8 @@ I don't like the way it works and am going to try and make something that is cle
 
 from __future__ import absolute_import
 
+import uuid
+
 from .connection import Connection
 from .message import Message
 from .provider import Provider
@@ -69,7 +71,10 @@ class Portal(object):
         directly in a configuration file!  It is only used internally
         by dripline.
         """
-        ep_queue = self.conn.chan.queue_declare(exclusive=True, auto_delete=True)
+        ep_queue = self.conn.chan.queue_declare(queue=__file__+'-'+uuid.uuid1().hex[:12],
+                                                exclusive=True,
+                                                auto_delete=True,
+                                               )
 
         self.conn.chan.queue_bind(exchange='requests',
                                   queue=ep_queue.method.queue,
