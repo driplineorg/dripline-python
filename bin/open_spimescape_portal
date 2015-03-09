@@ -56,5 +56,9 @@ if __name__ == '__main__':
     try:
         open_spimescape_portal(**conf_dict)
     except KeyboardInterrupt:
-        import sys
-        sys.exit()
+        import threading
+        logger.info('there are {} total threads'.format(threading.active_count()))
+        for thread in threading.enumerate():
+            if thread.name.startswith('logger_'):
+                logger.info('canceling a thread named: {}'.format(thread.name))
+                thread.cancel()
