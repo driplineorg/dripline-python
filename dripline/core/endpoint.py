@@ -132,7 +132,7 @@ class Endpoint(object):
         except KeyError as err:
             if err.message == 'Basic.Ack':
                 logger.warning("pika screwed up maybe")
-            else
+            else:
                 raise
 
     def handle_request(self, channel, method, properties, request):
