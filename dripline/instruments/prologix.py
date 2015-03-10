@@ -171,7 +171,7 @@ class GPIBInstrument(Provider):
             
 
     def send(self, cmd):
-        to_send = '++addr {}\r{}self._cmd_term'.format(self.addr, cmd)
+        to_send = '++addr {}\r{}{}'.format(self.addr, cmd, self._cmd_term)
         return self.provider.send(to_send)
 
 
