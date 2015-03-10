@@ -5,9 +5,12 @@ I don't like the way it works and am going to try and make something that is cle
 
 from __future__ import absolute_import
 
+import uuid
+
 from .connection import Connection
 from .message import Message
 from .provider import Provider
+from .endpoint import Endpoint
 import logging
 
 __all__ = ['Portal']
@@ -22,7 +25,7 @@ class Portal(object):
         self.name = name
         logger.info('connecting to broker {}'.format(broker))
         try:
-            self.conn = Connection(broker)
+            self.conn = Connection(broker, queue_name='reply-{}-{}'.format(self.name,uuid.uuid1().hex[:12]))
         except Exception as err:
             logger.error('connection to broker failed!!')
             raise err
@@ -45,10 +48,11 @@ class Portal(object):
     def _bind_endpoints(self, instance):
         '''
         '''
+        logger.info('now bindings for: {}'.format(instance.name))
         if isinstance(instance, Provider):
             for child in instance.endpoints.keys():
                 self._bind_endpoints(instance.endpoints[child])
-        else:
+        if isinstance(instance, Endpoint):
             logger.debug('creating binding for: {}'.format(instance.name))
             self.bind_endpoint(instance)
 
@@ -69,13 +73,21 @@ class Portal(object):
         directly in a configuration file!  It is only used internally
         by dripline.
         """
-        ep_queue = self.conn.chan.queue_declare(exclusive=True, auto_delete=True)
+        ep_queue = self.conn.chan.queue_declare('portal-{}:{}-{}'.format(self.name,
+                                                                         endpoint.name,
+                                                                         uuid.uuid1().hex[:12]
+                                                                        ),
+                                                exclusive=True,
+                                                auto_delete=True,
+                                               )
 
         self.conn.chan.queue_bind(exchange='requests',
                                   queue=ep_queue.method.queue,
                                   routing_key=endpoint.name)
         self.conn.chan.basic_consume(endpoint.handle_request,
-                                     queue=ep_queue.method.queue)
+                                     queue=ep_queue.method.queue,
+                                     no_ack=True,
+                                    )
 
     # TODO: god these names are awkward, who came up with this???
     # do these even ever get used?

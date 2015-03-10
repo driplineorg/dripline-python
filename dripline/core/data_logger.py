@@ -9,6 +9,7 @@ import threading
 import time
 import traceback
 import msgpack
+import uuid
 
 from .endpoint import Endpoint
 
@@ -21,6 +22,7 @@ class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, log_interval=0., **kwargs):
+        self._data_logger_lock = threading.Lock()
         self._log_interval = log_interval
         self._is_logging = False
         self._loop_process = threading.Timer([], {})
@@ -42,6 +44,7 @@ class DataLogger(object):
         self._log_interval = value
 
     def _log_a_value(self):
+        self._data_logger_lock.acquire()
         try:
             val = self.get_value()
             to_send = {'from':self.name,
@@ -50,20 +53,31 @@ class DataLogger(object):
             to_send_msgpack = msgpack.packb(to_send)
             self.store_value(to_send_msgpack, severity='sensor_value')
         except Exception as err:
-            logger.error('got a: {}'.format(err))
+            logger.error('got a: {}'.format(err.message))
+            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
             logger.error('error logging {} for {}'.format(val, self.name))
-            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+        finally:
+            self._data_logger_lock.release()
+        logger.info('value sent')
         if (self._log_interval <= 0) or (not self._is_logging):
             return
         self._loop_process = threading.Timer(self._log_interval, self._log_a_value, ())
+        self._loop_process.name = 'logger_{}_{}'.format(self.name, uuid.uuid1().hex[:16])
         self._loop_process.start()
 
     def _stop_loop(self):
-        self._is_logging = False
-        if self._loop_process.is_alive():
-            self._loop_process.cancel()
-        else:
-            raise Warning("loop process not running")
+        self._data_logger_lock.acquire()
+        try:
+            self._is_logging = False
+            if self._loop_process.is_alive():
+                self._loop_process.cancel()
+            else:
+                raise Warning("loop process not running")
+        except:
+            logger.error('something went wrong stopping')
+            raise
+        finally:
+            self._data_logger_lock.release()
 
     def _start_loop(self):
         self._is_logging = True
