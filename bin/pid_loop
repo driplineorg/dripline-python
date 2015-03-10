@@ -44,10 +44,22 @@ class pid_controller(object):
         self.Kdifferential = differential
 
         self._integral= 0
-        self._old_current = None
 
         self.max_current = maximum
         self.min_current_change = delta_I_min
+
+        self._old_current = self.__get_old_current()
+        logger.info('starting current is: {}'.format(self._old_current))
+
+    def __get_old_current(self):
+        request = dripline.core.RequestMessage(target=self._current_channel,
+                                               msgop=dripline.core.OP_SENSOR_GET,
+                                               payload=[],
+                                              )
+        reply = self.conn.send_request(self._current_channel, request.to_msgpack())
+        result = dripline.core.Message.from_msgpack(reply)
+        value = result.payload
+        return float(value)
 
     @property
     def target_temp(self):
