@@ -32,7 +32,7 @@ class EthernetSCPI(Provider):
         self.command_terminator = command_terminator
         if type(self.socket_info) is str:
             import re
-            re_str = "\([\"'](\S+)[\"'],(\d+)\)"
+            re_str = "\([\"'](\S+)[\"'], ?(\d+)\)"
             (ip,port) = re.findall(re_str,self.socket_info)[0]
             self.socket_info = (ip,int(port))
         logger.debug('socket info is {}'.format(self.socket_info))
