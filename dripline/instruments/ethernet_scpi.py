@@ -1,17 +1,16 @@
 
 
 from __future__ import absolute_import
-import socket
-import threading
-import types
+import socket, threading
 
-from ..core import Provider
+from ..core import Provider, Endpoint
 
 import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['EthernetSCPI',
-           ]
+           'EthernetRepeater',
+          ]
 
 class EthernetSCPI(Provider):
     def __init__(self,
@@ -23,7 +22,7 @@ class EthernetSCPI(Provider):
                  ):
         '''
         '''
-        Provider.__init__(self,**kwargs)
+        Provider.__init__(self, **kwargs)
         self.alock = threading.Lock()
         self.socket_timeout = float(socket_timeout)
         self.socket_info = socket_info
@@ -31,10 +30,9 @@ class EthernetSCPI(Provider):
         self.socket = socket.socket()
         self.response_terminator = response_terminator
         self.command_terminator = command_terminator
-        self.endpoints = {}
         if type(self.socket_info) is str:
             import re
-            re_str = "\([\"'](\S+)[\"'],(\d+)\)"
+            re_str = "\([\"'](\S+)[\"'], ?(\d+)\)"
             (ip,port) = re.findall(re_str,self.socket_info)[0]
             self.socket_info = (ip,int(port))
         logger.debug('socket info is {}'.format(self.socket_info))
@@ -59,15 +57,11 @@ class EthernetSCPI(Provider):
             commands = [commands]
         self.alock.acquire()
         
-        all_data = []
-        for command in commands:
-            logger.debug('sending: {}'.format(repr(command)))
-            if self.command_terminator is not None:
-                command += self.command_terminator
-            self.socket.send(command)
-            data = self.get()
-            logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
-            all_data.append(data)
+        logger.debug('sending: {}'.format(repr(command)))
+        if self.command_terminator is not None:
+            command += self.command_terminator
+        self.socket.send(command)
+        data = self.get()
         self.alock.release()
         return ';'.join(all_data)
 
@@ -88,10 +82,15 @@ class EthernetSCPI(Provider):
     def spimes(self):
         return self.endpoints
 
-    def add_endpoint(self,spime):
-        if spime.name in self.endpoints.keys():
-            logger.warning('spime "{}" already present'.format(spime.name))
-            return
-        self.endpoints.update({spime.name:spime})
-        spime.provider = self
-        logger.info('spime list is now: {}'.format(self.endpoints.keys()))
+
+class EthernetRepeater(EthernetSCPI, Endpoint):
+    '''
+    '''
+
+    def __init__(self, **kwargs):
+        Endpoint.__init__(self, **kwargs)
+        EthernetSCPI.__init__(self, **kwargs)
+
+    def on_send(self, to_send):
+        result = self.send(to_send)
+        return result

@@ -21,17 +21,17 @@ class DSPLockin7265(GPIBInstrument):
 
     def _confirm_setup(self):
         # set the external ADC trigger mode
-        value = self.provider.send("TADC 0;TADC", from_spime=self)
+        value = self.send("TADC 0;TADC")
         logger.info('trig: {}'.format(value))
         # select the curves to sample
-        value = self.provider.send("CBD 55;CBD", from_spime=self)
+        value = self.send("CBD 55;CBD")
         logger.info('curve buffer: {}'.format(value))
         # set the status byte to include all options
-        value = self.provider.send("MSK 255;MSK", from_spime=self)
+        value = self.send("MSK 255;MSK")
         logger.info('status mask: {}'.format(value))
 
     def _check_status(self):
-        raw = self.provider.send("ST", from_spime=self)
+        raw = self.send("ST")
         if raw:
             data = int(raw)
         else:
@@ -44,7 +44,7 @@ class DSPLockin7265(GPIBInstrument):
         return status
 
     def _taking_data_status(self):
-        result = self.provider.send("M", from_spime=self)
+        result = self.send("M")
         curve_status = result.split(';')[0]
         status  = None
         if curve_status == '0':
@@ -58,12 +58,12 @@ class DSPLockin7265(GPIBInstrument):
 
     @property
     def number_of_points(self):
-        return self.provider.send("LEN", from_spime=self)
+        return self.send("LEN")
     @number_of_points.setter
     def number_of_points(self, value):
         if not isinstance(value, int):
             raise TypeError('value must be an int')
-        status = self.provider.send("len {};ST".format(value), from_spime=self)
+        status = self.send("len {};ST".format(value))
         if not status == 1:
             raise ValueError("got an error status code")
 
@@ -72,7 +72,7 @@ class DSPLockin7265(GPIBInstrument):
         '''
         Returns the sampling interval in ms
         '''
-        return self.provider.send("STR", from_spime=self)
+        return self.send("STR")
     @sampling_interval.setter
     def sampling_interval(self, value):
         '''
@@ -80,7 +80,7 @@ class DSPLockin7265(GPIBInstrument):
         '''
         if not isinstance(value, int):
             raise TypeError('value must be an int')
-        status = self.provider.send("STR {};ST".format(value), from_spime=self)
+        status = self.send("STR {};ST".format(value))
         if not status == 1:
             raise ValueError("got an error status code")
 

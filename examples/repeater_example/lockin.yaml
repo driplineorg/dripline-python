@@ -1,0 +1,52 @@
+nodename: lockin
+broker: localhost
+providers:
+  - name: lockin_repeater
+    module: RepeaterProvider
+    repeat_target: wolfburn_repeater
+    broker: myrna.local
+    endpoints:
+      - name: lockin
+        module: DSPLockin7265
+        addr: 12
+        endpoints:
+          - name: lockin_curve_status
+            module: RawSendEndpoint
+            base_str: "M"
+          - name: lockin_ensure_setup
+            module: CallProviderMethod
+            method_name: "_confirm_setup"
+          - name: lockin_status
+            module: CallProviderMethod
+            method_name: "_taking_data_status"
+          - name: lockin_take_data
+            module: RawSendEndpoint
+            base_str: "TD;M"
+          - name: lockin_n_points
+            module: ProviderProperty
+            property_name: number_of_points
+          - name: lockin_sampling_interval
+            module: ProviderProperty
+            property_name: sampling_interval
+          - name: lockin_x_data
+            module: RawSendEndpoint
+            base_str: "DC. 0"
+          - name: lockin_y_data
+            module: RawSendEndpoint
+            base_str: "DC. 1"
+          - name: lockin_mag_data
+            module: RawSendEndpoint
+            base_str: "DC. 2"
+          - name: lockin_phase_data
+            module: RawSendEndpoint
+            base_str: "DC. 3"
+          - name: lockin_adc_data
+            module: RawSendEndpoint
+            base_str: "DC. 5"
+      - name: lf_lo
+        module: GPIBInstrument
+        addr: 19
+        endpoints:
+          - name: lf_lo_cw_freq
+            module: SimpleSCPISpime
+            base_str: "FREQ:CW"

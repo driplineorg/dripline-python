@@ -5,8 +5,9 @@ Basic abstraction for binding to the alerts exchange
 from __future__ import absolute_import
 import logging
 
-import pika
 import msgpack
+import pika
+import uuid
 
 from .connection import Connection
 from .message import Message
@@ -22,7 +23,10 @@ class AlertConsumer:
         self.table = None
         self.dripline_connection = Connection(broker_host=broker_host)
         self.dripline_connection._setup_amqp()
-        self.queue = self.dripline_connection.chan.queue_declare(auto_delete=True)
+        self.queue = self.dripline_connection.chan.queue_declare(queue=__name__+'-'+uuid.uuid1().hex[:12],
+              exclusive=True,
+              auto_delete=True,
+             )
         for key in keys:
             self.dripline_connection.chan.queue_bind(exchange=exchange,
                                                      queue=self.queue.method.queue,

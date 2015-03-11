@@ -2,6 +2,8 @@
 <this should say something useful>
 '''
 
+from __future__ import absolute_import
+
 import itertools
 import json
 import socket
@@ -39,7 +41,7 @@ class PrologixSpimescape(Provider):
         self.socket_info = socket_info
         self.poll_thread = threading.Timer([], {})
         self.socket = socket.socket()
-        self._devices = {}
+        #self._devices = {}
         if type(self.socket_info) is str:
             import re
             re_str = "\([\"'](\S+)[\"'], (\d+)\)"
@@ -47,6 +49,10 @@ class PrologixSpimescape(Provider):
             self.socket_info = (ip, int(port))
         logger.debug('socket info is {}'.format(self.socket_info))
         self.reconnect()
+
+    @property
+    def _devices(self):
+        return self._endpoints
 
     def reconnect(self):
         self.socket.close()
@@ -64,10 +70,6 @@ class PrologixSpimescape(Provider):
         return self._devices
 
     @property
-    def endpoints(self):
-        return self._devices
-
-    @property
     def devices(self):
         return self._devices.keys()
     @devices.setter
@@ -75,13 +77,6 @@ class PrologixSpimescape(Provider):
         self._devices = device_dict
         self._device_cycle = itertools.cycle(self._devices.keys())
         #self._queue_next_check()
-    def add_endpoint(self, spime):
-        if spime.name in self.devices:
-            logger.warning('spime "{}" already present'.format(spime.name))
-            return
-        self.devices = dict(self._devices.items()+[(spime.name, spime)])
-        spime.provider = self
-        logger.info('spime list is now: {}'.format(self.devices))
 
     @property
     def keep_polling(self):
@@ -112,20 +107,21 @@ class PrologixSpimescape(Provider):
         #    self._devices[device]['opc']=1
         self._queue_next_check(from_check=True)
 
-    def send(self, commands):#, from_spime=None):
+    def send(self, command):#, from_spime=None):
         '''
         that is, the call to the device blocks for a response
         '''
         self.alock.acquire()
-        if isinstance(commands, types.Stringtype):
-            commands = [commands]
-        #while self.expecting == True:
-        #    continue
-        #self.expecting = True
+        while self.expecting == True:
+            continue
+        self.expecting = True
         #if not from_spime:
         #    logger.warning("no from provided")
         #    tosend = command + '\r\n'
         #else:
+        tosend = '{}\r\n'.format(command)
+        logger.debug('sending: {}'.format(tosend))
+        self.socket.send(tosend)
         data = ""
         for command in commands:
             tosend = '{}\r\n'.format(command)
@@ -159,7 +155,6 @@ class GPIBInstrument(Provider):
         self.status = 0
         self.provider = None
         self._cmd_term = '\n'
-        self.endpoints = {}
 
     def _check_status(self):
         raw = self.provider.send('*ESR?', from_spime=self)
@@ -179,16 +174,9 @@ class GPIBInstrument(Provider):
         return status
             
 
-    def add_endpoint(self, spime):
-        self.endpoints.update({spime.name:spime})
-        spime.provider = self
-
     def send(self, cmd):
-        if isinstance(cmd, types.StringType):
-            cmd = [cmd]
-        to_send = ['++addr {}\r'.format(self.addr)] + cmd
-        result = self.provider.send(to_send)
-        return ';'.join(result.split(';')[1:])
+        to_send = '++addr {}\r{}{}'.format(self.addr, cmd, self._cmd_term)
+        return self.provider.send(to_send)
 
 
 class SimpleGetSpime(SimpleSCPIGetSpime):

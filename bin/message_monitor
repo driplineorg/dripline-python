@@ -9,6 +9,7 @@ from __future__ import print_function
 import pika
 import argparse
 import msgpack
+import uuid
 
 from dripline.core import Message, DriplineParser
 
@@ -18,7 +19,8 @@ def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     channel = connection.channel()
     #channel.exchange_declare(exchange='alerts', type='topic')
     
-    result = channel.queue_declare(exclusive=True)
+    result = channel.queue_declare(queue='MessageMonitor-'+uuid.uuid1().hex[:12],
+                                   exclusive=True)
     queue_name = result.method.queue
     
     for severity in keys:

@@ -94,8 +94,8 @@ class Endpoint(object):
 
         method_dict = {}
         for key in dir(constants):
-            if key.startswith('OP_SENSOR_'):
-                method_name = 'on_'+key.replace('OP_SENSOR_','').lower()
+            if key.startswith('OP_'):
+                method_name = 'on_' + key.split('_')[-1].lower()
                 method = getattr(self, method_name)
                 method_dict[getattr(constants, key)] = method
         self.methods = method_dict
@@ -112,6 +112,10 @@ class Endpoint(object):
     def on_config(self, attribute, value):
         raise NotImplementedError
 
+    # @abstractmethod
+    def on_send(self, to_send):
+        raise NotImplementedError
+
     def _send_reply(self, channel, properties, reply):
         '''
         Send an AMQP reply
@@ -119,15 +123,21 @@ class Endpoint(object):
         if not isinstance(reply, ReplyMessage):
             logger.warn('should be providing a ReplyMessage')
             reply = ReplyMessage(payload=reply)
-        channel.basic_publish(exchange='requests',
-                              immediate=True,
-                              mandatory=True,
-                              routing_key=properties.reply_to,
-                              properties=pika.BasicProperties(
-                                correlation_id=properties.correlation_id
-                              ),
-                              body=reply.to_msgpack(),
-                             )
+        try:
+            channel.basic_publish(exchange='requests',
+                                  immediate=True,
+                                  mandatory=True,
+                                  routing_key=properties.reply_to,
+                                  properties=pika.BasicProperties(
+                                    correlation_id=properties.correlation_id
+                                  ),
+                                  body=reply.to_msgpack(),
+                                 )
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning("pika screwed up maybe")
+            else:
+                raise
 
     def handle_request(self, channel, method, properties, request):
         '''
@@ -147,7 +157,7 @@ class Endpoint(object):
             result = err.message
         reply = ReplyMessage(payload=result)
         self._send_reply(channel, properties, reply)
-        channel.basic_ack(delivery_tag = method.delivery_tag)
+        #channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
 
         
@@ -168,5 +178,5 @@ class AutoReply(Endpoint):
         if msg.msgop == constants.OP_SENSOR_GET:
             result = self.on_get()
             self.send_reply(channel, properties, result)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
+            #channel.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -1,0 +1,8 @@
+nodename: wolfburn_repeater_service
+broker: localhost
+providers:
+  - name: wolfburn_repeater
+    module: EthernetRepeater
+    socket_info: ("wolfburn.local", 1234)
+    command_terminator: "\r\n"
+    response_terminator: "\n"

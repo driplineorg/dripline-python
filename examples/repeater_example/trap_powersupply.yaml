@@ -1,0 +1,21 @@
+nodename: harmonic_trap_current_supply
+broker: localhost
+providers:
+   - name: harmonic_trap_supply
+     module: RepeaterProvider
+     repeat_target: wolfburn_repeater
+     broker: myrna.local
+     endpoints:
+        - name: dc_supply_harmonictrap
+          module: GPIBInstrument
+          addr: 3
+          endpoints:
+            - name: current_limit_harmonic
+              module: SimpleGetSetSpime
+              base_str: "SOURCE:CURRENT:LEVEL"
+            - name: current_output_harmonic
+              module: SimpleGetSpime
+              base_str: "MEASURE:CURRENT?"
+            - name: current_output_status_harmonic
+              module: SimpleGetSetSpime
+              base_str: "OUTPUT:STATE"
