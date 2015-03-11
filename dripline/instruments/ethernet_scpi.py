@@ -1,6 +1,9 @@
 
 
-import socket, threading
+from __future__ import absolute_import
+import socket
+import threading
+import types
 
 from ..core import Provider
 
@@ -48,20 +51,25 @@ class EthernetSCPI(Provider):
         self.socket.settimeout(self.socket_timeout)
         self.send("")
 
-    def send(self, command):
+    def send(self, commands):
         '''
         this issues commands
         '''
+        if isinstance(commands, types.StringType):
+            commands = [commands]
         self.alock.acquire()
         
-        logger.debug('sending: {}'.format(command))
-        if self.command_terminator is not None:
-            command += self.command_terminator
-        self.socket.send(command)
-        data = self.get()
+        all_data = []
+        for command in commands:
+            logger.debug('sending: {}'.format(repr(command)))
+            if self.command_terminator is not None:
+                command += self.command_terminator
+            self.socket.send(command)
+            data = self.get()
+            logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
+            all_data.append(data)
         self.alock.release()
-        logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
-        return data
+        return ';'.join(all_data)
 
     def get(self):
         data = ""
