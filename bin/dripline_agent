@@ -14,7 +14,7 @@ def verb_list():
     """
     A list of acceptable verb arguments.
     """
-    return ['get', 'set', 'config', 'describe']
+    return ['get', 'set', 'config', 'send']
 
 
 def main(args):
@@ -41,6 +41,14 @@ def main(args):
     elif request_verb == 'config':
         request = message.RequestMessage(target=args.target,
                                          msgop=constants.OP_SENSOR_CONFIG,
+                                         payload=args.value)
+        #reply = node.send_sync(request)
+        reply = conn.send_request(args.target, request.to_msgpack())
+        result = Message.from_msgpack(reply)
+        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
+    elif request_verb == 'send':
+        request = message.RequestMessage(target=args.target,
+                                         msgop=constants.OP_PROVIDER_SEND,
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())
