@@ -55,7 +55,7 @@ class EthernetSCPI(Provider):
         '''
         self.alock.acquire()
         
-        logger.debug('sending: {}'.format(command))
+        logger.debug('sending: {}'.format(repr(command)))
         if self.command_terminator is not None:
             command += self.command_terminator
         self.socket.send(command)
