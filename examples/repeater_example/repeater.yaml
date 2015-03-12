@@ -3,6 +3,6 @@ broker: localhost
 providers:
   - name: dmm_repeater_provider
     module: EthernetRepeater
-    socket_info: ("ardbeg.local",5024)
+    socket_info: ("glengyle.local",5024)
     command_terminator: "\r\n"
-    response_terminator: "\r\nSCPI>"
+    response_terminator: "\r\n34461A>"
