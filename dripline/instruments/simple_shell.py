@@ -35,11 +35,11 @@ class simple_shell_command(AutoReply):
         self._on_set = on_set
 
     def on_get(self):
-        result = self._provider.send_sync(self._on_get)
+        result = self._provider.send(self._on_get)
         return result
 
     def on_set(self, value):
-        result = self._provider.send_sync(self._on_set.format(value))
+        result = self._provider.send(self._on_set.format(value))
         return result
 
     def on_config(self):
@@ -77,14 +77,14 @@ class sensors_command_temp(AutoReply, DataLogger):
 
     def on_get(self):
         result = None
-        res_lines = self._provider.send_sync(self._on_get).split('\n')
+        res_lines = self._provider.send(self._on_get).split('\n')
         for line in res_lines:
             if line.startswith('Core {}:'.format(self._core)):
                 result = line.split()[2].replace('\xc2\xb0', ' ')
         return result
 
     def on_set(self, value):
-        result = self._provider.send_sync(self._on_set.format(value))
+        result = self._provider.send(self._on_set.format(value))
         return result
 
     def on_config(self, attribute, value):

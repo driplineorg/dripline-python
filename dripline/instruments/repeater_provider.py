@@ -23,9 +23,8 @@ class RepeaterProvider(Provider):
 
     def send(self, to_send):
         logger.debug('trying to send: {}'.format(to_send))
-        request = message.RequestMessage(target=self._repeat_target,
-                                         msgop=constants.OP_PROVIDER_SEND,
-                                         payload=[to_send]
+        request = message.RequestMessage(msgop=constants.OP_PROVIDER_SEND,
+                                         payload=[to_send],
                                         )
         reply = self._conn.send_request(self._repeat_target, request.to_msgpack())
         result = message.Message.from_msgpack(reply)

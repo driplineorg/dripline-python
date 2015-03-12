@@ -94,7 +94,7 @@ class Connection(object):
         try:
             logger.info('sending an alert message: {}'.format(repr(alert)))
             message = AlertMessage()
-            message.update({'target':severity, 'payload':alert})
+            message.update({'payload':alert})
             packed = message.to_msgpack()
             pr = self.chan.basic_publish(exchange='alerts',
                                          properties=pika.BasicProperties(

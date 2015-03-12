@@ -33,11 +33,11 @@ class simple_scpi_sensor(AutoReply):
         self._on_set = on_set
 
     def on_get(self):
-        result = self._provider.send_sync(self._on_get)
+        result = self._provider.send(self._on_get)
         return result
 
     def on_set(self, value):
-        result = self._provider.send_sync(self._on_set.format(value))
+        result = self._provider.send(self._on_set.format(value))
         return result
 
     def on_config(self):

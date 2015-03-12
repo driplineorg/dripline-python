@@ -6,6 +6,7 @@ from . import constants
 
 import math
 import traceback
+import types
 import pika
 
 __all__ = ['Endpoint', 'AutoReply', 'calibrate']
@@ -92,32 +93,18 @@ class Endpoint(object):
         self.provider = None
         self._calibration_str = cal_str
 
+        def raiser(self):
+            raise NotImplementedError
+
         method_dict = {}
         for key in dir(constants):
             if key.startswith('OP_'):
                 method_name = 'on_' + key.split('_')[-1].lower()
+                if not hasattr(self, method_name):
+                    setattr(self, method_name, types.MethodType(raiser, self, Endpoint))
                 method = getattr(self, method_name)
                 method_dict[getattr(constants, key)] = method
         self.methods = method_dict
-
-    # @abstractmethod
-    def on_get(self):
-        raise NotImplementedError
-
-    # @abstractmethod
-    def on_set(self, value):
-        raise NotImplementedError
-
-    # @abstractmethod
-    def on_config(self, attribute, value):
-        raise NotImplementedError
-
-    # @abstractmethod
-    def on_send(self, to_send):
-        raise NotImplementedError
-
-    def on_run(self):
-        raise NotImplementedError
 
     def _send_reply(self, channel, properties, reply):
         '''

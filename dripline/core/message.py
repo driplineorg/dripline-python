@@ -23,10 +23,9 @@ class Message(dict, object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self, msgop=None, target=None, timestamp=None,
+    def __init__(self, msgop=None, timestamp=None,
                  payload=None, exceptions=None):
         self.msgop = msgop
-        self.target = target
         if timestamp is None:
             self.timestamp = datetime.utcnow().strftime(constants.TIME_FORMAT)
         else:
@@ -41,14 +40,6 @@ class Message(dict, object):
     @msgop.setter
     def msgop(self, value):
         self['msgop'] = value
-
-    @property
-    def target(self):
-        return self['target']
-
-    @target.setter
-    def target(self, value):
-        self['target'] = value
 
     @property
     def timestamp(self):
