@@ -1,7 +1,9 @@
 
 
 from __future__ import absolute_import
-import socket, threading
+import socket
+import threading
+import types
 
 from ..core import Provider, Endpoint
 
@@ -57,11 +59,15 @@ class EthernetSCPI(Provider):
             commands = [commands]
         self.alock.acquire()
         
-        logger.debug('sending: {}'.format(repr(command)))
-        if self.command_terminator is not None:
-            command += self.command_terminator
-        self.socket.send(command)
-        data = self.get()
+        all_data = []
+        for command in commands:
+            logger.debug('sending: {}'.format(repr(command)))
+            if self.command_terminator is not None:
+                command += self.command_terminator
+            self.socket.send(command)
+            data = self.get()
+            logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
+            all_data.append(data)
         self.alock.release()
         return ';'.join(all_data)
 
@@ -70,11 +76,11 @@ class EthernetSCPI(Provider):
         try:
             while True:
                 data += self.socket.recv(1024)
-                if (self.response_terminator is not None and  data.endswith(self.response_terminator)):
+                if (self.response_terminator and  data.endswith(self.response_terminator)):
                     break
         except socket.timeout:
             pass
-        if self.response_terminator is not None:
+        if self.response_terminator:
             data = data.rsplit(self.response_terminator,1)[0]
         return data
 
