@@ -53,7 +53,7 @@ class pid_controller(object):
 
     def __get_old_current(self):
         request = dripline.core.RequestMessage(target=self._current_channel,
-                                               msgop=dripline.core.OP_SENSOR_GET,
+                                               msgop=dripline.core.OP_GET,
                                                payload=[],
                                               )
         reply = self.conn.send_request(self._current_channel, request.to_msgpack())
@@ -108,7 +108,7 @@ class pid_controller(object):
     def set_current(self, value):
         logger.debug('would set new current to: {}'.format(value))
         m = dripline.core.RequestMessage(target=self._current_channel,
-                                         msgop=constants.OP_SENSOR_SET,
+                                         msgop=constants.OP_SET,
                                          payload=[str(value)]
                                         )
         logger.debug('request will be: {}'.format(m))

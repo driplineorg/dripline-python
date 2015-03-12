@@ -105,7 +105,7 @@ class BruteLogger:
 
     def _LogChannel(self):
         req = dripline.core.RequestMessage(target=self.end_name,
-                                           msgop=dripline.core.OP_SENSOR_GET,
+                                           msgop=dripline.core.OP_GET,
                                            )
         resp = self.node.send_sync(req)
         add_to_log(self.conn, self.end_name, resp.payload, resp.timestamp) #datetime.datetime.now())

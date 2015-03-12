@@ -116,6 +116,9 @@ class Endpoint(object):
     def on_send(self, to_send):
         raise NotImplementedError
 
+    def on_run(self):
+        raise NotImplementedError
+
     def _send_reply(self, channel, properties, reply):
         '''
         Send an AMQP reply
@@ -175,7 +178,7 @@ class AutoReply(Endpoint):
 
     def handle_request(self, channel, method, properties, request):
         msg = Message.from_msgpack(request)
-        if msg.msgop == constants.OP_SENSOR_GET:
+        if msg.msgop == constants.OP_GET:
             result = self.on_get()
             self.send_reply(channel, properties, result)
             #channel.basic_ack(delivery_tag=method.delivery_tag)

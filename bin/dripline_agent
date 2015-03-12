@@ -24,7 +24,7 @@ def main(args):
     # TODO: this block makes me sad, a dict can do this in a way that is way more flexible
     if request_verb == 'get':
         request = message.RequestMessage(target=args.target,
-                                         msgop=constants.OP_SENSOR_GET,
+                                         msgop=constants.OP_GET,
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())
@@ -32,7 +32,7 @@ def main(args):
         print(args.target + ': ' + str(result.payload))
     elif request_verb == 'set':
         request = message.RequestMessage(target=args.target,
-                                         msgop=constants.OP_SENSOR_SET,
+                                         msgop=constants.OP_SET,
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())
@@ -40,7 +40,7 @@ def main(args):
         print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
     elif request_verb == 'config':
         request = message.RequestMessage(target=args.target,
-                                         msgop=constants.OP_SENSOR_CONFIG,
+                                         msgop=constants.OP_CONFIG,
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())
@@ -48,7 +48,7 @@ def main(args):
         print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
     elif request_verb == 'send':
         request = message.RequestMessage(target=args.target,
-                                         msgop=constants.OP_PROVIDER_SEND,
+                                         msgop=constants.OP_SEND,
                                          payload=args.value)
         #reply = node.send_sync(request)
         reply = conn.send_request(args.target, request.to_msgpack())

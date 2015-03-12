@@ -3,11 +3,11 @@ Constant mappings
 '''
 
 # Operation constants.
-OP_SENSOR_SET = 0
-OP_SENSOR_GET = 1
-OP_SENSOR_CONFIG = 6
-OP_PROVIDER_SEND = 7
-OP_MANTIS_RUN = 8
+OP_SET = 0
+OP_GET = 1
+OP_CONFIG = 6
+OP_SEND = 7
+OP_RUN = 8
 
 # Message type constants.
 T_REPLY = 2
