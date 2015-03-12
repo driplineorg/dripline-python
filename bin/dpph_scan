@@ -19,7 +19,7 @@ logger = logging.getLogger('dpph_scan')
 
 
 def _get(name, connection):
-    request = RequestMessage(target=name,
+    request = RequestMessage(
                              msgop=constants.OP_GET,
                              payload='',
                             )

@@ -104,13 +104,14 @@ class BruteLogger:
             sleep(self.interval)
 
     def _LogChannel(self):
-        req = dripline.core.RequestMessage(target=self.end_name,
+        req = dripline.core.RequestMessage(
                                            msgop=dripline.core.OP_GET,
-                                           )
+                                          )
         resp = self.node.send_sync(req)
         add_to_log(self.conn, self.end_name, resp.payload, resp.timestamp) #datetime.datetime.now())
 
 if __name__ == '__main__':
+    raise DeprecationWarning('brute force logging not updated for version > 1.x.x')
     parser = argparse.ArgumentParser(description='Start logging endpoints')
     parser.add_argument('-c', '--config',
                         metavar='configuration file',
