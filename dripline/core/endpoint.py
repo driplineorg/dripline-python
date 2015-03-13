@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractproperty, abstractmethod
 from .message import Message, RequestMessage, ReplyMessage
 from . import constants
 
+import functools
 import math
 import traceback
 import types
@@ -69,6 +70,7 @@ def pt100_calibration(resistance):
 
 
 def calibrate(fun):
+    @functools.wraps(fun)
     def wrapper(self):
         val_dict = {'value_raw':fun(self)}
         if not self._calibration_str is None:
@@ -86,9 +88,8 @@ def calibrate(fun):
 
 
 class Endpoint(object):
-    __metaclass__ = ABCMeta
 
-    def __init__(self, name, cal_str=None, **kwargs):
+    def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
         self.name = name
         self.provider = None
         self._calibration_str = cal_str
@@ -105,6 +106,16 @@ class Endpoint(object):
                 method = getattr(self, method_name)
                 method_dict[getattr(constants, key)] = method
         self.methods = method_dict
+
+        if get_on_set:
+            logger.info('should force get on set')
+            self.methods[constants.OP_SET] = self.__get_after_set
+
+    def __get_after_set(self, value):
+        self.on_set(value)
+        result = self.on_get()
+        logger.info('got: {}'.format(result))
+        return result
 
     def _send_reply(self, channel, properties, reply):
         '''
