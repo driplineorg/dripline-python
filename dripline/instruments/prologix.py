@@ -112,7 +112,7 @@ class PrologixSpimescape(Provider):
         that is, the call to the device blocks for a response
         '''
         self.alock.acquire()
-        if isinstance(commands, types.Stringtype):
+        if isinstance(commands, types.StringType):
             commands = [commands]
         #while self.expecting == True:
         #    continue
