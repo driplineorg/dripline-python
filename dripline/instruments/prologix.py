@@ -205,7 +205,10 @@ class MuxerGetSpime(SimpleGetSpime):
     @calibrate
     def on_get(self):
         very_raw = self.provider.send(self.base_str.format(self.ch_number))
-        return very_raw.split()[0]
+        result = None
+        if very_raw:
+            result = very_raw.split()[0]
+        return result
     
 
 class SimpleGetSetSpime(Spime):
