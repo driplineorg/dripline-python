@@ -8,11 +8,15 @@ providers:
         module: kv_store_key
         cal_str: '2*{}'
         initial_value: 0.75
-        cal_str: '2*{}'
         log_interval: 30
       - name: chips
         module: kv_store_key
+        log_interval: 30
+        cal_str: '1.*{}'
         initial_value: 1.75
       - name: waffles
         module: kv_store_key
+        log_interval: 30
+        get_on_set: True
+        cal_str: '1.*{}'
         initial_value: 4.00

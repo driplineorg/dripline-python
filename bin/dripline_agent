@@ -7,7 +7,9 @@ import uuid
 
 from dripline.core import message, constants, DriplineParser, Connection, Message
 
-
+import logging
+logger = logging.getLogger('dripline_agent')
+logger.setLevel(logging.DEBUG)
 
 # TODO: this should be by introspection
 def verb_list():
@@ -64,6 +66,7 @@ if __name__ == '__main__':
                             amqp_broker=True,
                             config_file=True,
                             tmux_support=True,
+                            extra_logger=logger,
                            )
     parser.add_argument('verb', choices=verb_list())
     parser.add_argument('target')
