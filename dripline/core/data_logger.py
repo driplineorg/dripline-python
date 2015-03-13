@@ -55,7 +55,6 @@ class DataLogger(object):
         except Exception as err:
             logger.error('got a: {}'.format(err.message))
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
-            logger.error('error logging {} for {}'.format(val, self.name))
         finally:
             self._data_logger_lock.release()
         logger.info('value sent')
