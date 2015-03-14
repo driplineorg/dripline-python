@@ -47,7 +47,7 @@ class Connection(object):
         '''
         ensures all exchanges are present and creates a response queue.
         '''
-        self.chan.exchange_declare(exchange='requests', type='topic', durable=True)
+        self.chan.exchange_declare(exchange='requests', type='topic')
         self.queue = self.chan.queue_declare(queue=self._queue_name,
                                              exclusive=True,
                                              auto_delete=True,

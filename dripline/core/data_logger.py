@@ -52,7 +52,6 @@ class DataLogger(object):
                 logger.warning('get returned None')
                 if hasattr(self, 'name'):
                     logger.warning('for: {}'.format(self.name))
-                break
             to_send = {'from':self.name,
                        'value':val,
                       }
