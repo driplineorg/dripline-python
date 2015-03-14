@@ -114,13 +114,6 @@ class PrologixSpimescape(Provider):
         self.alock.acquire()
         if isinstance(commands, types.StringType):
             commands = [commands]
-        #while self.expecting == True:
-        #    continue
-        #self.expecting = True
-        #if not from_spime:
-        #    logger.warning("no from provided")
-        #    tosend = command + '\r\n'
-        #else:
         data = ""
         for command in commands:
             tosend = '{}\r\n'.format(command)
@@ -131,8 +124,8 @@ class PrologixSpimescape(Provider):
                     data += self.socket.recv(1024)
             except socket.timeout:
                 pass
-        #self.expecting = False
             logger.debug('sync: {} -> {}'.format(repr(command), repr(data)))
+        logger.debug('data is: {}'.format(data))
         self.alock.release()
         return data
 
@@ -178,7 +171,8 @@ class GPIBInstrument(Provider):
             cmd = [cmd]
         to_send = ['++addr {}\r'.format(self.addr)] + cmd
         result = self.provider.send(to_send)
-        return ';'.join(result.split(';')[1:])
+        logger.debug("muxer got back: {}".format(result))
+        return result
 
 
 class SimpleGetSpime(SimpleSCPIGetSpime):
@@ -205,6 +199,7 @@ class MuxerGetSpime(SimpleGetSpime):
     @calibrate
     def on_get(self):
         very_raw = self.provider.send(self.base_str.format(self.ch_number))
+        logger.debug('very raw is: {}'.format(very_raw))
         result = None
         if very_raw:
             result = very_raw.split()[0]
