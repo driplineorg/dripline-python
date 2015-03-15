@@ -84,6 +84,9 @@ class Message(dict, object):
         }
         try:
             msg_type = msg_dict.pop('msgtype')
+            if 'target' in msg_dict:
+                logger.warning('this is a hack')
+                msg_dict.pop('target')
             return subclasses_dict[msg_type](**msg_dict)
         except KeyError:
             logger.debug('present keys are: {}'.format(msg_dict.keys()))
