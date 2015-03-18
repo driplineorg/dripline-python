@@ -47,6 +47,7 @@ if __name__ == '__main__':
                             description='Print messages from an exchange',
                             amqp_broker=True,
                             tmux_support=True,
+                            twitter_support=True,
                            )
     parser.add_argument('-e',
                         '--exchange',

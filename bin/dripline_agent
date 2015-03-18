@@ -66,6 +66,7 @@ if __name__ == '__main__':
                             amqp_broker=True,
                             config_file=True,
                             tmux_support=True,
+                            twitter_support=True,
                             extra_logger=logger,
                            )
     parser.add_argument('verb', choices=verb_list())

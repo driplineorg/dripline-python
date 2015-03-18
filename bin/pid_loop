@@ -163,6 +163,7 @@ if __name__ == '__main__':
                             extra_logger=logger,
                             amqp_broker=True,
                             tmux_support=True,
+                            twitter_support=True,
                            )
     parser.add_argument('-s',
                         '--sensor',
