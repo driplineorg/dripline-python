@@ -47,15 +47,23 @@ class DataLogger(object):
         self._data_logger_lock.acquire()
         try:
             val = self.get_value()
+            if val is None:
+                raise UserWarning
+                logger.warning('get returned None')
+                if hasattr(self, 'name'):
+                    logger.warning('for: {}'.format(self.name))
             to_send = {'from':self.name,
                        'value':val,
                       }
             to_send_msgpack = msgpack.packb(to_send)
             self.store_value(to_send_msgpack, severity='sensor_value')
+        except UserWarning:
+            logger.warning('get returned None')
+            if hasattr(self, 'name'):
+                logger.warning('for: {}'.format(self.name))
         except Exception as err:
             logger.error('got a: {}'.format(err.message))
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
-            logger.error('error logging {} for {}'.format(val, self.name))
         finally:
             self._data_logger_lock.release()
         logger.info('value sent')

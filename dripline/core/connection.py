@@ -32,6 +32,13 @@ class Connection(object):
 
         self._setup_amqp()
 
+    def _ensure_connection(self):
+        if not self.conn.is_open:
+            logger.warning('amqp connection seems to have broken, reconnecting')
+            self.conn.connect()
+            self.chan = self.conn.channel()
+            self.chan.confirm_delivery()
+
     def __del__(self):
         if hasattr(self, 'conn') and self.conn.is_open:
             self.conn.close()
@@ -66,6 +73,7 @@ class Connection(object):
         '''
         send a request to a specific consumer.
         '''
+        self._ensure_connection()
         self.response = None
         self.corr_id = str(uuid.uuid4())
         pr = self.chan.basic_publish(exchange='requests',
@@ -91,6 +99,7 @@ class Connection(object):
         send an alert
         '''
         self.__alert_lock.acquire()
+        self._ensure_connection()
         try:
             logger.info('sending an alert message: {}'.format(repr(alert)))
             message = AlertMessage()

@@ -73,6 +73,8 @@ def calibrate(fun):
     @functools.wraps(fun)
     def wrapper(self):
         val_dict = {'value_raw':fun(self)}
+        if val_dict['value_raw'] is None:
+            return None
         if not self._calibration_str is None:
             globals = {"__builtins__": None,
                        "math": math,
