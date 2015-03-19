@@ -23,7 +23,6 @@ def _log_on_set(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         result = fun(*args, **kwargs)
-        logger.warning('log_on_set set return was: {}'.format(result))
         values = {}
         if result is not None:
             values.update(result)
