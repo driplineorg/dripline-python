@@ -87,6 +87,15 @@ def calibrate(fun):
     return wrapper
 
 
+def _get_on_set(self, fun):
+    #@functools.wraps(fun)
+    def wrapper(*args, **kwargs):
+        fun(*args, **kwargs)
+        result = self.on_get()
+        return result
+    return wrapper
+
+
 class Endpoint(object):
 
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
@@ -97,25 +106,14 @@ class Endpoint(object):
         def raiser(self):
             raise NotImplementedError
 
-        method_dict = {}
         for key in dir(constants):
             if key.startswith('OP_'):
                 method_name = 'on_' + key.split('_')[-1].lower()
                 if not hasattr(self, method_name):
                     setattr(self, method_name, types.MethodType(raiser, self, Endpoint))
-                method = getattr(self, method_name)
-                method_dict[getattr(constants, key)] = method
-        self.methods = method_dict
 
         if get_on_set:
-            logger.info('should force get on set')
-            self.methods[constants.OP_SET] = self.__get_after_set
-
-    def __get_after_set(self, value):
-        self.on_set(value)
-        result = self.on_get()
-        logger.info('got: {}'.format(result))
-        return result
+            self.on_set = _get_on_set(self, self.on_set)
 
     def _send_reply(self, channel, properties, reply):
         '''
@@ -146,10 +144,18 @@ class Endpoint(object):
         msg = Message.from_msgpack(request)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
 
+        method_name = ''
+        for const_name in dir(constants):
+            if getattr(constants, const_name) == msg.msgop:
+                method_name = 'on_' + const_name.split('_')[-1].lower()
+        method = getattr(self, method_name)
+        if method is None:
+            raise TypeError
+
         result = None
         try:
             value = msg.payload
-            result = self.methods[msg.msgop](*value)
+            result = method(*value)
             if result is None:
                 result = "operation returned None"
         except Exception as err:

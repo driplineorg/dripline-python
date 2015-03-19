@@ -6,13 +6,16 @@ Utility app for printing all of the messages through some exchange
 
 from __future__ import print_function
 
-import pika
 import argparse
 import msgpack
+import pika
+import types
 import uuid
 
 from dripline.core import Message, DriplineParser
 
+import logging
+logger = logging.getLogger('message_monitor')
 
 def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
@@ -33,7 +36,9 @@ def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     
     def callback(ch, method, properties, body):
         message = Message.from_msgpack(body)
-        message.payload = msgpack.unpackb(message.payload)
+        if not isinstance(message.payload, types.DictType):
+            payload = msgpack.unpackb(message.payload)
+            message.payload = payload
         print(" [x] {}:{}".format(method.routing_key, message,))
     
     channel.basic_consume(callback,
@@ -47,6 +52,7 @@ if __name__ == '__main__':
                             description='Print messages from an exchange',
                             amqp_broker=True,
                             tmux_support=True,
+                            extra_logger=logger,
                            )
     parser.add_argument('-e',
                         '--exchange',
