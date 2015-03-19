@@ -31,7 +31,7 @@ def _log_on_set(self, fun):
         to_log = {'from': self.name,
                   'value': values,
                  }
-        self.report_log(to_log, 'sensor_data')
+        self.report_log(to_log, 'sensor_value')
         return result
     return wrapper
 
