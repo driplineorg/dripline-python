@@ -13,6 +13,24 @@ logger.setLevel(logging.DEBUG)
 
 __all__ = ['DriplineParser']
 
+
+class TwitterHandler(logging.Handler):
+    '''
+    A custom handler for sending tweets
+    '''
+    def emit(self, record):
+        try:
+            import TwitterAPI, yaml, os
+            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
+            api = TwitterAPI.TwitterAPI(**auth_kwargs)
+            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
+            api.request('statuses/update', {'status': tweet_text})
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
+
+
 class DriplineParser(argparse.ArgumentParser):
     '''
     A wrapper of the logger.ArgumentParser for dripline scripts
@@ -23,6 +41,7 @@ class DriplineParser(argparse.ArgumentParser):
                  amqp_broker=False,
                  config_file=False,
                  tmux_support=False,
+                 twitter_support=False,
                  **kwargs):
         '''
         '''
@@ -63,6 +82,14 @@ class DriplineParser(argparse.ArgumentParser):
                               nargs='?',
                               default=None, # value if option not given
                               const=False, # value if option given with no argument
+                             )
+        if twitter_support:
+            self.add_argument('-T',
+                              '--twitter',
+                              help='enable sending critical messages as tweets',
+                              nargs='?',
+                              default=False,
+                              const=True,
                              )
 
     def __set_format(self):
@@ -125,6 +152,14 @@ class DriplineParser(argparse.ArgumentParser):
             print('tmux session {} created'.format(session_name))
             sys.exit()
 
+    def __process_twitter(self):
+        twitter_handler = TwitterHandler()
+        twitter_handler.setLevel(logging.CRITICAL)
+        logger.addHandler(twitter_handler)
+        if hasattr(self, 'extra_logger'):
+            self.extra_logger.addHandler(twitter_handler)
+        self._handlers.append(twitter_handler)
+
     def parse_args(self):
         '''
         '''
@@ -144,4 +179,7 @@ class DriplineParser(argparse.ArgumentParser):
         if hasattr(args, 'tmux'):
             if not args.tmux is None:
                 self.__process_tmux(args)
+        if hasattr(args, 'twitter'):
+            if args.twitter:
+                self.__process_twitter()
         return args

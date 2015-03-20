@@ -9,14 +9,18 @@ providers:
         cal_str: '2*{}'
         initial_value: 0.75
         log_interval: 30
+        get_on_set: True
+        log_on_set: True
       - name: chips
         module: kv_store_key
         log_interval: 30
+        get_on_set: True
+        log_on_set: True
         cal_str: '1.*{}'
         initial_value: 1.75
       - name: waffles
         module: kv_store_key
         log_interval: 30
-        get_on_set: True
+        log_on_set: True
         cal_str: '1.*{}'
         initial_value: 4.00

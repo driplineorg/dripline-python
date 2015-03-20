@@ -151,6 +151,7 @@ if __name__ == '__main__':
                             extra_logger=logger,
                             amqp_broker=True,
                             tmux_support=True,
+                            twitter_support=True,
                            )
     # an option for outputting raw data
     parser.add_argument('-o', '--output', default=False)
