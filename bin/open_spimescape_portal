@@ -45,7 +45,7 @@ def create_child(conf_dict):
     return this_child
 
 if __name__ == '__main__':
-    parser = dripline.core.DriplineParser(extra_logger=logger, amqp_broker=True, config_file=True, tmux_support=True)
+    parser = dripline.core.DriplineParser(extra_logger=logger, amqp_broker=True, config_file=True, tmux_support=True, twitter_support=True)
     
     args = parser.parse_args()
     logger.info('args parsed, reading config')
@@ -57,6 +57,7 @@ if __name__ == '__main__':
         open_spimescape_portal(**conf_dict)
     except KeyboardInterrupt:
         import threading
+        logger.critical('service <{}> killed by keyboard interrupt'.format(conf_dict['nodename']))
         logger.info('there are {} total threads'.format(threading.active_count()))
         for thread in threading.enumerate():
             if thread.name.startswith('logger_'):
