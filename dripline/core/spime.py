@@ -12,6 +12,7 @@ __all__ = ['Spime',
            'SimpleSCPISpime',
            'SimpleSCPIGetSpime',
            'SimpleSCPISetSpime',
+           'FormatSCPISpime',
           ]
 
 logger = logging.getLogger(__name__)
@@ -94,3 +95,26 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     @staticmethod
     def on_get():
         raise NotImplementedError('getting not available for {}'.format(self.name))
+
+class FormatSCPISpime(Spime):
+    '''
+    '''
+    def __init__(self, get_str=None, set_str=None, **kwargs):
+        '''
+        '''
+        Spime.__init__(self, **kwargs)
+        self._get_str = get_str
+        self._set_str = set_str
+
+    @calibrate
+    def on_get(self):
+        if self._get_str is None:
+            raise NotImplementedError('<{}> has no get string available'.format(self.name))
+        result = self.provider.send(self._get_str)
+        return result
+
+    def on_set(self, value):
+        if self._set_str is None:
+            raise NotImplementedError('<{}> has no set string available'.format(self.name))
+        result = self.provider.send(self._set_str.format(value))
+        return result
