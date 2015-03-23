@@ -57,7 +57,7 @@ class pid_controller(object):
                                               )
         reply = self.conn.send_request(self._current_channel, request.to_msgpack())
         result = dripline.core.Message.from_msgpack(reply)
-        value = result.payload.split(';')[-1]
+        value = result.payload['value_cal']
         return float(value)
 
     @property

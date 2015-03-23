@@ -76,13 +76,15 @@ def calibrate(fun):
         if val_dict['value_raw'] is None:
             return None
         if not self._calibration_str is None:
-            globals = {"__builtins__": None,
+            globals = {
                        "math": math,
                        "cernox_calibration": cernox_calibration,
                        "pt100_calibration": pt100_calibration,
                       }
             locals = {}
-            cal = eval(self._calibration_str.format(val_dict['value_raw']), globals, locals)
+            eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
+            logger.debug("formated cal is:\n{}".format(eval_str))
+            cal = eval(eval_str, globals, locals)
             if cal is not None:
                 val_dict['value_cal'] = cal
         return val_dict
