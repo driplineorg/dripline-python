@@ -107,7 +107,7 @@ class Endpoint(object):
         self.provider = None
         self._calibration_str = cal_str
 
-        def raiser(self):
+        def raiser(self, *args, **kwargs):
             raise NotImplementedError
 
         for key in dir(constants):
@@ -159,6 +159,8 @@ class Endpoint(object):
         result = None
         try:
             value = msg.payload
+            logger.debug('calling:\n{}'.format(method, ))
+            logger.debug('args are:\n{}'.format(value))
             result = method(*value)
             if result is None:
                 result = "operation returned None"
@@ -170,6 +172,21 @@ class Endpoint(object):
         self._send_reply(channel, properties, reply)
         #channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
+
+    def on_config(self, attribute, value=None):
+        '''
+        configure a property again
+        '''
+        result = None
+        if hasattr(self, attribute):
+            if value is not None:
+                setattr(self, attribute, value)
+                logger.info('set {} of {} to {}'.format(attribute, self.name, value))
+            else:
+                result = getattr(self, attribute)
+        else:
+            raise AttributeError("No attribute: {}".format(attribute))
+        return result
 
         
 class AutoReply(Endpoint):

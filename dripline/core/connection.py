@@ -110,7 +110,6 @@ class Connection(object):
                                            content_encoding='application/msgpack',
                                          ),
                                          routing_key=severity,
-                                         mandatory=True,
                                          body=packed,
                                         )
             if not pr:
