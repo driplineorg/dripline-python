@@ -9,8 +9,10 @@ __all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
 
 from abc import ABCMeta
 from datetime import datetime
-import msgpack
+import json
 import logging
+
+import msgpack
 
 from . import constants
 
@@ -39,7 +41,7 @@ class Message(dict, object):
 
     @msgop.setter
     def msgop(self, value):
-        self['msgop'] = value
+        self['msgop'] = int(value)
 
     @property
     def timestamp(self):
@@ -83,7 +85,7 @@ class Message(dict, object):
             constants.T_INFO: InfoMessage,
         }
         try:
-            msg_type = msg_dict.pop('msgtype')
+            msg_type = int(msg_dict.pop('msgtype'))
             if 'target' in msg_dict:
                 logger.warning('this is a hack')
                 msg_dict.pop('target')
@@ -98,10 +100,21 @@ class Message(dict, object):
         message = cls.from_dict(message_dict)
         return message
 
+    @classmethod
+    def from_json(cls, msg):
+        message_dict = json.loads(msg)
+        message = cls.from_dict(message_dict)
+        return message
+
     def to_msgpack(self):
         temp_dict = self.copy()
         temp_dict.update({'msgtype': self.msgtype})
         return msgpack.packb(temp_dict)
+
+    def to_json(self):
+        temp_dict = self.copy()
+        temp_dict.update({'msgtype': self.msgtype})
+        return json.dumps(temp_dict)
 
 
 class ReplyMessage(Message):

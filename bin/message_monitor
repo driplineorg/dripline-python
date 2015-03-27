@@ -35,10 +35,20 @@ def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     print(' [*] Waiting for logs. To exit press CTRL+C')
     
     def callback(ch, method, properties, body):
-        message = Message.from_msgpack(body)
-        if not isinstance(message.payload, types.DictType):
-            payload = msgpack.unpackb(message.payload)
-            message.payload = payload
+        encoding = properties.content_encoding
+        if encoding == 'application/msgpack':
+            logger.debug('encoding is msgpack, trying usual thing')
+            message = Message.from_msgpack(body)
+        elif encoding == 'application/json':
+            logger.debug('encoding is json')
+            logger.debug('message is: {}'.format(body))
+            message = Message.from_json(body)
+        else:
+            raise TypeError('unrecognized encoding')
+        #if not isinstance(message.payload, types.DictType):
+        #    logger.debug('further decoding payload:\n{}'.format(message.payload))
+        #    payload = msgpack.unpackb(message.payload)
+        #    message.payload = payload
         print(" [x] {}:{}".format(method.routing_key, message,))
     
     channel.basic_consume(callback,
