@@ -16,46 +16,20 @@ def verb_list():
     """
     A list of acceptable verb arguments.
     """
-    return ['get', 'set', 'config', 'send']
+    verbs = [v[3:].lower() for v in dir(constants) if v.startswith('OP_')]
+    return verbs
 
 
 def main(args):
     request_verb = args.verb
+    msgop = getattr(constants, 'OP_'+request_verb.upper())
     conn = Connection(args.broker)
 
-    # TODO: this block makes me sad, a dict can do this in a way that is way more flexible
-    if request_verb == 'get':
-        request = message.RequestMessage(msgop=constants.OP_GET,
-                                         payload=args.value,
-                                        )
-        #reply = node.send_sync(request)
-        reply = conn.send_request(args.target, request.to_msgpack())
-        result = Message.from_msgpack(reply)
-        print(args.target + ': ' + str(result.payload))
-    elif request_verb == 'set':
-        request = message.RequestMessage(msgop=constants.OP_SET,
-                                         payload=args.value,
-                                        )
-        #reply = node.send_sync(request)
-        reply = conn.send_request(args.target, request.to_msgpack())
-        result = Message.from_msgpack(reply)
-        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
-    elif request_verb == 'config':
-        request = message.RequestMessage(msgop=constants.OP_CONFIG,
-                                         payload=args.value,
-                                        )
-        #reply = node.send_sync(request)
-        reply = conn.send_request(args.target, request.to_msgpack())
-        result = Message.from_msgpack(reply)
-        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
-    elif request_verb == 'send':
-        request = message.RequestMessage(msgop=constants.OP_SEND,
-                                         payload=args.value,
-                                        )
-        #reply = node.send_sync(request)
-        reply = conn.send_request(args.target, request.to_msgpack())
-        result = Message.from_msgpack(reply)
-        print(args.target + '->' + str(args.value) + ': ' + str(result.payload))
+    request = message.RequestMessage(msgop=msgop, payload=args.value)
+    reply = conn.send_request(args.target, request.to_msgpack())
+    result = Message.from_msgpack(reply)
+    print_prefix = '->'.join([args.target]+args.value)
+    print('{}: {}'.format(print_prefix, result.payload))
 
 
 if __name__ == '__main__':
