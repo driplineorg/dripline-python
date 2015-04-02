@@ -32,7 +32,7 @@ def monitor():
                                                       }
                                 )
         if not len(json.loads(response.text)):
-            logger.critical('no values logged in last 10 minutes')
+            logger.critical('no values logged in the last 10 minutes')
             time.sleep(60*60) # we've tweeted here so sleep for an hour
             continue
         logger.info('everything okay until: {}'.format(stop))
