@@ -9,7 +9,6 @@ from __future__ import print_function
 import datetime
 import pika
 import argparse
-#import msgpack
 import uuid
 
 import dripline
@@ -120,7 +119,6 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
     channel = connection.channel()
-    #channel.exchange_declare(exchange='alerts', type='topic')
     
     result = channel.queue_declare(queue='PID-'+uuid.uuid1().hex[:12],
                                    auto_delete=True,
@@ -141,7 +139,7 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     
     def callback(ch, method, properties, body):
         message = Message.from_encoded(body, properties.content_encoding)
-        payload = message.payload#msgpack.unpackb(message.payload)
+        payload = message.payload
         if not payload['from'] == sensor:
             return
         logger.info('got a value for sensor')
