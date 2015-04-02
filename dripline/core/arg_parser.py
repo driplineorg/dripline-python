@@ -98,13 +98,13 @@ class DriplineParser(argparse.ArgumentParser):
             import colorlog
             self.fmt = colorlog.ColoredFormatter(
                     base_format.format('%(log_color)s', '%(purple)s'),
-                    datefmt = constants.TIME_FORMAT,
+                    datefmt = constants.TIME_FORMAT[:-1],
                     reset=True,
                     )
         except ImportError:
             self.fmt = logging.Formatter(
                     base_format.format(' ', ''),
-                    constants.TIME_FORMAT
+                    constants.TIME_FORMAT[:-1]
                     )
         self._handlers[0].setFormatter(self.fmt)
 
