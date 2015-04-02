@@ -33,7 +33,7 @@ def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     print(' [*] Waiting for logs. To exit press CTRL+C')
     
     def callback(ch, method, properties, body):
-        message = Message.from_encoding(body, properties.content_encoding)
+        message = Message.from_encoded(body, properties.content_encoding)
         print(" [x] {}:{}".format(method.routing_key, message,))
     
     channel.basic_consume(callback,
