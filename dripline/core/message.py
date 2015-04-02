@@ -2,16 +2,13 @@
 Meta and derived classes for dripline messages
 '''
 
-from __future__ import absolute_import
 
-__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
-           'Message']
+from __future__ import absolute_import
 
 # standard libs
 from abc import ABCMeta
 from datetime import datetime
 import json
-import logging
 
 # 3rd party libs
 import msgpack
@@ -19,7 +16,10 @@ import msgpack
 # internal imports
 from . import constants
 
+__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
+           'Message']
 
+import logging
 logger = logging.getLogger(__name__)
 
 class Message(dict, object):
@@ -99,6 +99,12 @@ class Message(dict, object):
         return message
 
     @classmethod
+    def from_json(cls, msg):
+        message_dict = json.loads(msg)
+        message = cls.from_dict(message_dict)
+        return message
+
+    @classmethod
     def from_encoded(cls, msg, encoding):
         if encoding.endswith('json'):
             return cls.from_json(msg)
@@ -107,16 +113,23 @@ class Message(dict, object):
         else:
             raise ValueError('encoding <{}> not recognized'.format(encoding))
 
-    @classmethod
-    def from_json(cls, msg):
-        message_dict = json.loads(msg)
-        message = cls.from_dict(message_dict)
-        return message
-
     def to_msgpack(self):
         temp_dict = self.copy()
         temp_dict.update({'msgtype': self.msgtype})
         return msgpack.packb(temp_dict)
+
+    def to_json(self):
+        temp_dict = self.copy()
+        temp_dict.update({'msgtype': self.msgtype})
+        return json.dumps(temp_dict)
+
+    def to_encoding(self, encoding):
+        if encoding.endswith('json'):
+            return self.to_json()
+        elif encoding.endswith("msgpack"):
+            return self.to_msgpack()
+        else:
+            raise ValueError('encoding <{}> not recognized'.format(encoding))
 
 
 class ReplyMessage(Message):

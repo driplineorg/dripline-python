@@ -3,16 +3,20 @@ Basic abstraction for binding to the alerts exchange
 '''
 
 from __future__ import absolute_import
-import logging
 
-import msgpack
-import pika
+# standard libs
+import logging
 import uuid
 
+# 3rd party libs
+import pika
+
+# internal imports
 from .connection import Connection
 from .message import Message
 
 __all__ = ['AlertConsumer']
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,8 +65,7 @@ class AlertConsumer:
         logger.debug("AlertConsmer consume starting")
         def process_message(channel, method, properties, message):
             logger.debug('in process_message callback')
-            message_unpacked = Message.from_msgpack(message)
-            message_unpacked.payload = msgpack.unpackb(message_unpacked.payload)
+            message_unpacked = Message.from_encoded(message, properties.content_encoding)
             self.this_consume(message_unpacked)
         self.dripline_connection.chan.basic_consume(process_message,
                                                      queue=self.queue.method.queue,

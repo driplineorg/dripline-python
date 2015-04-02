@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from abc import ABCMeta, abstractproperty, abstractmethod
 from .message import Message, RequestMessage, ReplyMessage
+from .connection import Connection
 from . import constants
 
 import functools
@@ -169,7 +170,8 @@ class Endpoint(object):
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
         reply = ReplyMessage(payload=result)
-        self._send_reply(channel, properties, reply)
+        Connection.send_reply(channel, properties, reply)
+        #self._send_reply(channel, properties, reply)
         #channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
 

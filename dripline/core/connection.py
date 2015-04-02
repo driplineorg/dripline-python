@@ -5,12 +5,15 @@ A connection to the AMQP broker
 
 from __future__ import absolute_import
 
-import pika
+# standard libs
 import threading
 import traceback
 import uuid
 
-from .endpoint import Endpoint
+# 3rd party libs
+import pika
+
+# internal libs
 from .message import Message, AlertMessage, ReplyMessage
 
 __all__ = ['Connection']
@@ -119,11 +122,6 @@ class Connection(object):
         send an alert
         '''
         self.__alert_lock.acquire()
-
-        if isinstance(alert, Message):
-            to_send = alert.to_msgpack()
-        else:
-            to_send = alert
         self._ensure_connection()
         try:
             logger.info('sending an alert message: {}'.format(repr(alert)))
@@ -151,3 +149,29 @@ class Connection(object):
             raise
         finally:
             self.__alert_lock.release()
+
+    @staticmethod
+    def send_reply(chan, properties, reply):
+        '''
+        '''
+        if not isinstance(reply, ReplyMessage):
+            logger.warn('send_reply expects a dripline.core.ReplyMessage, packing reply as payload of such, fix your code')
+            reply = ReplyMessage(payload=reply)
+
+        body = reply.to_encoding(properties.content_encoding)
+        try:
+            pr = chan.basic_publish(exchange='requests',
+                                    immediate=True,
+                                    mandatory=True,
+                                    routing_key=properties.reply_to,
+                                    properties=pika.BasicProperties(
+                                       correlation_id=properties.correlation_id,
+                                       content_encoding=properties.content_encoding,
+                                    ),
+                                    body=body,
+                                   )
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning('pika screwed up... maybe')
+            else:
+                raise

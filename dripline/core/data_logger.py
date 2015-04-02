@@ -8,7 +8,6 @@ import abc
 import threading
 import time
 import traceback
-import msgpack
 import uuid
 
 from .endpoint import Endpoint
@@ -55,8 +54,7 @@ class DataLogger(object):
             to_send = {'from':self.name,
                        'value':val,
                       }
-            to_send_msgpack = msgpack.packb(to_send)
-            self.store_value(to_send_msgpack, severity='sensor_value')
+            self.store_value(to_send, severity='sensor_value')
         except UserWarning:
             logger.warning('get returned None')
             if hasattr(self, 'name'):
