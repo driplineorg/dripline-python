@@ -7,7 +7,6 @@ Utility app for printing all of the messages through some exchange
 from __future__ import print_function
 
 import argparse
-import msgpack
 import pika
 import types
 import uuid
@@ -20,7 +19,6 @@ logger = logging.getLogger('message_monitor')
 def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
     channel = connection.channel()
-    #channel.exchange_declare(exchange='alerts', type='topic')
     
     result = channel.queue_declare(queue='MessageMonitor-'+uuid.uuid1().hex[:12],
                                    exclusive=True)
@@ -35,10 +33,7 @@ def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
     print(' [*] Waiting for logs. To exit press CTRL+C')
     
     def callback(ch, method, properties, body):
-        message = Message.from_msgpack(body)
-        if not isinstance(message.payload, types.DictType):
-            payload = msgpack.unpackb(message.payload)
-            message.payload = payload
+        message = Message.from_encoding(body, properties.content_encoding)
         print(" [x] {}:{}".format(method.routing_key, message,))
     
     channel.basic_consume(callback,

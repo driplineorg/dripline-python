@@ -99,6 +99,15 @@ class Message(dict, object):
         return message
 
     @classmethod
+    def from_encoded(cls, msg, encoding):
+        if encoding.endswith('json'):
+            return cls.from_json(msg)
+        elif encoding.endswith('msgpack'):
+            return cls.from_msgpack(msg)
+        else:
+            raise ValueError('encoding <{}> not recognized'.format(encoding))
+
+    @classmethod
     def from_json(cls, msg):
         message_dict = json.loads(msg)
         message = cls.from_dict(message_dict)

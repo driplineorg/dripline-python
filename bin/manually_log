@@ -8,13 +8,12 @@ from __future__ import print_function, absolute_import
 import dripline
 
 import logging
-import msgpack
 logger = logging.getLogger('manual_logger')
 logger.setLevel(logging.DEBUG)
 
 
 def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwargs):
-    # construct message
+    # construct log info
     to_log = {'from':sensor,
               'value':{'value_raw': value_raw,
                        'memo': 'logged manually',
@@ -26,11 +25,10 @@ def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=Non
         to_log['value']['memo'] += extra_memo
     logger.debug('logging to sensor: {}'.format(sensor))
     logger.debug('with info:\n{}'.format(to_log['value']))
-    to_send = msgpack.packb(to_log)
 
     # make connection
     conn = dripline.core.Connection(broker)
-    conn.send_alert(to_send, severity='sensor_value')
+    conn.send_alert(to_log, severity='sensor_value')
     logger.info('log sent')
 
 

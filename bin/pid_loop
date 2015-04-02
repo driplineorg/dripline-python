@@ -9,7 +9,7 @@ from __future__ import print_function
 import datetime
 import pika
 import argparse
-import msgpack
+#import msgpack
 import uuid
 
 import dripline
@@ -55,9 +55,9 @@ class pid_controller(object):
         request = dripline.core.RequestMessage(msgop=dripline.core.OP_GET,
                                                payload=[],
                                               )
-        reply = self.conn.send_request(self._current_channel, request.to_msgpack())
-        result = dripline.core.Message.from_msgpack(reply)
-        value = result.payload['value_cal']
+        reply = self.conn.send_request(self._current_channel, request)
+        #result = dripline.core.Message.from_msgpack(reply)
+        value = reply.payload['value_cal']
         return float(value)
 
     @property
@@ -110,9 +110,8 @@ class pid_controller(object):
                                          payload=[str(value)]
                                         )
         logger.debug('request will be: {}'.format(m))
-        reply = self.conn.send_request(self._current_channel, m.to_msgpack())
-        result = Message.from_msgpack(reply)
-        logger.info('set response was: {}'.format(result))
+        reply = self.conn.send_request(self._current_channel, m)
+        logger.info('set response was: {}'.format(reply))
 
 
 def start_monitoring(sensor, broker='localhost', **kwargs):
@@ -141,8 +140,8 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     pid = pid_controller(dripline_connection=dripline_connection, **kwargs)
     
     def callback(ch, method, properties, body):
-        message = Message.from_msgpack(body)
-        payload = msgpack.unpackb(message.payload)
+        message = Message.from_encoded(body, properties.content_encoding)
+        payload = message.payload#msgpack.unpackb(message.payload)
         if not payload['from'] == sensor:
             return
         logger.info('got a value for sensor')

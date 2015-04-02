@@ -9,7 +9,6 @@ from __future__ import print_function
 import sys
 import pika
 import argparse
-import msgpack
 
 #import sqlite3
 import sqlalchemy

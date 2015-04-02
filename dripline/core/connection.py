@@ -119,6 +119,11 @@ class Connection(object):
         send an alert
         '''
         self.__alert_lock.acquire()
+
+        if isinstance(alert, Message):
+            to_send = alert.to_msgpack()
+        else:
+            to_send = alert
         self._ensure_connection()
         try:
             logger.info('sending an alert message: {}'.format(repr(alert)))
