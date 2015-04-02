@@ -103,6 +103,7 @@ class Connection(object):
         logger.debug('publish success is: {}'.format(pr))
         if not pr:
             self._response = ReplyMessage(exceptions='no such queue', payload='key: {} not matched'.format(target)).to_msgpack()
+            self._response_encoding = 'application/msgpack'
         while self._response is None:
             self.conn.process_data_events()
 
