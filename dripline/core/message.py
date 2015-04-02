@@ -7,11 +7,16 @@ from __future__ import absolute_import
 __all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
            'Message']
 
+# standard libs
 from abc import ABCMeta
 from datetime import datetime
-import msgpack
+import json
 import logging
 
+# 3rd party libs
+import msgpack
+
+# internal imports
 from . import constants
 
 
@@ -36,7 +41,6 @@ class Message(dict, object):
     @property
     def msgop(self):
         return self['msgop']
-
     @msgop.setter
     def msgop(self, value):
         self['msgop'] = value
@@ -44,7 +48,6 @@ class Message(dict, object):
     @property
     def timestamp(self):
         return self['timestamp']
-
     @timestamp.setter
     def timestamp(self, value):
         self['timestamp'] = value
@@ -52,7 +55,6 @@ class Message(dict, object):
     @property
     def payload(self):
         return self['payload']
-
     @payload.setter
     def payload(self, value):
         self['payload'] = value
@@ -60,7 +62,6 @@ class Message(dict, object):
     @property
     def exceptions(self):
         return self['exceptions']
-
     @exceptions.setter
     def exceptions(self, value):
         self['exceptions'] = value
@@ -68,7 +69,6 @@ class Message(dict, object):
     @property
     def msgtype(self):
         return None
-
     @msgtype.setter
     def msgtype(self, value):
         raise AttributeError('msgtype cannot be changed')
@@ -95,6 +95,12 @@ class Message(dict, object):
     @classmethod
     def from_msgpack(cls, msg):
         message_dict = msgpack.unpackb(msg)
+        message = cls.from_dict(message_dict)
+        return message
+
+    @classmethod
+    def from_json(cls, msg):
+        message_dict = json.loads(msg)
         message = cls.from_dict(message_dict)
         return message
 

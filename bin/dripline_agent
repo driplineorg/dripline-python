@@ -26,8 +26,11 @@ def main(args):
     conn = Connection(args.broker)
 
     request = message.RequestMessage(msgop=msgop, payload=args.value)
-    reply = conn.send_request(args.target, request.to_msgpack())
-    result = Message.from_msgpack(reply)
+    reply = conn.send_request(args.target, request)
+    if not isinstance(reply, Message):
+        result = Message.from_msgpack(reply)
+    else:
+        result = reply
     print_prefix = '->'.join([args.target]+args.value)
     print('{}: {}'.format(print_prefix, result.payload))
 
