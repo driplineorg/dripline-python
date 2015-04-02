@@ -106,7 +106,7 @@ class Connection(object):
         while self._response is None:
             self.conn.process_data_events()
 
-        if decode:
+        if decode and (self._response_encoding is not None):
             if self._response_encoding.endswith('json'):
                 to_return = Message.from_json(self._response)
             elif self._response_encoding.endswith('msgpack'):
