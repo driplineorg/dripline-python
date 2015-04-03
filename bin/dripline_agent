@@ -13,7 +13,6 @@ import logging
 logger = logging.getLogger('dripline_agent')
 logger.setLevel(logging.DEBUG)
 
-# TODO: this should be by introspection
 def verb_list():
     """
     A list of acceptable verb arguments.
@@ -26,6 +25,17 @@ def main(args):
     request_verb = args.verb
     msgop = getattr(constants, 'OP_'+request_verb.upper())
     conn = Connection(args.broker)
+
+    values = []
+    for val in args.value:
+        temp_val = val
+        try:
+            temp_val = float(val)
+            temp_val = int(val)
+        except ValueError:
+            pass
+        finally:
+            values.append(temp_val)
 
     request = message.RequestMessage(msgop=msgop, payload=args.value)
     reply = conn.send_request(args.target, request)
