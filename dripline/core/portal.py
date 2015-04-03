@@ -25,7 +25,7 @@ class Portal(object):
         self.name = name
         logger.info('connecting to broker {}'.format(broker))
         try:
-            self.conn = Connection(broker, queue_name='reply-{}-{}'.format(self.name,uuid.uuid1().hex[:12]))
+            self.conn = Connection(broker, queue_name='reply-{}'.format(self.name))
         except Exception as err:
             logger.error('connection to broker failed!!')
             raise err
@@ -73,13 +73,16 @@ class Portal(object):
         directly in a configuration file!  It is only used internally
         by dripline.
         """
-        ep_queue = self.conn.chan.queue_declare('portal-{}:{}-{}'.format(self.name,
-                                                                         endpoint.name,
-                                                                         uuid.uuid1().hex[:12]
-                                                                        ),
-                                                exclusive=True,
-                                                auto_delete=True,
-                                               )
+        queue_name = 'portal-{}:{}'.format(self.name, endpoint.name)
+        try:
+            ep_queue = self.conn.chan.queue_declare(queue_name,
+                                                    exclusive=True,
+                                                    auto_delete=True,
+                                                   )
+        except pika.exceptions.ChannelClosed:
+            logger.error('endpoint queue "{}" already exists, queue names must be unique'.format(queue_name))
+            return
+
 
         self.conn.chan.queue_bind(exchange='requests',
                                   queue=ep_queue.method.queue,

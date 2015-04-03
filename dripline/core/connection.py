@@ -53,10 +53,15 @@ class Connection(object):
         ensures all exchanges are present and creates a response queue.
         '''
         self.chan.exchange_declare(exchange='requests', type='topic')
-        self.queue = self.chan.queue_declare(queue=self._queue_name,
-                                             exclusive=True,
-                                             auto_delete=True,
-                                            )
+        try:
+            self.queue = self.chan.queue_declare(queue=self._queue_name,
+                                                 exclusive=True,
+                                                 auto_delete=True,
+                                                )
+        except pika.exceptions.ChannelClosed:
+            logger.error('reply queue "{}"already exists. Config must use unique names'.format(self._queue_name))
+            import sys
+            sys.exit()
         self.chan.queue_bind(exchange='requests',
                              queue=self.queue.method.queue,
                              routing_key=self.queue.method.queue,
