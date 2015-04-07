@@ -8,6 +8,7 @@ OP_GET = 1
 OP_CONFIG = 6
 OP_SEND = 7
 OP_RUN = 8
+OP_CMD = 9
 
 # Message type constants.
 T_REPLY = 2
