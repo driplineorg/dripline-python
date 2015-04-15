@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import logging
 
 import abc
+import datetime
 import threading
 import time
 import traceback
@@ -20,11 +21,16 @@ logger = logging.getLogger(__name__)
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, log_interval=0., **kwargs):
+    def __init__(self, log_interval=0., max_interval=0, min_fractional_change=0, **kwargs):
         self._data_logger_lock = threading.Lock()
         self._log_interval = log_interval
+        self._max_interval = max_interval
+        self._min_fractional_change = min_fractional_change
         self._is_logging = False
         self._loop_process = threading.Timer([], {})
+
+        self._last_log_time = None
+        self._last_log_value = None
 
     def get_value(self):
         raise NotImplementedError('get value in derrived class')
@@ -42,6 +48,18 @@ class DataLogger(object):
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
 
+    def _conditionally_send(self, to_send):
+        if self._last_log_value is None:
+            logger.warning("log b/c no last log")
+        elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
+            logger.warning('log b/c too much time')
+        elif (math.abs(self._last_log_value - to_send['value']['value_raw'])/self._last_log_value) > self.min_fractional_change:
+            logger.warning('log b/c change is too large')
+        else:
+            logger.warning('no log condition met, not logging')
+            return
+        self.store_value(to_send, severity='sensor_value')
+
     def _log_a_value(self):
         self._data_logger_lock.acquire()
         try:
@@ -54,7 +72,7 @@ class DataLogger(object):
             to_send = {'from':self.name,
                        'value':val,
                       }
-            self.store_value(to_send, severity='sensor_value')
+            self._conditionally_send(to_send)
         except UserWarning:
             logger.warning('get returned None')
             if hasattr(self, 'name'):
@@ -92,10 +110,8 @@ class DataLogger(object):
         elif self._log_interval <= 0:
             raise Exception("log interval must be > 0")
         else:
-            self._loop_process = threading.Timer(self._log_interval,
-                                                 self._log_a_value, ())
+            self._log_a_value()
             logger.info("log loop started")
-            self._loop_process.start()
 
     def _restart_loop(self):
         try:
