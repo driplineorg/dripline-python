@@ -31,6 +31,11 @@ class TwitterHandler(logging.Handler):
             self.handleError(record)
 
 
+class DotAccess(object):
+    def __init__(self, adict):
+        self.__dict__.update(adict)
+
+
 class DriplineParser(argparse.ArgumentParser):
     '''
     A wrapper of the logger.ArgumentParser for dripline scripts
@@ -165,6 +170,17 @@ class DriplineParser(argparse.ArgumentParser):
         '''
         # first, the parse the args
         args = argparse.ArgumentParser.parse_args(self)
+        args_dict = vars(args)
+        # update the logs based on the config file if there is one
+        if args.config is not None:
+            try:
+                import yaml
+                args_dict.update(yaml.load(open(args.config)))
+                args = DotAccess(args_dict)
+            except:
+                print("parsing of config failed")
+                raise
+
         # setup logging stuff
         log_level = max(0, 30-args.verbose*10)
         self._handlers[0].setLevel(log_level)
