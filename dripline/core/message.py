@@ -28,9 +28,9 @@ class Message(dict, object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self, msgop=None, timestamp=None,
-                 payload=None, retcode=None):
-        self.msgop = msgop
+    def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None):
+        if msgop is not None:
+            self.msgop = msgop
         if timestamp is None:
             self.timestamp = datetime.utcnow().strftime(constants.TIME_FORMAT)
         else:
@@ -43,7 +43,7 @@ class Message(dict, object):
         return self['msgop']
     @msgop.setter
     def msgop(self, value):
-        self['msgop'] = value
+        self['msgop'] = int(value)
 
     @property
     def timestamp(self):
@@ -83,7 +83,8 @@ class Message(dict, object):
             constants.T_INFO: InfoMessage,
         }
         try:
-            msg_type = msg_dict.pop('msgtype')
+            msg_type = int(msg_dict.pop('msgtype'))
+            logger.debug('msgtype is {}'.format(msg_type))
             if 'target' in msg_dict:
                 logger.warning('this is a hack')
                 msg_dict.pop('target')
