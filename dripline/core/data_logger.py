@@ -7,7 +7,6 @@ import logging
 import abc
 import datetime
 import threading
-import time
 import traceback
 import uuid
 
@@ -48,17 +47,40 @@ class DataLogger(object):
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
 
+    @property
+    def max_interval(self):
+        return self._max_interval
+    @max_interval.setter
+    def max_interval(self, value):
+        value = float(value)
+        if value < 0:
+            raise ValueError('max log interval cannot be < 0')
+        self._max_interval = value
+    
+    @property
+    def min_fractional_change(self):
+        return self._max_interval
+    @min_fractional_change.setter
+    def min_fractional_change(self, value):
+        value = float(value)
+        if value < 0:
+            raise ValueError('fractional change cannot be < 0')
+        self._max_interval = value
+
     def _conditionally_send(self, to_send):
+        this_value = float(to_send['value']['value_raw'])
         if self._last_log_value is None:
             logger.warning("log b/c no last log")
         elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
             logger.warning('log b/c too much time')
-        elif (math.abs(self._last_log_value - to_send['value']['value_raw'])/self._last_log_value) > self.min_fractional_change:
+        elif (abs(self._last_log_value - this_value)/self._last_log_value) > self.min_fractional_change:
             logger.warning('log b/c change is too large')
         else:
             logger.warning('no log condition met, not logging')
             return
         self.store_value(to_send, severity='sensor_value')
+        self._last_log_time = datetime.datetime.utcnow()
+        self._last_log_value = this_value
 
     def _log_a_value(self):
         self._data_logger_lock.acquire()
