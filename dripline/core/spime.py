@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import logging
 import math
 import functools
+import types
 
 from .endpoint import Endpoint, calibrate
 from .data_logger import DataLogger
@@ -30,7 +31,11 @@ def _log_on_set(self, fun):
             
         values = {}
         if result is not None:
-            values.update(result)
+            if isinstance(result, types.DictType):
+            #import pdb; pdb.set_trace()
+                values.update(result)
+            else:
+                values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
         to_log = {'from': self.name,

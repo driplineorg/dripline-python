@@ -27,7 +27,7 @@ def main(args):
     conn = Connection(args.broker)
 
     values = []
-    for val in args.value:
+    for val in args.values:
         temp_val = val
         try:
             temp_val = float(val)
@@ -37,13 +37,14 @@ def main(args):
         finally:
             values.append(temp_val)
 
-    request = message.RequestMessage(msgop=msgop, payload=args.value)
+#    request = message.RequestMessage(msgop=msgop, payload=args.value)
+    request = message.RequestMessage(msgop=msgop, payload={'values':values})
     reply = conn.send_request(args.target, request)
     if not isinstance(reply, Message):
         result = Message.from_msgpack(reply)
     else:
         result = reply
-    print_prefix = '->'.join([args.target]+args.value)
+    print_prefix = '->'.join([args.target]+args.values)
     print('{}: {}'.format(print_prefix, result.payload))
 
 
@@ -60,7 +61,7 @@ if __name__ == '__main__':
                            )
     parser.add_argument('verb', choices=verb_list())
     parser.add_argument('target')
-    parser.add_argument('value', nargs='*')
+    parser.add_argument('values', nargs='*')
 
     args = parser.parse_args()
     try:

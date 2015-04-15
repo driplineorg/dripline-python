@@ -154,12 +154,13 @@ class Endpoint(object):
             if getattr(constants, const_name) == msg.msgop:
                 method_name = 'on_' + const_name.split('_')[-1].lower()
         method = getattr(self, method_name)
+        logger.debug('method is: {}'.format(method))
         if method is None:
             raise TypeError
 
         result = None
         try:
-            value = msg.payload
+            value = msg.payload['values']
             logger.debug('calling:\n{}'.format(method, ))
             logger.debug('args are:\n{}'.format(value))
             result = method(*value)
@@ -171,8 +172,6 @@ class Endpoint(object):
             result = err.message
         reply = ReplyMessage(payload=result)
         Connection.send_reply(channel, properties, reply)
-        #self._send_reply(channel, properties, reply)
-        #channel.basic_ack(delivery_tag = method.delivery_tag)
         logger.debug('reply sent')
 
     def on_config(self, attribute, value=None):
