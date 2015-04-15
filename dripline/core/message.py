@@ -137,6 +137,12 @@ class ReplyMessage(Message):
     '''
     Derrived class for Reply type messages
     '''
+    def __init__(self, retcode=None, **kwargs):
+        if retcode is None:
+            retcode=0
+        kwargs.update({'retcode':retcode})
+        Message.__init__(self, **kwargs)
+
     @property
     def msgtype(self):
         return constants.T_REPLY
