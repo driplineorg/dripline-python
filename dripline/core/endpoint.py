@@ -161,14 +161,13 @@ class Endpoint(object):
         result = None
         try:
             value = msg.payload['values']
-            logger.debug('calling:\n{}'.format(method, ))
             logger.debug('args are:\n{}'.format(value))
             result = method(*value)
             if result is None:
                 result = "operation returned None"
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
-            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
+            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
         reply = ReplyMessage(payload=result)
         Connection.send_reply(channel, properties, reply)

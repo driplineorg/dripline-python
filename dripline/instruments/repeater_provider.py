@@ -2,6 +2,8 @@
 '''
 from __future__ import absolute_import
 
+import types
+
 from ..core import Provider, Connection, message, constants
 
 
@@ -22,9 +24,10 @@ class RepeaterProvider(Provider):
         self._conn = Connection(broker)
 
     def send(self, to_send):
+        to_send = {'values':[to_send]}
         logger.debug('trying to send: {}'.format(to_send))
         request = message.RequestMessage(msgop=constants.OP_SEND,
-                                         payload=[to_send],
+                                         payload=to_send,
                                         )
         reply = self._conn.send_request(self._repeat_target, request.to_msgpack())
         result = message.Message.from_msgpack(reply)
