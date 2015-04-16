@@ -175,10 +175,12 @@ class DriplineParser(argparse.ArgumentParser):
         if args.config is not None:
             try:
                 import yaml
-                args_dict.update(yaml.load(open(args.config)))
-                args = DotAccess(args_dict)
+                conf_file = yaml.load(open(args.config))
+                conf_file.update(args_dict)
+                print('config file is: {}'.format(conf_file))
             except:
                 print("parsing of config failed")
+                args = DotAccess(conf_file)
                 raise
 
         # setup logging stuff
