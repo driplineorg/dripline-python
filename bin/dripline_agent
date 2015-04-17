@@ -5,6 +5,7 @@ Do simple stuff like gets and sets.
 from __future__ import absolute_import
 
 import argparse
+import types
 import uuid
 
 from dripline.core import message, constants, DriplineParser, Connection, Message
@@ -27,16 +28,36 @@ def main(args):
     conn = Connection(args.broker)
 
     values = []
+    payload = {}
     for val in args.values:
         temp_val = val
         try:
             temp_val = float(val)
             temp_val = int(val)
         except ValueError:
+            if isinstance(temp_val, types.StringType):
+                try:
+                    if val.lower() == 'true':
+                        temp_val = True
+                    elif val.lower() == 'false':
+                        temp_val = False
+                    elif val.lower() in ['none', 'nil', 'null']:
+                        temp_val = None
+                except ValueError:
+                    pass
             pass
         finally:
-            values.append(temp_val)
+            if isinstance(temp_val, types.StringType):
+                if len(temp_val.split('=')) > 1:
+                    payload.update({temp_val.split('=')[0]:temp_val.split('=')[1:]})
+                else:
+                    values.append(temp_val)
+                
+            else:
+                values.append(temp_val)
 
+    payload.update({'values':values})
+    logger.debug('payload will be: {}'.format(payload))
 #    request = message.RequestMessage(msgop=msgop, payload=args.value)
     request = message.RequestMessage(msgop=msgop, payload={'values':values})
     reply = conn.send_request(args.target, request)
