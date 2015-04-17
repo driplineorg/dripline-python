@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # standard libs
 import logging
+import traceback
 import uuid
 
 # 3rd party libs
@@ -21,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 class AlertConsumer:
-   
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']):
         logger.debug('AlertConsumer initializing')
         self.table = None
@@ -47,10 +47,10 @@ class AlertConsumer:
         data = {}
         for key in ['value_raw', 'value_cal', 'memo']:
             try:
-                data[key] = message['payload']['value'][key]
+                data[key] = message['payload']['values'][key]
             except:
                 pass
-            
+
         insert_dict = {'endpoint_name': message['payload']['from'],
                        'timestamp': message['timestamp'],
                       }
@@ -58,8 +58,9 @@ class AlertConsumer:
         try:
             ins = self.table.insert().values(**insert_dict)
             ins.execute()
-        except:
-            logger.warning('unknown error during sqlalchemy insert')
+        except Exception as err:
+            logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
+            logger.debug('traceback follows:\n{}'.format(traceback.format_exec()))
 
     def start(self):
         logger.debug("AlertConsmer consume starting")
