@@ -15,16 +15,16 @@ logger.setLevel(logging.DEBUG)
 def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwargs):
     # construct log info
     to_log = {'from':sensor,
-              'value':{'value_raw': value_raw,
+              'values':{'value_raw': value_raw,
                        'memo': 'logged manually',
                       },
              }
     if value_cal is not None:
-        to_log['value']['value_cal'] = value_cal
+        to_log['values']['value_cal'] = value_cal
     if extra_memo is not None:
-        to_log['value']['memo'] += extra_memo
+        to_log['values']['memo'] += extra_memo
     logger.debug('logging to sensor: {}'.format(sensor))
-    logger.debug('with info:\n{}'.format(to_log['value']))
+    logger.debug('with info:\n{}'.format(to_log['values']))
 
     # make connection
     conn = dripline.core.Connection(broker)
