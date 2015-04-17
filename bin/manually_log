@@ -35,6 +35,8 @@ def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=Non
 if __name__ == '__main__':
     parser = dripline.core.DriplineParser(extra_logger=logger,
                                           amqp_broker=True,
+                                          config_file=True,
+                                          twitter_support=True,
                                          )
     parser.add_argument('sensor',
                         help="name of the sensor to log",
