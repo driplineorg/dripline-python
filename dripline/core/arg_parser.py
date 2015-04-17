@@ -172,16 +172,17 @@ class DriplineParser(argparse.ArgumentParser):
         args = argparse.ArgumentParser.parse_args(self)
         args_dict = vars(args)
         # update the logs based on the config file if there is one
-        if args.config is not None:
-            try:
-                import yaml
-                conf_file = yaml.load(open(args.config))
-                conf_file.update(args_dict)
-                print('config file is: {}'.format(conf_file))
-            except:
-                print("parsing of config failed")
-                args = DotAccess(conf_file)
-                raise
+        if 'config' in args:
+            if args.config is not None:
+                try:
+                    import yaml
+                    conf_file = yaml.load(open(args.config))
+                    conf_file.update(args_dict)
+                    print('config file is: {}'.format(conf_file))
+                except:
+                    print("parsing of config failed")
+                    args = DotAccess(conf_file)
+                    raise
 
         # setup logging stuff
         log_level = max(0, 30-args.verbose*10)
