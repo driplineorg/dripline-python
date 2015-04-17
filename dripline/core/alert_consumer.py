@@ -59,8 +59,15 @@ class AlertConsumer:
             ins = self.table.insert().values(**insert_dict)
             ins.execute()
         except Exception as err:
-            logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
-            logger.debug('traceback follows:\n{}'.format(traceback.format_exec()))
+            if err.message.startswith("(InternalError)"):
+                if 'no known endpoint with name' in err.message:
+                    logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
+                else:
+                    logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
+                    logger.debug('traceback follows:\n{}'.format(traceback.format_exec()))
+            else:
+                raise
+
 
     def start(self):
         logger.debug("AlertConsmer consume starting")
