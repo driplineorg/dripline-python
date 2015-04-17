@@ -64,7 +64,7 @@ class AlertConsumer:
                     logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
                 else:
                     logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
-                    logger.debug('traceback follows:\n{}'.format(traceback.format_exec()))
+                    logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             else:
                 raise
 
@@ -73,10 +73,15 @@ class AlertConsumer:
         logger.debug("AlertConsmer consume starting")
         def process_message(channel, method, properties, message):
             logger.debug('in process_message callback')
-            message_unpacked = Message.from_encoded(message, properties.content_encoding)
-            self.this_consume(message_unpacked)
+            try:
+                message_unpacked = Message.from_encoded(message, properties.content_encoding)
+                self.this_consume(message_unpacked)
+            except Exception as err:
+                logger.warning('got an exception (trying to continue running):\n{}'.format(err.message))
+                logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+                raise
         self.dripline_connection.chan.basic_consume(process_message,
-                                                     queue=self.queue.method.queue,
-                                                     no_ack=True
+                                                    queue=self.queue.method.queue,
+                                                    no_ack=True
                                                    )
         self.dripline_connection.chan.start_consuming()
