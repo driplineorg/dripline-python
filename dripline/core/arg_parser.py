@@ -168,10 +168,11 @@ class DriplineParser(argparse.ArgumentParser):
     def parse_args(self):
         '''
         '''
-        # first, the parse the args
+        # first, parse the args
         args = argparse.ArgumentParser.parse_args(self)
         args_dict = vars(args)
-        # update the logs based on the config file if there is one
+
+        # add args specified in a config file if there is one
         if 'config' in args:
             if args.config is not None:
                 try:
@@ -184,7 +185,7 @@ class DriplineParser(argparse.ArgumentParser):
                     args = DotAccess(conf_file)
                     raise
 
-        # setup logging stuff
+        # setup loggers and handlers
         log_level = max(0, 30-args.verbose*10)
         self._handlers[0].setLevel(log_level)
         if not args.logfile is None:
@@ -195,9 +196,13 @@ class DriplineParser(argparse.ArgumentParser):
             if self.extra_logger:
                 self.extra_logger.addHandler(_file_handler)
             self._handlers.append(_file_handler)
+
+        # take care of tmux if needed
         if hasattr(args, 'tmux'):
             if not args.tmux is None:
                 self.__process_tmux(args)
+
+        # and add twitter to the log handling if enabled
         if hasattr(args, 'twitter'):
             if args.twitter:
                 self.__process_twitter()
