@@ -49,7 +49,8 @@ def main(args):
         finally:
             if isinstance(temp_val, types.StringType):
                 if len(temp_val.split('=')) > 1:
-                    payload.update({temp_val.split('=')[0]:temp_val.split('=')[1:]})
+                    value = '='.join(temp_val.split('=')[1:])
+                    payload.update({temp_val.split('=')[0]:value})
                 else:
                     values.append(temp_val)
                 
