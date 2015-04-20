@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import logging
 import math
 import functools
+import types
 
 from .endpoint import Endpoint, calibrate
 from .data_logger import DataLogger
@@ -23,10 +24,18 @@ logger = logging.getLogger(__name__)
 def _log_on_set(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
-        result = fun(*args, **kwargs)
+        try:
+            result = fun(*args, **kwargs)
+        except TypeError as err:
+            return err.message
+            
         values = {}
         if result is not None:
-            values.update(result)
+            if isinstance(result, types.DictType):
+            #import pdb; pdb.set_trace()
+                values.update(result)
+            else:
+                values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
         to_log = {'from': self.name,
@@ -60,13 +69,6 @@ class Spime(Endpoint, DataLogger):
     def report_log(value, severity):
         logger.info("Should be logging (value,severity): ({},{})".format(value, severity))
 
-    def on_config(self, attribute, value):
-        '''
-        simple access to setting attributes
-        '''
-        logger.info('setting attribute')
-        setattr(self, attribute, value)
-        
 
 class SimpleSCPISpime(Spime):
     '''

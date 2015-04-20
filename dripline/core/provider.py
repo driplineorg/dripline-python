@@ -1,17 +1,16 @@
 from __future__ import absolute_import
 
-from abc import ABCMeta, abstractmethod
+from .endpoint import Endpoint
 
 import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['Provider']
 
-class Provider(object):
-    __metaclass__ = ABCMeta
+class Provider(Endpoint):
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, **kwargs):
+        Endpoint.__init__(self, **kwargs)
         self._endpoints = {}
 
     def add_endpoint(self, endpoint):
@@ -21,6 +20,25 @@ class Provider(object):
         self._endpoints.update({endpoint.name:endpoint})
         endpoint.provider = self
         logger.info('endpoint list is now: {}'.format(self._endpoints.keys()))
+
+    @property
+    def logging_status(self):
+        logger.info('getting logging status for endpoints of: {}'.format(self.name))
+        results = []
+        for (name,endpoint) in self._endpoints.items():
+            logger.debug('getting status of: {}'.format(endpoint.name))
+            if hasattr(endpoint, 'logging_status'):
+                results.append((name,endpoint.logging_status))
+        return results
+    @logging_status.setter
+    def logging_status(self, value):
+        logger.info('setting logging status for endpoints of: {}'.format(self.name))
+        results = []
+        for (name,endpoint) in self._endpoints.items():
+            logger.debug('trying to set for: {}'.format(endpoint.name))
+            if hasattr(endpoint, 'logging_status'):
+                results.append((name, setattr(endpoint, 'logging_status', value)))
+        return results
 
     @property
     def endpoints(self):

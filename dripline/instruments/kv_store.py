@@ -72,7 +72,7 @@ class kv_store_key(Spime):
         key.
         """
         value = self._value
-        return value
+        return str(value)
 
     def on_set(self, value):
         """
@@ -84,13 +84,3 @@ class kv_store_key(Spime):
             self._value = value - value % .01
         except ValueError:
             raise ValueError('argument to set must be a float!')
-
-    def on_config(self, attribute, value):
-        """
-        Configuring a key is not defined.
-        """
-        if hasattr(self, attribute):
-            setattr(self, attribute, value)
-            logger.info('set {} to {}'.format(attribute, value))
-        else:
-            raise AttributeError("No attribute: {}".format(attribute))

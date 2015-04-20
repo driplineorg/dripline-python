@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from abc import ABCMeta, abstractproperty, abstractmethod
 from .message import Message, RequestMessage, ReplyMessage
+from .connection import Connection
 from . import constants
 
 import functools
@@ -107,7 +108,7 @@ class Endpoint(object):
         self.provider = None
         self._calibration_str = cal_str
 
-        def raiser(self):
+        def raiser(self, *args, **kwargs):
             raise NotImplementedError
 
         for key in dir(constants):
@@ -153,23 +154,39 @@ class Endpoint(object):
             if getattr(constants, const_name) == msg.msgop:
                 method_name = 'on_' + const_name.split('_')[-1].lower()
         method = getattr(self, method_name)
+        logger.debug('method is: {}'.format(method))
         if method is None:
             raise TypeError
 
         result = None
         try:
-            value = msg.payload
+            value = msg.payload['values']
+            logger.debug('args are:\n{}'.format(value))
             result = method(*value)
             if result is None:
                 result = "operation returned None"
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
-            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
+            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
         reply = ReplyMessage(payload=result)
-        self._send_reply(channel, properties, reply)
-        #channel.basic_ack(delivery_tag = method.delivery_tag)
+        Connection.send_reply(channel, properties, reply)
         logger.debug('reply sent')
+
+    def on_config(self, attribute, value=None):
+        '''
+        configure a property again
+        '''
+        result = None
+        if hasattr(self, attribute):
+            if value is not None:
+                setattr(self, attribute, value)
+                logger.info('set {} of {} to {}'.format(attribute, self.name, value))
+            else:
+                result = getattr(self, attribute)
+        else:
+            raise AttributeError("No attribute: {}".format(attribute))
+        return result
 
         
 class AutoReply(Endpoint):

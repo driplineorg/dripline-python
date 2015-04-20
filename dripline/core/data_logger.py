@@ -5,10 +5,9 @@ from __future__ import absolute_import
 import logging
 
 import abc
+import datetime
 import threading
-import time
 import traceback
-import msgpack
 import uuid
 
 from .endpoint import Endpoint
@@ -21,11 +20,16 @@ logger = logging.getLogger(__name__)
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, log_interval=0., **kwargs):
+    def __init__(self, log_interval=0., max_interval=0, max_fractional_change=0, **kwargs):
         self._data_logger_lock = threading.Lock()
         self._log_interval = log_interval
+        self._max_interval = max_interval
+        self._max_fractional_change = max_fractional_change
         self._is_logging = False
         self._loop_process = threading.Timer([], {})
+
+        self._last_log_time = None
+        self._last_log_value = None
 
     def get_value(self):
         raise NotImplementedError('get value in derrived class')
@@ -43,6 +47,41 @@ class DataLogger(object):
             raise ValueError('Log interval cannot be < 0')
         self._log_interval = value
 
+    @property
+    def max_interval(self):
+        return self._max_interval
+    @max_interval.setter
+    def max_interval(self, value):
+        value = float(value)
+        if value < 0:
+            raise ValueError('max log interval cannot be < 0')
+        self._max_interval = value
+    
+    @property
+    def max_fractional_change(self):
+        return self._max_fractional_change
+    @max_fractional_change.setter
+    def max_fractional_change(self, value):
+        value = float(value)
+        if value < 0:
+            raise ValueError('fractional change cannot be < 0')
+        self._max_fractional_change = value
+
+    def _conditionally_send(self, to_send):
+        this_value = float(to_send['values']['value_raw'])
+        if self._last_log_value is None:
+            logger.debug("log b/c no last log")
+        elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
+            logger.debug('log b/c too much time')
+        elif (abs(self._last_log_value - this_value)/self._last_log_value) > self.max_fractional_change:
+            logger.debug('log b/c change is too large')
+        else:
+            logger.debug('no log condition met, not logging')
+            return
+        self.store_value(to_send, severity='sensor_value')
+        self._last_log_time = datetime.datetime.utcnow()
+        self._last_log_value = this_value
+
     def _log_a_value(self):
         self._data_logger_lock.acquire()
         try:
@@ -53,10 +92,9 @@ class DataLogger(object):
                 if hasattr(self, 'name'):
                     logger.warning('for: {}'.format(self.name))
             to_send = {'from':self.name,
-                       'value':val,
+                       'values':val,
                       }
-            to_send_msgpack = msgpack.packb(to_send)
-            self.store_value(to_send_msgpack, severity='sensor_value')
+            self._conditionally_send(to_send)
         except UserWarning:
             logger.warning('get returned None')
             if hasattr(self, 'name'):
@@ -94,10 +132,8 @@ class DataLogger(object):
         elif self._log_interval <= 0:
             raise Exception("log interval must be > 0")
         else:
-            self._loop_process = threading.Timer(self._log_interval,
-                                                 self._log_a_value, ())
+            self._log_a_value()
             logger.info("log loop started")
-            self._loop_process.start()
 
     def _restart_loop(self):
         try:
