@@ -47,6 +47,7 @@ if __name__ == '__main__':
     parser = DriplineParser(extra_logger=logger,
                             amqp_broker=True,
                             tmux_support=True,
+                            config_file=True,
                             twitter_support=True,
                            )
     parser.add_argument('-e',
