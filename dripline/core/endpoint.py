@@ -1,15 +1,19 @@
 from __future__ import absolute_import
 
 from abc import ABCMeta, abstractproperty, abstractmethod
-from .message import Message, RequestMessage, ReplyMessage
-from .connection import Connection
-from . import constants
 
 import functools
 import math
 import traceback
 import types
+
 import pika
+
+from .message import Message, RequestMessage, ReplyMessage
+from .connection import Connection
+from . import constants
+from .exception import *
+
 
 __all__ = ['Endpoint', 'AutoReply', 'calibrate']
 
@@ -159,17 +163,21 @@ class Endpoint(object):
             raise TypeError
 
         result = None
+        retcode = None
         try:
             value = msg.payload['values']
             logger.debug('args are:\n{}'.format(value))
             result = method(*value)
             if result is None:
                 result = "operation returned None"
+        except DriplineException as err:
+            retcode = err.retcode
+            result = err.message
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
-        reply = ReplyMessage(payload=result)
+        reply = ReplyMessage(payload=result, retcode=retcode)
         Connection.send_reply(channel, properties, reply)
         logger.debug('reply sent')
 
@@ -185,7 +193,7 @@ class Endpoint(object):
             else:
                 result = getattr(self, attribute)
         else:
-            raise AttributeError("No attribute: {}".format(attribute))
+            raise DriplineValueError("No attribute: {}".format(attribute))
         return result
 
         
