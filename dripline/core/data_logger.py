@@ -70,13 +70,13 @@ class DataLogger(object):
     def _conditionally_send(self, to_send):
         this_value = float(to_send['values']['value_raw'])
         if self._last_log_value is None:
-            logger.warning("log b/c no last log")
+            logger.debug("log b/c no last log")
         elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
-            logger.warning('log b/c too much time')
+            logger.debug('log b/c too much time')
         elif (abs(self._last_log_value - this_value)/self._last_log_value) > self.max_fractional_change:
-            logger.warning('log b/c change is too large')
+            logger.debug('log b/c change is too large')
         else:
-            logger.warning('no log condition met, not logging')
+            logger.debug('no log condition met, not logging')
             return
         self.store_value(to_send, severity='sensor_value')
         self._last_log_time = datetime.datetime.utcnow()
