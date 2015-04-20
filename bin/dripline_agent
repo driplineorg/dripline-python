@@ -59,8 +59,7 @@ def main(args):
 
     payload.update({'values':values})
     logger.debug('payload will be: {}'.format(payload))
-#    request = message.RequestMessage(msgop=msgop, payload=args.value)
-    request = message.RequestMessage(msgop=msgop, payload={'values':values})
+    request = message.RequestMessage(msgop=msgop, payload=payload)
     reply = conn.send_request(args.target, request)
     if not isinstance(reply, Message):
         result = Message.from_msgpack(reply)
