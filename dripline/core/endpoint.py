@@ -89,7 +89,10 @@ def calibrate(fun):
             locals = {}
             eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
             logger.debug("formated cal is:\n{}".format(eval_str))
-            cal = eval(eval_str, globals, locals)
+            try:
+                cal = eval(eval_str, globals, locals)
+            except OverflowError:
+                cal = None
             if cal is not None:
                 val_dict['value_cal'] = cal
         return val_dict
