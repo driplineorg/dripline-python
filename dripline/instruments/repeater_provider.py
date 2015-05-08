@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import types
 
-from ..core import Provider, Connection, message, constants
+from ..core import Provider, Connection, message, constants, exception_map
 
 
 import logging
@@ -31,4 +31,9 @@ class RepeaterProvider(Provider):
                                         )
         reply = self._conn.send_request(self._repeat_target, request.to_msgpack())
         result = message.Message.from_msgpack(reply)
+        if not result.retcode == 0:
+            msg = ''
+            if 'ret_msg' in result.payload:
+                msg = result.payload['ret_msg']
+            raise exception_map[result.retcode](msg)
         return result.payload
