@@ -78,7 +78,11 @@ class Connection(object):
 
     def start(self):
         while True:
-            self.conn.process_data_events()
+            try:
+                self.conn.process_data_events()
+            except pika.exceptions.ConnectionClosed:
+                logger.error('connection broken in process event loop')
+                raise ValueError('connection broken')
 
     def send_request(self, target, request, decode=False):
         '''
@@ -94,18 +98,25 @@ class Connection(object):
         self._response = None
         self._response_encoding = None
         self.corr_id = str(uuid.uuid4())
-        pr = self.chan.basic_publish(exchange='requests',
-                                     routing_key=target,
-                                     mandatory=True,
-                                     immediate=True,
-                                     properties=pika.BasicProperties(
-                                       reply_to=self.queue.method.queue,
-                                       content_encoding='application/msgpack',
-                                       correlation_id=self.corr_id,
-                                     ),
-                                     body=to_send
-                                    )
-        logger.debug('publish success is: {}'.format(pr))
+        pr = None
+        try:
+            pr = self.chan.basic_publish(exchange='requests',
+                                         routing_key=target,
+                                         mandatory=True,
+                                         immediate=True,
+                                         properties=pika.BasicProperties(
+                                           reply_to=self.queue.method.queue,
+                                           content_encoding='application/msgpack',
+                                           correlation_id=self.corr_id,
+                                         ),
+                                         body=to_send
+                                        )
+            logger.debug('publish success is: {}'.format(pr))
+        except KeyError as err:
+            if err.message == 'Basic.Ack':
+                logger.warning("pika screwed up...\nit's probably fine")
+            else:
+                raise
         if not pr:
             self._response = ReplyMessage(retcode=102, payload={'ret_msg':'key <{}> not matched'.format(target)}).to_msgpack()
             logger.warning('return code is hard coded, should not be')

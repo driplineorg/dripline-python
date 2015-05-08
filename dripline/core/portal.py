@@ -5,15 +5,14 @@ I don't like the way it works and am going to try and make something that is cle
 
 from __future__ import absolute_import
 
-import uuid
-
 from .connection import Connection
 from .message import Message
 from .provider import Provider
 from .endpoint import Endpoint
-import logging
 
 __all__ = ['Portal']
+
+import logging
 logger = logging.getLogger(__name__)
 
 
