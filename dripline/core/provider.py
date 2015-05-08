@@ -37,7 +37,10 @@ class Provider(Endpoint):
         for (name,endpoint) in self._endpoints.items():
             logger.debug('trying to set for: {}'.format(endpoint.name))
             if hasattr(endpoint, 'logging_status'):
-                results.append((name, setattr(endpoint, 'logging_status', value)))
+                try:
+                    results.append((name, setattr(endpoint, 'logging_status', value)))
+                except Warning as err:
+                    logger.warning('got warning: {}'.format(err.message))
         return results
 
     @property
