@@ -77,3 +77,8 @@ __all__.append('DriplinePayloadError')
 class DriplineValueError(DriplineError):
     retcode = 304
 __all__.append('DriplineValueError')
+
+exception_map = {}
+for exception in __all__:
+    exception_map[locals()[exception].retcode] = locals()[exception]
+__all__.append('exception_map')
