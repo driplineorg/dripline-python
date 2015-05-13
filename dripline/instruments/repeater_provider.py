@@ -29,11 +29,14 @@ class RepeaterProvider(Provider):
         request = message.RequestMessage(msgop=constants.OP_SEND,
                                          payload=to_send,
                                         )
-        reply = self.portal.send_request(self._repeat_target, request)
-        result = message.Message.from_msgpack(reply)
+        reply = self._conn.send_request(self._repeat_target, request, decode=True)
+        result = reply
+        if not 'retcode' in result:
+            logger.error('no return code in reply')
         if not result.retcode == 0:
             msg = ''
             if 'ret_msg' in result.payload:
                 msg = result.payload['ret_msg']
+            import pdb; pdb.set_trace()
             raise exception_map[result.retcode](msg)
         return result.payload

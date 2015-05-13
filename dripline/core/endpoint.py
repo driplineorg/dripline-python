@@ -152,17 +152,17 @@ class Endpoint(object):
 
         result = None
         retcode = None
-        logger.debug('trying to get lock')
-        lockouts = 0
-        while True:
-            got_lock = self.__request_lock.acquire(False)
-            if got_lock:
-                break
-            if lockouts > 10:
-                logger.warning('unable to get a lock')
-                raise exception_map[300]
-            lockouts += 1
-            time.sleep(1)
+#        logger.debug('trying to get lock')
+#        lockouts = 0
+#        while True:
+#            got_lock = self.__request_lock.acquire(False)
+#            if got_lock:
+#                break
+#            if lockouts > 10:
+#                logger.warning('unable to get a lock')
+#                raise exception_map[300]
+#            lockouts += 1
+#            time.sleep(1)
         try:
             value = msg.payload['values']
             logger.debug('args are:\n{}'.format(value))
@@ -177,13 +177,13 @@ class Endpoint(object):
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
-        self.__request_lock.release()
+#        self.__request_lock.release()
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
         logger.debug('reply2')
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
-        channel.basic_ack(delivery_tag=method.delivery_tag)
+#        channel.basic_ack(delivery_tag=method.delivery_tag)
         logger.debug('lock released')
 
     def on_config(self, attribute, value=None):

@@ -28,13 +28,11 @@ class Connection(object):
     def __init__(self, broker_host='localhost', queue_name=None):
         if queue_name is None:
             queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])
-        #self._queue_name = queue_name
         self.broker_host = broker_host
         conn_params = pika.ConnectionParameters(broker_host)
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
         self.chan.confirm_delivery()
-        #self.__alert_lock = threading.Lock()
         self._response = None
         self._response_encoding = None
 
@@ -65,14 +63,20 @@ class Connection(object):
 
         self.chan.exchange_declare(exchange='alerts', type='topic')
 
-        self.chan.basic_consume(self._on_response, queue=self.queue.method.queue, no_ack=True)
+        self.chan.basic_consume(self._on_response, queue=self.queue.method.queue, no_ack=False)
 
     def _on_response(self, channel, method, props, response):
+        logger.debug('got a response: {}'.format(repr(response)))
         if self.corr_id == props.correlation_id:
             self._response = response
             self._response_encoding = props.content_encoding
+            self.chan.basic_ack(delivery_tag=method.delivery_tag)
             self.chan.stop_consuming()
             logger.info('stopping consumption')
+        else:
+            logger.debug('corr id received does not match target:')
+            logger.debug('target: {}'.format(self.corr_id))
+            logger.debug("recv'd: {}".format(props.correlation_id))
 
     def start(self):
         try:
@@ -99,13 +103,13 @@ class Connection(object):
         try:
             pr = self.chan.basic_publish(exchange='requests',
                                          routing_key=target,
-                                         mandatory=True,
+                                         body=to_send,
                                          properties=pika.BasicProperties(
                                            reply_to=self.queue.method.queue,
                                            content_encoding='application/msgpack',
                                            correlation_id=self.corr_id,
                                          ),
-                                         body=to_send
+                                         mandatory=True,
                                         )
             logger.debug('publish success is: {}'.format(pr))
         except KeyError as err:
@@ -118,8 +122,9 @@ class Connection(object):
             self._response = ReplyMessage(retcode=102, payload={'ret_msg':'key <{}> not matched'.format(target)}).to_msgpack()
             logger.warning('return code is hard coded, should not be')
             self._response_encoding = 'application/msgpack'
-        while self._response is None:
-            self.conn.process_data_events()
+        
+        # consume until response
+        self.chan.start_consuming()
 
         if decode and (self._response_encoding is not None):
             if self._response_encoding.endswith('json'):
@@ -130,6 +135,9 @@ class Connection(object):
                 to_return = self._response
         else:
             to_return = self._response
+        if to_return is None:
+            logger.warning('to return is None')
+            import ipdb; ipdb.set_trace()
         return to_return
 
     def send_alert(self, alert, severity):

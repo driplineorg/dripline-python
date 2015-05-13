@@ -156,6 +156,8 @@ class Portal(object):
         '''
         send a request to a specific endpoint
         '''
+        logger.warning('do not use this requst!!!')
+        raise NotImplementedError
         self.__request_out_lock.acquire()
         correlation_id = str(uuid.uuid4())
         try:
@@ -196,11 +198,10 @@ class Portal(object):
             
             if counter % 100 == 0:
                 logger.warning('waiting for reply count: {}'.format(counter))
-                import pdb;pdb.set_trace()
             counter += 1
             pass
-#        if counter > cmax-1:
-#            import pdb; pdb.set_trace()
+        #if counter > cmax-1:
+        #    import pdb; pdb.set_trace()
 
         try:
             result_tup = self._responses.pop(correlation_id)
@@ -223,6 +224,7 @@ class Portal(object):
                                             body=body,
                                             properties=pika.BasicProperties(
                                                 content_encoding='application/msgpack',
+                                                correlation_id=properties.correlation_id,
                                             ),
                                             mandatory=True,
                                             #immediate=True,
@@ -239,6 +241,7 @@ class Portal(object):
             logger.error('an error while sending alert')
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
         finally:
+            logger.debug('release lock')
             self.__reply_out_lock.release()
 
     def start_event_loop(self):
@@ -267,14 +270,15 @@ class Portal(object):
             logger.info('request received by {}'.format(self.name))
             self.endpoints[method.routing_key].handle_request(channel, method, header, body)
             logger.info('request processing complete\n{}'.format('-'*29))
+            self.channel.basic_ack(delivery_tag=method.delivery_tag)
         finally:
             self.__request_in_lock.release()
 
     def _handle_reply(self, channel, method, header, body):
         logger.info("got a reply")
-        import pdb;pdb.set_trace()
         self._responses[header.correlation_id] = (method, header, body)
         self.channel.basic_ack(delivery_tag=method.delivery_tag)
+        logger.warning('ack-d')
         logger.info('reply processing complete\n{}'.format('-'*29))
 
     def config(self):
