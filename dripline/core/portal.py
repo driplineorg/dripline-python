@@ -37,10 +37,11 @@ class Portal(object):
 
         logger.info('connecting to broker {}'.format(broker))
         try:
-            def foo():print('new channel callback complete')
+            #def foo():print('new channel callback complete')
             self.conn = pika.BlockingConnection(pika.ConnectionParameters(broker))
             #self.conn = pika.SelectConnection(pika.ConnectionParameters(broker))
             self.channel = self.conn.channel()
+            self.reply_channel = self.conn.channel()
             #self.channel.exchange_declare(exchange='requests', exchange_type='topic')
             self.channel.exchange_declare(exchange='requests', type='topic')
             self.channel.confirm_delivery()
@@ -152,76 +153,19 @@ class Portal(object):
         finally:
             self.__alert_out_lock.release()
 
-    def send_request(self, target, request, decode=False):
-        '''
-        send a request to a specific endpoint
-        '''
-        logger.warning('do not use this requst!!!')
-        raise NotImplementedError
-        self.__request_out_lock.acquire()
-        correlation_id = str(uuid.uuid4())
-        try:
-            logger.info('sending a request message: {}'.format(repr(request)))
-            if not isinstance(request, Message):
-                logger.warning("received request isn't a Message instance")
-                message = RequestMessage()
-                message.update({'payload':request})
-            else:
-                message = request
-            packed = message.to_msgpack()
-            pr = self.channel.basic_publish(exchange='requests',
-                                            routing_key=target,
-                                            body=packed,
-                                            properties=pika.BasicProperties(
-                                                reply_to=self.reply_queue.method.queue,
-                                                content_encoding='application/msgpack',
-                                                correlation_id=correlation_id,
-                                            ),
-                                           )
-            if not pr:
-                logger.error('alert unable to send')
-                logger.warning('publish result is: {}'.format(pr))
-        except KeyError as err:
-            if err.message == 'Basic.Ack':
-                logger.warning("pika screwed up...\nit's probably fine")
-            else:
-                raise
-        except Exception as err:
-            logger.error('an error while sending request')
-            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
-        finally:
-            self.__request_out_lock.release()
-
-        counter = 0
-        #cmax=50000
-        while not correlation_id in self._responses:# and counter < cmax:
-            
-            if counter % 100 == 0:
-                logger.warning('waiting for reply count: {}'.format(counter))
-            counter += 1
-            pass
-        #if counter > cmax-1:
-        #    import pdb; pdb.set_trace()
-
-        try:
-            result_tup = self._responses.pop(correlation_id)
-            import pdb; pdb.set_trace()
-        except Exception:
-            raise
-
     def send_reply(self, properties, reply):
         '''
         send a notification to the alert exchange
         '''
         logger.info('sending a reply message: {}'.format(repr(reply)))
-        is_locked = self.__reply_out_lock.acquire(False)
-        if not is_locked:
-            import ipdb;ipdb.set_trace()
+        #is_locked = self.__reply_out_lock.acquire(False)
+        #if not is_locked:
+        #    import ipdb;ipdb.set_trace()
         try:
             if not isinstance(reply, Message):
                 reply = message.ReplyMessage(payload=reply)
             body = reply.to_encoding(properties.content_encoding)
-            pr = self.channel.basic_publish(exchange='requests',
+            pr = self.reply_channel.basic_publish(exchange='requests',
                                             routing_key=properties.reply_to,
                                             body=body,
                                             properties=pika.BasicProperties(
@@ -244,7 +188,8 @@ class Portal(object):
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
         finally:
             logger.debug('release lock')
-            self.__reply_out_lock.release()
+            #self.__reply_out_lock.release()
+        logger.debug('send reply complete')
 
     def start_event_loop(self):
         """
@@ -267,7 +212,9 @@ class Portal(object):
         logger.debug("loop ended")
 
     def _handle_request(self, channel, method, header, body):
-        self.__request_in_lock.acquire()
+        while not self.__request_in_lock.acquire(False):
+            logger.warning('unable to get lock')
+            time.sleep(0.1)
         try:
             logger.info('request received by {}'.format(self.name))
             self.endpoints[method.routing_key].handle_request(channel, method, header, body)

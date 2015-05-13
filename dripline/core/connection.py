@@ -26,6 +26,7 @@ class Connection(object):
     A simple API to the AMQP system
     '''
     def __init__(self, broker_host='localhost', queue_name=None):
+        self._make_request_lock = threading.Lock()
         if queue_name is None:
             queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])
         self.broker_host = broker_host
@@ -90,6 +91,7 @@ class Connection(object):
         '''
         send a request to a specific consumer.
         '''
+        self._make_request_lock.acquire()
         if isinstance(request, Message):
             to_send = request.to_msgpack()
             decode = True
@@ -135,9 +137,12 @@ class Connection(object):
                 to_return = self._response
         else:
             to_return = self._response
+        self._response = None
+        self._response_encoding = None
         if to_return is None:
             logger.warning('to return is None')
             import ipdb; ipdb.set_trace()
+        self._make_request_lock.release()
         return to_return
 
     def send_alert(self, alert, severity):
