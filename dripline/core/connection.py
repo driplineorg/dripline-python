@@ -28,6 +28,7 @@ class Connection(object):
         self._queue_name = queue_name
         self.broker_host = broker_host
         conn_params = pika.ConnectionParameters(broker_host)
+        #conn_params = pika.ConnectionParameters(broker_host, backpressure_detection=True)
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
         self.chan.confirm_delivery()
@@ -40,6 +41,7 @@ class Connection(object):
     def _ensure_connection(self):
         if not self.conn.is_open:
             logger.warning('amqp connection seems to have broken, reconnecting')
+            raise ValueError('connection is not open')
             self.conn.connect()
             self.chan = self.conn.channel()
             self.chan.confirm_delivery()
@@ -69,7 +71,7 @@ class Connection(object):
 
         self.chan.exchange_declare(exchange='alerts', type='topic')
 
-        self.chan.basic_consume(self._on_response, queue=self.queue.method.queue)
+        self.chan.basic_consume(self._on_response, queue=self.queue.method.queue, no_ack=True)
 
     def _on_response(self, channel, method, props, response):
         if self.corr_id == props.correlation_id:
@@ -77,12 +79,13 @@ class Connection(object):
             self._response_encoding = props.content_encoding
 
     def start(self):
-        while True:
-            try:
-                self.conn.process_data_events()
-            except pika.exceptions.ConnectionClosed:
-                logger.error('connection broken in process event loop')
-                raise ValueError('connection broken')
+        try:
+            #self.conn.process_data_events()
+            self.chan.start_consuming()
+        except pika.exceptions.ConnectionClosed:
+            logger.error('connection broken in process event loop')
+            raise
+        logger.critical("end of consume")
 
     def send_request(self, target, request, decode=False):
         '''
@@ -103,7 +106,6 @@ class Connection(object):
             pr = self.chan.basic_publish(exchange='requests',
                                          routing_key=target,
                                          mandatory=True,
-                                         immediate=True,
                                          properties=pika.BasicProperties(
                                            reply_to=self.queue.method.queue,
                                            content_encoding='application/msgpack',
@@ -118,6 +120,7 @@ class Connection(object):
             else:
                 raise
         if not pr:
+            logger.warning('pr is: {}'.format(pr))
             self._response = ReplyMessage(retcode=102, payload={'ret_msg':'key <{}> not matched'.format(target)}).to_msgpack()
             logger.warning('return code is hard coded, should not be')
             self._response_encoding = 'application/msgpack'
@@ -155,6 +158,7 @@ class Connection(object):
                                         )
             if not pr:
                 logger.error('alert unable to send')
+                logger.warning('pr is: {}'.format(pr))
             logger.info('alert sent, returned:{}'.format(pr))
         except KeyError as err:
             if err.message == 'Basic.Ack':
@@ -172,12 +176,14 @@ class Connection(object):
     def send_reply(chan, properties, reply):
         '''
         '''
+        logger.debug('sending reply')
         if not isinstance(reply, ReplyMessage):
             logger.warn('send_reply expects a dripline.core.ReplyMessage, packing reply as payload of such, fix your code')
             reply = ReplyMessage(payload=reply)
 
         body = reply.to_encoding(properties.content_encoding)
         try:
+            logger.debug('about to publish')
             pr = chan.basic_publish(exchange='requests',
                                     immediate=True,
                                     mandatory=True,
@@ -188,8 +194,10 @@ class Connection(object):
                                     ),
                                     body=body,
                                    )
+            logger.debug('pr is:{}'.format(pr))
         except KeyError as err:
             if err.message == 'Basic.Ack':
                 logger.warning('pika screwed up... maybe')
             else:
                 raise
+        logger.debug('reply sent')

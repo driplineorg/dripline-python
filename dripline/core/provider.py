@@ -19,7 +19,6 @@ class Provider(Endpoint):
             return
         self._endpoints.update({endpoint.name:endpoint})
         endpoint.provider = self
-        logger.info('endpoint list is now: {}'.format(self._endpoints.keys()))
 
     @property
     def logging_status(self):

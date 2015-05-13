@@ -4,6 +4,8 @@ from abc import ABCMeta, abstractproperty, abstractmethod
 
 import functools
 import math
+import threading
+import time
 import traceback
 import types
 
@@ -11,11 +13,14 @@ import pika
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
+from .exception import exception_map
 from . import constants
 from .exception import *
 
 
-__all__ = ['Endpoint', 'AutoReply', 'calibrate']
+__all__ = ['Endpoint',
+           'calibrate',
+          ]
 
 import logging
 logger = logging.getLogger(__name__)
@@ -113,7 +118,9 @@ class Endpoint(object):
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
         self.name = name
         self.provider = None
+        self.portal = None
         self._calibration_str = cal_str
+        self.__request_lock = threading.Lock()
 
         def raiser(self, *args, **kwargs):
             raise NotImplementedError
@@ -127,32 +134,10 @@ class Endpoint(object):
         if get_on_set:
             self.on_set = _get_on_set(self, self.on_set)
 
-    def _send_reply(self, channel, properties, reply):
-        '''
-        Send an AMQP reply
-        '''
-        if not isinstance(reply, ReplyMessage):
-            logger.warn('should be providing a ReplyMessage')
-            reply = ReplyMessage(payload=reply)
-        try:
-            channel.basic_publish(exchange='requests',
-                                  immediate=True,
-                                  mandatory=True,
-                                  routing_key=properties.reply_to,
-                                  properties=pika.BasicProperties(
-                                    correlation_id=properties.correlation_id
-                                  ),
-                                  body=reply.to_msgpack(),
-                                 )
-        except KeyError as err:
-            if err.message == 'Basic.Ack':
-                logger.warning("pika screwed up maybe")
-            else:
-                raise
-
     def handle_request(self, channel, method, properties, request):
         '''
         '''
+        logger.debug('handling requst:{}'.format(request))
         msg = Message.from_msgpack(request)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
 
@@ -160,29 +145,47 @@ class Endpoint(object):
         for const_name in dir(constants):
             if getattr(constants, const_name) == msg.msgop:
                 method_name = 'on_' + const_name.split('_')[-1].lower()
-        method = getattr(self, method_name)
-        logger.debug('method is: {}'.format(method))
-        if method is None:
+        endpoint_method = getattr(self, method_name)
+        logger.debug('method is: {}'.format(endpoint_method))
+        if endpoint_method is None:
             raise TypeError
 
         result = None
         retcode = None
+        logger.debug('trying to get lock')
+        lockouts = 0
+        while True:
+            got_lock = self.__request_lock.acquire(False)
+            if got_lock:
+                break
+            if lockouts > 10:
+                logger.warning('unable to get a lock')
+                raise exception_map[300]
+            lockouts += 1
+            time.sleep(1)
         try:
             value = msg.payload['values']
             logger.debug('args are:\n{}'.format(value))
-            result = method(*value)
+            result = endpoint_method(*value)
             if result is None:
                 result = "operation returned None"
         except DriplineException as err:
+            logger.debug('got a dripine exception')
             retcode = err.retcode
             result = err.message
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
+        self.__request_lock.release()
+        logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
-        Connection.send_reply(channel, properties, reply)
+        logger.debug('reply2')
+        #Connection.send_reply(channel, properties, reply)
+        self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
+        channel.basic_ack(delivery_tag=method.delivery_tag)
+        logger.debug('lock released')
 
     def on_config(self, attribute, value=None):
         '''
@@ -200,22 +203,21 @@ class Endpoint(object):
         return result
 
         
-class AutoReply(Endpoint):
-    __metaclass__ = ABCMeta
-
-    def send_reply(self, channel, properties, result):
-        logger.debug('trying to send result: {}'.format(result))
-        channel.basic_publish(exchange='requests',
-                              routing_key=properties.reply_to,
-                              properties=pika.BasicProperties(
-                                  correlation_id=properties.correlation_id
-                                  ),
-                              body=result.to_msgpack())
-
-    def handle_request(self, channel, method, properties, request):
-        msg = Message.from_msgpack(request)
-        if msg.msgop == constants.OP_GET:
-            result = self.on_get()
-            self.send_reply(channel, properties, result)
-            #channel.basic_ack(delivery_tag=method.delivery_tag)
-
+#class AutoReply(Endpoint):
+#    __metaclass__ = ABCMeta
+#
+#    def send_reply(self, channel, properties, result):
+#        logger.debug('trying to send result: {}'.format(result))
+#        channel.basic_publish(exchange='requests',
+#                              routing_key=properties.reply_to,
+#                              properties=pika.BasicProperties(
+#                                  correlation_id=properties.correlation_id
+#                                  ),
+#                              body=result.to_msgpack())
+#
+#    def handle_request(self, channel, method, properties, request):
+#        msg = Message.from_msgpack(request)
+#        if msg.msgop == constants.OP_GET:
+#            result = self.on_get()
+#            self.send_reply(channel, properties, result)
+#            #channel.basic_ack(delivery_tag=method.delivery_tag)

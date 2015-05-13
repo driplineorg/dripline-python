@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import socket
-from ..core import Provider, AutoReply
+from ..core import Provider, Endpoint#, AutoReply
 
 __all__ = ['simple_scpi_instrument', 'simple_scpi_sensor']
 
@@ -25,7 +25,7 @@ class simple_scpi_instrument(Provider):
         data = self.sock.recv(1024)
         return data
 
-class simple_scpi_sensor(AutoReply):
+class simple_scpi_sensor(Endpoint):
     def __init__(self, name, on_get=None, on_set=None):
         self.name = name
         self._provider = None

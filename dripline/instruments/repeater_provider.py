@@ -29,7 +29,7 @@ class RepeaterProvider(Provider):
         request = message.RequestMessage(msgop=constants.OP_SEND,
                                          payload=to_send,
                                         )
-        reply = self._conn.send_request(self._repeat_target, request.to_msgpack())
+        reply = self.portal.send_request(self._repeat_target, request)
         result = message.Message.from_msgpack(reply)
         if not result.retcode == 0:
             msg = ''
