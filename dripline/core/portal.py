@@ -214,7 +214,9 @@ class Portal(object):
         send a notification to the alert exchange
         '''
         logger.info('sending a reply message: {}'.format(repr(reply)))
-        self.__reply_out_lock.acquire()
+        is_locked = self.__reply_out_lock.acquire(False)
+        if not is_locked:
+            import ipdb;ipdb.set_trace()
         try:
             if not isinstance(reply, Message):
                 reply = message.ReplyMessage(payload=reply)
