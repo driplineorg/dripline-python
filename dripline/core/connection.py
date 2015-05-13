@@ -22,46 +22,40 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Connection(object):
+    '''
+    A simple API to the AMQP system
+    '''
     def __init__(self, broker_host='localhost', queue_name=None):
         if queue_name is None:
             queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])
-        self._queue_name = queue_name
+        #self._queue_name = queue_name
         self.broker_host = broker_host
         conn_params = pika.ConnectionParameters(broker_host)
-        #conn_params = pika.ConnectionParameters(broker_host, backpressure_detection=True)
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
         self.chan.confirm_delivery()
-        self.__alert_lock = threading.Lock()
+        #self.__alert_lock = threading.Lock()
         self._response = None
         self._response_encoding = None
 
-        self._setup_amqp()
-
-    def _ensure_connection(self):
-        if not self.conn.is_open:
-            logger.warning('amqp connection seems to have broken, reconnecting')
-            raise ValueError('connection is not open')
-            self.conn.connect()
-            self.chan = self.conn.channel()
-            self.chan.confirm_delivery()
+        self._setup_amqp(queue_name)
 
     def __del__(self):
         if hasattr(self, 'conn') and self.conn.is_open:
             self.conn.close()
 
-    def _setup_amqp(self):
+    def _setup_amqp(self, queue_name):
         '''
         ensures all exchanges are present and creates a response queue.
         '''
         self.chan.exchange_declare(exchange='requests', type='topic')
         try:
-            self.queue = self.chan.queue_declare(queue=self._queue_name,
+            self.queue = self.chan.queue_declare(queue=queue_name,
                                                  exclusive=True,
                                                  auto_delete=True,
                                                 )
         except pika.exceptions.ChannelClosed:
-            logger.error('reply queue "{}"already exists. Config must use unique names'.format(self._queue_name))
+            logger.error('reply queue "{}"already exists. Config must use unique names'.format(self.queue.method.queue))
             import sys
             sys.exit()
         self.chan.queue_bind(exchange='requests',
@@ -77,10 +71,11 @@ class Connection(object):
         if self.corr_id == props.correlation_id:
             self._response = response
             self._response_encoding = props.content_encoding
+            self.chan.stop_consuming()
+            logger.info('stopping consumption')
 
     def start(self):
         try:
-            #self.conn.process_data_events()
             self.chan.start_consuming()
         except pika.exceptions.ConnectionClosed:
             logger.error('connection broken in process event loop')
@@ -97,7 +92,6 @@ class Connection(object):
         else:
             to_send = request
 
-        self._ensure_connection()
         self._response = None
         self._response_encoding = None
         self.corr_id = str(uuid.uuid4())

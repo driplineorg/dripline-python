@@ -181,7 +181,6 @@ class Endpoint(object):
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
         logger.debug('reply2')
-        #Connection.send_reply(channel, properties, reply)
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
         channel.basic_ack(delivery_tag=method.delivery_tag)

@@ -30,15 +30,18 @@ class Portal(object):
         self.name = name
         self.__request_in_lock = threading.Lock()
         self.__request_out_lock = threading.Lock()
-        self.__alert__out_lock = threading.Lock()
-        self.__reply__out_lock = threading.Lock()
+        self.__alert_out_lock = threading.Lock()
+        self.__reply_out_lock = threading.Lock()
 
         self._responses = {}
 
         logger.info('connecting to broker {}'.format(broker))
         try:
+            def foo():print('new channel callback complete')
             self.conn = pika.BlockingConnection(pika.ConnectionParameters(broker))
+            #self.conn = pika.SelectConnection(pika.ConnectionParameters(broker))
             self.channel = self.conn.channel()
+            #self.channel.exchange_declare(exchange='requests', exchange_type='topic')
             self.channel.exchange_declare(exchange='requests', type='topic')
             self.channel.confirm_delivery()
             self.queue_name = 'requests-{}'.format(self.name)
@@ -50,8 +53,13 @@ class Portal(object):
                                                           exclusive=True,
                                                           auto_delete=True,
                                                          )
+            self.channel.queue_bind(exchange='requests',
+                                    queue=self.reply_queue.method.queue,
+                                    routing_key=self.reply_queue.method.queue,
+                                   )
         except Exception as err:
             logger.error('connection to broker failed!!')
+            logger.error('traceback:\n{}'.format(traceback.format_exc()))
             raise err
 
         self.providers = {}
@@ -182,12 +190,21 @@ class Portal(object):
         finally:
             self.__request_out_lock.release()
 
-        while not correlation_id in self._responses:
+        counter = 0
+        #cmax=50000
+        while not correlation_id in self._responses:# and counter < cmax:
+            
+            if counter % 100 == 0:
+                logger.warning('waiting for reply count: {}'.format(counter))
+                import pdb;pdb.set_trace()
+            counter += 1
             pass
+#        if counter > cmax-1:
+#            import pdb; pdb.set_trace()
 
         try:
             result_tup = self._responses.pop(correlation_id)
-            logger.warning('!'*40)
+            import pdb; pdb.set_trace()
         except Exception:
             raise
 
@@ -195,9 +212,9 @@ class Portal(object):
         '''
         send a notification to the alert exchange
         '''
-        self.__reply_lock.acquire()
+        logger.info('sending a reply message: {}'.format(repr(reply)))
+        self.__reply_out_lock.acquire()
         try:
-            logger.info('sending a reply message: {}'.format(repr(reply)))
             if not isinstance(reply, Message):
                 reply = message.ReplyMessage(payload=reply)
             body = reply.to_encoding(properties.content_encoding)
@@ -208,7 +225,7 @@ class Portal(object):
                                                 content_encoding='application/msgpack',
                                             ),
                                             mandatory=True,
-                                            immediate=True,
+                                            #immediate=True,
                                            )
             if not pr:
                 logger.error('alert unable to send')
@@ -222,7 +239,7 @@ class Portal(object):
             logger.error('an error while sending alert')
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
         finally:
-            self.__reply_lock.release()
+            self.__reply_out_lock.release()
 
     def start_event_loop(self):
         """
@@ -242,7 +259,7 @@ class Portal(object):
         except KeyboardInterrupt:
             self.channel.stop_consuming()
             del(self.conn)
-        logger.debug("shouldn't get here")
+        logger.debug("loop ended")
 
     def _handle_request(self, channel, method, header, body):
         self.__request_in_lock.acquire()
@@ -255,8 +272,10 @@ class Portal(object):
 
     def _handle_reply(self, channel, method, header, body):
         logger.info("got a reply")
+        import pdb;pdb.set_trace()
         self._responses[header.correlation_id] = (method, header, body)
-        self.channel.basic_ack(deliver_tag=method.delivery_tag)
+        self.channel.basic_ack(delivery_tag=method.delivery_tag)
+        logger.info('reply processing complete\n{}'.format('-'*29))
 
     def config(self):
         """
