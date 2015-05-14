@@ -22,7 +22,6 @@ class RepeaterProvider(Provider):
         Provider.__init__(self, **kwargs)
         self._repeat_target = repeat_target
         self._broker_info = broker
-        #self._conn = Connection(broker)
 
     def send(self, to_send):
         _conn = Connection(self._broker_info)

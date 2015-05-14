@@ -152,17 +152,6 @@ class Endpoint(object):
 
         result = None
         retcode = None
-#        logger.debug('trying to get lock')
-#        lockouts = 0
-#        while True:
-#            got_lock = self.__request_lock.acquire(False)
-#            if got_lock:
-#                break
-#            if lockouts > 10:
-#                logger.warning('unable to get a lock')
-#                raise exception_map[300]
-#            lockouts += 1
-#            time.sleep(1)
         try:
             value = msg.payload['values']
             logger.debug('args are:\n{}'.format(value))
@@ -177,13 +166,11 @@ class Endpoint(object):
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
-#        self.__request_lock.release()
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
         logger.debug('reply2')
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
-#        channel.basic_ack(delivery_tag=method.delivery_tag)
         logger.debug('lock released')
 
     def on_config(self, attribute, value=None):
@@ -201,22 +188,3 @@ class Endpoint(object):
             raise DriplineValueError("No attribute: {}".format(attribute))
         return result
 
-        
-#class AutoReply(Endpoint):
-#    __metaclass__ = ABCMeta
-#
-#    def send_reply(self, channel, properties, result):
-#        logger.debug('trying to send result: {}'.format(result))
-#        channel.basic_publish(exchange='requests',
-#                              routing_key=properties.reply_to,
-#                              properties=pika.BasicProperties(
-#                                  correlation_id=properties.correlation_id
-#                                  ),
-#                              body=result.to_msgpack())
-#
-#    def handle_request(self, channel, method, properties, request):
-#        msg = Message.from_msgpack(request)
-#        if msg.msgop == constants.OP_GET:
-#            result = self.on_get()
-#            self.send_reply(channel, properties, result)
-#            #channel.basic_ack(delivery_tag=method.delivery_tag)

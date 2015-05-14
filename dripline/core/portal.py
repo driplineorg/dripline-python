@@ -11,7 +11,6 @@ import uuid
 
 import pika
 
-#from .connection import Connection
 from .message import Message, AlertMessage, RequestMessage
 from .provider import Provider
 from .endpoint import Endpoint
@@ -37,12 +36,9 @@ class Portal(object):
 
         logger.info('connecting to broker {}'.format(broker))
         try:
-            #def foo():print('new channel callback complete')
             self.conn = pika.BlockingConnection(pika.ConnectionParameters(broker))
-            #self.conn = pika.SelectConnection(pika.ConnectionParameters(broker))
             self.channel = self.conn.channel()
             self.reply_channel = self.conn.channel()
-            #self.channel.exchange_declare(exchange='requests', exchange_type='topic')
             self.channel.exchange_declare(exchange='requests', type='topic')
             self.channel.confirm_delivery()
             self.queue_name = 'requests-{}'.format(self.name)
@@ -158,9 +154,6 @@ class Portal(object):
         send a notification to the alert exchange
         '''
         logger.info('sending a reply message: {}'.format(repr(reply)))
-        #is_locked = self.__reply_out_lock.acquire(False)
-        #if not is_locked:
-        #    import ipdb;ipdb.set_trace()
         try:
             if not isinstance(reply, Message):
                 reply = message.ReplyMessage(payload=reply)
@@ -173,7 +166,6 @@ class Portal(object):
                                                 correlation_id=properties.correlation_id,
                                             ),
                                             mandatory=True,
-                                            #immediate=True,
                                            )
             if not pr:
                 logger.error('alert unable to send')
@@ -188,7 +180,6 @@ class Portal(object):
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
         finally:
             logger.debug('release lock')
-            #self.__reply_out_lock.release()
         logger.debug('send reply complete')
 
     def start_event_loop(self):
