@@ -32,7 +32,6 @@ def _log_on_set(self, fun):
         values = {}
         if result is not None:
             if isinstance(result, types.DictType):
-            #import pdb; pdb.set_trace()
                 values.update(result)
             else:
                 values.update({'value_raw': result})

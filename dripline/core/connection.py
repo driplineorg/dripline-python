@@ -141,7 +141,6 @@ class Connection(object):
         self._response_encoding = None
         if to_return is None:
             logger.warning('to return is None')
-            import ipdb; ipdb.set_trace()
         self._make_request_lock.release()
         return to_return
 

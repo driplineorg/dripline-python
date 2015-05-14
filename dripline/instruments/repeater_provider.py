@@ -39,6 +39,5 @@ class RepeaterProvider(Provider):
             msg = ''
             if 'ret_msg' in result.payload:
                 msg = result.payload['ret_msg']
-            import ipdb; ipdb.set_trace()
             raise exception_map[result.retcode](msg)
         return result.payload
