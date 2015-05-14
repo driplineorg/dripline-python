@@ -1,17 +1,26 @@
 from __future__ import absolute_import
 
 from abc import ABCMeta, abstractproperty, abstractmethod
-from .message import Message, RequestMessage, ReplyMessage
-from .connection import Connection
-from . import constants
 
 import functools
 import math
+import threading
+import time
 import traceback
 import types
+
 import pika
 
-__all__ = ['Endpoint', 'AutoReply', 'calibrate']
+from .message import Message, RequestMessage, ReplyMessage
+from .connection import Connection
+from .exception import exception_map
+from . import constants
+from .exception import *
+
+
+__all__ = ['Endpoint',
+           'calibrate',
+          ]
 
 import logging
 logger = logging.getLogger(__name__)
@@ -85,7 +94,10 @@ def calibrate(fun):
             locals = {}
             eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
             logger.debug("formated cal is:\n{}".format(eval_str))
-            cal = eval(eval_str, globals, locals)
+            try:
+                cal = eval(eval_str, globals, locals)
+            except OverflowError:
+                cal = None
             if cal is not None:
                 val_dict['value_cal'] = cal
         return val_dict
@@ -106,7 +118,9 @@ class Endpoint(object):
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
         self.name = name
         self.provider = None
+        self.portal = None
         self._calibration_str = cal_str
+        self.__request_lock = threading.Lock()
 
         def raiser(self, *args, **kwargs):
             raise NotImplementedError
@@ -120,32 +134,10 @@ class Endpoint(object):
         if get_on_set:
             self.on_set = _get_on_set(self, self.on_set)
 
-    def _send_reply(self, channel, properties, reply):
-        '''
-        Send an AMQP reply
-        '''
-        if not isinstance(reply, ReplyMessage):
-            logger.warn('should be providing a ReplyMessage')
-            reply = ReplyMessage(payload=reply)
-        try:
-            channel.basic_publish(exchange='requests',
-                                  immediate=True,
-                                  mandatory=True,
-                                  routing_key=properties.reply_to,
-                                  properties=pika.BasicProperties(
-                                    correlation_id=properties.correlation_id
-                                  ),
-                                  body=reply.to_msgpack(),
-                                 )
-        except KeyError as err:
-            if err.message == 'Basic.Ack':
-                logger.warning("pika screwed up maybe")
-            else:
-                raise
-
     def handle_request(self, channel, method, properties, request):
         '''
         '''
+        logger.debug('handling requst:{}'.format(request))
         msg = Message.from_msgpack(request)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
 
@@ -153,25 +145,33 @@ class Endpoint(object):
         for const_name in dir(constants):
             if getattr(constants, const_name) == msg.msgop:
                 method_name = 'on_' + const_name.split('_')[-1].lower()
-        method = getattr(self, method_name)
-        logger.debug('method is: {}'.format(method))
-        if method is None:
+        endpoint_method = getattr(self, method_name)
+        logger.debug('method is: {}'.format(endpoint_method))
+        if endpoint_method is None:
             raise TypeError
 
         result = None
+        retcode = None
         try:
             value = msg.payload['values']
             logger.debug('args are:\n{}'.format(value))
-            result = method(*value)
+            result = endpoint_method(*value)
             if result is None:
                 result = "operation returned None"
+        except DriplineException as err:
+            logger.debug('got a dripine exception')
+            retcode = err.retcode
+            result = err.message
         except Exception as err:
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
-        reply = ReplyMessage(payload=result)
-        Connection.send_reply(channel, properties, reply)
+        logger.debug('request method execution complete')
+        reply = ReplyMessage(payload=result, retcode=retcode)
+        logger.debug('reply2')
+        self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
+        logger.debug('lock released')
 
     def on_config(self, attribute, value=None):
         '''
@@ -185,26 +185,6 @@ class Endpoint(object):
             else:
                 result = getattr(self, attribute)
         else:
-            raise AttributeError("No attribute: {}".format(attribute))
+            raise DriplineValueError("No attribute: {}".format(attribute))
         return result
-
-        
-class AutoReply(Endpoint):
-    __metaclass__ = ABCMeta
-
-    def send_reply(self, channel, properties, result):
-        logger.debug('trying to send result: {}'.format(result))
-        channel.basic_publish(exchange='requests',
-                              routing_key=properties.reply_to,
-                              properties=pika.BasicProperties(
-                                  correlation_id=properties.correlation_id
-                                  ),
-                              body=result.to_msgpack())
-
-    def handle_request(self, channel, method, properties, request):
-        msg = Message.from_msgpack(request)
-        if msg.msgop == constants.OP_GET:
-            result = self.on_get()
-            self.send_reply(channel, properties, result)
-            #channel.basic_ack(delivery_tag=method.delivery_tag)
 

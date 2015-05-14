@@ -119,6 +119,8 @@ class DataLogger(object):
                 self._loop_process.cancel()
             else:
                 raise Warning("loop process not running")
+        except Warning:
+            pass
         except:
             logger.error('something went wrong stopping')
             raise
@@ -130,7 +132,7 @@ class DataLogger(object):
         if self._loop_process.is_alive():
             raise Warning("loop process already started")
         elif self._log_interval <= 0:
-            raise Exception("log interval must be > 0")
+            raise Warning("log interval must be > 0")
         else:
             self._log_a_value()
             logger.info("log loop started")

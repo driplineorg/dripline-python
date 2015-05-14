@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from subprocess import check_output
 import logging
 
-from ..core import Provider, AutoReply, DataLogger
+from ..core import Provider, Endpoint, Spime
 
 __all__ = ['simple_shell_instrument', 'simple_shell_command',
            'sensors_command_temp']
@@ -27,7 +27,7 @@ class simple_shell_instrument(Provider):
         return raw_result
 
 
-class simple_shell_command(AutoReply):
+class simple_shell_command(Endpoint):
     def __init__(self, name, on_get=None, on_set=None):
         self.name = name
         self._provider = None
@@ -53,7 +53,7 @@ class simple_shell_command(AutoReply):
 
 
 # WARNING, this is not even close to portable
-class sensors_command_temp(AutoReply, DataLogger):
+class sensors_command_temp(Spime):
     '''
     Temperature sensors on higgsino
     
