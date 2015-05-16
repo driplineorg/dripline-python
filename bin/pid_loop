@@ -142,10 +142,10 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
         if not payload['from'] == sensor:
             return
         logger.info('got a value for sensor')
-        if not 'value_cal' in payload['value']:
+        if not 'value_cal' in payload['values']:
             logger.warning('no calibrated value')
             return
-        pid.process_new_value(timestamp=message['timestamp'], value=payload['value']['value_cal'])
+        pid.process_new_value(timestamp=message['timestamp'], value=payload['values']['value_cal'])
     
     channel.basic_consume(callback,
                           queue=queue_name,
