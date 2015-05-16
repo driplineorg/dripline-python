@@ -52,10 +52,9 @@ class pid_controller(object):
 
     def __get_old_current(self):
         request = dripline.core.RequestMessage(msgop=dripline.core.OP_GET,
-                                               payload=[],
+                                               payload={'values':{}}
                                               )
         reply = self.conn.send_request(self._current_channel, request)
-        #result = dripline.core.Message.from_msgpack(reply)
         value = reply.payload['value_cal']
         return float(value)
 
