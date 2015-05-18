@@ -1,0 +1,22 @@
+nodename: a_run_table_test
+broker: localhost
+providers:
+  - name: the_run_table
+    module: RunDBInterface
+    user: p8_db_user
+    password: m1d41r
+    database_name: p8_sc_db_debug
+    database_server: localhost
+    tables: 
+      - run_table
+    endpoints:
+      - name: run_table
+        module: InsertDBEndpoint
+        table_name: run_table
+        required_insert_names:
+          - run_name
+        return_col_names:
+          - run_id
+        default_insert_values:
+          daq_id: 1
+
