@@ -153,9 +153,11 @@ class Endpoint(object):
         result = None
         retcode = None
         try:
-            value = msg.payload['values']
-            logger.debug('args are:\n{}'.format(value))
-            result = endpoint_method(*value)
+            these_args = msg.payload['values']
+            these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
+            #value = msg.payload['values']
+            logger.debug('args are:\n{}'.format(these_args))
+            result = endpoint_method(*these_args, **these_kwargs)
             if result is None:
                 result = "operation returned None"
         except DriplineException as err:
@@ -188,3 +190,17 @@ class Endpoint(object):
             raise DriplineValueError("No attribute: {}".format(attribute))
         return result
 
+    def on_cmd(self, *args, **kwargs):  
+        '''
+        '''
+        logger.debug('args are: {}'.format(args))
+        logger.debug('kwargs are: {}'.format(kwargs))
+        try:
+            method = getattr(self, args[0])
+        except:
+            raise
+        try:
+            result = method(*args[1:], **kwargs)
+        except:
+            raise
+        return result
