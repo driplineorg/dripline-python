@@ -3,8 +3,8 @@ broker: localhost
 providers:
   - name: the_run_table
     module: RunDBInterface
-    user: p8_db_user
-    password: m1d41r
+    user: p8_db_user # comment 1
+    password: must_provide_from_cli #comment 2
     database_name: p8_sc_db_debug
     database_server: localhost
     tables: 
