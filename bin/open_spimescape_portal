@@ -45,11 +45,18 @@ def create_child(conf_dict):
     return this_child
 
 if __name__ == '__main__':
-    parser = dripline.core.DriplineParser(extra_logger=logger, amqp_broker=True, config_file=True, tmux_support=True, twitter_support=True)
+    parser = dripline.core.DriplineParser(extra_logger=logger, 
+                                          amqp_broker=True,
+                                          config_file=True,
+                                          tmux_support=True,
+                                          twitter_support=True,
+                                          user_pass_support=True,
+                                         )
     
     args = parser.parse_args()
     logger.info('args parsed, reading config')
-    conf_dict = yaml.load(open(args.config).read())
+    #conf_dict = yaml.load(open(args.config).read())
+    conf_dict = args.config
     logger.info('config parsed')
     if args.broker:
         conf_dict.update({'broker':args.broker})

@@ -5,7 +5,8 @@ import os
 import subprocess
 import sys
 
-from dripline.core import constants
+from ..core import constants
+from .. import __version__
 
 import logging
 logger = logging.getLogger('dripline')
@@ -47,6 +48,7 @@ class DriplineParser(argparse.ArgumentParser):
                  config_file=False,
                  tmux_support=False,
                  twitter_support=False,
+                 user_pass_support=False,
                  **kwargs):
         '''
         '''
@@ -61,6 +63,12 @@ class DriplineParser(argparse.ArgumentParser):
         self.add_argument('-l',
                           '--logfile',
                           help='file to save logged output',
+                         )
+        self.add_argument('-V',
+                          '--version',
+                          action='version',
+                          version=__version__,
+                          help='display dripline version',
                          )
         self._handlers = []
         self._handlers.append(logging.StreamHandler())
@@ -95,6 +103,17 @@ class DriplineParser(argparse.ArgumentParser):
                               nargs='?',
                               default=False,
                               const=True,
+                             )
+        if user_pass_support:
+            self.add_argument('-u',
+                              '--user',
+                              help='substitue user lines in config file',
+                              default=None,
+                             )
+            self.add_argument('-p',
+                              '--password',
+                              help='substitue password lines in config file',
+                              default=None,
                              )
 
     def __set_format(self):
@@ -176,13 +195,29 @@ class DriplineParser(argparse.ArgumentParser):
         if 'config' in args:
             if args.config is not None:
                 try:
+                    file_str = open(args.config).read()
                     import yaml
-                    conf_file = yaml.load(open(args.config))
+                    if 'user' in args:
+                        logger.warning('updating user')
+                        if args.user is not None:
+                            import re
+                            reg_ex = r'([ ]*[-]? user:[ ]*)([\S]*)(.*)'
+                            new_user = r'\1{}\3'.format(args.user)
+                            file_str = re.sub(reg_ex, new_user, file_str)
+                    if 'password' in args:
+                        logger.warning("updating password")
+                        if args.password is not None:
+                            import re
+                            reg_ex = r'([ ]*[-]? password:[ ]*)([\S]*)(.*)'
+                            new_pass = r'\1{}\3'.format(args.password)
+                            file_str = re.sub(reg_ex, new_pass, file_str)
+                    conf_file = yaml.load(file_str)
                     conf_file.update(args_dict)
                     print('config file is: {}'.format(conf_file))
+                    args_dict['config'] = conf_file
+                    args = DotAccess(args_dict)
                 except:
                     print("parsing of config failed")
-                    args = DotAccess(conf_file)
                     raise
 
         # setup loggers and handlers
