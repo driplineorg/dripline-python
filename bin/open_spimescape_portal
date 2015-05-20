@@ -22,14 +22,14 @@ def open_spimescape_portal(nodename, broker, **kwargs):
     logger.info('starting {}'.format(nodename))
     ##### need to fix the node class here...
     for provider in kwargs['providers']:
-        portal.add_provider(create_child(provider))
+        portal.add_endpoint(create_child(portal, provider))
     logger.info('spimescapes created and populated')
     logger.info('creating bindings')
     portal.create_bindings()
     logger.info('starting consumption')
     portal.start_event_loop()
 
-def create_child(conf_dict):
+def create_child(portal, conf_dict):
     module = conf_dict.pop('module')
     child_confs = conf_dict.pop('endpoints', [])
     logger.info('creating a <{}> with args:\n{}'.format(module, conf_dict))
@@ -41,7 +41,9 @@ def create_child(conf_dict):
         raise NameError('no module "{}" in dripline.core or dripline.instruments'.format(module))
 
     for child_dict in child_confs:
-        this_child.add_endpoint(create_child(child_dict))
+        this_child.add_endpoint(create_child(portal, child_dict))
+    if isinstance(this_child, dripline.core.Provider):
+        portal.endpoints.update(this_child.endpoints)
     return this_child
 
 if __name__ == '__main__':

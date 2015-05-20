@@ -28,9 +28,7 @@ class Portal(object):
     def __init__(self, name, broker):
         self.name = name
         self.__request_in_lock = threading.Lock()
-        self.__request_out_lock = threading.Lock()
         self.__alert_out_lock = threading.Lock()
-        self.__reply_out_lock = threading.Lock()
 
         self._responses = {}
 
@@ -62,61 +60,32 @@ class Portal(object):
         self.providers = {}
         self.endpoints = {}
 
-    def add_provider(self, provider):
+    def add_endpoint(self, endpoint):
         '''
         '''
-        if provider.name in self.providers:
-            raise ValueError('provider ({}) already present'.format(provider.name))
-        self.providers[provider.name] = provider
+        if endpoint.name in self.endpoints:
+            raise ValueError('endpoint ({}) already present'.format(endpoint.name))
+        self.endpoints[endpoint.name] = endpoint
 
     def create_bindings(self):
         '''
         '''
-        for provider in self.providers.keys():
-            self._bind_endpoints(self.providers[provider])
+        for endpoint in self.endpoints.keys():
+            self._bind_endpoint(self.endpoints[endpoint])
 
-    def _bind_endpoints(self, instance):
-        '''
-        '''
-        logger.info('now bindings for: {}'.format(instance.name))
-        if isinstance(instance, Provider):
-            for child in instance.endpoints.keys():
-                self._bind_endpoints(instance.endpoints[child])
-        if isinstance(instance, Endpoint):
-            self.bind_endpoint(instance)
-
-    def bind_endpoint(self, endpoint):
+    def _bind_endpoint(self, endpoint):
         """
         Bind an endpoint to the dripline node.  Once an endpoint is bound by
         name, it has an address and may be found on the dripline node by
         that name.
         """
-        self.endpoints[endpoint.name] = endpoint
-        self.bind(endpoint)
-        setattr(endpoint, 'store_value', self.send_alert)
-        endpoint.report_log = self.send_alert
-        endpoint.portal = self
-
-    def bind(self, endpoint):
-        """
-        Bind an arbitrary set of set/get/config functions to the
-        dripline node.  Note that currently this cannot be called
-        directly in a configuration file!  It is only used internally
-        by dripline.
-        """
         self.channel.queue_bind(exchange='requests',
                                 queue=self.queue_name,
                                 routing_key=endpoint.name,
                                )
-
-    @staticmethod
-    def __handle_request_test(channel, method, properties, request):
-        logger.warning('channel:\n{}'.format(channel))
-        logger.warning('method:\n{}'.format(method))
-        logger.warning('properties:\n{}'.format(properties))
-        logger.warning('request:\n{}'.format(request))
-        channel.basic_ack(delivery_tag=method.delivery_tag)
-        logger.warning('ack sent')
+        setattr(endpoint, 'store_value', self.send_alert)
+        endpoint.report_log = self.send_alert
+        endpoint.portal = self
 
     def send_alert(self, alert, severity):
         '''
