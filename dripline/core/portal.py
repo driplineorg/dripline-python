@@ -30,11 +30,18 @@ class Portal(object):
         self.__request_in_lock = threading.Lock()
         self.__alert_out_lock = threading.Lock()
 
+        self.providers = {}
+        self.endpoints = {}
         self._responses = {}
+        self.broker = broker
+        self.reconnect()
 
-        logger.info('connecting to broker {}'.format(broker))
+    def reconnect(self):
+        '''
+        '''
+        logger.info('connecting to broker {}'.format(self.broker))
         try:
-            self.conn = pika.BlockingConnection(pika.ConnectionParameters(broker))
+            self.conn = pika.BlockingConnection(pika.ConnectionParameters(self.broker))
             self.channel = self.conn.channel()
             self.reply_channel = self.conn.channel()
             self.channel.exchange_declare(exchange='requests', type='topic')
@@ -52,13 +59,12 @@ class Portal(object):
                                     queue=self.reply_queue.method.queue,
                                     routing_key=self.reply_queue.method.queue,
                                    )
+            self.create_bindings()
         except Exception as err:
             logger.error('connection to broker failed!!')
             logger.error('traceback:\n{}'.format(traceback.format_exc()))
             raise err
 
-        self.providers = {}
-        self.endpoints = {}
 
     def add_endpoint(self, endpoint):
         '''
