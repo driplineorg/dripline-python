@@ -10,7 +10,11 @@ from __future__ import absolute_import
 import types
 
 # 3rd party libraries
-import sqlalchemy
+try:
+    import sqlalchemy
+except ImportError:
+    print('warning sqlalchmy not found, database support will not be available')
+####### the above import really does go here, there should probably be some plugin infrastructure or something to deal with this as an optional feature, for now I'll import elsewhere
 
 # local imports
 from ..core import Provider, Endpoint
