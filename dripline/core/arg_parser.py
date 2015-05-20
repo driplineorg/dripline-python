@@ -198,15 +198,15 @@ class DriplineParser(argparse.ArgumentParser):
                     file_str = open(args.config).read()
                     import yaml
                     if 'user' in args:
-                        logger.warning('updating user')
                         if args.user is not None:
+                            logger.info('updating user')
                             import re
                             reg_ex = r'([ ]*[-]? user:[ ]*)([\S]*)(.*)'
                             new_user = r'\1{}\3'.format(args.user)
                             file_str = re.sub(reg_ex, new_user, file_str)
                     if 'password' in args:
-                        logger.warning("updating password")
                         if args.password is not None:
+                            logger.info("updating password")
                             import re
                             reg_ex = r'([ ]*[-]? password:[ ]*)([\S]*)(.*)'
                             new_pass = r'\1{}\3'.format(args.password)
