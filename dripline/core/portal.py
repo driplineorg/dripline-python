@@ -171,21 +171,15 @@ class Portal(object):
         Start the event loop for processing messages.
         """
         logger.info('starting event loop for node {}\n{}'.format(self.name,'-'*29))
-#        self.channel.basic_consume(self._handle_request,
-#                                   queue=self.queue_name,
-#                                   no_ack=False,
-#                                  )
-#        self.channel.basic_consume(self._handle_reply,
-#                                   queue=self.reply_queue.method.queue,
-#                                   no_ack=False,
-#                                  )
+
         try:
             while True:
                 try:
                     logger.debug('starting new consume')
                     self.channel.start_consuming()
-                except:
+                except pika.exceptions.ConnectionClosed:
                     self.reconnect()
+                    logger.critical('had to reconnect')
                     continue
                 logger.info('should break out now')
                 break
