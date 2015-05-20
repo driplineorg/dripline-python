@@ -46,15 +46,23 @@ class Portal(object):
             self.reply_channel = self.conn.channel()
             self.channel.exchange_declare(exchange='requests', type='topic')
             self.channel.confirm_delivery()
-            self.queue_name = 'requests-{}'.format(self.name)
-            self.queue = self.channel.queue_declare(queue=self.queue_name,
+            queue_name = 'requests-{}'.format(self.name)
+            self.queue = self.channel.queue_declare(queue=queue_name,
                                                     exclusive=True,
                                                     auto_delete=True,
                                                    )
+            self.channel.basic_consume(self._handle_request,
+                                       queue=self.queue.method.queue,
+                                       no_ack=False,
+                                      )
             self.reply_queue = self.channel.queue_declare(queue='reply-{}'.format(self.name),
                                                           exclusive=True,
                                                           auto_delete=True,
                                                          )
+            self.channel.basic_consume(self._handle_reply,
+                                       queue=self.reply_queue.method.queue,
+                                       no_ack=False,
+                                      )
             self.channel.queue_bind(exchange='requests',
                                     queue=self.reply_queue.method.queue,
                                     routing_key=self.reply_queue.method.queue,
@@ -86,7 +94,7 @@ class Portal(object):
         that name.
         """
         self.channel.queue_bind(exchange='requests',
-                                queue=self.queue_name,
+                                queue=self.queue.method.queue,
                                 routing_key=endpoint.name,
                                )
         setattr(endpoint, 'store_value', self.send_alert)
@@ -162,16 +170,26 @@ class Portal(object):
         Start the event loop for processing messages.
         """
         logger.info('starting event loop for node {}\n{}'.format(self.name,'-'*29))
-        self.channel.basic_consume(self._handle_request,
-                                   queue=self.queue_name,
-                                   no_ack=False,
-                                  )
-        self.channel.basic_consume(self._handle_reply,
-                                   queue=self.reply_queue.method.queue,
-                                   no_ack=False,
-                                  )
+#        self.channel.basic_consume(self._handle_request,
+#                                   queue=self.queue_name,
+#                                   no_ack=False,
+#                                  )
+#        self.channel.basic_consume(self._handle_reply,
+#                                   queue=self.reply_queue.method.queue,
+#                                   no_ack=False,
+#                                  )
         try:
-            self.channel.start_consuming()
+            while True:
+                try:
+                    self.channel.start_consuming()
+                    import ipdb;ipdb.set_trace()
+                except:
+                    import ipdb;ipdb.set_trace()
+                    self.reconnect()
+                    continue
+                logger.info('should break out now')
+                break
+                
         except KeyboardInterrupt:
             self.channel.stop_consuming()
             del(self.conn)
