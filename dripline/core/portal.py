@@ -72,6 +72,7 @@ class Portal(object):
             logger.error('connection to broker failed!!')
             logger.error('traceback:\n{}'.format(traceback.format_exc()))
             raise err
+        logger.info('connected')
 
 
     def add_endpoint(self, endpoint):
@@ -181,10 +182,9 @@ class Portal(object):
         try:
             while True:
                 try:
+                    logger.debug('starting new consume')
                     self.channel.start_consuming()
-                    import ipdb;ipdb.set_trace()
                 except:
-                    import ipdb;ipdb.set_trace()
                     self.reconnect()
                     continue
                 logger.info('should break out now')
