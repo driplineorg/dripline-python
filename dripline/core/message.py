@@ -15,12 +15,20 @@ import msgpack
 
 # internal imports
 from . import constants
+from .. import __version__, __commit__
 
-__all__ = ['ReplyMessage', 'RequestMessage', 'InfoMessage', 'AlertMessage',
-           'Message']
+import inspect
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+__all__ = ['ReplyMessage',
+           'RequestMessage',
+           'InfoMessage',
+           'AlertMessage',
+           'Message']
+
 
 class Message(dict, object):
     '''
@@ -28,7 +36,7 @@ class Message(dict, object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None):
+    def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None, sender_info=None):
         if msgop is not None:
             self.msgop = msgop
         if timestamp is None:
@@ -37,6 +45,15 @@ class Message(dict, object):
             self.timestamp = timestamp
         self.payload = payload
         self.retcode = retcode
+        if sender_info is None:
+            this_exe = inspect.stack()[-1][1]
+            self.sender_info = {'package': 'dripline',
+                    'exe': this_exe,
+                    'version': __version__,
+                    'commit': __commit__,
+                   }
+        else:
+            self.sender_info = sender_info
 
     @property
     def msgop(self):
@@ -72,6 +89,19 @@ class Message(dict, object):
     @msgtype.setter
     def msgtype(self, value):
         raise AttributeError('msgtype cannot be changed')
+
+    @property
+    def sender_info(self):
+        return self['sender_info']
+        this_exe = inspect.stack()[-1][1]
+        return {'package': 'dripline',
+                'exe': this_exe,
+                'version': __version__,
+                'commit': __commit,
+               }
+    @sender_info.setter
+    def sender_info(self, value):
+        self['sender_info'] = value
 
     @classmethod
     def from_dict(cls, msg_dict):

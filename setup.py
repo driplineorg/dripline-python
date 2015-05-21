@@ -6,7 +6,9 @@ from setuptools.command.test import test as TestCommand
 
 verstr = "none"
 try:
-    verstr = open("VERSION").read().strip().replace(' ', '.')
+    #verstr = open("VERSION").read().strip().replace(' ', '.')
+    import subprocess
+    verstr = subprocess.check_output(['git','describe','--long']).strip()
 except EnvironmentError:
     pass
 except:

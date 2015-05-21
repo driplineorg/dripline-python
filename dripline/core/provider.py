@@ -21,6 +21,13 @@ class Provider(Endpoint):
         endpoint.provider = self
 
     @property
+    def endpoint_names(self):
+        return self._endpoints.keys()
+    @endpoint_names.setter
+    def endpoint_names(self, value):
+        raise AttributeError('endpoint name list cannot be directly modified')
+
+    @property
     def logging_status(self):
         logger.info('getting logging status for endpoints of: {}'.format(self.name))
         results = []
