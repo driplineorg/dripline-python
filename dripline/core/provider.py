@@ -21,6 +21,10 @@ class Provider(Endpoint):
         endpoint.provider = self
 
     @property
+    def endpoint_names(self):
+        return self._endpoints.keys()
+
+    @property
     def logging_status(self):
         logger.info('getting logging status for endpoints of: {}'.format(self.name))
         results = []
