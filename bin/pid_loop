@@ -105,7 +105,7 @@ class pid_controller(object):
     def set_current(self, value):
         logger.debug('would set new current to: {}'.format(value))
         m = dripline.core.RequestMessage(msgop=constants.OP_SET,
-                                         payload=[str(value)]
+                                         payload={'values':[value]},
                                         )
         logger.debug('request will be: {}'.format(m))
         reply = self.conn.send_request(self._current_channel, m)
