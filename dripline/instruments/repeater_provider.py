@@ -25,7 +25,9 @@ class RepeaterProvider(Provider):
 
     def send(self, to_send):
         _conn = Connection(self._broker_info)
-        to_send = {'values':[to_send]}
+        if not isinstance(to_send, types.ListType):
+            to_send = [to_send]
+        to_send = {'values':to_send}
         logger.debug('trying to send: {}'.format(to_send))
         request = message.RequestMessage(msgop=constants.OP_SEND,
                                          payload=to_send,
