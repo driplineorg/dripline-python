@@ -5,6 +5,7 @@ I don't like the way it works and am going to try and make something that is cle
 
 from __future__ import absolute_import
 
+import datetime
 import threading
 import time
 import traceback
@@ -191,14 +192,21 @@ class Portal(object):
         logger.debug("loop ended")
 
     def _handle_request(self, channel, method, header, body):
+        first_fail = None
         while not self.__request_in_lock.acquire(False):
             logger.warning('unable to get lock')
+            if first_fail is None:
+                first_fail = datetime.datetime.utcnow()
+            if (datetime.datetime.utcnow() - first_fail).seconds > 60:
+                raise DriplineInternalError('not able to get a lock in handle request')
             time.sleep(0.1)
         try:
-            logger.info('request received by {}'.format(self.name))
-            self.endpoints[method.routing_key].handle_request(channel, method, header, body)
-            logger.info('request processing complete\n{}'.format('-'*29))
-            self.channel.basic_ack(delivery_tag=method.delivery_tag)
+            try:
+                logger.info('request received by {}'.format(self.name))
+                self.endpoints[method.routing_key].handle_request(channel, method, header, body)
+                logger.info('request processing complete\n{}'.format('-'*29))
+            finally:
+                self.channel.basic_ack(delivery_tag=method.delivery_tag)
         finally:
             self.__request_in_lock.release()
 
