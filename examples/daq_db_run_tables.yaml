@@ -1,10 +1,12 @@
-nodename: a_run_table_test
+nodename: run_table_service
 broker: localhost
 providers:
-  - name: the_run_table
+  - name: run_table_interface
     module: RunDBInterface
-    user: p8_db_user # comment 1
-    password: must_provide_from_cli #comment 2
+    user: p8_db_user
+    # Note that I'm not putting the password here,
+    # you must pass it into open_spimescape_portal with -p
+    password: must_provide_from_cli
     database_name: p8_sc_db_debug
     database_server: localhost
     tables: 
