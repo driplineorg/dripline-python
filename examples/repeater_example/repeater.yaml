@@ -1,8 +1,7 @@
-nodename: dmm_repeater
+nodename: store_repeater
 broker: localhost
 providers:
-  - name: dmm_repeater_provider
-    module: EthernetRepeater
-    socket_info: ("glengyle.local",5024)
-    command_terminator: "\r\n"
-    response_terminator: "\r\n34461A>"
+  - name: peach
+    module: RepeaterProvider
+    repeat_target: peaches
+    broker: localhost
