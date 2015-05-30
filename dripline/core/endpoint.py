@@ -13,7 +13,7 @@ import pika
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
-from .exceptions import exception_map
+from .exceptions import exception_map, DriplineException
 from . import constants
 
 

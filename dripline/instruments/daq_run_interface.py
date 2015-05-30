@@ -7,8 +7,12 @@ from __future__ import absolute_import
 import threading
 
 # internal imports
-import ..core
+from .. import core
 
+__all__ = []
+
+
+__all__.append('DAQProvider')
 class DAQProvider(core.Provider):
     '''
     Base class for providing a uniform interface to different DAQ systems
@@ -41,7 +45,8 @@ class DAQProvider(core.Provider):
         self._run_number = None
 
 
-class MantisProvider(DAQProvider):
+__all__.append('MantisProvider')
+class MantisProvider(DAQProvider, core.Spime):
     '''
     A DAQProvider for interacting with Mantis DAQ
     '''
@@ -50,6 +55,7 @@ class MantisProvider(DAQProvider):
                  **kwargs
                 ):
         DAQProvider.__init__(self, **kwargs)
+        core.Spime.__init__(self, **kwargs)
         self.mantis_queue = mantis_queue
         self._acquisition_count = 0
 
