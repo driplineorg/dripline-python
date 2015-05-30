@@ -13,7 +13,7 @@ import pika
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
-from .exceptions import exception_map, DriplineException
+from . import exceptions
 from . import constants
 
 
@@ -159,7 +159,7 @@ class Endpoint(object):
             result = endpoint_method(*these_args, **these_kwargs)
             if result is None:
                 result = "operation returned None"
-        except DriplineException as err:
+        except exceptions.DriplineException as err:
             logger.debug('got a dripine exception')
             retcode = err.retcode
             result = err.message
