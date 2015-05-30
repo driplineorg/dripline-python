@@ -8,7 +8,7 @@ import argparse
 import types
 import uuid
 
-from dripline.core import message, constants, DriplineParser, Connection, Message
+from dripline.core import message, constants, DriplineParser, Connection, Message, exceptions
 
 import logging
 logger = logging.getLogger('dripline_agent')
@@ -60,7 +60,11 @@ def main(args):
     payload.update({'values':values})
     logger.debug('payload will be: {}'.format(payload))
     request = message.RequestMessage(msgop=msgop, payload=payload)
-    reply = conn.send_request(args.target, request)
+    try:
+        reply = conn.send_request(args.target, request)
+    except exceptions.DriplineException as dripline_error:
+        logger.warning(dripline_error.message)
+        return
     if not isinstance(reply, Message):
         result = Message.from_msgpack(reply)
     else:

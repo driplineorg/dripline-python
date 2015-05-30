@@ -13,9 +13,8 @@ import pika
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
-from .exception import exception_map
+from .exceptions import exception_map
 from . import constants
-from .exception import *
 
 
 __all__ = ['Endpoint',
@@ -187,7 +186,7 @@ class Endpoint(object):
             else:
                 result = getattr(self, attribute)
         else:
-            raise DriplineValueError("No attribute: {}".format(attribute))
+            raise exceptions.DriplineValueError("No attribute: {}".format(attribute))
         return result
 
     def on_cmd(self, *args, **kwargs):  
