@@ -68,6 +68,7 @@ class MantisProvider(DAQProvider, core.Spime):
                 ):
         DAQProvider.__init__(self, **kwargs)
         core.Spime.__init__(self, **kwargs)
+        self.alert_routing_key = 'daq_requests'
         self.mantis_queue = mantis_queue
 
     def start_run(self):
@@ -97,6 +98,7 @@ class MantisProvider(DAQProvider, core.Spime):
             logger.warning('got an error from mantis: {}'.format(msg))
         else:
             self._acquisition_count += 1
+            return "acquisition of [{}] requested".format(filepath)
 
     def close_run(self):
         self._acquisition_count = 0
