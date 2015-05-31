@@ -27,9 +27,11 @@ class DAQProvider(core.Provider):
         core.Provider.__init__(self, **kwargs)
         self.daq_name = daq_name
         self._run_name = None
-        self._run_number = None
+        self.run_id = None
         self.directory_path = directory_path
         self.run_table_endpoint = run_table_endpoint
+
+        self._acquisition_count = None
 
     @property
     def run_name(self):
@@ -37,12 +39,22 @@ class DAQProvider(core.Provider):
     @run_name.setter
     def run_name(self, value):
         self._run_name = value
-        # this is where I should get a run_id to go with my run_name
-        self._run_number = 0
+        _conn = core.Connection(self.portal.broker)
+        request = core.RequestMessage(msgop=core.OP_CMD,
+                                      payload={'values':['do_insert'],
+                                               'run_name':value,
+                                              },
+                                     )
+        result = _conn.send_request(self.run_table_endpoint,
+                                    request=request,
+                                    decode=True,
+                                   )
+        self.run_id = result.payload['run_id']
+        self._acquisition_count = 0
 
     def close_run(self):
         self._run_name = None
-        self._run_number = None
+        self.run_id = None
 
 
 __all__.append('MantisProvider')
@@ -57,7 +69,6 @@ class MantisProvider(DAQProvider, core.Spime):
         DAQProvider.__init__(self, **kwargs)
         core.Spime.__init__(self, **kwargs)
         self.mantis_queue = mantis_queue
-        self._acquisition_count = 0
 
     def start_run(self):
         pass
@@ -66,11 +77,11 @@ class MantisProvider(DAQProvider, core.Spime):
         '''
         Setting an on_get so that the logging functionality can be used to queue multiple acquisitions.
         '''
-        if self._run_number is None:
+        if self.run_id is None:
             raise core.DriplineInternalError('run number is None, must request a run_id assignment prior to starting acquisition')
         _conn = core.Connection(self.portal.broker)
         filepath = '{}/{:09d}_{:09d}.egg'.format(self.directory_path,
-                                         self._run_number,
+                                         self.run_id,
                                          self._acquisition_count)
         request = core.RequestMessage(payload={'values':[], 'file':filepath},
                                       msgop=core.OP_RUN,
