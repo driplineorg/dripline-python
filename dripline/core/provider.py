@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from .endpoint import Endpoint
+from .spime import Spime
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,6 +30,8 @@ class Provider(Endpoint):
 
     @property
     def logging_status(self):
+        if isinstance(self, Spime):
+            return Spime.logging_status.fget(self)
         logger.info('getting logging status for endpoints of: {}'.format(self.name))
         results = []
         for (name,endpoint) in self._endpoints.items():
@@ -38,6 +41,9 @@ class Provider(Endpoint):
         return results
     @logging_status.setter
     def logging_status(self, value):
+        if isinstance(self, Spime):
+            Spime.logging_status.fset(self, value)
+            return
         logger.info('setting logging status for endpoints of: {}'.format(self.name))
         results = []
         for (name,endpoint) in self._endpoints.items():
