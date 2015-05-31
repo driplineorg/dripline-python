@@ -169,10 +169,8 @@ class Endpoint(object):
             result = err.message
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
-        logger.debug('reply2')
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
-        logger.debug('lock released')
 
     def on_config(self, attribute, value=None):
         '''
