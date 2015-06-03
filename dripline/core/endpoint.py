@@ -146,19 +146,18 @@ class Endpoint(object):
                 method_name = 'on_' + const_name.split('_')[-1].lower()
         endpoint_method = getattr(self, method_name)
         logger.debug('method is: {}'.format(endpoint_method))
-        if endpoint_method is None:
-            raise TypeError
 
         result = None
         retcode = None
         try:
             these_args = msg.payload['values']
             these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
-            #value = msg.payload['values']
             logger.debug('args are:\n{}'.format(these_args))
             result = endpoint_method(*these_args, **these_kwargs)
             if result is None:
                 result = "operation returned None"
+        except NotImplementedError as err:
+            logger.warning('method {} is not implemented'.format(method_name))
         except exceptions.DriplineException as err:
             logger.debug('got a dripine exception')
             retcode = err.retcode

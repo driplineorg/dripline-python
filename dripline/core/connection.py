@@ -136,10 +136,11 @@ class Connection(object):
             else:
                 raise
         if not pr:
-            logger.warning('pr is: {}'.format(pr))
+            #logger.warning('pr is: {}'.format(pr))
             self._response = ReplyMessage(retcode=102, payload={'ret_msg':'key <{}> not matched'.format(target)}).to_msgpack()
-            logger.warning('return code is hard coded, should not be')
+            #logger.warning('return code is hard coded, should not be')
             self._response_encoding = 'application/msgpack'
+            raise exceptions.DriplineAMQPRoutingKeyError('key <{}> not matched'.format(target))
         
         # consume until response
         self.chan.start_consuming()
