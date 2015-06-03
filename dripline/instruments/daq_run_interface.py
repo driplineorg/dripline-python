@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 
 # standard imports
+import logging
 import threading
 
 # internal imports
@@ -11,6 +12,7 @@ from .. import core
 
 __all__ = []
 
+logger = logging.getLogger(__name__)
 
 __all__.append('DAQProvider')
 class DAQProvider(core.Provider):
@@ -25,12 +27,13 @@ class DAQProvider(core.Provider):
         '''
         '''
         core.Provider.__init__(self, **kwargs)
+
+        self.stop_thread = threading.Timer(0, self.end_run, ())
         self.daq_name = daq_name
         self._run_name = None
         self.run_id = None
         self.directory_path = directory_path
         self.run_table_endpoint = run_table_endpoint
-
         self._acquisition_count = None
 
     @property
@@ -38,7 +41,6 @@ class DAQProvider(core.Provider):
         return self._run_name
     @run_name.setter
     def run_name(self, value):
-        self._run_name = value
         _conn = core.Connection(self.portal.broker)
         request = core.RequestMessage(msgop=core.OP_CMD,
                                       payload={'values':['do_insert'],
@@ -50,11 +52,31 @@ class DAQProvider(core.Provider):
                                     decode=True,
                                    )
         self.run_id = result.payload['run_id']
+        self._run_name = value
         self._acquisition_count = 0
 
-    def close_run(self):
+    def end_run(self):
+        run_was = self.run_id
+        if self.stop_thread.is_alive():
+            self.stop_thread.cancel()
         self._run_name = None
         self.run_id = None
+        logger.info('run <{}> ended'.format(run_was))
+    
+    def start_run(self, run_name):
+        '''
+        '''
+        self.run_name = run_name
+    
+    def start_timed_run(self, run_name, run_time):
+        '''
+        '''
+        self.stop_thread = threading.Timer(float(run_time), # log interval [seconds]
+                                           self.end_run, # function to call
+                                           (), # args tuple
+                                          )
+        self.start_run(run_name)
+        self.stop_thread.start()
 
 
 __all__.append('MantisProvider')
@@ -71,8 +93,9 @@ class MantisProvider(DAQProvider, core.Spime):
         self.alert_routing_key = 'daq_requests'
         self.mantis_queue = mantis_queue
 
-    def start_run(self):
-        pass
+    def start_run(self, run_name):
+        super(MantisProvider, self).start_run(run_name)
+        self.logging_status = 'on'
 
     def on_get(self):
         '''
@@ -100,6 +123,9 @@ class MantisProvider(DAQProvider, core.Spime):
             self._acquisition_count += 1
             return "acquisition of [{}] requested".format(filepath)
 
-    def close_run(self):
+    def end_run(self):
+        self._loop_process.cancel()
+        if self.logging_status == 'started':
+            self.logging_status = 'off'
+        super(MantisProvider, self).end_run()
         self._acquisition_count = 0
-        super(DAQProvider, self).close_run()
