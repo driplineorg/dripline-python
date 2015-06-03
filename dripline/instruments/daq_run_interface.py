@@ -9,6 +9,7 @@ import threading
 
 # internal imports
 from .. import core
+from .ethernet_scpi import EthernetSCPI
 
 __all__ = []
 
@@ -79,8 +80,8 @@ class DAQProvider(core.Provider):
         self.stop_thread.start()
 
 
-__all__.append('MantisProvider')
-class MantisProvider(DAQProvider, core.Spime):
+__all__.append('MantisAcquisitionInterface')
+class MantisAcquisitionInterface(DAQProvider, core.Spime):
     '''
     A DAQProvider for interacting with Mantis DAQ
     '''
@@ -129,3 +130,19 @@ class MantisProvider(DAQProvider, core.Spime):
             self.logging_status = 'off'
         super(MantisProvider, self).end_run()
         self._acquisition_count = 0
+
+
+__all__.append('RSAAcquisitionInterface')
+class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
+    '''
+    A DAQProvider for interacting with the RSA
+    '''
+
+    def start_run(self, run_name):
+        super(MantisProvider, self).start_run(run_name)
+        # something to setup fast_save
+        # something to start FastSave 
+
+    def end_run(self):
+        # something to stop FastSave
+        super(MantisProvider, self).end_run()
