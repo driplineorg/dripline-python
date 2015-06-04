@@ -4,4 +4,4 @@ providers:
   - name: peach
     module: RepeaterProvider
     repeat_target: peaches
-    broker: localhost
+    broker: myrna.p8
