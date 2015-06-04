@@ -21,7 +21,7 @@ __all__ = ['Spime',
 logger = logging.getLogger(__name__)
 
 
-def _log_on_set(self, fun):
+def _log_on_set_decoration(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         try:
@@ -61,8 +61,22 @@ class Spime(Endpoint, DataLogger):
         # Endpoint stuff
         Endpoint.__init__(self, **kwargs)
 
+        self._log_on_set = log_on_set
         if log_on_set:
-            self.on_set = _log_on_set(self, self.on_set)
+            self.on_set = _log_on_set_decoration(self, self.on_set)
+    @property
+    def log_on_set(self):
+        return self._log_on_set
+    @log_on_set.setter
+    def log_on_set(self, value):
+        if bool(value) != bool(self._log_on_set):
+            return
+        self._log_on_set = bool(value)
+        if log_on_set:
+            self.on_set = _log_on_set_decoration(self, super(Spime, self))
+        else:
+            self.on_set = super(Spime, self).on_set
+        
 
     @staticmethod
     def report_log(value, severity):

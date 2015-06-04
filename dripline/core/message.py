@@ -9,6 +9,9 @@ from __future__ import absolute_import
 from abc import ABCMeta
 from datetime import datetime
 import json
+import os
+import pwd
+import socket
 
 # 3rd party libs
 import msgpack
@@ -47,11 +50,15 @@ class Message(dict, object):
         self.retcode = retcode
         if sender_info is None:
             this_exe = inspect.stack()[-1][1]
+            this_host = socket.gethostname()
+            this_username = pwd.getpwuid(os.getuid())[0]
             self.sender_info = {'package': 'dripline',
-                    'exe': this_exe,
-                    'version': __version__,
-                    'commit': __commit__,
-                   }
+                                'exe': this_exe,
+                                'version': __version__,
+                                'commit': __commit__,
+                                'hostname': this_host,
+                                'username': this_username,
+                               }
         else:
             self.sender_info = sender_info
 

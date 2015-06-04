@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from .agilent34461a import *
 from .dsp_lockin_7265 import *
 from .daq_db_interface import *
+from .daq_run_interface import *
 from .kv_store import *
 from .prologix import *
 from .random_sensor import *

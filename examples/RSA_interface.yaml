@@ -1,0 +1,13 @@
+nodename: rsa_service
+broker: localhost
+providers:
+  - name: rsa_interface
+    module: RSAAcquisitionInterface
+    # ethernet SCPI params
+    socket_info: ("rsa5100b.p8", 4000)
+    command_terminator: "\n"
+    response_terminator: "\n"
+    # RSA DAQ Interface params
+    daq_name: 'RSA5106B'
+    run_table_endpoint: run_table
+    directory_path: "C:\\tmp_ben_testing"

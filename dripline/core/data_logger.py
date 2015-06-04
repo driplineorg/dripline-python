@@ -20,7 +20,13 @@ logger = logging.getLogger(__name__)
 class DataLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, log_interval=0., max_interval=0, max_fractional_change=0, **kwargs):
+    def __init__(self,
+                 log_interval=0.,
+                 max_interval=0,
+                 max_fractional_change=0,
+                 alert_routing_key='sensor_value',
+                 **kwargs):
+        self.alert_routing_key=alert_routing_key
         self._data_logger_lock = threading.Lock()
         self._log_interval = log_interval
         self._max_interval = max_interval
@@ -68,7 +74,11 @@ class DataLogger(object):
         self._max_fractional_change = value
 
     def _conditionally_send(self, to_send):
-        this_value = float(to_send['values']['value_raw'])
+        this_value = None
+        try:
+            this_value = float(to_send['values']['value_raw'])
+        except TypeError:
+            pass
         if self._last_log_value is None:
             logger.debug("log b/c no last log")
         elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
@@ -78,7 +88,7 @@ class DataLogger(object):
         else:
             logger.debug('no log condition met, not logging')
             return
-        self.store_value(to_send, severity='sensor_value')
+        self.store_value(to_send, severity=self.alert_routing_key)
         self._last_log_time = datetime.datetime.utcnow()
         self._last_log_value = this_value
 

@@ -6,6 +6,7 @@ A connection to the AMQP broker
 from __future__ import absolute_import
 
 # standard libs
+import multiprocessing
 import threading
 import traceback
 import uuid
@@ -15,6 +16,7 @@ import pika
 
 # internal libs
 from .message import Message, AlertMessage, ReplyMessage
+from ..core import exceptions
 
 __all__ = ['Connection']
 
@@ -87,7 +89,21 @@ class Connection(object):
             raise
         logger.critical("end of consume")
 
-    def send_request(self, target, request, decode=False):
+    def send_request(self, target, request, decode=False, timeout=10):
+        '''
+        '''
+        result_queue = multiprocessing.Queue()
+        process = multiprocessing.Process(target=self._send_request, kwargs={'result_queue':result_queue, 'target':target, 'request':request, 'decode':decode})
+        process.start()
+        process.join(timeout)
+        if process.is_alive():
+            process.terminate()
+            raise exceptions.DriplineTimeoutError("sending request timed out")
+        else:
+            result = result_queue.get()
+        return result
+        
+    def _send_request(self, result_queue, target, request, decode=False):
         '''
         send a request to a specific consumer.
         '''
@@ -120,10 +136,11 @@ class Connection(object):
             else:
                 raise
         if not pr:
-            logger.warning('pr is: {}'.format(pr))
+            #logger.warning('pr is: {}'.format(pr))
             self._response = ReplyMessage(retcode=102, payload={'ret_msg':'key <{}> not matched'.format(target)}).to_msgpack()
-            logger.warning('return code is hard coded, should not be')
+            #logger.warning('return code is hard coded, should not be')
             self._response_encoding = 'application/msgpack'
+            raise exceptions.DriplineAMQPRoutingKeyError('key <{}> not matched'.format(target))
         
         # consume until response
         self.chan.start_consuming()
@@ -142,6 +159,7 @@ class Connection(object):
         if to_return is None:
             logger.warning('to return is None')
         self._make_request_lock.release()
+        result_queue.put(to_return)
         return to_return
 
     def send_alert(self, alert, severity):

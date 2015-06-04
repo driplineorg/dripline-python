@@ -12,7 +12,7 @@ from .connection import *
 from .constants import *
 from .data_logger import *
 from .endpoint import *
-from .exception import *
+from .exceptions import *
 from .message import *
 from .portal import *
 from .provider import *

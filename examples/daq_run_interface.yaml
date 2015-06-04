@@ -1,0 +1,10 @@
+nodename: mantis_service
+broker: localhost
+providers:
+  - name: mantis_interface
+    module: MantisAcquisitionInterface
+    daq_name: 'PXIe'
+    run_table_endpoint: run_table
+    directory_path: /Users/laroque
+    log_interval: 5
+    mantis_queue: mantis
