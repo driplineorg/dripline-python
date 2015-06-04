@@ -95,7 +95,7 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         self.mantis_queue = mantis_queue
 
     def start_run(self, run_name):
-        super(MantisProvider, self).start_run(run_name)
+        super(MantisAcquisitionInterface, self).start_run(run_name)
         self.logging_status = 'on'
 
     def on_get(self):
@@ -128,7 +128,7 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         self._loop_process.cancel()
         if self.logging_status == 'started':
             self.logging_status = 'off'
-        super(MantisProvider, self).end_run()
+        super(MantisAcquisitionInterface, self).end_run()
         self._acquisition_count = 0
 
 
@@ -137,12 +137,28 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
     '''
     A DAQProvider for interacting with the RSA
     '''
+    def __init__(self, **kwargs):
+        DAQProvider.__init__(self, **kwargs)
+        EthernetSCPI.__init__(self, **kwargs)
 
     def start_run(self, run_name):
-        super(MantisProvider, self).start_run(run_name)
-        # something to setup fast_save
-        # something to start FastSave 
+        super(RSAAcquisitionInterface, self).start_run(run_name)
+        # ensure the output format is set to mat
+        self.send(["SENS:ACQ:FSAV:FORM MAT;*OPC?"])
+        # build strings for output directory and file prefix, then set those
+        file_directory = "\\".join([self.directory_path, '{:09d}'.format(self.run_id)])
+        file_base = "rid{:09d}".format(self.run_id)
+        self.send(['SENS:ACQ:FSAV:LOC "{}"'.format(file_directory),
+                   'SENS:ACQ:FSAV:NAME:BASE "{}"'.format(file_base),
+                   "*OPC?"
+                  ]
+                 )
+        # ensure in triggered mode
+        self.send(['TRIG:SEQ:STAT 1;*OPC?'])
+        # actually start to FastSave
+        self.send(['SENS:ACQ:FSAV:ENAB 1;*OPC?'])
 
     def end_run(self):
         # something to stop FastSave
-        super(MantisProvider, self).end_run()
+        self.send(['SENS:ACQ:FSAV:ENAB 0'])
+        super(RSAAcquisitionInterface, self).end_run()
