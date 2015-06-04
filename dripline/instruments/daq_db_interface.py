@@ -18,7 +18,7 @@ except ImportError:
 
 # local imports
 from ..core import Provider, Endpoint
-from ..core.exception import *
+from ..core.exceptions import *
 
 import logging
 logger = logging.getLogger(__name__)
