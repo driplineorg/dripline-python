@@ -71,7 +71,8 @@ class InsertDBEndpoint(Endpoint):
     '''
     A class for making calls to _insert_with_return
     '''
-    def __init__(self, table_name, required_insert_names, return_col_names,
+    def __init__(self, table_name, required_insert_names,
+                 return_col_names=[],
                  optional_insert_names=[],
                  default_insert_values={},
                  *args,
