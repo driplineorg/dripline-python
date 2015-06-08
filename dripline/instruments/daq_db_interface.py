@@ -54,7 +54,8 @@ class RunDBInterface(Provider):
     def _insert_with_return(self, table_name, insert_kv_dict, return_col_names_list):
         try:
             ins = self.tables[table_name].insert().values(**insert_kv_dict)
-            ins = ins.returning(*[self.tables[table_name].c[col_name] for col_name in return_col_names_list])
+            if return_col_names_list:
+                ins = ins.returning(*[self.tables[table_name].c[col_name] for col_name in return_col_names_list])
             insert_result = ins.execute()
             return_values = insert_result.first()
         except Exception as err:
