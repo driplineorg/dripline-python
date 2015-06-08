@@ -57,7 +57,10 @@ class RunDBInterface(Provider):
             if return_col_names_list:
                 ins = ins.returning(*[self.tables[table_name].c[col_name] for col_name in return_col_names_list])
             insert_result = ins.execute()
-            return_values = insert_result.first()
+            if return_col_names_list:
+                return_values = insert_result.first()
+            else:
+                return_values = []
         except Exception as err:
             if err.message.startswith('(psycopg2.IntegrityError)'):
                 raise DriplineDatabaseError(err.message)
