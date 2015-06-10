@@ -26,7 +26,6 @@ class AlertConsumer:
         logger.debug('AlertConsumer initializing')
         self.table = None
         self.dripline_connection = Connection(broker_host=broker_host)
-        self.dripline_connection._setup_amqp()
         self.queue = self.dripline_connection.chan.queue_declare(queue=__name__+'-'+uuid.uuid1().hex[:12],
               exclusive=True,
               auto_delete=True,
