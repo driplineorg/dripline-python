@@ -17,8 +17,8 @@ except ImportError:
 ####### the above import really does go here, there should probably be some plugin infrastructure or something to deal with this as an optional feature, for now I'll import elsewhere
 
 # local imports
-from ..core import Provider, Endpoint
-from ..core.exception import *
+from ..core import Provider, Endpoint, fancy_init_doc
+from ..core.exceptions import *
 
 import logging
 logger = logging.getLogger(__name__)
@@ -34,6 +34,13 @@ class RunDBInterface(Provider):
     
     def __init__(self, user, password, database_name, database_server, tables, *args, **kwargs):
         '''
+        ~Params
+            user (str): user name for connecting to database
+            password (str): password for connecting to database
+            database_name (str): name of the database to connect to
+            database_server (str): network resolvable hostname of database server
+            tables (list): list of names (str) of tables in the database
+        ~Params
         '''
         if isinstance(tables, types.StringType):
             tables = [tables]
@@ -77,6 +84,13 @@ class InsertDBEndpoint(Endpoint):
                  *args,
                 **kwargs):
         '''
+        ~Params
+            table_name (str): name of the table to insert to
+            required_insert_names (list): list of names (str) of the table columns which must be included on every requested insert
+            return_col_names (list): list of names (str) of columns whose values should be returned on completion of the insert
+            optional_insert_names (list): list of names (str) of columns which the user may specify on an insert request, but which may be omitted
+            default_insert_values (dict): dictionary of {column_names: values} to serve as defaults when inserting, any values provided explicitly on the insert request will override these values
+        ~Params
         '''
         Endpoint.__init__(self, *args, **kwargs)
 

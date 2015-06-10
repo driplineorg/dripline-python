@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractproperty, abstractmethod
 
 import functools
+import inspect
 import math
 import threading
 import time
@@ -10,6 +11,7 @@ import traceback
 import types
 
 import pika
+import yaml
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
@@ -119,7 +121,7 @@ def fancy_init_doc(cls):
     if this_doc is None:
         this_doc = ''
     if len(this_doc.split("~Params")) != 3:
-        this_doc = this_doc + '\nalso\n' + param_block
+        this_doc = this_doc + '\n\n' + param_block
     else:
         doc_list = this_doc.split('~Params')
         this_doc = (doc_list[0] +
@@ -142,6 +144,14 @@ def _get_on_set(self, fun):
 class Endpoint(object):
 
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
+        '''
+        ~Params
+            name (str): unique identifier across all dripline services
+                        (used to determine routing key)
+            cal_str (str): string use to process raw get result
+            get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
+        ~Params
+        '''
         self.name = name
         self.provider = None
         self.portal = None

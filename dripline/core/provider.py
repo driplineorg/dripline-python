@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .endpoint import Endpoint
+from .endpoint import Endpoint, fancy_init_doc
 from .spime import Spime
 
 import logging
@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 __all__ = ['Provider']
 
+
+@fancy_init_doc
 class Provider(Endpoint):
 
     def __init__(self, **kwargs):
