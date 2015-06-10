@@ -6,6 +6,8 @@
 Welcome to dripline's documentation!
 ====================================
 
+These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
+
 Contents:
 
 .. toctree::
@@ -16,6 +18,12 @@ Contents:
     contribute
     tutorials/tutorials
     cli_tools
+
+.. toctree::
+    :hidden:
+
+    glossary
+    apidocs/modules
 
 Indices and tables
 ==================

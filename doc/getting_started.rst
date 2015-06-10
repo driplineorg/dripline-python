@@ -1,8 +1,9 @@
+===============
 Getting Started
 ===============
 
 Libraries!
-*********
+**********
 There are quite a few dependencies for dripline, some required and many optional (though needed for certain features).
 
 Required
@@ -74,6 +75,7 @@ $ virtualenv path/to/virt_environments/dripline
 $ source path/to/virt_environments/dripline/bin/activate
 $ pip install pika PyYAML msgpack-python sqlalchemy
 $ pip install ipython sphinx sphinx_rtd_theme sphinxcontrib-programoutput colorlog
+
 .. sphinx-argparse is not used for now
 
 

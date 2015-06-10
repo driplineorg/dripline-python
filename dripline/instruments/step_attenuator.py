@@ -1,10 +1,17 @@
 from __future__ import absolute_import  
 ##this makes sure python can use stuff from newer versions of python
 
+# standard library imports
 import logging
-import spidev
+
+# 3rd party imports
+try:
+    import spidev
+except ImportError:
+    pass
 ##here import outside libraries that you will use later
 
+# local imports
 from ..core import Endpoint
 ##if you needed to import anything from dripline (Spime, Provider, ect) import specific things here  
 
