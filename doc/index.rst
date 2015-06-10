@@ -6,6 +6,11 @@
 Welcome to dripline's documentation!
 ====================================
 
+.. toctree::
+    :maxdepth: 2
+    
+    introduction
+
 These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
 
 Contents:
