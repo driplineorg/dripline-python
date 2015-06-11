@@ -6,7 +6,9 @@ A connection to the AMQP broker
 from __future__ import absolute_import
 
 # standard libs
+import json
 import multiprocessing
+import os
 import threading
 import traceback
 import uuid
@@ -32,7 +34,8 @@ class Connection(object):
         if queue_name is None:
             queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])
         self.broker_host = broker_host
-        conn_params = pika.ConnectionParameters(broker_host)
+        credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
+        conn_params = pika.ConnectionParameters(host=broker_host, credentials=credentials)
         self.conn = pika.BlockingConnection(conn_params)
         self.chan = self.conn.channel()
         self.chan.confirm_delivery()
