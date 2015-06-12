@@ -17,6 +17,11 @@ Contents:
     tutorials/tutorials
     cli_tools
 
+.. toctree::
+    :hidden:
+    
+    apidocs/modules
+
 Indices and tables
 ==================
 

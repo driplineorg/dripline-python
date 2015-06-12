@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractproperty, abstractmethod
 
 import functools
+import inspect
 import math
 import threading
 import time
@@ -10,6 +11,7 @@ import traceback
 import types
 
 import pika
+import yaml
 
 from .message import Message, RequestMessage, ReplyMessage
 from .connection import Connection
@@ -19,6 +21,7 @@ from . import constants
 
 __all__ = ['Endpoint',
            'calibrate',
+           'fancy_init_doc',
           ]
 
 import logging
@@ -102,6 +105,32 @@ def calibrate(fun):
         return val_dict
     return wrapper
 
+def fancy_init_doc(cls):
+    params = {}
+    for a_cls in inspect.getmro(cls):
+        if a_cls == object:
+            continue
+        this_doc = a_cls.__init__.__func__.__doc__
+        if this_doc is None:
+            continue
+        if len(this_doc.split('~Params')) != 3:
+            continue
+        params.update(yaml.load(this_doc.split('~Params')[1]))
+    this_doc = cls.__init__.__doc__
+    param_block = '\n'.join([' '*12 + '{}: {}'.format(k,v) for k,v in params.items()])
+    if this_doc is None:
+        this_doc = ''
+    if len(this_doc.split("~Params")) != 3:
+        this_doc = this_doc + '\n\n' + param_block
+    else:
+        doc_list = this_doc.split('~Params')
+        this_doc = (doc_list[0] +
+                    '~Params\n' + param_block + '\n' + ' '*8 + '~Params\n\n' +
+                    doc_list[2].lstrip('\n')
+                   )
+    cls.__init__.__func__.__doc__ = this_doc
+    return cls
+
 
 def _get_on_set(self, fun):
     #@functools.wraps(fun)
@@ -115,6 +144,14 @@ def _get_on_set(self, fun):
 class Endpoint(object):
 
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
+        '''
+        ~Params
+            name (str): unique identifier across all dripline services
+                        (used to determine routing key)
+            cal_str (str): string use to process raw get result
+            get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
+        ~Params
+        '''
         self.name = name
         self.provider = None
         self.portal = None
