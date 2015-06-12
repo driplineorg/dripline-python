@@ -1,0 +1,103 @@
+=======
+Purpose
+=======
+Our software packages generally communicate with one another, and interact with hardware components with messages sent using the AMQP protocol. This wire protocol was developed to standardize the format of those messages.
+
+Version: 1.2.0
+==============
+
+History
+=======
+
+| Version | Date | Release Notes |
+|:--------|:-----|:--------------|
+| 1.2.0   | June 1, 2015 | Added hostname and username to sender_info |
+| 1.1.0   | May, 2015 | Added `sender_info` |
+| 1.0.0   | c 2000 b.c.e. | Thought to originate during the Middle Kingdom of ancient Egypt |
+
+|:--------|:-----|:--------------|
+| 1.2.0   | June 1, 2015 | Added hostname and username to sender_info |
+| 1.1.0   | May, 2015 | Added `sender_info` |
+| 1.0.0   | c 2000 b.c.e. | Thought to originate during the Middle Kingdom of ancient Egypt |
+
+
+Message Standards
+=================
+
+Encoding
+--------
+
+The AMQP message body should be formatted in either [JSON](http://json.org) or [msgpack](http://msgpack.org).  The encoding (`application/json` or `application/msgpack`) should be specified in the `content_encoding` field of the AMQP message.
+
+Structure
+---------
+
+| Field | Type | Required | Values |
+|:------|:-----|:---------|:-------|
+| `msgtype` | integer | All | Reply (2), Request (3), Alert (4), Info (5) |
+| `msgop`   | integer | Requests | Set (0), Get (1), Config (6), Send (7), Run (8), Command (9) |
+| `timestamp` | string | All | Following the [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format |
+| `sender_info.package` | string | All | Software package used to send the message |
+| `sender_info.exe` | string | All | Full path of the executable used to send the message |
+| `sender_info.version` | string | All | Sender package version |
+| `sender_info.commit` | string | All | Git commit of the sender package |
+| `sender_info.hostname` | string | All | Name of the host computer that sends the message |
+| `sender_info.username` | string | All | User responsible for sending the message |
+| `payload` | any | | The content of the message |  
+| `retcode` | integer | Reply | See [table below](#return-codes) |  
+
+Return Codes
+------------
+
+The following table is direct from the current error codes as defined in dripline. I think I'd like to make some changes, but I haven't thought them through very much. Just brainstorming, I'm thinking 0-99 for success and warnings; 100-199 for errors related to AMQP (ex, errors caught from library); 200-299 for hardware related errors (interaction problems, driver exceptions, etc.); 300-399 shouldn't be 'dripline' but 'consumer', the several encoding/decoding related exceptions could probably be combined. I should discuss this with Noah w.r.t. hornet and mantis.
+
+| Code | Description |  
+|:----:|:------------|  
+| 0    | Success     |  
+| 1-99 | Unassigned, non-error warnings|  
+| 100  | Generic AMQP Related Error |  
+| 101  | AMQP Connection Error |  
+| 102  | AMQP Routing Key Error |  
+|103-199| Unallocated AMQP Errors |  
+| 200  | Generic Hardware Related Error |  
+| 201  | Hardware Connection Error |  
+| 202  | Hardware no Response Error |  
+|203-299| Unallocated Hardware Errors|  
+| 300  | Generic Dripline Error |  
+| 301  | No message encoding error |  
+| 302  | Decoding Failed Error |  
+| 303  | Payload related error |  
+| 304  | Value Error |  
+| 305  | Timeout |  
+|306-399| Unallocated Dripline errors|  
+| 400  | Generic Database Error |  
+| >=401 | Unallocated |  
+
+Software Implementations
+========================
+
+Compatibility
+-------------
+
+| Package  | Version | Commit  | Comments |
+|:---------|:--------|:--------|:---------|
+| dripline | 1.4.4   | 4c0fceb | Complies with v1.1.0 |
+| hornet   |         |         | |
+| mantis   | 3.0.0   | b830fed | Complies with v1.1.0 |
+
+Notes
+=====
+
+dripline
+--------
+
+* Constants are defined in [constants.py](https://github.com/project8/dripline/blob/master/python/dripline/core/constants.py).
+
+hornet
+------
+
+mantis
+------
+
+* Missing information in the `sender_info` field: `hostname` and `username`; `exe` does not necessarily contain the absolute path.
+* Constants are defined in [mt_constants.hh](https://github.com/project8/mantis/blob/master/Common/mt_constants.hh).

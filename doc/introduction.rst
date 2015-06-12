@@ -23,3 +23,23 @@ That is, as long as your C++ application on Windows and my python application on
 
 The *official* definition of the wire protocol can be found on the `Project 8 wiki <https://github.com/project8/hardware/wiki/Wire-Protocol>`_ (this page requires authentication to github and membership in the Project 8 organization).
 I will duplicate that information here now, but assume it will immediately be out of date; please request (via email or github issue) an update to this information if you suspect it is stale.
+
+.. literalinclude:: wire_protocol.txt
+
+Dripline Payload Syntax
+=======================
+While the wire protocol allows for the payload field to be of any type, meaningful interactions must constrain this field.
+Here I'll describe the standards expected by dripline for various message types.
+
+Request Messages
+++++++++++++++++
+
+.. todo::
+
+    add request message standard
+
+Reply Messages
+++++++++++++++
+
+Alert Messages
+++++++++++++++
