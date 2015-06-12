@@ -15,6 +15,8 @@ We use a vanilla installation of version 2.8.4 of rabbit from the Debian Linux 7
 By using a centralized message routing service, it becomes easy for services to be run on as many different systems as we like.
 We can also add and remove services from the system without having to disrupt others, etc.
 
+.. _wire-protocol:
+
 Message Wire Protocol
 =====================
 If AMQP defines a protocol for message routing, the Project 8 wire protocol defines a protocol for the content of those messages.
