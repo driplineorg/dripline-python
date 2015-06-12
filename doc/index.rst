@@ -6,19 +6,20 @@
 Welcome to dripline's documentation!
 ====================================
 
-.. toctree::
-    :maxdepth: 2
-    
-    introduction
-
-These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
-
 Contents:
 
 .. toctree::
     :maxdepth: 2
-
+    
+    introduction
     getting_started
+
+These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
+
+
+.. toctree::
+    :maxdepth: 2
+
     spec
     contribute
     tutorials/tutorials

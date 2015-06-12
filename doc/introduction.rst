@@ -34,12 +34,14 @@ Here I'll describe the standards expected by dripline for various message types.
 Request Messages
 ++++++++++++++++
 
-.. todo::
-
-    add request message standard
+.. todo:: add request message standard
 
 Reply Messages
 ++++++++++++++
 
+.. todo:: add reply message standard
+
 Alert Messages
 ++++++++++++++
+
+.. todo:: add alert message standard

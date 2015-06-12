@@ -44,6 +44,8 @@ setup(
     install_requires=['pika>=0.9.8', 'PyYAML', 'msgpack-python'],
     extras_require={
         'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],# sphinx-argparse
+        'database': ['sqlalchemy', 'psycopg2'],
+        'other': ['colorlog', 'ipython', 'ipdb'],
     },
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],
