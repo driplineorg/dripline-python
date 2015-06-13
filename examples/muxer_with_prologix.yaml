@@ -1,0 +1,91 @@
+nodename: lagavulin
+broker: localhost
+providers:
+  - name: lagavulin_provider #muxer_repeater
+    #module: RepeaterProvider
+    #repeat_target: lagavulin_repeater
+    #broker: myrna.p8
+    module: EthernetRepeater
+    socket_info: ("lagavulin.p8", 1234)
+    command_terminator: "\r"
+    response_terminator: ""
+    endpoints:
+      - name: multiplexer
+        module: GPIBInstrument
+        addr: 9
+        endpoints:
+          - name: amp_1_temp
+            module: MuxerGetSpime
+            log_interval: 60
+            cal_str: 'cernox_calibration({}, 87821)'
+            ch_number: 101
+          - name: amp_2_temp
+            module: MuxerGetSpime
+            cal_str: 'pt100_calibration({})'
+            log_interval: 60
+            ch_number: 102
+          - name: coldhead_temp
+            module: MuxerGetSpime
+            cal_str: "pt100_calibration({})"
+            log_interval: 60
+            ch_number: 103
+          - name: bore_pressure
+            module: MuxerGetSpime
+            log_interval: 60
+            cal_str: "10**({}-6.0)"
+            ch_number: 105
+          - name: hall_probe_voltage
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 106
+            cal_str: "(0.9991/0.847)*(1000*math.fabs({})+0.007)"
+          - name: cell_temp
+            module: MuxerGetSpime
+            log_interval: 60
+            cal_str: 'cernox_calibration({}, 87820)'
+            ch_number: 108
+          - name: terminator_temp
+            module: MuxerGetSpime
+            log_interval: 60
+            cal_str: 'pt100_calibration({})'
+            ch_number: 110
+          - name: spare_micro_pirani
+            module: MuxerGetSpime
+            log_interval: 0
+            cal_str: "10**({}-6.0)"
+            ch_number: 115
+          - name: string_pot_resistance
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 301
+            cal_str: "0.036490*{}-152.978934"
+          - name: ion_gauge_1
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 302
+            cal_str: "10**({}-10)"
+          - name: gas_line_upper_right_ptemp
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 304
+            cal_str: 'pt100_calibration({})'
+          - name: gas_line_upper_left_ptemp
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 305
+            cal_str: 'pt100_calibration({})'
+          - name: ion_gauge_2
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 312
+            cal_str: "10**({}-10)"
+          - name: gas_line_lower_right_ptemp
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 314
+            cal_str: 'pt100_calibration({})'
+          - name: gas_line_lower_left_ptemp
+            module: MuxerGetSpime
+            log_interval: 60
+            ch_number: 315
+            cal_str: 'pt100_calibration({})'
