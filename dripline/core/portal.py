@@ -6,6 +6,8 @@ I don't like the way it works and am going to try and make something that is cle
 from __future__ import absolute_import
 
 import datetime
+import json
+import os
 import threading
 import time
 import traceback
@@ -43,7 +45,8 @@ class Portal(object):
         '''
         logger.info('connecting to broker {}'.format(self.broker))
         try:
-            self.conn = pika.BlockingConnection(pika.ConnectionParameters(self.broker))
+            credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
+            self.conn = pika.BlockingConnection(pika.ConnectionParameters(host=self.broker, credentials=credentials))
             self.channel = self.conn.channel()
             self.reply_channel = self.conn.channel()
             self.channel.exchange_declare(exchange='requests', type='topic')
