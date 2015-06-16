@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.programoutput',
+    'sphinx.ext.napoleon',
     #'sphinxarg.ext',
 ]
 
