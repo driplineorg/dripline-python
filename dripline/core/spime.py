@@ -47,6 +47,9 @@ def _log_on_set_decoration(self, fun):
 
 class Spime(Endpoint, DataLogger):
     '''
+    From wikipedia (paraphrased): ``**Spime** is a neologism for a futuristic object, characteristic to the Internet of Things, that can be tracked through space and time throughout its lifetime. A Spime is essentially virtual master objects that can, at various times, have physical incarnations of itself.``
+
+    In the context of Dripline, a Spime is an object with which one interacts (Endpoint) and which is able to regularly report on its own state (DataLogger). Examples include obvious sensor readings such as the coldhead_temperature or bore_pressure and instrument settings such as heater_current or lo_ch1_cw_frequency.
     '''
 
     def __init__(self,

@@ -1,5 +1,11 @@
 '''
-A connection to the AMQP broker
+A connection to the AMQP broker.
+
+This code violates DRY programming with the Portal class. A resolution would be
+very desirable, but is probably best achieved by having a version of this class
+which provides the existing interface of those to, to the AsynchronousConnection
+in pika. Portal could then have an instance of this class to interact with. That
+constitutes a non-trivial reworking of some of this code for future me (or someone).
 '''
 
 
@@ -28,6 +34,11 @@ class Connection(object):
     A simple API to the AMQP system
     '''
     def __init__(self, broker_host='localhost', queue_name=None):
+        '''
+        Keyword Args:
+            broker_host (str): network path for the amqp broker to connect to
+            queue_name (str|None): name of the queue to bind to for receiving replies
+        '''
         self._make_request_lock = threading.Lock()
         if queue_name is None:
             queue_name = "reply_queue-{}".format(uuid.uuid1().hex[:12])

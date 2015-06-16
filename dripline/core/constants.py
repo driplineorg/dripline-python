@@ -1,5 +1,5 @@
 '''
-Constant mappings
+Constant definitions
 '''
 
 # Operation constants.

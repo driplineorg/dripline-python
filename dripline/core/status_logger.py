@@ -1,5 +1,7 @@
 '''
-Log (application status, not sensor logs) master configuration
+Log (application status messages from python's logging, not sensor value logs) master configuration
+
+Similar to arg_parse, this is a utility primarily for scripts/applications so that they can configure themselves to print using the same format etc... could potentially be incorporated into that module.
 '''
 
 from __future__ import print_function, absolute_import

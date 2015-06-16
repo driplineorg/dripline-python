@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class DataLogger(object):
     '''
+    Base class for objects which need to call their own methods periodically.
     '''
     __metaclass__ = abc.ABCMeta
 
@@ -30,8 +31,6 @@ class DataLogger(object):
                  alert_routing_key='sensor_value',
                  **kwargs):
         '''
-        Base class for objects which need to call their own methods periodically.
-
         Keyword Args:
             log_interval (float): minimum time in seconds between sequential log events (note that this may or may not produce an actual log broadcast)
             max_interval (float): If > 0, any log event exceding this number of seconds since the last broadcast will trigger a broadcast.
