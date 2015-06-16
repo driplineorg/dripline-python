@@ -37,10 +37,12 @@ __all__ = ['ReplyMessage',
 
 
 class Message(dict, object):
-    '''
-    Base class enforcing the Project 8 wire protocol and responsible for encoding and decoding.
+    '''Base message/wire protocol class
+
+    Base class for enforcing the Project 8 wire protocol and responsible for encoding and decoding.
 
     Any actual instance should be a subclass of this class.
+
     '''
 
     def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None, sender_info=None):
@@ -51,7 +53,6 @@ class Message(dict, object):
             payload (any): actual message content, usually a dict
             retcode (int): only meaningful in Reply messages, indicates return value and/or error code (see constants)
             sender_info (dict): several fields providing information about the system which originally generated a message.
-        ~Params
         '''
         if msgop is not None:
             self.msgop = msgop

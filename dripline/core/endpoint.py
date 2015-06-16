@@ -106,6 +106,11 @@ def calibrate(fun):
     return wrapper
 
 def fancy_init_doc(cls):
+    '''
+    note that this was a hack and I'm pulling it back out
+
+    The idea isn't bad, but it doesn't work well with Google's style doc strings, which sphinx renders well
+    '''
     params = {}
     for a_cls in inspect.getmro(cls):
         if a_cls == object:
@@ -145,12 +150,11 @@ class Endpoint(object):
 
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
         '''
-        ~Params
-            name (str): unique identifier across all dripline services
-                        (used to determine routing key)
+        Keyword Args:
+            name (str): unique identifier across all dripline services (used to determine routing key)
             cal_str (str): string use to process raw get result
             get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
-        ~Params
+
         '''
         self.name = name
         self.provider = None
@@ -171,8 +175,6 @@ class Endpoint(object):
             self.on_set = _get_on_set(self, self.on_set)
 
     def handle_request(self, channel, method, properties, request):
-        '''
-        '''
         logger.debug('handling requst:{}'.format(request))
         msg = Message.from_msgpack(request)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
@@ -224,8 +226,6 @@ class Endpoint(object):
         return result
 
     def on_cmd(self, *args, **kwargs):  
-        '''
-        '''
         logger.debug('args are: {}'.format(args))
         logger.debug('kwargs are: {}'.format(kwargs))
         try:
