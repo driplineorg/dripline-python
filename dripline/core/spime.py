@@ -8,7 +8,7 @@ import math
 import functools
 import types
 
-from .endpoint import Endpoint, calibrate, fancy_init_doc
+from .endpoint import Endpoint, calibrate
 from .data_logger import DataLogger
 
 __all__ = ['Spime',
@@ -45,19 +45,20 @@ def _log_on_set_decoration(self, fun):
     return wrapper
 
 
-@fancy_init_doc
 class Spime(Endpoint, DataLogger):
     '''
     '''
 
-    def __init__(self, 
+    def __init__(self,
                  log_on_set=False,
                  **kwargs
                 ):
         '''
-        ~Params
+        Keyword Args:
             log_on_set (bool): flag to enable logging the new value whenever a new one is set
-        ~Params
+
+        See :class:`Endpoint <dripline.core.endpoint.Endpoint>` and :class:`DataLogger <dripline.core.data_logger.DataLogger>` for additional parameters
+
         '''
         # DataLogger stuff
         DataLogger.__init__(self, **kwargs)
@@ -88,20 +89,18 @@ class Spime(Endpoint, DataLogger):
         logger.info("Should be logging (value,severity): ({},{})".format(value, severity))
 
 
-@fancy_init_doc
 class SimpleSCPISpime(Spime):
-    '''
-    '''
 
     def __init__(self,
                  base_str,
                  **kwargs):
         '''
-        ~Params
+        Keyword ARgs:
             base_str (str): string used to generate SCPI commands
                             get will be of the form "base_str?"
                             set will be of the form "base_str <value>;*OPC?"
-        ~Params
+
+
         '''
         self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
@@ -116,7 +115,6 @@ class SimpleSCPISpime(Spime):
         return self.provider.send(self.cmd_base + ' {};*OPC?'.format(value))
 
 
-@fancy_init_doc
 class SimpleSCPIGetSpime(SimpleSCPISpime):
     '''
     Identical to SimpleSCPISpime, but with an explicit exception if on_set is attempted
@@ -130,7 +128,6 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
         raise NotImplementedError('setting not available for {}'.format(self.name))
 
 
-@fancy_init_doc
 class SimpleSCPISetSpime(SimpleSCPISpime):
     '''
     Identical to SimpleSCPISpime, but with an explicit exception if on_get is attempted
@@ -143,16 +140,15 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     def on_get():
         raise NotImplementedError('getting not available for {}'.format(self.name))
 
-@fancy_init_doc
+
 class FormatSCPISpime(Spime):
-    '''
-    '''
     def __init__(self, get_str=None, set_str=None, **kwargs):
         '''
-        ~Params
+        Keyword Args:
             get_str (str): if not None, sent verbatim in the event of on_get
             set_str (str): if not None, sent as set_str.format(value) in the event of on_set
-        ~Params
+        
+
         '''
         Spime.__init__(self, **kwargs)
         self._get_str = get_str
