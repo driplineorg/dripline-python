@@ -1,12 +1,15 @@
 '''
-Meta and derived classes for dripline messages
+Base and derived classes for implementing the Project 8 wire protocol.
+
+The Message class should implement the protocol generally, and the types of emssage represent types of messages that dripline expects to send, possibly with extra restrictions.
+
+These classes are responsible both for enforcing compliance with the protocol, and with encoding and decoding support formats for AMQP payloads (currently json and yaml).
 '''
 
 
 from __future__ import absolute_import
 
 # standard libs
-from abc import ABCMeta
 from datetime import datetime
 import json
 import os
@@ -35,11 +38,21 @@ __all__ = ['ReplyMessage',
 
 class Message(dict, object):
     '''
-    metaclass for dripline messages
+    Base class enforcing the Project 8 wire protocol and responsible for encoding and decoding.
+
+    Any actual instance should be a subclass of this class.
     '''
-    __metaclass__ = ABCMeta
 
     def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None, sender_info=None):
+        '''
+        ~Params
+            msgop (int): only meaningful for Request messages, indicates the operation being requested
+            timestamp (str): string representation of datetime object, reflecting the creation time of this message. Note that if the default value of None is provided, the current time will be used.
+            payload (any): actual message content, usually a dict
+            retcode (int): only meaningful in Reply messages, indicates return value and/or error code (see constants)
+            sender_info (dict): several fields providing information about the system which originally generated a message.
+        ~Params
+        '''
         if msgop is not None:
             self.msgop = msgop
         if timestamp is None:
