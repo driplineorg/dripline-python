@@ -17,7 +17,7 @@ except ImportError:
 ####### the above import really does go here, there should probably be some plugin infrastructure or something to deal with this as an optional feature, for now I'll import elsewhere
 
 # local imports
-from ..core import Provider, Endpoint, fancy_init_doc
+from ..core import Provider, Endpoint#, fancy_init_doc
 from ..core.exceptions import *
 
 import logging
