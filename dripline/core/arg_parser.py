@@ -32,6 +32,26 @@ class TwitterHandler(logging.Handler):
             self.handleError(record)
 
 
+class SlackHandler(logging.Handler):
+    '''
+    A custom handler for sending messages to slack
+    '''
+    def __init__(self, *args, **kwargs):
+        logging.Handler.__init__(self, *args, **kwargs)
+        try:
+            import slackclient
+            import json
+            token = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']['token']
+            self.slackclient = slackclient.SlackClient(token)
+        except ImportError as err:
+            if 'slackclient' in err.message:
+                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
+            raise
+
+    def emit(self, record):
+        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record, username='driplineBot')
+
+
 class DotAccess(object):
     def __init__(self, adict):
         self.__dict__.update(adict)
