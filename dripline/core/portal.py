@@ -47,6 +47,7 @@ class Portal(object):
             self.channel = self.conn.channel()
             self.reply_channel = self.conn.channel()
             self.channel.exchange_declare(exchange='requests', type='topic')
+            self.channel.exchange_declare(exchange='alerts', type='topic')
             self.channel.confirm_delivery()
             queue_name = 'requests-{}'.format(self.name)
             self.queue = self.channel.queue_declare(queue=queue_name,
