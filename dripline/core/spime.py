@@ -8,7 +8,7 @@ import math
 import functools
 import types
 
-from .endpoint import Endpoint, calibrate, fancy_init_doc
+from .endpoint import Endpoint, calibrate#, fancy_init_doc
 from .data_logger import DataLogger
 
 __all__ = ['Spime',
@@ -45,7 +45,7 @@ def _log_on_set_decoration(self, fun):
     return wrapper
 
 
-@fancy_init_doc
+#@fancy_init_doc
 class Spime(Endpoint, DataLogger):
     '''
     '''
@@ -88,7 +88,7 @@ class Spime(Endpoint, DataLogger):
         logger.info("Should be logging (value,severity): ({},{})".format(value, severity))
 
 
-@fancy_init_doc
+#@fancy_init_doc
 class SimpleSCPISpime(Spime):
     '''
     '''
@@ -116,7 +116,7 @@ class SimpleSCPISpime(Spime):
         return self.provider.send(self.cmd_base + ' {};*OPC?'.format(value))
 
 
-@fancy_init_doc
+#@fancy_init_doc
 class SimpleSCPIGetSpime(SimpleSCPISpime):
     '''
     Identical to SimpleSCPISpime, but with an explicit exception if on_set is attempted
@@ -130,7 +130,7 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
         raise NotImplementedError('setting not available for {}'.format(self.name))
 
 
-@fancy_init_doc
+#@fancy_init_doc
 class SimpleSCPISetSpime(SimpleSCPISpime):
     '''
     Identical to SimpleSCPISpime, but with an explicit exception if on_get is attempted
@@ -143,7 +143,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     def on_get():
         raise NotImplementedError('getting not available for {}'.format(self.name))
 
-@fancy_init_doc
+#@fancy_init_doc
 class FormatSCPISpime(Spime):
     '''
     '''

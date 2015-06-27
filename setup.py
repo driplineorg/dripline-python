@@ -8,7 +8,7 @@ verstr = "none"
 try:
     #verstr = open("VERSION").read().strip().replace(' ', '.')
     import subprocess
-    verstr = subprocess.check_output(['git','describe','--long']).strip()
+    verstr = subprocess.check_output(['git','describe','--long']).decode('utf-8').strip()
 except EnvironmentError:
     pass
 except:
