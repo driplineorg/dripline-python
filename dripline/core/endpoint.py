@@ -132,6 +132,7 @@ def calibrate(fun):
 #    return cls
 
 
+
 def _get_on_set(self, fun):
     #@functools.wraps(fun)
     def wrapper(*args, **kwargs):
@@ -145,12 +146,11 @@ class Endpoint(object):
 
     def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
         '''
-        ~Params
-            name (str): unique identifier across all dripline services
-                        (used to determine routing key)
+        Keyword Args:
+            name (str): unique identifier across all dripline services (used to determine routing key)
             cal_str (str): string use to process raw get result
             get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
-        ~Params
+
         '''
         self.name = name
         self.provider = None
@@ -171,8 +171,6 @@ class Endpoint(object):
             self.on_set = _get_on_set(self, self.on_set)
 
     def handle_request(self, channel, method, properties, request):
-        '''
-        '''
         logger.debug('handling requst:{}'.format(request))
         msg = Message.from_msgpack(request)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
@@ -224,8 +222,6 @@ class Endpoint(object):
         return result
 
     def on_cmd(self, *args, **kwargs):  
-        '''
-        '''
         logger.debug('args are: {}'.format(args))
         logger.debug('kwargs are: {}'.format(kwargs))
         try:

@@ -22,7 +22,14 @@ logger = logging.getLogger(__name__)
 
 
 class AlertConsumer:
-    def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']):
+    def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']): 
+        '''
+        Keyword Args:
+            broker_host (str): network address of the amqp broker to connect to
+            exchange (str): AMQP exchange on the broker to which we will be binding
+            keys (list): list of strings, each string will be a routing key bound to the provided exchange.
+
+        '''
         logger.debug('AlertConsumer initializing')
         self.table = None
         self.dripline_connection = Connection(broker_host=broker_host)

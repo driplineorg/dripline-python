@@ -10,16 +10,26 @@ Contents:
 
 .. toctree::
     :maxdepth: 2
-
+    
+    introduction
     getting_started
-    spec
+
+These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
+
+
+.. toctree::
+    :maxdepth: 2
+
     contribute
     tutorials/tutorials
     cli_tools
 
+.. todolist:: 
+
 .. toctree::
     :hidden:
-    
+
+    glossary
     apidocs/modules
 
 Indices and tables

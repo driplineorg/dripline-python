@@ -1,6 +1,6 @@
 '''
-this is funamentally a clone of node.py
-I don't like the way it works and am going to try and make something that is cleaner
+The portal abstraction is a bit of a mess. Generally speaking it is the crossroad
+between abstractions relating to communicating via AMQP and communicating with hardware.
 '''
 
 from __future__ import absolute_import
@@ -30,6 +30,11 @@ class Portal(object):
     Like a node, but pythonic
     """
     def __init__(self, name, broker):
+        '''
+        Args:
+            name (str): name for the portal instance, represents an AMQP binding key
+            broker (str): as always, the network resolvable path to the AMQP broker
+        '''
         self.name = name
         self.__request_in_lock = threading.Lock()
         self.__alert_out_lock = threading.Lock()
