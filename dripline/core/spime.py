@@ -48,16 +48,21 @@ def _log_on_set_decoration(self, fun):
 #@fancy_init_doc
 class Spime(Endpoint, DataLogger):
     '''
+    From wikipedia (paraphrased): *A spime is a neologism for a futuristic object, characteristic to the Internet of Things, that can be tracked through space and time throughout its lifetime. A Spime is essentially virtual master objects that can, at various times, have physical incarnations of itself.*
+
+    In the context of Dripline, a Spime is an object with which one interacts (Endpoint) and which is able to regularly report on its own state (DataLogger). Examples include obvious sensor readings such as the coldhead_temperature or bore_pressure and instrument settings such as heater_current or lo_ch1_cw_frequency.
     '''
 
-    def __init__(self, 
+    def __init__(self,
                  log_on_set=False,
                  **kwargs
                 ):
         '''
-        ~Params
+        Keyword Args:
             log_on_set (bool): flag to enable logging the new value whenever a new one is set
-        ~Params
+
+        See :class:`Endpoint <dripline.core.endpoint.Endpoint>` and :class:`DataLogger <dripline.core.data_logger.DataLogger>` for additional parameters
+
         '''
         # DataLogger stuff
         DataLogger.__init__(self, **kwargs)
@@ -90,18 +95,17 @@ class Spime(Endpoint, DataLogger):
 
 #@fancy_init_doc
 class SimpleSCPISpime(Spime):
-    '''
-    '''
 
     def __init__(self,
                  base_str,
                  **kwargs):
         '''
-        ~Params
+        Keyword ARgs:
             base_str (str): string used to generate SCPI commands
                             get will be of the form "base_str?"
                             set will be of the form "base_str <value>;*OPC?"
-        ~Params
+
+
         '''
         self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
@@ -145,14 +149,13 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
 #@fancy_init_doc
 class FormatSCPISpime(Spime):
-    '''
-    '''
     def __init__(self, get_str=None, set_str=None, **kwargs):
         '''
-        ~Params
+        Keyword Args:
             get_str (str): if not None, sent verbatim in the event of on_get
             set_str (str): if not None, sent as set_str.format(value) in the event of on_set
-        ~Params
+        
+
         '''
         Spime.__init__(self, **kwargs)
         self._get_str = get_str

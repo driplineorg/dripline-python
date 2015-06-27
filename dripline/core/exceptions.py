@@ -1,5 +1,5 @@
 '''
-Dripline's exception and warning classes
+Dripline's exception and warning classes, including their associated return codes.
 '''
 
 
