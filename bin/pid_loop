@@ -6,10 +6,13 @@ Utility app for doing PID control
 
 from __future__ import print_function
 
-import datetime
-import pika
 import argparse
+import datetime
+import json
+import os
 import uuid
+
+import pika
 
 import dripline
 from dripline.core import Message, DriplineParser, constants
@@ -116,7 +119,9 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
     exchange = 'alerts' # this is always alerts
     keys = ['sensor_value'] # this is always a sensor value
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker))
+    credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker, credentials=credentials))
     channel = connection.channel()
     
     result = channel.queue_declare(queue='PID-'+uuid.uuid1().hex[:12],
