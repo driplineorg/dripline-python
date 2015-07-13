@@ -65,15 +65,11 @@ class AlertConsumer:
             ins = self.table.insert().values(**insert_dict)
             ins.execute()
         except Exception as err:
-            if err.message.startswith("(InternalError)"):
-                if 'no known endpoint with name' in err.message:
-                    logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
-                else:
-                    logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
-                    logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+            if 'no known endpoint with name' in err.message:
+                logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
             else:
+                logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
                 raise
-
 
     def start(self):
         logger.debug("AlertConsmer consume starting")
