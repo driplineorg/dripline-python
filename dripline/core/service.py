@@ -2,6 +2,8 @@
 This file is based upon the example in the pika docs.
 '''
 
+from __future__ import absolute_import
+
 
 import json
 import logging
@@ -10,6 +12,7 @@ import os
 import pika
 
 from .message import Message
+from . import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -280,11 +283,8 @@ class Service(object):
         """
         try:
             decoded = Message.from_encoded(body, properties.content_encoding)
-        except ValueError as err:
-            if err.message.startswith('encoding') and err.message.endswith(' not recognized'):
+        except exceptions.DriplineDecodingError as err:
                 pass
-            else:
-                raise
         logger.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, decoded or body)
         self.acknowledge_message(basic_deliver.delivery_tag)

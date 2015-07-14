@@ -21,6 +21,7 @@ import msgpack
 
 # internal imports
 from . import constants
+from . import exceptions
 from .. import __version__, __commit__
 
 import inspect
@@ -163,7 +164,7 @@ class Message(dict, object):
         elif encoding.endswith('msgpack'):
             return cls.from_msgpack(msg)
         else:
-            raise ValueError('encoding <{}> not recognized'.format(encoding))
+            raise exceptions.DriplineDecodingError('encoding <{}> not recognized'.format(encoding))
 
     def to_msgpack(self):
         temp_dict = self.copy()
