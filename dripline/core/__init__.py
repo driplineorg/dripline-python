@@ -16,4 +16,5 @@ from .exceptions import *
 from .message import *
 from .portal import *
 from .provider import *
+from .service import *
 from .spime import *

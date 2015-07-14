@@ -4,7 +4,6 @@ Do simple stuff like gets and sets.
 """
 from __future__ import absolute_import
 
-import argparse
 import types
 import uuid
 
