@@ -278,7 +278,13 @@ class Service(object):
         :param str|unicode body: The message body
 
         """
-        decoded = Message.from_encoded(body, properties.content_encoding)
+        try:
+            decoded = Message.from_encoded(body, properties.content_encoding)
+        except ValueError as err:
+            if err.message.startswith('encoding') and err.message.endswith(' not recognized'):
+                pass
+            else:
+                raise
         logger.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, decoded or body)
         self.acknowledge_message(basic_deliver.delivery_tag)
