@@ -1,58 +1,32 @@
 #!/usr/bin/python
 
 '''
-Utility app for printing all of the messages through some exchange
+message monitoring port based on service class
 '''
 
-from __future__ import print_function
-
-import argparse
-import json
-import types
-import os
-import uuid
-
-import pika
-
-from dripline.core import Message, DriplineParser
+from __future__ import absolute_import
 
 import logging
-logger = logging.getLogger('message_monitor')
 
-def start_monitoring(broker='localhost', exchange='alerts', keys='#', **kwargs):
-    credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker, credentials=credentials))
-    channel = connection.channel()
-    
-    result = channel.queue_declare(queue='MessageMonitor-'+uuid.uuid1().hex[:12],
-                                   exclusive=True)
-    queue_name = result.method.queue
-    
-    for severity in keys:
-        channel.queue_bind(exchange=exchange,
-                           queue=queue_name,
-                           routing_key=severity,
-                          )
-    
-    print(' [*] Waiting for logs. To exit press CTRL+C')
-    
-    def callback(ch, method, properties, body):
-        message = Message.from_encoded(body, properties.content_encoding)
-        print(" [x] {}:{}".format(method.routing_key, message,))
-    
-    channel.basic_consume(callback,
-                          queue=queue_name,
-                          no_ack=True)
-    
-    channel.start_consuming()
+from dripline.core import DriplineParser, Service
+
+logger = logging.getLogger("monitor_service")
+
+def start_monitoring(**kwargs):
+    example = Service(amqp_url = kwargs['broker'],
+                      exchange = kwargs['exchange'],
+                      keys = kwargs['keys'],
+                     )
+    example.run()
 
 if __name__ == '__main__':
-    parser = DriplineParser(
-                            description='Print messages from an exchange',
+    monitor_doc = '''
+                  a more DRY version of message_monitor
+                  '''
+    parser = DriplineParser(description=monitor_doc,
                             amqp_broker=True,
                             config_file=True,
                             tmux_support=True,
-                            twitter_support=True,
                             extra_logger=logger,
                            )
     parser.add_argument('-e',
@@ -63,14 +37,14 @@ if __name__ == '__main__':
                        )
     parser.add_argument('-k',
                         '--keys',
-                        metavar='key',
+                        metavar='keys',
                         help='amqp binding keys to follow',
                         default='#',
                         nargs='*',
                        )
-    
     kwargs = parser.parse_args()
+    
     try:
         start_monitoring(**vars(kwargs))
     except KeyboardInterrupt:
-        print(' [*] exiting')
+        logger.info('exiting')
