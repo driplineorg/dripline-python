@@ -285,8 +285,12 @@ class Service(object):
             decoded = Message.from_encoded(body, properties.content_encoding)
         except exceptions.DriplineDecodingError as err:
                 pass
-        logger.info('Received message # %s from %s: %s',
-                    basic_deliver.delivery_tag, properties.app_id, decoded or body)
+        logger.log(35, # NOTICE, between INFO and WARNING
+                   'Received message # {} from {}: {}'.format(basic_deliver.delivery_tag,
+                                                              properties.app_id,
+                                                              decoded or body,
+                                                             )
+                  )
         self.acknowledge_message(basic_deliver.delivery_tag)
 
     def acknowledge_message(self, delivery_tag):
