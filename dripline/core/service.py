@@ -49,7 +49,7 @@ class Service(object):
         self._consumer_tag = None
         self._url = amqp_url
         self._exchange = exchange
-        self._keys = keys
+        self.keys = keys
 
     def connect(self):
         """This method connects to RabbitMQ, returning the connection handle.
@@ -214,7 +214,7 @@ class Service(object):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
 
         """
-        for key in self._keys:
+        for key in self.keys:
             logger.info('Binding %s to %s with %s',
                         self._exchange, self.QUEUE, key)
             self._channel.queue_bind(self.on_bindok, self.QUEUE,
