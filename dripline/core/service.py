@@ -8,10 +8,11 @@ from __future__ import absolute_import
 import json
 import logging
 import os
+import uuid
 
 import pika
 
-from .message import Message
+from .message import Message, RequestMessage
 from . import exceptions
 
 logger = logging.getLogger(__name__)
@@ -31,10 +32,8 @@ class Service(object):
     commands that were issued and that should surface in the output as well.
 
     """
-#    EXCHANGE = 'message'
     EXCHANGE_TYPE = 'topic'
     QUEUE = 'text'
-#    ROUTING_KEY = 'example.text'
 
     def __init__(self, amqp_url, exchange, keys):
         """Create a new instance of the consumer class, passing in the AMQP
@@ -47,9 +46,21 @@ class Service(object):
         self._channel = None
         self._closing = False
         self._consumer_tag = None
-        self._url = amqp_url
+        self._broker = amqp_url
         self._exchange = exchange
         self.keys = keys
+
+    def __get_credentials(self):
+        '''
+        read the '~/.project8_authentications.json' file and parse out the amqp credentials
+        '''
+        credentials = {'username':'guest','password':'guest'}
+        try:
+            credentials = json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp']
+        except:
+            logger.warning('unable to read project8 authentications file, trying default')
+            pass
+        return pika.PlainCredentials(**credentials)
 
     def connect(self):
         """This method connects to RabbitMQ, returning the connection handle.
@@ -59,9 +70,8 @@ class Service(object):
         :rtype: pika.SelectConnection
 
         """
-        logger.info('Connecting to %s', self._url)
-        credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
-        return pika.SelectConnection(pika.ConnectionParameters(host='higgsino.physics.ucsb.edu', credentials=credentials),
+        logger.info('Connecting to %s', self._broker)
+        return pika.SelectConnection(pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials()),
                                      self.on_connection_open,
                                      stop_ioloop_on_close=False)
 
@@ -361,3 +371,45 @@ class Service(object):
         """This method closes the connection to RabbitMQ."""
         logger.info('Closing connection')
         self._connection.close()
+
+    def send_request(self, target, request):
+        '''
+        It seems like there should be a way to do this with the existing SelectConnection.
+        The problem is that the message handler needs to send a request and then be called
+        not block the reply from being processed, and needs to get the reply from that processed response.
+        The non-blocking part seems tricky. I'm sure there exists a good solution for this,
+        maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
+        '''
+        if not isinstance(request, RequestMessage):
+            raise TypeError('request must be a RequestMessage')
+        parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
+        connection = pika.BlockingConnection(parameters)
+        channel = connection.channel()
+        result = channel.queue_declare(exclusive=True)
+        channel.queue_bind(exchange='requests',
+                           queue=result.method.queue,
+                           routing_key='#',
+                          )
+        
+        correlation_id = str(uuid.uuid4())
+        self.__ret_val = None
+        def on_response(ch, method, props, body):
+            if correlation_id == props.correlation_id:
+                self.__ret_val = Message.from_encoded(body, props.content_encoding)
+
+        channel.basic_consume(on_response, no_ack=True, queue=result.method.queue)
+
+        properties = pika.BasicProperties(reply_to=result.method.queue,
+                                          content_encoding='application/msgpack',
+                                          correlation_id=correlation_id,
+                                          app_id='dripline.core.Service'
+                                         )
+        channel.basic_publish(exchange='requests',
+                              routing_key=target,
+                              body=request.to_msgpack(),
+                              properties=properties,
+                             )
+        while self.__ret_val is None:
+            connection.process_data_events()
+        connection.close()
+        return self.__ret_val
