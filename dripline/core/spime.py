@@ -38,7 +38,7 @@ def _log_on_set_decoration(self, fun):
         else:
             values.update({'value_raw': args[0]})
         to_log = {'from': self.name,
-                  'value': values,
+                  'values': values,
                  }
         self.report_log(to_log, 'sensor_value')
         return result
