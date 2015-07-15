@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+import multiprocessing
 import os
 import uuid
 
@@ -374,7 +375,7 @@ class Service(object):
         logger.info('Closing connection')
         self._connection.close()
 
-    def send_message(self, target, message, properties=None):
+    def send_message(self, target, message, return_queue=None, properties=None):
         '''
         '''
         if not isinstance(message, Message):
@@ -395,7 +396,7 @@ class Service(object):
         self.__ret_val = None
         def on_response(ch, method, props, body):
             if correlation_id == props.correlation_id:
-                self.__ret_val = Message.from_encoded(body, props.content_encoding)
+                return_queue.put(Message.from_encoded(body, props.content_encoding))
 
         channel.basic_consume(on_response, no_ack=True, queue=result.method.queue)
 
@@ -412,7 +413,7 @@ class Service(object):
                              )
         return connection
 
-    def send_request(self, target, request):
+    def send_request(self, target, request, timeout=5):
         '''
         It seems like there should be a way to do this with the existing SelectConnection.
         The problem is that the message handler needs to send a request and then be called
@@ -422,11 +423,20 @@ class Service(object):
         '''
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
-        connection = self.send_message(target, request)
-        while self.__ret_val is None:
-            connection.process_data_events()
+        result_queue = multiprocessing.Queue()
+        connection = self.send_message(target, request, return_queue=result_queue)
+        self.__ret_val = None
+        def _get_result(result_queue):
+            while result_queue.empty():
+                connection.process_data_events()
+        process = multiprocessing.Process(target=_get_result, kwargs={'result_queue':result_queue})
+        process.start()
+        process.join(timeout)
+        if process.is_alive():
+            process.terminate()
+            raise exceptions.DriplineTimeoutError('request response timed out')
         connection.close()
-        return self.__ret_val
+        return result_queue.get()
 
     def send_alert(self, severity, alert):
         '''
