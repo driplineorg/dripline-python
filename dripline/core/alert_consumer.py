@@ -13,16 +13,16 @@ import uuid
 import pika
 
 # internal imports
-from .connection import Connection
 from .message import Message
+from .service import Service
 
 __all__ = ['AlertConsumer']
 
 logger = logging.getLogger(__name__)
 
 
-class AlertConsumer:
-    def __init__(self, broker_host='localhost', exchange='alerts', keys=['#']): 
+class AlertConsumer(Service):
+    def __init__(self, broker_host='localhost', exchange='alerts', keys=['#'], name=None): 
         '''
         Keyword Args:
             broker_host (str): network address of the amqp broker to connect to
@@ -31,17 +31,10 @@ class AlertConsumer:
 
         '''
         logger.debug('AlertConsumer initializing')
-        self.table = None
-        self.dripline_connection = Connection(broker_host=broker_host)
-        self.queue = self.dripline_connection.chan.queue_declare(queue=__name__+'-'+uuid.uuid1().hex[:12],
-              exclusive=True,
-              auto_delete=True,
-             )
-        for key in keys:
-            self.dripline_connection.chan.queue_bind(exchange=exchange,
-                                                     queue=self.queue.method.queue,
-                                                     routing_key=key,
-                                                    )
+        if name is None:
+            name = __name__ + '-' + uuid.uuid1().hex[:12]
+        Service.__init__(self, amqp_url=broker_host, exchange=exchange, keys=keys, name=name)
+
     def this_consume(self, message):
         raise NotImplementedError('you must set this_consume to a valid function')
 
@@ -73,19 +66,21 @@ class AlertConsumer:
                 logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
                 raise
 
+    def on_message(channel, method, properties, message):
+        logger.debug('in process_message callback')
+        try:
+            message_unpacked = Message.from_encoded(message, properties.content_encoding)
+            self.this_consume(message_unpacked)
+        except Exception as err:
+            logger.warning('got an exception (trying to continue running):\n{}'.format(err.message))
+            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+            raise
+
     def start(self):
         logger.debug("AlertConsmer consume starting")
-        def process_message(channel, method, properties, message):
-            logger.debug('in process_message callback')
-            try:
-                message_unpacked = Message.from_encoded(message, properties.content_encoding)
-                self.this_consume(message_unpacked)
-            except Exception as err:
-                logger.warning('got an exception (trying to continue running):\n{}'.format(err.message))
-                logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
-                raise
-        self.dripline_connection.chan.basic_consume(process_message,
-                                                    queue=self.queue.method.queue,
-                                                    no_ack=True
-                                                   )
-        self.dripline_connection.chan.start_consuming()
+        self.run()
+#        self.dripline_connection.chan.basic_consume(process_message,
+#                                                    queue=self.queue.method.queue,
+#                                                    no_ack=True
+#                                                   )
+#        self.dripline_connection.chan.start_consuming()
