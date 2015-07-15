@@ -43,8 +43,8 @@ class Service(object):
 
         """
         if name is None:
-            name = 'unknown_service_'
-        self._name = name + str(uuid.uuid4())[1:12]
+            name = 'unknown_service_' + str(uuid.uuid4())[1:12]
+        self._name = name
         self._connection = None
         self._channel = None
         self._closing = False
