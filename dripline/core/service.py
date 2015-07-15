@@ -33,15 +33,18 @@ class Service(object):
 
     """
     EXCHANGE_TYPE = 'topic'
-    QUEUE = 'text'
+    #QUEUE = 'text'
 
-    def __init__(self, amqp_url, exchange, keys):
+    def __init__(self, amqp_url, exchange, keys, name=None):
         """Create a new instance of the consumer class, passing in the AMQP
         URL used to connect to RabbitMQ.
 
         :param str amqp_url: The AMQP url to connect with
 
         """
+        if name is None:
+            name = 'unknown_service_'
+        self._name = name + str(uuid.uuid4())[1:12]
         self._connection = None
         self._channel = None
         self._closing = False
@@ -197,7 +200,7 @@ class Service(object):
 
         """
         logger.info('Exchange declared')
-        self.setup_queue(self.QUEUE)
+        self.setup_queue(self._name)
 
     def setup_queue(self, queue_name):
         """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -226,8 +229,8 @@ class Service(object):
         """
         for key in self.keys:
             logger.info('Binding %s to %s with %s',
-                        self._exchange, self.QUEUE, key)
-            self._channel.queue_bind(self.on_bindok, self.QUEUE,
+                        self._exchange, self._name, key)
+            self._channel.queue_bind(self.on_bindok, self._name,
                                      self._exchange, key)
 
     def on_bindok(self, unused_frame):
@@ -254,7 +257,7 @@ class Service(object):
         logger.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self.on_message,
-                                                         self.QUEUE)
+                                                         self._name)
 
     def add_on_cancel_callback(self):
         """Add a callback that will be invoked if RabbitMQ cancels the consumer
@@ -385,10 +388,13 @@ class Service(object):
         parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
-        result = channel.queue_declare(exclusive=True)
+        result = channel.queue_declare(queue='request_reply'+str(uuid.uuid4()),
+                                       exclusive=True,
+                                       auto_delete=True,
+                                      )
         channel.queue_bind(exchange='requests',
                            queue=result.method.queue,
-                           routing_key='#',
+                           routing_key=result.method.queue,
                           )
         
         correlation_id = str(uuid.uuid4())
