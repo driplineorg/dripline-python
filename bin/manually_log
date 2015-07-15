@@ -27,8 +27,12 @@ def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=Non
     logger.debug('with info:\n{}'.format(to_log['values']))
 
     # make connection
-    conn = dripline.core.Connection(broker)
-    conn.send_alert(to_log, severity='sensor_value')
+    # note that we're not consuming, so the exchange and key values here don't really matter
+    conn = dripline.core.Service(amqp_url = broker,
+                                 exchange = 'alerts',
+                                 keys = '#'
+                                )
+    conn.send_alert(severity='sensor_value', alert=to_log)
     logger.info('log sent')
 
 

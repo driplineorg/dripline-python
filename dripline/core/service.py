@@ -377,8 +377,8 @@ class Service(object):
     def send_message(self, target, message, properties=None):
         '''
         '''
-        if not isinstance(request, RequestMessage):
-            raise TypeError('request must be a RequestMessage')
+        if not isinstance(message, Message):
+            raise TypeError('message must be a dripline.core.Message')
         parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
@@ -386,7 +386,7 @@ class Service(object):
                                        exclusive=True,
                                        auto_delete=True,
                                       )
-        channel.queue_bind(exchange='requests',
+        channel.queue_bind(exchange=self._exchange,
                            queue=result.method.queue,
                            routing_key=result.method.queue,
                           )
@@ -405,9 +405,9 @@ class Service(object):
                                               correlation_id=correlation_id,
                                               app_id='dripline.core.Service'
                                              )
-        channel.basic_publish(exchange='requests',
+        channel.basic_publish(exchange=self._exchange,
                               routing_key=target,
-                              body=request.to_msgpack(),
+                              body=message.to_msgpack(),
                               properties=properties,
                              )
         return connection
@@ -420,18 +420,20 @@ class Service(object):
         The non-blocking part seems tricky. I'm sure there exists a good solution for this,
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
+        if not isinstance(request, RequestMessage):
+            raise TypeError('request must be a dripline.core.RequestMessage')
         connection = self.send_message(target, request)
         while self.__ret_val is None:
             connection.process_data_events()
         connection.close()
         return self.__ret_val
 
-    def send_alert(self, target, alert):
+    def send_alert(self, severity, alert):
         '''
         '''
         if not isinstance(alert, AlertMessage):
             alert = AlertMessage(payload=alert)
-        self.send_message(target, alert)
+        self.send_message(target=severity, message=alert)
 
     def send_reply(self, properties, reply):
         '''
