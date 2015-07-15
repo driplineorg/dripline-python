@@ -12,7 +12,7 @@ import uuid
 
 import pika
 
-from .message import Message, RequestMessage
+from .message import Message, AlertMessage, RequestMessage, ReplyMessage
 from . import exceptions
 
 logger = logging.getLogger(__name__)
@@ -374,13 +374,8 @@ class Service(object):
         logger.info('Closing connection')
         self._connection.close()
 
-    def send_request(self, target, request):
+    def send_message(self, target, message, properties=None):
         '''
-        It seems like there should be a way to do this with the existing SelectConnection.
-        The problem is that the message handler needs to send a request and then be called
-        not block the reply from being processed, and needs to get the reply from that processed response.
-        The non-blocking part seems tricky. I'm sure there exists a good solution for this,
-        maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a RequestMessage')
@@ -404,17 +399,43 @@ class Service(object):
 
         channel.basic_consume(on_response, no_ack=True, queue=result.method.queue)
 
-        properties = pika.BasicProperties(reply_to=result.method.queue,
-                                          content_encoding='application/msgpack',
-                                          correlation_id=correlation_id,
-                                          app_id='dripline.core.Service'
-                                         )
+        if properties is None:
+            properties = pika.BasicProperties(reply_to=result.method.queue,
+                                              content_encoding='application/msgpack',
+                                              correlation_id=correlation_id,
+                                              app_id='dripline.core.Service'
+                                             )
         channel.basic_publish(exchange='requests',
                               routing_key=target,
                               body=request.to_msgpack(),
                               properties=properties,
                              )
+        return connection
+
+    def send_request(self, target, request):
+        '''
+        It seems like there should be a way to do this with the existing SelectConnection.
+        The problem is that the message handler needs to send a request and then be called
+        not block the reply from being processed, and needs to get the reply from that processed response.
+        The non-blocking part seems tricky. I'm sure there exists a good solution for this,
+        maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
+        '''
+        connection = self.send_message(target, request)
         while self.__ret_val is None:
             connection.process_data_events()
         connection.close()
         return self.__ret_val
+
+    def send_alert(self, target, alert):
+        '''
+        '''
+        if not isinstance(alert, AlertMessage):
+            alert = AlertMessage(payload=alert)
+        self.send_message(target, alert)
+
+    def send_reply(self, properties, reply):
+        '''
+        '''
+        if not isinstance(reply, Message):
+            reply = ReplyMessage(payload=reply)
+        self.send_message(target=properties.reply_to, message=reply, properties=properties)
