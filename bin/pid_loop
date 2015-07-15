@@ -204,4 +204,4 @@ if __name__ == '__main__':
     try:
         start_monitoring(**vars(kwargs))
     except KeyboardInterrupt:
-        logger.warning(' [*] exiting')
+        logger.info(' [*] exiting')
