@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import types
 import uuid
 
-from dripline.core import message, constants, DriplineParser, Connection, Message, exceptions
+from dripline.core import message, constants, DriplineParser, Service, Message, exceptions
 
 import logging
 logger = logging.getLogger('dripline_agent')
@@ -24,7 +24,10 @@ def verb_list():
 def main(args):
     request_verb = args.verb
     msgop = getattr(constants, 'OP_'+request_verb.upper())
-    conn = Connection(args.broker)
+    conn = Service(amqp_url = args.broker,
+                   exchange = 'requests',
+                   keys = '#'
+                  )
 
     values = []
     payload = {}
