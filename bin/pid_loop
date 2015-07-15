@@ -2,6 +2,8 @@
 
 '''
 Utility app for doing PID control
+
+Updated for v1.6 using async connections
 '''
 
 from __future__ import print_function
@@ -15,7 +17,7 @@ import uuid
 import pika
 
 import dripline
-from dripline.core import Message, DriplineParser, constants
+from dripline.core import Message, DriplineParser, constants, Service
 
 import logging
 logger = logging.getLogger('pid_loop')
@@ -27,7 +29,7 @@ class pid_controller(object):
     '''
 
     def __init__(self,
-                 dripline_connection,
+                 dripline_service,
                  output_channel,
                  goal=110,
                  proportional=0.0, integral=0.0, differential=0.0,
@@ -36,7 +38,7 @@ class pid_controller(object):
                 ):
         '''
         '''
-        self.conn = dripline_connection
+        self.service = dripline_service
         self._current_channel = output_channel
 
         self.target_temp = goal
@@ -57,7 +59,7 @@ class pid_controller(object):
         request = dripline.core.RequestMessage(msgop=dripline.core.OP_GET,
                                                payload={'values':{}}
                                               )
-        reply = self.conn.send_request(self._current_channel, request)
+        reply = self.service.send_request(self._current_channel, request)
         value = reply.payload['value_cal']
         return float(value)
 
@@ -111,9 +113,31 @@ class pid_controller(object):
                                          payload={'values':[value]},
                                         )
         logger.debug('request will be: {}'.format(m))
-        reply = self.conn.send_request(self._current_channel, m)
+        reply = self.service.send_request(self._current_channel, m)
         logger.info('set response was: {}'.format(reply))
 
+class pidService(Service):
+    '''
+    '''
+    def __init__(self, pid_args, sensor, *args, **kwargs):
+        Service.__init__(self, *args, **kwargs)
+        self._sensor = sensor
+        self.pid = pid_controller(dripline_service=self, **pid_args)
+
+    def on_message(self, ch, method, properties, body):
+        '''
+        '''
+        message = Message.from_encoded(body, properties.content_encoding)
+        payload = message.payload
+        if not payload['from'] == self._sensor:
+            return
+        logger.info('got a value for sensor')
+        if not 'values' in payload:
+            return
+        if not 'value_cal' in payload['values']:
+            logger.warning('no calibrated value')
+            return
+        self.pid.process_new_value(timestamp=message['timestamp'], value=payload['values']['value_cal'])
 
 def start_monitoring(sensor, broker='localhost', **kwargs):
     exchange = 'alerts' # this is always alerts
@@ -121,43 +145,11 @@ def start_monitoring(sensor, broker='localhost', **kwargs):
 
     credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker, credentials=credentials))
-    channel = connection.channel()
-    
-    result = channel.queue_declare(queue='PID-'+uuid.uuid1().hex[:12],
-                                   auto_delete=True,
-                                   exclusive=True,
-                                  )
-    queue_name = result.method.queue
-    
-    for severity in keys:
-        channel.queue_bind(exchange=exchange,
-                           queue=queue_name,
-                           routing_key=severity,
-                          )
+    service = pidService(pid_args=kwargs, sensor=sensor, amqp_url=broker, exchange=exchange, keys=keys)
     
     logger.info(' [*] Waiting for logs. To exit press CTRL+C')
 
-    dripline_connection = dripline.core.Connection(broker,queue_name='PID_unused_reply-{}'.format(uuid.uuid1().hex[:12]))
-    pid = pid_controller(dripline_connection=dripline_connection, **kwargs)
-    
-    def callback(ch, method, properties, body):
-        message = Message.from_encoded(body, properties.content_encoding)
-        payload = message.payload
-        if not payload['from'] == sensor:
-            return
-        logger.info('got a value for sensor')
-        if not 'value_cal' in payload['values']:
-            logger.warning('no calibrated value')
-            return
-        pid.process_new_value(timestamp=message['timestamp'], value=payload['values']['value_cal'])
-    
-    channel.basic_consume(callback,
-                          queue=queue_name,
-                          no_ack=True,
-                         )
-    
-    channel.start_consuming()
+    service.run()
 
 if __name__ == '__main__':
     parser = DriplineParser(

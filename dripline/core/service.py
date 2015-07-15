@@ -33,7 +33,6 @@ class Service(object):
 
     """
     EXCHANGE_TYPE = 'topic'
-    #QUEUE = 'text'
 
     def __init__(self, amqp_url, exchange, keys, name=None):
         """Create a new instance of the consumer class, passing in the AMQP
