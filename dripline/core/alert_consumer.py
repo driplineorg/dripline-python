@@ -60,10 +60,13 @@ class AlertConsumer(Service):
         except Exception as err:
             if 'no known endpoint with name' in err.message:
                 logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
+                return
             if 'sqlalchemny' in repr(err):
                 logger.critical("got an unknown sqlalchemy error: {}".format(repr(err)))
+                return
             if 'psycopg2' in repr(err):
                 logger.critical("got an unknown psycopg2 error: {}".format(repr(err)))
+                return
             else:
                 logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
                 raise
