@@ -62,11 +62,13 @@ class AlertConsumer(Service):
                 logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
             if 'sqlalchemny' in repr(err):
                 logger.critical("got an unknown sqlalchemy error: {}".format(repr(err)))
+            if 'psycopg2' in repr(err):
+                logger.critical("got an unknown psycopg2 error: {}".format(repr(err)))
             else:
                 logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
                 raise
 
-    def on_message(channel, method, properties, message):
+    def on_message(self, channel, method, properties, message):
         logger.debug('in process_message callback')
         try:
             message_unpacked = Message.from_encoded(message, properties.content_encoding)
