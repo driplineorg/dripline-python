@@ -418,7 +418,7 @@ class Service(object):
             return
         return connection
 
-    def send_request(self, target, request, timeout=5):
+    def send_request(self, target, request, timeout=10):
         '''
         It seems like there should be a way to do this with the existing SelectConnection.
         The problem is that the message handler needs to send a request and then be called
@@ -427,10 +427,11 @@ class Service(object):
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
         logger.info('sending a request')
+        logger.debug('request to <{}> is: {}'.format(target, request))
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
         result_queue = multiprocessing.Queue()
-        connection = self.send_message(target, request, return_queue=result_queue, return_connection=True)
+        connection = self.send_message(target, request, return_queue=result_queue, return_connection=True, exchange='requests')
         self.__ret_val = None
         def _get_result(result_queue):
             while result_queue.empty():

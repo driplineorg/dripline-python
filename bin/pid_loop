@@ -59,7 +59,7 @@ class pid_controller(object):
         request = dripline.core.RequestMessage(msgop=dripline.core.OP_GET,
                                                payload={'values':{}}
                                               )
-        reply = self.service.send_request(self._current_channel, request)
+        reply = self.service.send_request(target=self._current_channel, request=request)
         value = reply.payload['value_cal']
         return float(value)
 
