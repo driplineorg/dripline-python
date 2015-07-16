@@ -40,7 +40,7 @@ def _log_on_set_decoration(self, fun):
         to_log = {'from': self.name,
                   'values': values,
                  }
-        self.report_log(to_log, 'sensor_value')
+        self.report_log(alert=to_log, severity='sensor_value')
         return result
     return wrapper
 
@@ -89,8 +89,8 @@ class Spime(Endpoint, DataLogger):
         
 
     @staticmethod
-    def report_log(value, severity):
-        logger.info("Should be logging (value,severity): ({},{})".format(value, severity))
+    def report_log(alert, severity):
+        logger.info("Should be logging (value,severity): ({},{})".format(alert, severity))
 
 
 #@fancy_init_doc

@@ -52,7 +52,7 @@ class DataLogger(object):
     def get_value(self):
         raise NotImplementedError('get value in derrived class')
 
-    def store_value(self, value, severity='sensor_value'):
+    def store_value(self, severity='sensor_value', value=None):
         raise NotImplementedError('store value in derrived class')
 
     @property

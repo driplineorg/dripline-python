@@ -44,7 +44,7 @@ class Service(object):
         """
         if name is None:
             name = 'unknown_service_' + str(uuid.uuid4())[1:12]
-        self._name = name
+        self.name = name
         self._connection = None
         self._channel = None
         self._closing = False
@@ -200,7 +200,7 @@ class Service(object):
 
         """
         logger.info('Exchange declared')
-        self.setup_queue(self._name)
+        self.setup_queue(self.name)
 
     def setup_queue(self, queue_name):
         """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -229,8 +229,8 @@ class Service(object):
         """
         for key in self.keys:
             logger.info('Binding %s to %s with %s',
-                        self._exchange, self._name, key)
-            self._channel.queue_bind(self.on_bindok, self._name,
+                        self._exchange, self.name, key)
+            self._channel.queue_bind(self.on_bindok, self.name,
                                      self._exchange, key)
 
     def on_bindok(self, unused_frame):
@@ -257,7 +257,7 @@ class Service(object):
         logger.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self.on_message,
-                                                         self._name)
+                                                         self.name)
 
     def add_on_cancel_callback(self):
         """Add a callback that will be invoked if RabbitMQ cancels the consumer
@@ -375,9 +375,11 @@ class Service(object):
         logger.info('Closing connection')
         self._connection.close()
 
-    def send_message(self, target, message, return_queue=None, properties=None):
+    def send_message(self, target, message, return_queue=None, properties=None, exchange=None, return_connection=False):
         '''
         '''
+        if exchange is None:
+            exchange = self._exchange
         if not isinstance(message, Message):
             raise TypeError('message must be a dripline.core.Message')
         parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
@@ -387,7 +389,7 @@ class Service(object):
                                        exclusive=True,
                                        auto_delete=True,
                                       )
-        channel.queue_bind(exchange=self._exchange,
+        channel.queue_bind(exchange=exchange,
                            queue=result.method.queue,
                            routing_key=result.method.queue,
                           )
@@ -406,11 +408,14 @@ class Service(object):
                                               correlation_id=correlation_id,
                                               app_id='dripline.core.Service'
                                              )
-        channel.basic_publish(exchange=self._exchange,
+        channel.basic_publish(exchange=exchange,
                               routing_key=target,
                               body=message.to_msgpack(),
                               properties=properties,
                              )
+        if not return_connection:
+            connection.close()
+            return
         return connection
 
     def send_request(self, target, request, timeout=5):
@@ -421,10 +426,11 @@ class Service(object):
         The non-blocking part seems tricky. I'm sure there exists a good solution for this,
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
+        logger.info('sending a request')
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
         result_queue = multiprocessing.Queue()
-        connection = self.send_message(target, request, return_queue=result_queue)
+        connection = self.send_message(target, request, return_queue=result_queue, return_connection=True)
         self.__ret_val = None
         def _get_result(result_queue):
             while result_queue.empty():
@@ -438,16 +444,19 @@ class Service(object):
         connection.close()
         return result_queue.get()
 
-    def send_alert(self, severity, alert):
+    def send_alert(self, alert, severity):
         '''
         '''
+        logger.info('sending an alert')
+        logger.debug('to {} sending {}'.format(severity,alert))
         if not isinstance(alert, AlertMessage):
             alert = AlertMessage(payload=alert)
-        self.send_message(target=severity, message=alert)
+        self.send_message(target=severity, message=alert, exchange='alerts')
 
     def send_reply(self, properties, reply):
         '''
         '''
+        logger.info("sending a reply")
         if not isinstance(reply, Message):
             reply = ReplyMessage(payload=reply)
         self.send_message(target=properties.reply_to, message=reply, properties=properties)
