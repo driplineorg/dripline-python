@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 
 __all__ = ['PrologixSpimescape',
            'GPIBInstrument',
-           'SimpleGetSpime',
            'MuxerGetSpime',
-           'SimpleGetSetSpime',
           ]
 
 
@@ -176,21 +174,7 @@ class GPIBInstrument(Provider):
         return result
 
 
-class SimpleGetSpime(SimpleSCPIGetSpime):
-    '''
-    A generic Spime for SCPI commands which take no arguments (ie queries).
-
-    It is assumed that the command will:
-        1) return something
-        2) return quickly
-
-    If either assumption is wrong then you need a different Spime derived class
-    '''
-    def on_get(self):
-        return self.provider.send(self.cmd_base+'?')
-
-
-class MuxerGetSpime(SimpleGetSpime):
+class MuxerGetSpime(SimpleSCPIGetSpime):
     def __init__(self, ch_number, **kwargs):
         self.base_str = "DATA:LAST? (@{})"
         self.ch_number = ch_number
@@ -205,28 +189,3 @@ class MuxerGetSpime(SimpleGetSpime):
         if very_raw:
             result = very_raw.split()[0]
         return result
-    
-
-class SimpleGetSetSpime(Spime):
-    '''
-    A generic Spime for SCPI commands using a standard pattern for query and assignment.
-
-    The pattern looks like the following. Consider a command "CMD"
-        ~To request the current value, the SCPI command would be: "CMD?"
-        ~To assign a new value, the SCPI command would be "CMD <value>;*OPC?"
-
-    It is assumed that both of the above constructions will:
-        1) return something
-        2) return quickly
-
-    If either of those assumptions is wrong then you want a different Spime derived class
-    '''
-    def __init__(self, base_str, **kwargs):
-        self.cmd_base = base_str
-        Spime.__init__(self, **kwargs)
-
-    def on_get(self):
-        return self.provider.send(self.cmd_base + '?')
-
-    def on_set(self, value):
-        return self.provider.send(self.cmd_base + ' {};*ESR?'.format(value))
