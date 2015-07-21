@@ -178,7 +178,7 @@ class MuxerGetSpime(SimpleSCPIGetSpime):
     def __init__(self, ch_number, **kwargs):
         self.base_str = "DATA:LAST? (@{})"
         self.ch_number = ch_number
-        SimpleGetSpime.__init__(self, base_str=self.base_str, **kwargs)
+        SimpleSCPIGetSpime.__init__(self, base_str=self.base_str, **kwargs)
         self.get_value = self.on_get
     
     @calibrate
