@@ -12,19 +12,22 @@ import csv
 import pika
 import time
 
-from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage
+from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage, Service
 
 import logging
 logger = logging.getLogger('dpph_scan')
 
 
 def _get(name, connection):
-    request = RequestMessage(
-                             msgop=constants.OP_GET,
-                             payload='',
-                            )
-    result = connection.send_request(name, request.to_msgpack())
-    result_message = Message.from_msgpack(result).payload
+    payload = {}
+    payload.update({'values':[]})
+    request = RequestMessage(msgop=constants.OP_GET,payload=payload)
+    reply = connection.send_request(name, request)
+    if not isinstance(reply, Message):
+        result = Message.from_msgpack(reply)
+    else:
+        result = reply
+    result_message = result.payload
     logger.debug("{}-> {}".format(name, result_message))
     return result_message
 
@@ -91,7 +94,8 @@ def FrequencyToField(frequency):
 def main(broker, frequency_limits, output, **kwargs):
     logger.info('broker is: {}'.format(broker))
     try:
-        connection = Connection(broker)
+        #connection = Connection(broker)
+        connection = Service(amqp_url = broker,exchange = 'requests',keys = '#')
     except pika.exceptions.AMQPConnectionError:
         logger.error('unable to connect to broker')
         #return
