@@ -101,6 +101,13 @@ def get_data(connection):
     data['amplitude'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
     result = _get('lockin_adc_data', connection)
     data['sweep_out'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+    # Save additional data
+    result = _get('lockin_x_data', connection)
+    data['lockin_x_data'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+    result = _get('lockin_y_data', connection)
+    data['lockin_y_data'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+
+
     return data
 
 
@@ -178,6 +185,8 @@ def main(broker, frequency_limits, output, **kwargs):
         csv_writer.writerow(['sweep_out',
                              'sweep_freqs',
                              'lockin_signal',
+                             'lockin_x_data',
+                             'lockin_y_data',
                              'filter_freqs',
                              'filter_target',
                              'filter_result',
@@ -185,6 +194,8 @@ def main(broker, frequency_limits, output, **kwargs):
         csv_writer.writerows(zip(lockin_data['sweep_out'],
                                  lockin_data['frequencies'],
                                  lockin_data['amplitude'],
+                                 lockin_data['lockin_x_data'],
+                                 lockin_data['lockin_y_data'],
                                  filter_data['freqs'],
                                  filter_data['target'],
                                  filter_data['result'],
