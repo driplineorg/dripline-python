@@ -12,7 +12,7 @@ import csv
 import pika
 import time
 
-from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage, Service
+from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage, Service, message, exceptions
 
 import logging
 logger = logging.getLogger('dpph_scan')
