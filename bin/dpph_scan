@@ -201,10 +201,10 @@ def main(broker, frequency_limits, output, **kwargs):
     # Save the results to the database
     # First, save the Z position
     sensor = 'string_pot_resistance'
-    result = scdb_query_and_log.scdb_query(broker=broker,sensor=sensor)
-    scdb_query_and_log.scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
+    result = scdb_query(broker=broker,sensor=sensor)
+    scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
     # Then the dpph value
-    scdb_query_and_log.scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
+    scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
     #########
     # Print Results
     print('String Z Position = %0.02f ; Field = %f kG' % (result.payload['value_cal'],field))
