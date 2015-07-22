@@ -17,6 +17,57 @@ from dripline.core import DriplineParser, Connection, constants, Message, Reques
 import logging
 logger = logging.getLogger('dpph_scan')
 
+def scdb_log(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwargs):
+    # construct log info
+    to_log = {'from':sensor,
+              'values':{'value_raw': value_raw,
+                       'memo': 'logged manually',
+                      },
+             }
+    if value_cal is not None:
+        to_log['values']['value_cal'] = value_cal
+    if extra_memo is not None:
+        to_log['values']['memo'] += extra_memo
+    logger.debug('logging to sensor: {}'.format(sensor))
+    logger.debug('with info:\n{}'.format(to_log['values']))
+
+    # make connection
+    # note that we're not consuming, so the exchange and key values here don't really matter
+    conn = Service(amqp_url = broker,exchange = 'alerts',keys = '#')
+    conn.send_alert(severity='sensor_value', alert=to_log)
+    logger.info('log sent')
+
+
+
+def scdb_query(broker,sensor):
+    request_verb = 'get'
+    msgop = getattr(constants, 'OP_'+request_verb.upper())
+    conn = Service(amqp_url = broker,
+                   exchange = 'requests',
+                   keys = '#'
+                  )
+
+    values = []
+    payload = {}
+    payload.update({'values':values})
+    logger.debug('payload will be: {}'.format(payload))
+    request = message.RequestMessage(msgop=msgop, payload=payload)
+    try:
+        reply = conn.send_request(sensor, request)
+    except exceptions.DriplineException as dripline_error:
+        logger.warning(dripline_error.message)
+        return
+    if not isinstance(reply, Message):
+        result = Message.from_msgpack(reply)
+    else:
+        result = reply
+    print_prefix = '->'.join([sensor])
+    color = ''
+    if not result.retcode == 0:
+        color = '\033[91m'
+    print('{color}{}: {}\033[0m'.format(print_prefix, result.payload, color=color))
+    return result
+
 
 def _get(name, connection):
     payload = {}
@@ -144,7 +195,20 @@ def main(broker, frequency_limits, output, **kwargs):
     # print field result
     logger.info("compute field")
     field = FrequencyToField(filter_data['freqs'][filter_data['result']==filter_data['result'].max()])
-    print('value is: {}'.format(field))
+    #print('value is: {}'.format(field))
+
+    #########
+    # Save the results to the database
+    # First, save the Z position
+    sensor = 'string_pot_resistance'
+    result = scdb_query_and_log.scdb_query(broker=broker,sensor=sensor)
+    scdb_query_and_log.scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
+    # Then the dpph value
+    scdb_query_and_log.scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
+    #########
+    # Print Results
+    print('String Z Position = %0.02f ; Field = %f kG' % (result.payload['value_cal'],field))
+    print('Resuls logged to database')
 
 
 if __name__ == '__main__':
