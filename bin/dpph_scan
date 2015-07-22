@@ -98,9 +98,9 @@ def get_data(connection):
         result = _get('lockin_status', connection)
     # get data
     result = _get('lockin_mag_data', connection)
-    data['amplitude'] = numpy.array(result.split(), dtype=float)
+    data['amplitude'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
     result = _get('lockin_adc_data', connection)
-    data['sweep_out'] = numpy.array(result.split(), dtype=float)
+    data['sweep_out'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
     return data
 
 
