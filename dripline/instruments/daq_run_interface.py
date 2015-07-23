@@ -42,16 +42,15 @@ class DAQProvider(core.Provider):
         return self._run_name
     @run_name.setter
     def run_name(self, value):
-        _conn = core.Connection(self.portal.broker)
         request = core.RequestMessage(msgop=core.OP_CMD,
                                       payload={'values':['do_insert'],
                                                'run_name':value,
                                               },
                                      )
-        result = _conn.send_request(self.run_table_endpoint,
-                                    request=request,
-                                    decode=True,
-                                   )
+        result = self.portal.send_request(self.run_table_endpoint,
+                                          request=request,
+                                          decode=True,
+                                         )
         self.run_id = result.payload['run_id']
         self._run_name = value
         self._acquisition_count = 0
@@ -104,17 +103,16 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         '''
         if self.run_id is None:
             raise core.DriplineInternalError('run number is None, must request a run_id assignment prior to starting acquisition')
-        _conn = core.Connection(self.portal.broker)
         filepath = '{}/{:09d}_{:09d}.egg'.format(self.directory_path,
                                          self.run_id,
                                          self._acquisition_count)
         request = core.RequestMessage(payload={'values':[], 'file':filepath},
                                       msgop=core.OP_RUN,
                                      )
-        result = _conn.send_request(self.mantis_queue,
-                                    request=request,
-                                    decode=True,
-                                   )
+        result = self.portal.send_request(self.mantis_queue,
+                                          request=request,
+                                          decode=True,
+                                         )
         if not result.retcode == 0:
             msg = ''
             if 'ret_msg' in result.payload:

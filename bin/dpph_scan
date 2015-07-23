@@ -12,18 +12,72 @@ import csv
 import pika
 import time
 
-from dripline.core import DriplineParser, Service, constants, Message, RequestMessage
+from dripline.core import DriplineParser, constants, Service, message, exceptions
 
 import logging
 logger = logging.getLogger('dpph_scan')
 
+def scdb_log(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwargs):
+    # construct log info
+    to_log = {'from':sensor,
+              'values':{'value_raw': value_raw,
+                       'memo': 'logged manually',
+                      },
+             }
+    if value_cal is not None:
+        to_log['values']['value_cal'] = value_cal
+    if extra_memo is not None:
+        to_log['values']['memo'] += extra_memo
+    logger.debug('logging to sensor: {}'.format(sensor))
+    logger.debug('with info:\n{}'.format(to_log['values']))
+
+    # make connection
+    # note that we're not consuming, so the exchange and key values here don't really matter
+    conn = Service(amqp_url = broker,exchange = 'alerts',keys = '#')
+    conn.send_alert(severity='sensor_value', alert=to_log)
+    logger.info('log sent')
+
+
+
+def scdb_query(broker,sensor):
+    request_verb = 'get'
+    msgop = getattr(constants, 'OP_'+request_verb.upper())
+    conn = Service(amqp_url = broker,
+                   exchange = 'requests',
+                   keys = '#'
+                  )
+
+    values = []
+    payload = {}
+    payload.update({'values':values})
+    logger.debug('payload will be: {}'.format(payload))
+    request = message.RequestMessage(msgop=msgop, payload=payload)
+    try:
+        reply = conn.send_request(sensor, request)
+    except exceptions.DriplineException as dripline_error:
+        logger.warning(dripline_error.message)
+        return
+    if not isinstance(reply, message.Message):
+        result = message.Message.from_msgpack(reply)
+    else:
+        result = reply
+    print_prefix = '->'.join([sensor])
+    color = ''
+    if not result.retcode == 0:
+        color = '\033[91m'
+    print('{color}{}: {}\033[0m'.format(print_prefix, result.payload, color=color))
+    return result
+
 
 def _get(name, connection):
-    request = RequestMessage(
-                             msgop=constants.OP_GET,
-                             payload='',
-                            )
-    result = connection.send_request(name, request)
+    payload = {}
+    payload.update({'values':[]})
+    request = message.RequestMessage(msgop=constants.OP_GET,payload=payload)
+    reply = connection.send_request(name, request)
+    if not isinstance(reply, message.Message):
+        result = message.Message.from_msgpack(reply)
+    else:
+        result = reply
     result_message = result.payload
     logger.debug("{}-> {}".format(name, result_message))
     return result_message
@@ -45,9 +99,16 @@ def get_data(connection):
         result = _get('lockin_status', connection)
     # get data
     result = _get('lockin_mag_data', connection)
-    data['amplitude'] = numpy.array(result.split(), dtype=float)
+    data['amplitude'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
     result = _get('lockin_adc_data', connection)
-    data['sweep_out'] = numpy.array(result.split(), dtype=float)
+    data['sweep_out'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+    # Save additional data
+    result = _get('lockin_x_data', connection)
+    data['lockin_x_data'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+    result = _get('lockin_y_data', connection)
+    data['lockin_y_data'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
+
+
     return data
 
 
@@ -93,7 +154,7 @@ def main(broker, frequency_limits, output, **kwargs):
     ##### Connect to slow controls
     logger.info('broker is: {}'.format(broker))
     try:
-        connection = Service(amqp_url=broker, exchange='requests', keys=[''], name='dpph_script')#Connection(broker)
+        connection = Service(amqp_url=broker, exchange='requests', keys = ['#'])
     except pika.exceptions.AMQPConnectionError:
         logger.error('unable to connect to broker')
         #return
@@ -105,11 +166,11 @@ def main(broker, frequency_limits, output, **kwargs):
         pass
         # something to get them from the sweeper
         logger.warning('trying to get hf_start_freq, that name is hard coded for now')
-        result = connection.send_request(target='hf_start_freq', request=RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        result = connection.send_request(target='hf_start_freq', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
         start_freq = float(result['payload']['value_raw'])
         logger.info('got a start of: {}'.format(start_freq))
         logger.warning('trying to get hf_stop_freq, that name is hard coded for now')
-        result = connection.send_request(target='hf_stop_freq', request=RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        result = connection.send_request(target='hf_stop_freq', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
         stop_freq = float(result['payload']['value_raw'])
         logger.info('got a stop of: {}'.format(stop_freq))
         #logger.warning("don't know how to get freq limits automatically")
@@ -136,6 +197,8 @@ def main(broker, frequency_limits, output, **kwargs):
         csv_writer.writerow(['sweep_out',
                              'sweep_freqs',
                              'lockin_signal',
+                             'lockin_x_data',
+                             'lockin_y_data',
                              'filter_freqs',
                              'filter_target',
                              'filter_result',
@@ -143,6 +206,8 @@ def main(broker, frequency_limits, output, **kwargs):
         csv_writer.writerows(zip(lockin_data['sweep_out'],
                                  lockin_data['frequencies'],
                                  lockin_data['amplitude'],
+                                 lockin_data['lockin_x_data'],
+                                 lockin_data['lockin_y_data'],
                                  filter_data['freqs'],
                                  filter_data['target'],
                                  filter_data['result'],
@@ -153,7 +218,20 @@ def main(broker, frequency_limits, output, **kwargs):
     # print field result
     logger.info("compute field")
     field = FrequencyToField(filter_data['freqs'][filter_data['result']==filter_data['result'].max()])
-    print('value is: {}'.format(field))
+    #print('value is: {}'.format(field))
+
+    #########
+    # Save the results to the database
+    # First, save the Z position
+    sensor = 'string_pot_resistance'
+    result = scdb_query(broker=broker,sensor=sensor)
+    scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
+    # Then the dpph value
+    scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
+    #########
+    # Print Results
+    print('String Z Position = %0.02f ; Field = %f kG' % (result.payload['value_cal'],field))
+    print('Resuls logged to database')
 
 
 if __name__ == '__main__':

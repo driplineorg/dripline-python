@@ -45,7 +45,7 @@ class DSPLockin7265(GPIBInstrument):
 
     def _taking_data_status(self):
         result = self.send("M")
-        curve_status = result.split(';')[0]
+        curve_status = result.split(',')[0]
         status  = None
         if curve_status == '0':
             status = 'done'
