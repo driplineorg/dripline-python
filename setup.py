@@ -45,6 +45,7 @@ setup(
     extras_require={
         'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],# sphinx-argparse
         'database': ['sqlalchemy', 'psycopg2'],
+        'dpph': ['numpy', 'scipy'],
         'other': ['colorlog', 'ipython', 'ipdb'],
     },
     url='http://www.github.com/project8/dripline',
