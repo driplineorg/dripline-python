@@ -14,7 +14,6 @@ import pika
 import yaml
 
 from .message import Message, RequestMessage, ReplyMessage
-from .connection import Connection
 from . import exceptions
 from . import constants
 

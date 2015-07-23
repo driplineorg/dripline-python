@@ -8,7 +8,6 @@ from __future__ import absolute_import
 
 from .alert_consumer import *
 from .arg_parser import *
-from .connection import *
 from .constants import *
 from .data_logger import *
 from .endpoint import *
