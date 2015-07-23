@@ -12,7 +12,7 @@ import csv
 import pika
 import time
 
-from dripline.core import DriplineParser, Connection, constants, Message, RequestMessage
+from dripline.core import DriplineParser, Service, constants, Message, RequestMessage
 
 import logging
 logger = logging.getLogger('dpph_scan')
@@ -23,8 +23,8 @@ def _get(name, connection):
                              msgop=constants.OP_GET,
                              payload='',
                             )
-    result = connection.send_request(name, request.to_msgpack())
-    result_message = Message.from_msgpack(result).payload
+    result = connection.send_request(name, request)
+    result_message = result.payload
     logger.debug("{}-> {}".format(name, result_message))
     return result_message
 
@@ -35,6 +35,7 @@ def get_data(connection):
         raise ValueError('no connection')
     data = {}
     # ensure lockin config
+    logger.info('ensure_setup')
     _get('lockin_ensure_setup', connection)
     # trigger taking data
     result = _get('lockin_take_data', connection)
@@ -89,22 +90,34 @@ def FrequencyToField(frequency):
 
 
 def main(broker, frequency_limits, output, **kwargs):
+    ##### Connect to slow controls
     logger.info('broker is: {}'.format(broker))
     try:
-        connection = Connection(broker)
+        connection = Service(amqp_url=broker, exchange='requests', keys=[''], name='dpph_script')#Connection(broker)
     except pika.exceptions.AMQPConnectionError:
         logger.error('unable to connect to broker')
         #return
         connection = False
-    # confirm frequency limits
+
+    ##### confirm frequency limits
     logger.info('frequency limits are: {}'.format(frequency_limits))
     if not frequency_limits:
         pass
         # something to get them from the sweeper
-        logger.warning("don't know how to get freq limits automatically")
+        logger.warning('trying to get hf_start_freq, that name is hard coded for now')
+        result = connection.send_request(target='hf_start_freq', request=RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        start_freq = float(result['payload']['value_raw'])
+        logger.info('got a start of: {}'.format(start_freq))
+        logger.warning('trying to get hf_stop_freq, that name is hard coded for now')
+        result = connection.send_request(target='hf_stop_freq', request=RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        stop_freq = float(result['payload']['value_raw'])
+        logger.info('got a stop of: {}'.format(stop_freq))
+        #logger.warning("don't know how to get freq limits automatically")
     else:
         start_freq = min(map(float, frequency_limits))
         stop_freq = max(map(float, frequency_limits))
+    
+    ######## get lock-in data
     # get data
     logger.info('now get data from lockin')
     lockin_data = get_data(connection)
