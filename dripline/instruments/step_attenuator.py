@@ -16,8 +16,7 @@ class StepAttenuator(Endpoint):
     def __init__(self, file_name="/tmp/step_atten.txt", **kwargs):
         self.file_name=file_name
         
-
-    #**kwargs is a library that has arguments. If your class is given a name that it doesn't have a value/function for it will pass it to kwargs, which will pass it along to the parent class, which will do the same thing. 
+   #**kwargs is a library that has arguments. If your class is given a name that it doesn't have a value/function for it will pass it to kwargs, which will pass it along to the parent class, which will do the same thing. 
     #If you haven't came up with something for your function to do, pass it so that it doesn't do anything but you can still run file.
    #Before you had to be in the instruments directory in order for python to see that the file you wanted to open existed. By creating an argument named that gives a default location for the file you can work around that so other people don't need to be in instruments to run the code. 
    
