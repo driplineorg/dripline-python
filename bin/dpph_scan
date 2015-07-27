@@ -127,7 +127,7 @@ def WeinerFilter(freq_data, amp_data, width=False):
     data.sort()
     f,v= zip(*data)
     frequencies = numpy.array(f, dtype=float)
-    voltages = numpy.array(v, dtype=float)
+    voltages = numpy.array(v, dtype=complex)
     x1 = (frequencies - frequencies[0]) / width
     x2 = (frequencies - frequencies[-1]) / width
     gderiv1 = x1 * numpy.exp(-x1 * x1 / 2.)
@@ -186,10 +186,12 @@ def main(broker, frequency_limits, output, **kwargs):
     logger.info('map sweep out to frequencies')
     m = (stop_freq - start_freq) / (10.)
     lockin_data['frequencies'] = start_freq + m * lockin_data['sweep_out']
+    lockin_data['amplitude'] = lockin_data['lockin_x_data'] + 1j*lockin_data['lockin_y_data']
     # pass data to filter
     logger.info('do optimal filter on output')
     filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
-    res_freq = filter_data['freqs'][filter_data['result']==filter_data['result'].max()]
+    max_freq_index = np.abs(filter_data['result']) == np.abs(filter_data['result']).max()
+    res_freq = filter_data['freqs'][max_freqs_index]
     # save raw output to file if requested
     if output:
         output_file = open(output, 'w')
