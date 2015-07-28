@@ -6,7 +6,6 @@ Make a dpph based field measurement
 from __future__ import absolute_import
 
 import numpy
-from scipy import fftpack
 
 import csv
 import pika
@@ -133,10 +132,10 @@ def WeinerFilter(freq_data, amp_data, width=False):
     gderiv1 = x1 * numpy.exp(-x1 * x1 / 2.)
     gderiv2 = x2 * numpy.exp(-x2 * x2 / 2.)
     target_signal = (gderiv1 + gderiv2)
-    target_fft = fftpack.fft(target_signal)
-    data_fft = fftpack.fft(voltages)
+    target_fft = numpy.fft.fft(target_signal)
+    data_fft = numpy.fft.fft(voltages)
     data_fft[0] = 0
-    filtered = fftpack.ifft(data_fft * target_fft)
+    filtered = numpy.fft.ifft(data_fft * target_fft)
     return {'freqs': frequencies,
             'result': abs(filtered),
             'target': target_signal
