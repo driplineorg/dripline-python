@@ -6,13 +6,13 @@ from setuptools.command.test import test as TestCommand
 
 verstr = "none"
 try:
-    #verstr = open("VERSION").read().strip().replace(' ', '.')
     import subprocess
     verstr = subprocess.check_output(['git','describe','--long']).decode('utf-8').strip()
 except EnvironmentError:
     pass
-except:
-    raise RuntimeError("unable to find version")
+except Exception as err:
+    print(err)
+    verstr = 'v0.0.0-???'
 
 
 class PyTest(TestCommand):
