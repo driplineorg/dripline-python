@@ -201,6 +201,7 @@ class Endpoint(object):
             logger.error('got an error: {}'.format(err.message))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             result = err.message
+            retcode = 999
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)
         self.portal.send_reply(properties, reply)

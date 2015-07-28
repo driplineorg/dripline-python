@@ -91,8 +91,9 @@ def get_data(connection):
     logger.info('ensure_setup')
     _get('lockin_ensure_setup', connection)
     # trigger taking data
+    logger.info('start_taking_data')
     result = _get('lockin_take_data', connection)
-    # wait for data taking to finish
+    # wait for data taking to finish... would be nice to sleep for the nomial data-taking time prior to starting to poll
     while not result == 'done':
         time.sleep(0.2)
         result = _get('lockin_status', connection)
