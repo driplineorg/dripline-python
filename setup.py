@@ -37,9 +37,11 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 extras_require={
-    'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],# sphinx-argparse
+    'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],
     'database': ['sqlalchemy', 'psycopg2'],
-    'dpph': ['cython', 'numpy', 'scipy'],
+    # a note about dpph, I'm purging scipy; I've found that if we need to use it,
+    # it is more reliable to also have cython as a dependency
+    'dpph': ['numpy'],
     'other': ['colorlog', 'ipython', 'ipdb'],
 }
 everything = set()
