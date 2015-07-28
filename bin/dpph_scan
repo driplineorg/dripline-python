@@ -5,11 +5,12 @@ Make a dpph based field measurement
 
 from __future__ import absolute_import
 
-import numpy
 
 import csv
-import pika
 import time
+
+import pika
+import numpy
 
 from dripline.core import DriplineParser, constants, Service, message, exceptions
 
@@ -35,7 +36,6 @@ def scdb_log(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwarg
     conn = Service(amqp_url = broker,exchange = 'alerts',keys = '#')
     conn.send_alert(severity='sensor_value', alert=to_log)
     logger.info('log sent')
-
 
 
 def scdb_query(broker,sensor):
@@ -96,7 +96,9 @@ def get_data(connection):
     # wait for data taking to finish... would be nice to sleep for the nomial data-taking time prior to starting to poll
     while not result == 'done':
         time.sleep(0.2)
+        npts = _get('lockin_curve_status', connection)
         result = _get('lockin_status', connection)
+        logger.info('collected {}/400? points'.format(npts.split(',')[-1].strip()))
     # get data
     result = _get('lockin_mag_data', connection)
     data['amplitude'] = numpy.array(result.strip('\0').replace('\x00','').split(), dtype=float)
@@ -150,7 +152,7 @@ def FrequencyToField(frequency):
     return tesla
 
 
-def main(broker, frequency_limits, output, **kwargs):
+def main(broker, frequency_limits, output, store, **kwargs):
     ##### Connect to slow controls
     logger.info('broker is: {}'.format(broker))
     try:
@@ -190,8 +192,8 @@ def main(broker, frequency_limits, output, **kwargs):
     # pass data to filter
     logger.info('do optimal filter on output')
     filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
-    max_freq_index = np.abs(filter_data['result']) == np.abs(filter_data['result']).max()
-    res_freq = filter_data['freqs'][max_freqs_index]
+    max_freq_index = numpy.abs(filter_data['result']) == numpy.abs(filter_data['result']).max()
+    res_freq = filter_data['freqs'][max_freq_index]
     # save raw output to file if requested
     if output:
         output_file = open(output, 'w')
@@ -223,17 +225,18 @@ def main(broker, frequency_limits, output, **kwargs):
     #print('value is: {}'.format(field))
 
     #########
-    # Save the results to the database
-    # First, save the Z position
+    # Store the results to the database
     sensor = 'string_pot_resistance'
     result = scdb_query(broker=broker,sensor=sensor)
-    scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
-    # Then the dpph value
-    scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
+    if store:
+        # First, the Z position
+        scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
+        # Then the dpph value
+        scdb_log(broker=broker, sensor='dpph', value_raw=field[0], value_cal=field[0])
+        logger.info('Resuls logged to database')
     #########
     # Print Results
-    print('String Z Position = %0.02f ; Field = %f kG' % (result.payload['value_cal'],field))
-    print('Resuls logged to database')
+    logger.info('String Z Position = {:.2f} [mm]; Field = {:.5f} [kG]'.format(result.payload['value_cal'],field[0]))
 
 
 if __name__ == '__main__':
@@ -251,6 +254,13 @@ if __name__ == '__main__':
     # an option for outputting a grahic
     # an option for passing in the sweeper limits
     parser.add_argument('-f', '--frequency-limits', nargs=2, default=[])
+    parser.add_argument('-s', '--store',
+                        type=bool,
+                        default=False,
+                        nargs='?',
+                        const=True, #value if option given with no argument
+                        help='send an alert message logging both the z position and dpph field result',
+                       )
     # an option to log the result (have this prompt the user first?)
     args = parser.parse_args()
     main(**vars(args))
