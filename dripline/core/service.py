@@ -299,8 +299,9 @@ class Service(object):
         except exceptions.DriplineDecodingError as err:
                 pass
         logger.log(35, # NOTICE, between INFO and WARNING
-                   'Received message # {} from {}: {}'.format(basic_deliver.delivery_tag,
+                   'Received message #{}\napplication: {}\nrouting_key: {}\n{}'.format(basic_deliver.delivery_tag,
                                                               properties.app_id,
+                                                              basic_deliver.routing_key,
                                                               decoded or body,
                                                              )
                   )
