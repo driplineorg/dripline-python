@@ -77,6 +77,9 @@ class Message(dict, object):
         else:
             self.sender_info = sender_info
 
+    def __str__(self):
+        return json.dumps(self, indent=4)
+
     @property
     def msgop(self):
         return self['msgop']
