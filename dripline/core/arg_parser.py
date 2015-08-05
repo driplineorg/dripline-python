@@ -46,7 +46,11 @@ class SlackHandler(logging.Handler):
         try:
             import slackclient
             import json
-            token = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']['token']
+            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
+            if 'dripline' in slack:
+                token = slack['dripline']
+            else:
+                token = slack['token']
             self.slackclient = slackclient.SlackClient(token)
         except ImportError as err:
             if 'slackclient' in err.message:
@@ -54,7 +58,7 @@ class SlackHandler(logging.Handler):
             raise
 
     def emit(self, record):
-        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record, username='driplineBot')
+        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record.msg, username='driplineBot', as_user='true')
 
 
 class DotAccess(object):
@@ -73,6 +77,7 @@ class DriplineParser(argparse.ArgumentParser):
                  config_file=False,
                  tmux_support=False,
                  twitter_support=False,
+                 slack_support=False,
                  user_pass_support=False,
                  **kwargs):
         '''
@@ -82,6 +87,7 @@ class DriplineParser(argparse.ArgumentParser):
             config_file (bool): enable a '-c' option for specifying an input configuration file
             tmux_support (bool): enable a '-t' option to start the process in a tmux session rather than on the active shell
             twitter_support (bool): enable a '-T' option to send a logger messages of critical or higher severity as tweets
+            slack_support (bool): enable a '-S' option to send log messages to slack channels
             user_pass_support (bool): enable '-u' and '-p' for user and password specification. **Note:** these options should be replaced with either reading the standard file ~/.project8_authentication.json, and/or prompting the user for values interactively
 
         '''
@@ -134,8 +140,16 @@ class DriplineParser(argparse.ArgumentParser):
                               '--twitter',
                               help='enable sending critical messages as tweets',
                               nargs='?',
-                              default=False,
-                              const=True,
+                              default=False, # value if option not given
+                              const=True, # value if option given with no argument
+                             )
+        if slack_support:
+            self.add_argument('-S',
+                              '--slack',
+                              help='enable sending critical messages as slack messages to #p8_alerts',
+                              nargs='?',
+                              default=False, # value if option not given
+                              const=True, # value if option given with no argument
                              )
         if user_pass_support:
             self.add_argument('-u',
@@ -211,11 +225,18 @@ class DriplineParser(argparse.ArgumentParser):
 
     def __process_twitter(self):
         twitter_handler = TwitterHandler()
-        twitter_handler.setLevel(logging.CRITICAL)
-        logger.addHandler(twitter_handler)
+        self.__add_critical_handler(twitter_handler)
+
+    def __process_slack(self):
+        slack_handler = SlackHandler()
+        self.__add_critical_handler(slack_handler)
+
+    def __add_critical_handler(self, a_handler):
+        a_handler.setLevel(logging.CRITICAL)
+        logger.addHandler(a_handler)
         if hasattr(self, 'extra_logger'):
-            self.extra_logger.addHandler(twitter_handler)
-        self._handlers.append(twitter_handler)
+            self.extra_logger.addHandler(a_handler)
+        self._handlers.append(a_handler)
 
     def parse_args(self):
         '''
@@ -274,4 +295,10 @@ class DriplineParser(argparse.ArgumentParser):
         if hasattr(args, 'twitter'):
             if args.twitter:
                 self.__process_twitter()
+
+        # and add slack to the log handling if enabled
+        if hasattr(args, 'slack'):
+            if args.slack:
+                self.__process_slack()
+        
         return args
