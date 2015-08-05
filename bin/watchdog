@@ -43,6 +43,7 @@ if __name__ == '__main__':
                             extra_logger=logger,
                             tmux_support=True,
                             twitter_support=True,
+                            slack_support=True,
                            )
     parser.parse_args()
     monitor()
