@@ -190,7 +190,7 @@ class Endpoint(object):
             result = endpoint_method(*these_args, **these_kwargs)
             logger.debug('\n endpoint method returned \n')
             if result is None:
-                result = "operation returned without error"
+                result = "operation completed silently"
         except NotImplementedError as err:
             logger.warning('method {} is not implemented'.format(method_name))
         except exceptions.DriplineException as err:
