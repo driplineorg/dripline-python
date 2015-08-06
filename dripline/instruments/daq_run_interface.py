@@ -49,7 +49,6 @@ class DAQProvider(core.Provider):
                                      )
         result = self.portal.send_request(self.run_table_endpoint,
                                           request=request,
-                                          decode=True,
                                          )
         self.run_id = result.payload['run_id']
         self._run_name = value
@@ -111,7 +110,6 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
                                      )
         result = self.portal.send_request(self.mantis_queue,
                                           request=request,
-                                          decode=True,
                                          )
         if not result.retcode == 0:
             msg = ''
@@ -159,4 +157,5 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
     def end_run(self):
         # something to stop FastSave
         self.send(['SENS:ACQ:FSAV:ENAB 0'])
+        self.send(['TRIG:SEQ:STAT 0'])
         super(RSAAcquisitionInterface, self).end_run()
