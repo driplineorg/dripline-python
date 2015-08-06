@@ -157,5 +157,5 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
     def end_run(self):
         # something to stop FastSave
         self.send(['SENS:ACQ:FSAV:ENAB 0'])
-        self.send(['TRIG:SEQ:STAT 0'])
+        self.send(['TRIG:SEQ:STAT 0;*OPC?'])
         super(RSAAcquisitionInterface, self).end_run()
