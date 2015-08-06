@@ -158,7 +158,7 @@ class Endpoint(object):
         self.__request_lock = threading.Lock()
 
         def raiser(self, *args, **kwargs):
-            raise NotImplementedError
+            raise exceptions.DriplineMethodNotSupportedError('requested method not supported by this endpoint')
 
         for key in dir(constants):
             if key.startswith('OP_'):
