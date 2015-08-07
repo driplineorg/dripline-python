@@ -10,7 +10,7 @@ import yaml
 import dripline
 
 import logging
-logger = dripline.core.DriplineLogger(__name__)#logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
@@ -24,9 +24,7 @@ def open_spimescape_portal(nodename, broker, **kwargs):
     for provider in kwargs['providers']:
         portal.add_endpoint(create_child(portal, provider))
     logger.info('spimescapes created and populated')
-    #logger.info('creating bindings')
-    #portal.create_bindings()
-    logger.notice('Configuration of {} complete, starting consumption'.format(nodename))
+    logger.info('Configuration of {} complete, starting consumption'.format(nodename))
     portal.start_event_loop()
 
 def create_child(portal, conf_dict):

@@ -10,18 +10,6 @@ import logging
 __all__ = []
 
 
-__all__.append('DriplineLogger')
-class DriplineLogger(logging.Logger):
-    '''
-    Custom Logger for use in dripline modules.
-    '''
-    def notice(self, msg, *args, **kwargs):
-        '''
-        notice provides an extra logging level between info and warning.
-        '''
-        self.log(level=25, msg=msg, *args, **kwargs)
-
-
 __all__.append('SlackHandler')
 class SlackHandler(logging.Handler):
     '''
