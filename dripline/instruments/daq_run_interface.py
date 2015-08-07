@@ -149,6 +149,8 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
                    "*OPC?"
                   ]
                  )
+        # Set the maximum number of events to 10k
+        self.send(['SENS:ACQ:FSAV:FILE:MAX 10000;*OPC?'])
         # ensure in triggered mode
         self.send(['TRIG:SEQ:STAT 1;*OPC?'])
         # actually start to FastSave
