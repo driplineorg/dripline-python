@@ -1,32 +1,62 @@
 '''
-Log (application status messages from python's logging, not sensor value logs) master configuration
-
-Similar to arg_parse, this is a utility primarily for scripts/applications so that they can configure themselves to print using the same format etc... could potentially be incorporated into that module.
+Wrappers for the standard logging module classes
 '''
 
-from __future__ import print_function, absolute_import
+from __future__ import absolute_import
 
-from ..core import constants
 
 import logging
 
-# crate logger for 'dripline'
-logger = logging.getLogger('dripline')
-logger.setLevel(logging.DEBUG)
-# create the console log handler
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-# create formatter
-try:
-    import colorlog
-    formatter = colorlog.ColoredFormatter(
-            "%(asctime)s%(log_color)s[%(levelname)-8s]%(name)s(%(lineno)d) -> %(purple)s%(message)s",
-            datefmt = constants.TIME_FORMAT,
-            reset=True,
-            )
-except ImportError:
-    formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s(%(lineno)d) -> %(message)s', constants.TIME_FORMAT)
+__all__ = []
 
-# apply formatter and add handlers tot he loggers
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+
+__all__.append('DriplineLogger')
+class DriplineLogger(logging.Logger):
+    '''
+    Custom Logger for use in dripline modules.
+    '''
+    def notice(self, msg, *args, **kwargs):
+        '''
+        notice provides an extra logging level between info and warning.
+        '''
+        self.log(level=25, msg=msg, *args, **kwargs)
+
+
+__all__.append('SlackHandler')
+class SlackHandler(logging.Handler):
+    '''
+    A custom handler for sending messages to slack
+    '''
+    def __init__(self, *args, **kwargs):
+        logging.Handler.__init__(self, *args, **kwargs)
+        try:
+            import slackclient
+            import json
+            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
+            if 'dripline' in slack:
+                token = slack['dripline']
+            else:
+                token = slack['token']
+            self.slackclient = slackclient.SlackClient(token)
+        except ImportError as err:
+            if 'slackclient' in err.message:
+                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
+            raise
+
+
+__all__.append('TwitterHandler')
+class TwitterHandler(logging.Handler):
+    '''
+    A custom message handler for redirecting text to twitter
+    '''
+    def emit(self, record):
+        try:
+            import TwitterAPI, yaml, os
+            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
+            api = TwitterAPI.TwitterAPI(**auth_kwargs)
+            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
+            api.request('statuses/update', {'status': tweet_text})
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)

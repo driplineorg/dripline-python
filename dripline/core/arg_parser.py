@@ -10,7 +10,8 @@ import os
 import subprocess
 import sys
 
-from ..core import constants
+from .constants import TIME_FORMAT
+from .status_logger import SlackHandler, TwitterHandler
 from .. import __version__
 
 import logging
@@ -20,45 +21,45 @@ logger.setLevel(logging.DEBUG)
 __all__ = ['DriplineParser']
 
 
-class TwitterHandler(logging.Handler):
-    '''
-    A custom message handler for redirecting text to twitter
-    '''
-    def emit(self, record):
-        try:
-            import TwitterAPI, yaml, os
-            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
-            api = TwitterAPI.TwitterAPI(**auth_kwargs)
-            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
-            api.request('statuses/update', {'status': tweet_text})
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            self.handleError(record)
-
-
-class SlackHandler(logging.Handler):
-    '''
-    A custom handler for sending messages to slack
-    '''
-    def __init__(self, *args, **kwargs):
-        logging.Handler.__init__(self, *args, **kwargs)
-        try:
-            import slackclient
-            import json
-            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
-            if 'dripline' in slack:
-                token = slack['dripline']
-            else:
-                token = slack['token']
-            self.slackclient = slackclient.SlackClient(token)
-        except ImportError as err:
-            if 'slackclient' in err.message:
-                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
-            raise
-
-    def emit(self, record):
-        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record.msg, username='driplineBot', as_user='true')
+#class TwitterHandler(logging.Handler):
+#    '''
+#    A custom message handler for redirecting text to twitter
+#    '''
+#    def emit(self, record):
+#        try:
+#            import TwitterAPI, yaml, os
+#            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
+#            api = TwitterAPI.TwitterAPI(**auth_kwargs)
+#            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
+#            api.request('statuses/update', {'status': tweet_text})
+#        except (KeyboardInterrupt, SystemExit):
+#            raise
+#        except:
+#            self.handleError(record)
+#
+#
+#class SlackHandler(logging.Handler):
+#    '''
+#    A custom handler for sending messages to slack
+#    '''
+#    def __init__(self, *args, **kwargs):
+#        logging.Handler.__init__(self, *args, **kwargs)
+#        try:
+#            import slackclient
+#            import json
+#            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
+#            if 'dripline' in slack:
+#                token = slack['dripline']
+#            else:
+#                token = slack['token']
+#            self.slackclient = slackclient.SlackClient(token)
+#        except ImportError as err:
+#            if 'slackclient' in err.message:
+#                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
+#            raise
+#
+#    def emit(self, record):
+#        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record.msg, username='driplineBot', as_user='true')
 
 
 class DotAccess(object):
@@ -169,13 +170,13 @@ class DriplineParser(argparse.ArgumentParser):
             import colorlog
             self.fmt = colorlog.ColoredFormatter(
                     base_format.format('%(log_color)s', '%(purple)s'),
-                    datefmt = constants.TIME_FORMAT[:-1],
+                    datefmt = TIME_FORMAT[:-1],
                     reset=True,
                     )
         except ImportError:
             self.fmt = logging.Formatter(
                     base_format.format(' ', ''),
-                    constants.TIME_FORMAT[:-1]
+                    TIME_FORMAT[:-1]
                     )
         self._handlers[0].setFormatter(self.fmt)
 
@@ -267,7 +268,6 @@ class DriplineParser(argparse.ArgumentParser):
                             file_str = re.sub(reg_ex, new_pass, file_str)
                     conf_file = yaml.load(file_str)
                     conf_file.update(args_dict)
-                    print('config file is: {}'.format(conf_file))
                     args_dict['config'] = conf_file
                     args = DotAccess(args_dict)
                 except:
@@ -275,7 +275,7 @@ class DriplineParser(argparse.ArgumentParser):
                     raise
 
         # setup loggers and handlers
-        log_level = max(0, 30-args.verbose*10)
+        log_level = max(0, 25-args.verbose*10)
         self._handlers[0].setLevel(log_level)
         if not args.logfile is None:
             _file_handler = logging.FileHandler(args.logfile)
