@@ -84,6 +84,10 @@ class DriplineTimeoutError(DriplineError):
 __all__.append('DriplineTimeoutError')
 
 
+class DriplineMethodNotSupportedError(DriplineError):
+    retcode =306
+__all__.append('DriplineMethodNotSupportedError')
+
 class DriplineDatabaseError(DriplineError):
     retcode = 400
 __all__.append("DriplineDatabaseError")
