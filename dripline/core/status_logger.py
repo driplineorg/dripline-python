@@ -33,6 +33,9 @@ class SlackHandler(logging.Handler):
                 logger.warning('The slackclient package (available in pip) is required for using the slack handler')
             raise
 
+    def emit(self, record):
+        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record, username='dripline', as_user='true')
+
 
 __all__.append('TwitterHandler')
 class TwitterHandler(logging.Handler):
