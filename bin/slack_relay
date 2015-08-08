@@ -1,0 +1,23 @@
+#!/usr/bin/python
+'''
+Utility app for posting messages to slack
+'''
+
+from __future__ import absolute_import
+
+import json
+
+import slackclient
+
+import dripline
+
+class SlackRelay(dripline.core.AlertConsumer):
+    def __init__(self, **kwargs):
+        this_home = os.path.expanduser('~')
+        _tokens = json.loads(open(this_home+'/.project8_authentications.json').read())['slack']
+        self._slackclients = {}
+        for bot,token in _tokens.items():
+            self._slackclients[bot] = slackcleint.SlackClient(token)
+        
+    def on_message(self, channel, method, properties, message):
+        pass
