@@ -4,6 +4,7 @@ Wrappers for the standard logging module classes
 
 from __future__ import absolute_import
 
+import os
 
 import logging
 
@@ -20,7 +21,8 @@ class SlackHandler(logging.Handler):
         try:
             import slackclient
             import json
-            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
+            this_home = os.path.expanduser('~')
+            slack = json.loads(open(this_home+'/.project8_authentications.json').read())['slack']
             if 'dripline' in slack:
                 token = slack['dripline']
             else:
