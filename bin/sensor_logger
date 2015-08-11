@@ -49,6 +49,7 @@ if __name__ == '__main__':
                             tmux_support=True,
                             config_file=True,
                             twitter_support=True,
+                            slack_support=True
                            )
     parser.add_argument('-e',
                         '--exchange',

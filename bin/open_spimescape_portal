@@ -24,9 +24,7 @@ def open_spimescape_portal(nodename, broker, **kwargs):
     for provider in kwargs['providers']:
         portal.add_endpoint(create_child(portal, provider))
     logger.info('spimescapes created and populated')
-    #logger.info('creating bindings')
-    #portal.create_bindings()
-    logger.info('starting consumption')
+    logger.info('Configuration of {} complete, starting consumption'.format(nodename))
     portal.start_event_loop()
 
 def create_child(portal, conf_dict):
@@ -53,6 +51,7 @@ if __name__ == '__main__':
                                           config_file=True,
                                           tmux_support=True,
                                           twitter_support=True,
+                                          slack_support=True,
                                           user_pass_support=True,
                                          )
     

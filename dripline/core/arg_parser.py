@@ -10,7 +10,8 @@ import os
 import subprocess
 import sys
 
-from ..core import constants
+from .constants import TIME_FORMAT
+from .status_logger import SlackHandler, TwitterHandler
 from .. import __version__
 
 import logging
@@ -20,41 +21,45 @@ logger.setLevel(logging.DEBUG)
 __all__ = ['DriplineParser']
 
 
-class TwitterHandler(logging.Handler):
-    '''
-    A custom message handler for redirecting text to twitter
-    '''
-    def emit(self, record):
-        try:
-            import TwitterAPI, yaml, os
-            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
-            api = TwitterAPI.TwitterAPI(**auth_kwargs)
-            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
-            api.request('statuses/update', {'status': tweet_text})
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            self.handleError(record)
-
-
-class SlackHandler(logging.Handler):
-    '''
-    A custom handler for sending messages to slack
-    '''
-    def __init__(self, *args, **kwargs):
-        logging.Handler.__init__(self, *args, **kwargs)
-        try:
-            import slackclient
-            import json
-            token = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']['token']
-            self.slackclient = slackclient.SlackClient(token)
-        except ImportError as err:
-            if 'slackclient' in err.message:
-                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
-            raise
-
-    def emit(self, record):
-        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record, username='driplineBot')
+#class TwitterHandler(logging.Handler):
+#    '''
+#    A custom message handler for redirecting text to twitter
+#    '''
+#    def emit(self, record):
+#        try:
+#            import TwitterAPI, yaml, os
+#            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
+#            api = TwitterAPI.TwitterAPI(**auth_kwargs)
+#            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
+#            api.request('statuses/update', {'status': tweet_text})
+#        except (KeyboardInterrupt, SystemExit):
+#            raise
+#        except:
+#            self.handleError(record)
+#
+#
+#class SlackHandler(logging.Handler):
+#    '''
+#    A custom handler for sending messages to slack
+#    '''
+#    def __init__(self, *args, **kwargs):
+#        logging.Handler.__init__(self, *args, **kwargs)
+#        try:
+#            import slackclient
+#            import json
+#            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
+#            if 'dripline' in slack:
+#                token = slack['dripline']
+#            else:
+#                token = slack['token']
+#            self.slackclient = slackclient.SlackClient(token)
+#        except ImportError as err:
+#            if 'slackclient' in err.message:
+#                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
+#            raise
+#
+#    def emit(self, record):
+#        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record.msg, username='driplineBot', as_user='true')
 
 
 class DotAccess(object):
@@ -73,6 +78,7 @@ class DriplineParser(argparse.ArgumentParser):
                  config_file=False,
                  tmux_support=False,
                  twitter_support=False,
+                 slack_support=False,
                  user_pass_support=False,
                  **kwargs):
         '''
@@ -82,6 +88,7 @@ class DriplineParser(argparse.ArgumentParser):
             config_file (bool): enable a '-c' option for specifying an input configuration file
             tmux_support (bool): enable a '-t' option to start the process in a tmux session rather than on the active shell
             twitter_support (bool): enable a '-T' option to send a logger messages of critical or higher severity as tweets
+            slack_support (bool): enable a '-S' option to send log messages to slack channels
             user_pass_support (bool): enable '-u' and '-p' for user and password specification. **Note:** these options should be replaced with either reading the standard file ~/.project8_authentication.json, and/or prompting the user for values interactively
 
         '''
@@ -134,8 +141,16 @@ class DriplineParser(argparse.ArgumentParser):
                               '--twitter',
                               help='enable sending critical messages as tweets',
                               nargs='?',
-                              default=False,
-                              const=True,
+                              default=False, # value if option not given
+                              const=True, # value if option given with no argument
+                             )
+        if slack_support:
+            self.add_argument('-S',
+                              '--slack',
+                              help='enable sending critical messages as slack messages to #p8_alerts',
+                              nargs='?',
+                              default=False, # value if option not given
+                              const=True, # value if option given with no argument
                              )
         if user_pass_support:
             self.add_argument('-u',
@@ -155,13 +170,13 @@ class DriplineParser(argparse.ArgumentParser):
             import colorlog
             self.fmt = colorlog.ColoredFormatter(
                     base_format.format('%(log_color)s', '%(purple)s'),
-                    datefmt = constants.TIME_FORMAT[:-1],
+                    datefmt = TIME_FORMAT[:-1],
                     reset=True,
                     )
         except ImportError:
             self.fmt = logging.Formatter(
                     base_format.format(' ', ''),
-                    constants.TIME_FORMAT[:-1]
+                    TIME_FORMAT[:-1]
                     )
         self._handlers[0].setFormatter(self.fmt)
 
@@ -211,11 +226,18 @@ class DriplineParser(argparse.ArgumentParser):
 
     def __process_twitter(self):
         twitter_handler = TwitterHandler()
-        twitter_handler.setLevel(logging.CRITICAL)
-        logger.addHandler(twitter_handler)
+        self.__add_critical_handler(twitter_handler)
+
+    def __process_slack(self):
+        slack_handler = SlackHandler()
+        self.__add_critical_handler(slack_handler)
+
+    def __add_critical_handler(self, a_handler):
+        a_handler.setLevel(logging.CRITICAL)
+        logger.addHandler(a_handler)
         if hasattr(self, 'extra_logger'):
-            self.extra_logger.addHandler(twitter_handler)
-        self._handlers.append(twitter_handler)
+            self.extra_logger.addHandler(a_handler)
+        self._handlers.append(a_handler)
 
     def parse_args(self):
         '''
@@ -246,7 +268,6 @@ class DriplineParser(argparse.ArgumentParser):
                             file_str = re.sub(reg_ex, new_pass, file_str)
                     conf_file = yaml.load(file_str)
                     conf_file.update(args_dict)
-                    print('config file is: {}'.format(conf_file))
                     args_dict['config'] = conf_file
                     args = DotAccess(args_dict)
                 except:
@@ -254,7 +275,7 @@ class DriplineParser(argparse.ArgumentParser):
                     raise
 
         # setup loggers and handlers
-        log_level = max(0, 30-args.verbose*10)
+        log_level = max(0, 25-args.verbose*10)
         self._handlers[0].setLevel(log_level)
         if not args.logfile is None:
             _file_handler = logging.FileHandler(args.logfile)
@@ -274,4 +295,10 @@ class DriplineParser(argparse.ArgumentParser):
         if hasattr(args, 'twitter'):
             if args.twitter:
                 self.__process_twitter()
+
+        # and add slack to the log handling if enabled
+        if hasattr(args, 'slack'):
+            if args.slack:
+                self.__process_slack()
+        
         return args
