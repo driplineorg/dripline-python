@@ -133,9 +133,12 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
     '''
     A DAQProvider for interacting with the RSA
     '''
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 max_nb_files=10000,
+                 **kwargs):
         DAQProvider.__init__(self, **kwargs)
         EthernetSCPI.__init__(self, **kwargs)
+        self.max_nb_files = max_nb_files
 
     def start_run(self, run_name):
         super(RSAAcquisitionInterface, self).start_run(run_name)
@@ -149,8 +152,8 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
                    "*OPC?"
                   ]
                  )
-        # Set the maximum number of events to 10k
-        self.send(['SENS:ACQ:FSAV:FILE:MAX 10000;*OPC?'])
+        # Set the maximum number of events (note that the default is 10k)
+        self.send(['SENS:ACQ:FSAV:FILE:MAX {:d};*OPC?'.format(self.max_nb_files)])
         # ensure in triggered mode
         self.send(['TRIG:SEQ:STAT 1;*OPC?'])
         # actually start to FastSave
