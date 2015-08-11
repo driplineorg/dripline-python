@@ -49,13 +49,13 @@ class SlackRelay(dripline.core.AlertConsumer):
             this_client = self._slackclients['dripline']
        
         logger.debug('posting message')
-        this_client.api_call('chat.postMessage',
-                             channel='#'+routing_info['channel'],
-                             text=str(msg.payload),
-                             username=routing_info['from'],
-                             as_user=as_user,
-                            )
-        logger.debug('api call returned')
+        api_out = this_client.api_call('chat.postMessage',
+                                       channel='#'+routing_info['channel'],
+                                       text=str(msg.payload),
+                                       username=routing_info['from'],
+                                       as_user=as_user,
+                                      )
+        logger.debug('api call returned:{}'.format(api_out))
 
 def start_relay(**kwargs):
     relay = SlackRelay(**kwargs)
