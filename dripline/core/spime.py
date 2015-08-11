@@ -24,10 +24,7 @@ logger = logging.getLogger(__name__)
 def _log_on_set_decoration(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
-        try:
-            result = fun(*args, **kwargs)
-        except TypeError as err:
-            return err.message
+        result = fun(*args, **kwargs)
             
         values = {}
         if result is not None:
