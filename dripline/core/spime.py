@@ -8,6 +8,7 @@ import math
 import functools
 import types
 
+from . import exceptions
 from .endpoint import Endpoint, calibrate#, fancy_init_doc
 from .data_logger import DataLogger
 
@@ -128,7 +129,7 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
 
     @staticmethod
     def on_set():
-        raise NotImplementedError('setting not available for {}'.format(self.name))
+        raise exceptions.DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
 #@fancy_init_doc
@@ -142,31 +143,44 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
     @staticmethod
     def on_get():
-        raise NotImplementedError('getting not available for {}'.format(self.name))
+        raise exceptions.DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
 
 #@fancy_init_doc
 class FormatSCPISpime(Spime):
-    def __init__(self, get_str=None, set_str=None, **kwargs):
+    def __init__(self, get_str=None, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
         '''
         Keyword Args:
-            get_str (str): if not None, sent verbatim in the event of on_get
-            set_str (str): if not None, sent as set_str.format(value) in the event of on_set
+            get_str (str): if not None, sent verbatim in the event of on_get; (exception if None)
+            set_str (str): if not None, sent as set_str.format(value) in the event of on_set (exception if None)
+            set_value_map (dict): dictionary of mappings for values to on_set; note that the result of set_value_map[value] will be used as the input to set_str.format(value) if this dict is present
+            set_value_lowercase (bool): convenience option to use .lower() on set value if it is a string
         
 
         '''
         Spime.__init__(self, **kwargs)
         self._get_str = get_str
         self._set_str = set_str
+        self._set_value_map = set_value_map
 
     @calibrate
     def on_get(self):
         if self._get_str is None:
-            raise NotImplementedError('<{}> has no get string available'.format(self.name))
+            raise exceptions.DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
         result = self.provider.send(self._get_str)
         return result
 
     def on_set(self, value):
         if self._set_str is None:
-            raise NotImplementedError('<{}> has no set string available'.format(self.name))
-        result = self.provider.send(self._set_str.format(value))
+            raise exceptions.DriplineMethodNotSupportedError('<{}> has no set string available'.format(self.name))
+        if isinstance(value, types.StringTypes):
+            value = value.lower()
+        logger.debug('value is: {}'.format(value))
+        if isinstance(self._set_value_map, types.DictType):
+            mapped_value = self._set_value_map[value]
+        elif self._set_value_map is None:
+            mapped_value = value
+        else:
+            raise exceptions.DriplineInternalError('set_value_map of unsupported type')
+        logger.debug('mapped value is: {}'.format(mapped_value))
+        result = self.provider.send(self._set_str.format(mapped_value))
         return result
