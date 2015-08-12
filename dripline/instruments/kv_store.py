@@ -54,6 +54,9 @@ class kv_store(Provider):
         """
         return self.keys()
 
+    def send(self, to_send):
+        logger.info('asked to send:\n{}'.format(to_send))
+
 
 class kv_store_key(Spime):
     """
