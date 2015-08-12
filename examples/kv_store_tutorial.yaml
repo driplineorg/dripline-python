@@ -27,7 +27,9 @@ providers:
       - name: chicken
         module: FormatSCPISpime
         get_str: 'SOUR:CLOSE? (@101)'
-        cal_str: '{{0:"CLOSED",1:"OPEN"}}[{}]'
+        cal_str:
+            0: CLOSE
+            1: OPEN
         set_str: 'SOUR:{} (@101)'
         set_value_map:
             1: OPEN
