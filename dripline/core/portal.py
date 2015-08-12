@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import datetime
 import json
 import os
-import threading
 import time
 import traceback
 import uuid
@@ -40,9 +39,6 @@ class Portal(Service):
         self.endpoints = {}
         Service.__init__(self, amqp_url=broker, exchange='requests', keys=[], name=name)
         
-        # other portal specific inits
-        self.__request_in_lock = threading.Lock()
-
         self.providers = {}
         self._responses = {}
 
@@ -78,23 +74,12 @@ class Portal(Service):
         logger.debug("loop ended")
 
     def on_message(self, channel, method, header, body):
-        first_fail = None
-        while not self.__request_in_lock.acquire(False):
-            logger.warning('unable to get lock')
-            if first_fail is None:
-                first_fail = datetime.datetime.utcnow()
-            if (datetime.datetime.utcnow() - first_fail).seconds > 60:
-                raise DriplineInternalError('not able to get a lock in handle request')
-            time.sleep(0.1)
         try:
-            try:
-                logger.info('request received by {}'.format(self.name))
-                self.endpoints[method.routing_key].handle_request(channel, method, header, body)
-                logger.info('request processing complete\n{}'.format('-'*29))
-            finally:
-                self._channel.basic_ack(delivery_tag=method.delivery_tag)
+            logger.info('request received by {}'.format(self.name))
+            self.endpoints[method.routing_key].handle_request(channel, method, header, body)
+            logger.info('request processing complete\n{}'.format('-'*29))
         finally:
-            self.__request_in_lock.release()
+            self._channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def _handle_reply(self, channel, method, header, body):
         logger.info("got a reply")
