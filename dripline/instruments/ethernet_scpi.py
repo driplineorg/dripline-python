@@ -28,7 +28,6 @@ class EthernetSCPI(Provider):
         self.alock = threading.Lock()
         self.socket_timeout = float(socket_timeout)
         self.socket_info = socket_info
-        self.poll_thread = threading.Timer([],{})
         self.socket = socket.socket()
         self.response_terminator = response_terminator
         self.command_terminator = command_terminator
@@ -57,18 +56,20 @@ class EthernetSCPI(Provider):
         '''
         if isinstance(commands, types.StringType):
             commands = [commands]
-        self.alock.acquire()
-        
         all_data = []
-        for command in commands:
-            logger.debug('sending: {}'.format(repr(command)))
-            if self.command_terminator is not None:
-                command += self.command_terminator
-            self.socket.send(command)
-            data = self.get()
-            logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
-            all_data.append(data)
-        self.alock.release()
+        self.alock.acquire()
+        try:
+            
+            for command in commands:
+                logger.debug('sending: {}'.format(repr(command)))
+                if self.command_terminator is not None:
+                    command += self.command_terminator
+                self.socket.send(command)
+                data = self.get()
+                logger.debug('sync: {} -> {}'.format(repr(command),repr(data)))
+                all_data.append(data)
+        finally:
+            self.alock.release()
         return ';'.join(all_data)
 
     def get(self):
