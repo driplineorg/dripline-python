@@ -153,7 +153,7 @@ class Endpoint(object):
         '''
         Keyword Args:
             name (str): unique identifier across all dripline services (used to determine routing key)
-            cal_str (str): string use to process raw get result
+            cal_str (str||dict): string use to process raw get result (with .format(raw)) or a dict to use for the same purpose where raw must be a key
             get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
 
         '''
