@@ -42,7 +42,6 @@ class Portal(Service):
         
         # other portal specific inits
         self.__request_in_lock = threading.Lock()
-        self.__alert_out_lock = threading.Lock()
 
         self.providers = {}
         self._responses = {}
