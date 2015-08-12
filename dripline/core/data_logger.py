@@ -7,7 +7,6 @@ __docformat__ = 'reStructuredText'
 import abc
 import datetime
 import logging
-import threading
 import traceback
 import uuid
 
@@ -39,12 +38,11 @@ class DataLogger(object):
         
         '''
         self.alert_routing_key=alert_routing_key
-        self._data_logger_lock = threading.Lock()
         self._log_interval = log_interval
         self._max_interval = max_interval
         self._max_fractional_change = max_fractional_change
         self._is_logging = False
-        self._loop_process = threading.Timer([], {})
+        self._timeout_handle = None
 
         self._last_log_time = None
         self._last_log_value = None
@@ -86,6 +84,9 @@ class DataLogger(object):
         self._max_fractional_change = value
 
     def _conditionally_send(self, to_send):
+        '''
+        consider sending value, but only if a send condition is met
+        '''
         this_value = None
         try:
             this_value = float(to_send['values']['value_raw'])
@@ -105,7 +106,6 @@ class DataLogger(object):
         self._last_log_value = this_value
 
     def _log_a_value(self):
-        self._data_logger_lock.acquire()
         try:
             val = self.get_value()
             if val is None:
@@ -124,38 +124,27 @@ class DataLogger(object):
         except Exception as err:
             logger.error('got a: {}'.format(str(err)))
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
-        finally:
-            self._data_logger_lock.release()
         logger.info('value sent')
         if (self._log_interval <= 0) or (not self._is_logging):
             return
-        self._loop_process = threading.Timer(self._log_interval, self._log_a_value, ())
-        self._loop_process.name = 'logger_{}_{}'.format(self.name, uuid.uuid1().hex[:16])
-        self._loop_process.start()
+        self._timeout_handle = self.portal._connection.add_timeout(self._log_interval, self._log_a_value)
 
     def _stop_loop(self):
-        self._data_logger_lock.acquire()
         try:
             self._is_logging = False
-            if self._loop_process.is_alive():
-                self._loop_process.cancel()
-            else:
-                raise Warning("loop process not running")
+            self.portal._connection.remove_timeout(self._timeout_handle)
         except Warning:
             pass
         except:
             logger.error('something went wrong stopping')
             raise
-        finally:
-            self._data_logger_lock.release()
 
     def _start_loop(self):
         self._is_logging = True
-        if self._loop_process.is_alive():
-            raise Warning("loop process already started")
-        elif self._log_interval <= 0:
+        if self._log_interval <= 0:
             raise Warning("log interval must be > 0")
         else:
+            self.portal._connection.remove_timeout(self._timeout_handle)
             self._log_a_value()
             logger.info("log loop started")
 
@@ -168,10 +157,7 @@ class DataLogger(object):
 
     @property
     def logging_status(self):
-        translator = {True: 'running',
-                      False: 'stopped'
-                     }
-        return translator[self._loop_process.is_alive()]
+        return self._is_logging
     @logging_status.setter
     def logging_status(self, value):
         logger.info('setting logging state to: {}'.format(value))
