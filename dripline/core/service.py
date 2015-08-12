@@ -296,17 +296,18 @@ class Service(object):
         :param str|unicode body: The message body
 
         """
-        try:
-            decoded = Message.from_encoded(body, properties.content_encoding)
-        except exceptions.DriplineDecodingError as err:
-                pass
-        logger.log(35, # NOTICE, between INFO and WARNING
-                   'Received message #{}\napplication: {}\nrouting_key: {}\n{}'.format(basic_deliver.delivery_tag,
-                                                              properties.app_id,
-                                                              basic_deliver.routing_key,
-                                                              decoded or body,
-                                                             )
-                  )
+        logger.info('received a message')
+        #try:
+        #    decoded = Message.from_encoded(body, properties.content_encoding)
+        #except exceptions.DriplineDecodingError as err:
+        #        pass
+        #logger.log(35, # NOTICE, between INFO and WARNING
+        #           'Received message #{}\napplication: {}\nrouting_key: {}\n{}'.format(basic_deliver.delivery_tag,
+        #                                                      properties.app_id,
+        #                                                      basic_deliver.routing_key,
+        #                                                      decoded or body,
+        #                                                     )
+        #          )
         self.acknowledge_message(basic_deliver.delivery_tag)
 
     def acknowledge_message(self, delivery_tag):
