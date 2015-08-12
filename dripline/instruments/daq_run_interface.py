@@ -5,7 +5,6 @@ from __future__ import absolute_import
 
 # standard imports
 import logging
-import threading
 
 # internal imports
 from .. import core
@@ -29,7 +28,7 @@ class DAQProvider(core.Provider):
         '''
         core.Provider.__init__(self, **kwargs)
 
-        self.stop_thread = threading.Timer(0, self.end_run, ())
+        self._stop_handle = None
         self.daq_name = daq_name
         self._run_name = None
         self.run_id = None
@@ -56,8 +55,9 @@ class DAQProvider(core.Provider):
 
     def end_run(self):
         run_was = self.run_id
-        if self.stop_thread.is_alive():
-            self.stop_thread.cancel()
+        if self._stop_handle is not None:
+            self.portal._connection.remove_timeout(self._stop_handle)
+            self._stop_handle = None
         self._run_name = None
         self.run_id = None
         logger.info('run <{}> ended'.format(run_was))
@@ -70,12 +70,8 @@ class DAQProvider(core.Provider):
     def start_timed_run(self, run_name, run_time):
         '''
         '''
-        self.stop_thread = threading.Timer(float(run_time), # log interval [seconds]
-                                           self.end_run, # function to call
-                                           (), # args tuple
-                                          )
+        self._stop_handle = self.portal._connection.add_timeout(int(run_time), self.end_run)
         self.start_run(run_name)
-        self.stop_thread.start()
 
 
 __all__.append('MantisAcquisitionInterface')
