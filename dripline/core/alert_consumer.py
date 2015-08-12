@@ -58,8 +58,8 @@ class AlertConsumer(Service):
             ins = self.table.insert().values(**insert_dict)
             ins.execute()
         except Exception as err:
-            if 'no known endpoint with name' in err.message:
-                logger.critical("Unable to log for <{}>, sensor not in SQL table".format(err.message.split('with name')[-1]))
+            if 'no known endpoint with name' in str(err):
+                logger.critical("Unable to log for <{}>, sensor not in SQL table".format(str(err).split('with name')[-1]))
                 return
             if 'sqlalchemny' in repr(err):
                 logger.critical("got an unknown sqlalchemy error: {}".format(repr(err)))
@@ -77,7 +77,7 @@ class AlertConsumer(Service):
             message_unpacked = Message.from_encoded(message, properties.content_encoding)
             self.this_consume(message_unpacked)
         except Exception as err:
-            logger.warning('got an exception (trying to continue running):\n{}'.format(err.message))
+            logger.warning('got an exception (trying to continue running):\n{}'.format(str(err)))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             raise
 

@@ -29,7 +29,7 @@ class SlackHandler(logging.Handler):
                 token = slack['token']
             self.slackclient = slackclient.SlackClient(token)
         except ImportError as err:
-            if 'slackclient' in err.message:
+            if 'slackclient' in str(err):
                 logger.warning('The slackclient package (available in pip) is required for using the slack handler')
             raise
 

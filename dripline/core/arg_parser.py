@@ -21,47 +21,6 @@ logger.setLevel(logging.DEBUG)
 __all__ = ['DriplineParser']
 
 
-#class TwitterHandler(logging.Handler):
-#    '''
-#    A custom message handler for redirecting text to twitter
-#    '''
-#    def emit(self, record):
-#        try:
-#            import TwitterAPI, yaml, os
-#            auth_kwargs = yaml.load(open(os.path.expanduser('~/.twitter_authentication.yaml')))
-#            api = TwitterAPI.TwitterAPI(**auth_kwargs)
-#            tweet_text = '{} #SCAlert'.format(self.format(record)[:100])
-#            api.request('statuses/update', {'status': tweet_text})
-#        except (KeyboardInterrupt, SystemExit):
-#            raise
-#        except:
-#            self.handleError(record)
-#
-#
-#class SlackHandler(logging.Handler):
-#    '''
-#    A custom handler for sending messages to slack
-#    '''
-#    def __init__(self, *args, **kwargs):
-#        logging.Handler.__init__(self, *args, **kwargs)
-#        try:
-#            import slackclient
-#            import json
-#            slack = json.loads(open('/home/laroque/.project8_authentications.json').read())['slack']
-#            if 'dripline' in slack:
-#                token = slack['dripline']
-#            else:
-#                token = slack['token']
-#            self.slackclient = slackclient.SlackClient(token)
-#        except ImportError as err:
-#            if 'slackclient' in err.message:
-#                logger.warning('The slackclient package (available in pip) is required for using the slack handler')
-#            raise
-#
-#    def emit(self, record):
-#        self.slackclient.api_call('chat.postMessage', channel='#p8_alerts', text=record.msg, username='driplineBot', as_user='true')
-
-
 class DotAccess(object):
     def __init__(self, adict):
         self.__dict__.update(adict)

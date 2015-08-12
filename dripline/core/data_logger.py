@@ -122,7 +122,7 @@ class DataLogger(object):
             if hasattr(self, 'name'):
                 logger.warning('for: {}'.format(self.name))
         except Exception as err:
-            logger.error('got a: {}'.format(err.message))
+            logger.error('got a: {}'.format(str(err)))
             logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
         finally:
             self._data_logger_lock.release()

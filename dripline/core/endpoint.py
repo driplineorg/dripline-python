@@ -202,11 +202,11 @@ class Endpoint(object):
         except exceptions.DriplineException as err:
             logger.debug('got a dripine exception')
             retcode = err.retcode
-            result = err.message
+            result = str(err)
         except Exception as err:
-            logger.error('got an error: {}'.format(err.message))
+            logger.error('got an error: {}'.format(str(err)))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
-            result = err.message
+            result = str(err)
             retcode = 999
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode)

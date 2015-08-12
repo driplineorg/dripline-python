@@ -58,7 +58,7 @@ class Provider(Endpoint):
                 try:
                     results.append((name, setattr(endpoint, 'logging_status', value)))
                 except Warning as err:
-                    logger.warning('got warning: {}'.format(err.message))
+                    logger.warning('got warning: {}'.format(str(err)))
         return results
 
     @property
