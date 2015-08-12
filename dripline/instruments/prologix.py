@@ -7,7 +7,6 @@ from __future__ import absolute_import
 import itertools
 import json
 import socket
-import threading
 import time
 import types
 
@@ -16,116 +15,10 @@ from ..core import Spime, Provider, SimpleSCPIGetSpime, calibrate
 import logging
 logger = logging.getLogger(__name__)
 
-__all__ = ['PrologixSpimescape',
+__all__ = [
            'GPIBInstrument',
            'MuxerGetSpime',
           ]
-
-
-class PrologixSpimescape(Provider):
-    def __init__(self,
-                 socket_timeout=1.0,
-                 socket_info=("localhost", 1234),
-                 **kwargs
-                ):
-        '''
-        '''
-        Provider.__init__(self, **kwargs)
-        self.alock = threading.Lock()
-        self._keep_polling = True
-        self._poll_interval = 0.5
-        self.socket_timeout = float(socket_timeout)
-        #self.expecting = False
-        self.socket_info = socket_info
-        self.poll_thread = threading.Timer([], {})
-        self.socket = socket.socket()
-        #self._devices = {}
-        if type(self.socket_info) is str:
-            import re
-            re_str = "\([\"'](\S+)[\"'], (\d+)\)"
-            (ip, port) = re.findall(re_str, self.socket_info)[0]
-            self.socket_info = (ip, int(port))
-        logger.debug('socket info is {}'.format(self.socket_info))
-        self.reconnect()
-
-    @property
-    def _devices(self):
-        return self._endpoints
-
-    def reconnect(self):
-        self.socket.close()
-        self.socket = socket.socket()
-        try:
-            self.socket.connect(self.socket_info)
-        except:
-            logger.warning('connection with info: {} refused'.format(self.socket_info))
-            raise
-        self.socket.settimeout(self.socket_timeout)
-        self.socket.send("++auto 1\r")
-
-    @property
-    def spimes(self):
-        return self._devices
-
-    @property
-    def devices(self):
-        return self._devices.keys()
-    @devices.setter
-    def devices(self, device_dict):
-        self._devices = device_dict
-        self._device_cycle = itertools.cycle(self._devices.keys())
-        #self._queue_next_check()
-
-    @property
-    def keep_polling(self):
-        return self._keep_polling
-    @keep_polling.setter
-    def keep_polling(self, value):
-        if value:
-            self._keep_polling = True
-            if not self.poll_thread.is_alive():
-                self._queue_next_check()
-        else:
-            self._keep_polling = False
-            if self.poll_thread.is_alive():
-                self.poll_thread.cancel()
-
-    def _queue_next_check(self, from_check=False):
-        if self._devices and self.keep_polling and (from_check or not self.poll_thread.is_alive()):
-            self.poll_thread = threading.Timer(self._poll_interval, self._check_next_status, ())
-            self.poll_thread.start()
-        
-    def _check_next_status(self):
-        device_name = self._device_cycle.next()
-        device = self._devices[device_name]
-        resp = device._check_status()
-        #resp = self.send('*ESR?\n', from_spime=device)
-        device.status = resp
-        #if resp==1:
-        #    self._devices[device]['opc']=1
-        self._queue_next_check(from_check=True)
-
-    def send(self, commands):#, from_spime=None):
-        '''
-        that is, the call to the device blocks for a response
-        '''
-        self.alock.acquire()
-        if isinstance(commands, types.StringType):
-            commands = [commands]
-        data = ""
-        for command in commands:
-            tosend = '{}\r\n'.format(command)
-            logger.debug('sending: {}'.format(tosend))
-            self.socket.send(tosend)
-            try:
-                while True:
-                    data += self.socket.recv(1024)
-            except socket.timeout:
-                pass
-            logger.debug('sync: {} -> {}'.format(repr(command), repr(data)))
-        logger.debug('data is: {}'.format(data))
-        self.alock.release()
-        return data
 
 
 class GPIBInstrument(Provider):
