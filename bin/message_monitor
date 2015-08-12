@@ -5,6 +5,7 @@ message monitoring port based on service class
 
 from __future__ import absolute_import
 
+import json
 import logging
 
 from dripline.core import DriplineParser, Message, Service, exceptions
@@ -20,7 +21,7 @@ class Monitor(Service):
         try:
             decoded = Message.from_encoded(body, properties.content_encoding)
             if self._payload_only:
-                decoded = decoded.payload
+                decoded = json.dumps(decoded.payload, indent=2)
         except exceptions.DriplineDecodingError as err:
             pass
         logger.log(35, # log at a level that prints even without a -v
@@ -71,8 +72,6 @@ if __name__ == '__main__':
                         default=False, #value if not present
                         action='store_const',
                         const=True, #value if present w/o value
-                        #type=bool,
-                        #nargs='?',
                        )
     kwargs = parser.parse_args()
     
