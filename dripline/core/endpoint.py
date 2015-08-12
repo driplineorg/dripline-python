@@ -86,7 +86,8 @@ def calibrate(fun):
         val_dict = {'value_raw':fun(self)}
         if val_dict['value_raw'] is None:
             return None
-        if not self._calibration_str is None:
+        #if not self._calibration_str is None:
+        if isinstance(self._calibration_str, types.StringTypes):
             globals = {
                        "math": math,
                        "cernox_calibration": cernox_calibration,
@@ -101,6 +102,11 @@ def calibrate(fun):
                 cal = None
             if cal is not None:
                 val_dict['value_cal'] = cal
+        elif isinstance(self._calibration_str, dict):
+            if val_dict['value_raw'] in self._calibration_str:
+                val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
+            else:
+                raise exceptions.DriplineValueError('raw value not in cal dict')
         return val_dict
     return wrapper
 
