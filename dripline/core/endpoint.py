@@ -5,7 +5,6 @@ from abc import ABCMeta, abstractproperty, abstractmethod
 import functools
 import inspect
 import math
-import threading
 import time
 import traceback
 import types
@@ -161,7 +160,6 @@ class Endpoint(object):
         self.provider = None
         self.portal = None
         self._calibration_str = cal_str
-        self.__request_lock = threading.Lock()
 
         def raiser(self, *args, **kwargs):
             raise exceptions.DriplineMethodNotSupportedError('requested method not supported by this endpoint')
