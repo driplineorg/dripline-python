@@ -8,7 +8,7 @@ import math
 import functools
 import types
 
-from . import exceptions
+from .exceptions import *
 from .endpoint import Endpoint, calibrate#, fancy_init_doc
 from .data_logger import DataLogger
 
@@ -129,7 +129,7 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
 
     @staticmethod
     def on_set():
-        raise exceptions.DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
+        raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
 #@fancy_init_doc
@@ -143,7 +143,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
     @staticmethod
     def on_get():
-        raise exceptions.DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
+        raise DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
 
 #@fancy_init_doc
 class FormatSCPISpime(Spime):
@@ -165,13 +165,13 @@ class FormatSCPISpime(Spime):
     @calibrate
     def on_get(self):
         if self._get_str is None:
-            raise exceptions.DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
+            raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
         result = self.provider.send(self._get_str)
         return result
 
     def on_set(self, value):
         if self._set_str is None:
-            raise exceptions.DriplineMethodNotSupportedError('<{}> has no set string available'.format(self.name))
+            raise DriplineMethodNotSupportedError('<{}> has no set string available'.format(self.name))
         if isinstance(value, types.StringTypes):
             value = value.lower()
         logger.debug('value is: {}'.format(value))
@@ -180,7 +180,7 @@ class FormatSCPISpime(Spime):
         elif self._set_value_map is None:
             mapped_value = value
         else:
-            raise exceptions.DriplineInternalError('set_value_map of unsupported type')
+            raise DriplineInternalError('set_value_map of unsupported type')
         logger.debug('mapped value is: {}'.format(mapped_value))
         result = self.provider.send(self._set_str.format(mapped_value))
         return result
