@@ -12,6 +12,7 @@ from .constants import *
 from .data_logger import *
 from .endpoint import *
 from .exceptions import *
+from .interface import *
 from .message import *
 from .portal import *
 from .provider import *
