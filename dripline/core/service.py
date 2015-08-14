@@ -152,6 +152,7 @@ class Service(object):
         """
         logger.debug('Channel opened')
         self._channel = channel
+        self._channel.confirm_delivery()
         self.add_on_channel_close_callback()
         self.setup_exchange(self._exchange)
 
@@ -389,6 +390,7 @@ class Service(object):
         parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
+        channel.confirm_delivery()
         result = channel.queue_declare(queue='request_reply'+str(uuid.uuid4()),
                                        exclusive=True,
                                        auto_delete=True,
@@ -412,11 +414,17 @@ class Service(object):
                                               correlation_id=correlation_id,
                                               app_id='dripline.core.Service'
                                              )
-        channel.basic_publish(exchange=exchange,
-                              routing_key=target,
-                              body=message.to_msgpack(),
-                              properties=properties,
-                             )
+        publish_success = channel.basic_publish(exchange=exchange,
+                                                routing_key=target,
+                                                body=message.to_msgpack(),
+                                                properties=properties,
+                                                mandatory=True,
+                                               )
+        if not publish_success:
+            return_queue.put(ReplyMessage(retcode=exceptions.DriplineAMQPRoutingKeyError.retcode,
+                                          payload='message not deliverable'
+                                         )
+                            )
         if not return_connection:
             connection.close()
             return
