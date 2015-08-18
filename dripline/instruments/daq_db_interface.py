@@ -115,7 +115,6 @@ class InsertDBEndpoint(Endpoint):
             if (not col in self._required_insert_names) and (not col in self._optional_insert_names):
                 #raise DriplineDatabaseError('not allowed to insert into: {}'.format(col))
                 kwargs.pop(col)
-                logging.warning('poping column {}'.format(col))
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col in kwargs.keys():
