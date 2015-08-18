@@ -52,7 +52,7 @@ class DriplineParser(argparse.ArgumentParser):
 
         '''
         self.extra_logger = extra_logger
-        argparse.ArgumentParser.__init__(self, **kwargs)
+        argparse.ArgumentParser.__init__(self, formatter_class=argparse.ArgumentDefaultsHelpFormatter, **kwargs)
         self.add_argument('-v',
                           '--verbose',
                           default=0,
