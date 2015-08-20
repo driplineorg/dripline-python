@@ -114,17 +114,7 @@ def get_data(connection):
     return data
 
 
-def WeinerFilter(freq_data, amp_data, width=False):
-    if not width:
-        base_width = 4
-        if max(freq_data) < 30: # assume GHz
-            width = base_width * 1e-3
-        elif max(freq_data) < 30000: # assume MHz
-            width = base_width * 1
-        elif max(freq_data) < 30000000: # assume kHz
-            width = base_width * 1e3
-        else: # assume Hz
-            width = base_width * 1e6
+def WeinerFilter(freq_data, amp_data, width):
     data = zip(freq_data, amp_data)
     data.sort()
     f,v= zip(*data)
@@ -148,11 +138,15 @@ def WeinerFilter(freq_data, amp_data, width=False):
 def FrequencyToField(frequency):
     geff = 2.0036
     charge_over_mass = 1.758e11
-    tesla = (4 * numpy.pi * 10**7 / (geff * charge_over_mass) * frequency)
-    return tesla
+    # note that the following line has a factor of 10
+    # the resulting value is therefore in kG
+    # the frequency is assumed to be in Hz
+    field = (4 * numpy.pi * 10. / (geff * charge_over_mass) * frequency)
+    logger.info('converted {} [Hz] -> {} [kG]'.format(frequency, field))
+    return field
 
 
-def main(broker, frequency_limits, output, store, **kwargs):
+def main(broker, frequency_limits, output, store, width, **kwargs):
     ##### Connect to slow controls
     logger.info('broker is: {}'.format(broker))
     try:
@@ -191,7 +185,7 @@ def main(broker, frequency_limits, output, store, **kwargs):
     lockin_data['amplitude'] = lockin_data['lockin_x_data'] + 1j*lockin_data['lockin_y_data']
     # pass data to filter
     logger.info('do optimal filter on output')
-    filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'])
+    filter_data = WeinerFilter(lockin_data['frequencies'], lockin_data['amplitude'], width=width)
     max_freq_index = numpy.abs(filter_data['result']) == numpy.abs(filter_data['result']).max()
     res_freq = filter_data['freqs'][max_freq_index]
     # save raw output to file if requested
@@ -226,9 +220,10 @@ def main(broker, frequency_limits, output, store, **kwargs):
 
     #########
     # Store the results to the database
-    sensor = 'string_pot_resistance'
-    result = scdb_query(broker=broker,sensor=sensor)
+    result = None
     if store:
+        sensor = 'string_pot_resistance'
+        result = scdb_query(broker=broker,sensor=sensor)
         # First, the Z position
         scdb_log(broker=broker, sensor=sensor, value_raw=result.payload['value_raw'], value_cal=result.payload['value_cal'])
         # Then the dpph value
@@ -236,7 +231,11 @@ def main(broker, frequency_limits, output, store, **kwargs):
         logger.info('Resuls logged to database')
     #########
     # Print Results
-    logger.info('String Z Position = {:.2f} [mm]; Field = {:.5f} [kG]'.format(result.payload['value_cal'],field[0]))
+    result_str = ''
+    if result is not None:
+        result_str = 'String Z Position = {:.2f} [mm]; '.format(result.payload['valuecal'])
+    result_str += 'Field = {:.5f} [kG]'.format(field[0])
+    logger.log(25, result_str)
 
 
 if __name__ == '__main__':
@@ -254,13 +253,19 @@ if __name__ == '__main__':
     # an option for outputting a grahic
     # an option for passing in the sweeper limits
     parser.add_argument('-f', '--frequency-limits', nargs=2, default=[])
-    parser.add_argument('-s', '--store',
-                        type=bool,
-                        default=False,
-                        nargs='?',
-                        const=True, #value if option given with no argument
-                        help='send an alert message logging both the z position and dpph field result',
-                       )
     # an option to log the result (have this prompt the user first?)
+    parser.add_argument('-s', '--store',
+                        help='send an alert message logging both the z position and dpph field result',
+                        default=False,
+                        action='store_const',
+                        const=True, #value if option given with no argument
+                       )
+    parser.add_argument('-w', '--width',
+                        help='specify resonance width in Hz',
+                        default=4e6,
+                        action='store',
+                        type=float,
+                       )
+    
     args = parser.parse_args()
     main(**vars(args))
