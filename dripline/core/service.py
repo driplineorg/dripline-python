@@ -380,7 +380,7 @@ class Service(object):
         logger.debug('Closing connection')
         self._connection.close()
 
-    def send_message(self, target, message, return_queue=None, properties=None, exchange=None, return_connection=False):
+    def send_message(self, target, message, return_queue=None, properties=None, exchange=None, return_connection=False, ensure_delivery=True):
         '''
         '''
         if exchange is None:
@@ -420,11 +420,14 @@ class Service(object):
                                                 properties=properties,
                                                 mandatory=True,
                                                )
-        if not publish_success:
-            return_queue.put(ReplyMessage(retcode=exceptions.DriplineAMQPRoutingKeyError.retcode,
-                                          payload='message not deliverable'
-                                         )
+        if not publish_success and ensure_delivery:
+            if return_queue is not None:
+                return_queue.put(ReplyMessage(retcode=exceptions.DriplineAMQPRoutingKeyError.retcode,
+                                              payload='message not deliverable'
+                                             )
                             )
+            else:
+                raise exceptions.DriplineAMQPRoutingKeyError('not able to publish to: {}'.format(target))
         if not return_connection:
             connection.close()
             return
@@ -464,7 +467,7 @@ class Service(object):
         logger.debug('to {} sending {}'.format(severity,alert))
         if not isinstance(alert, AlertMessage):
             alert = AlertMessage(payload=alert)
-        self.send_message(target=severity, message=alert, exchange='alerts')
+        self.send_message(target=severity, message=alert, exchange='alerts', ensure_delivery=False)
 
     def send_reply(self, properties, reply):
         '''
