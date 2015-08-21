@@ -81,12 +81,14 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
     '''
     def __init__(self,
                  mantis_queue='mantis',
+                 filename_prefix='',
                  **kwargs
                 ):
         DAQProvider.__init__(self, **kwargs)
         core.Spime.__init__(self, **kwargs)
         self.alert_routing_key = 'daq_requests'
         self.mantis_queue = mantis_queue
+        self.filename_prefix = filename_prefix
 
     def start_run(self, run_name):
         super(MantisAcquisitionInterface, self).start_run(run_name)
@@ -98,7 +100,8 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         '''
         if self.run_id is None:
             raise core.DriplineInternalError('run number is None, must request a run_id assignment prior to starting acquisition')
-        filepath = '{}/{:09d}_{:09d}.egg'.format(self.directory_path,
+        filepath = '{}/{}{:09d}_{:09d}.egg'.format(self.directory_path,
+                                         self.filename_prefix,
                                          self.run_id,
                                          self._acquisition_count)
         request = core.RequestMessage(payload={'values':[], 'file':filepath},
@@ -117,7 +120,6 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
             return "acquisition of [{}] requested".format(filepath)
 
     def end_run(self):
-        #self._loop_process.cancel()
         self.logging_status = 'stop'
         super(MantisAcquisitionInterface, self).end_run()
         self._acquisition_count = 0
