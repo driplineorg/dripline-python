@@ -117,9 +117,8 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
             return "acquisition of [{}] requested".format(filepath)
 
     def end_run(self):
-        self._loop_process.cancel()
-        if self.logging_status == 'started':
-            self.logging_status = 'off'
+        #self._loop_process.cancel()
+        self.logging_status = 'stop'
         super(MantisAcquisitionInterface, self).end_run()
         self._acquisition_count = 0
 
