@@ -114,17 +114,26 @@ def get_data(connection):
     return data
 
 
-def WeinerFilter(freq_data, amp_data, width):
+def WeinerFilter(freq_data, amp_data, width, target='gaussian'):
     data = zip(freq_data, amp_data)
     data.sort()
     f,v= zip(*data)
     frequencies = numpy.array(f, dtype=float)
     voltages = numpy.array(v, dtype=complex)
-    x1 = (frequencies - frequencies[0]) / width
-    x2 = (frequencies - frequencies[-1]) / width
-    gderiv1 = x1 * numpy.exp(-x1 * x1 / 2.)
-    gderiv2 = x2 * numpy.exp(-x2 * x2 / 2.)
-    target_signal = (gderiv1 + gderiv2)
+    x1 = (frequencies - frequencies[0])
+    x2 = (frequencies - frequencies[-1])
+    gderiv1 = x1 * numpy.exp(-x1**2 / 2. / width**2) / width
+    gderiv2 = x2 * numpy.exp(-x2**2 / 2. / width**2) / width
+    #l_width = 4.e6
+    lderiv1 = -16. * x1 * width / (numpy.pi * (4*x1**2 + width**2))
+    lderiv2 = -16. * x2 * width / (numpy.pi * (4*x2**2 + width**2))
+    target='lorentzian'
+    targets = {}
+    targets['gaussian'] = numpy.concatenate((gderiv1[:len(gderiv1)/2], gderiv2[len(gderiv2)/2:]))
+    targets['lorentzian'] = numpy.concatenate((lderiv1[:len(lderiv1)/2], lderiv2[len(lderiv2)/2:]))
+    target_signal = targets[target]
+    if not sum(target_signal != 0):
+        raise ValueError("target signal identically 0, did you give width in Hz?")
     target_fft = numpy.fft.fft(target_signal)
     data_fft = numpy.fft.fft(voltages)
     data_fft[0] = 0
@@ -136,11 +145,15 @@ def WeinerFilter(freq_data, amp_data, width):
 
 
 def FrequencyToField(frequency):
+    '''
+    Args:
+        frequency (float): the resonant frequency [Hz] to convert
+    Returns:
+        value of the magnetic field for that frequency, in kG
+    '''
     geff = 2.0036
     charge_over_mass = 1.758e11
-    # note that the following line has a factor of 10
-    # the resulting value is therefore in kG
-    # the frequency is assumed to be in Hz
+    # factor of 10 is for T->kG
     field = (4 * numpy.pi * 10. / (geff * charge_over_mass) * frequency)
     logger.info('converted {} [Hz] -> {} [kG]'.format(frequency, field))
     return field
@@ -159,17 +172,33 @@ def main(broker, frequency_limits, output, store, width, **kwargs):
     ##### confirm frequency limits
     logger.info('frequency limits are: {}'.format(frequency_limits))
     if not frequency_limits:
-        pass
         # something to get them from the sweeper
-        logger.warning('trying to get hf_start_freq, that name is hard coded for now')
+        logger.warning('sweeper interactions are all hard-coded here right now...')
+
         result = connection.send_request(target='hf_start_freq', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
         start_freq = float(result['payload']['value_raw'])
         logger.info('got a start of: {}'.format(start_freq))
-        logger.warning('trying to get hf_stop_freq, that name is hard coded for now')
         result = connection.send_request(target='hf_stop_freq', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
         stop_freq = float(result['payload']['value_raw'])
         logger.info('got a stop of: {}'.format(stop_freq))
-        #logger.warning("don't know how to get freq limits automatically")
+        # also get the sweeper's sweep params and setup data taking options
+        result = connection.send_request(target='hf_number_sweep_points', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        n_sweep_pts = float(result['payload']['value_raw'])
+        result = connection.send_request(target='hf_dwell_time', request=message.RequestMessage(msgop=constants.OP_GET, payload={'values':{}}))
+        hf_dwell = float(result['payload']['value_raw'])
+        sweep_time = n_sweep_pts * hf_dwell
+        result = connection.send_request(target='lockin_instrument', request=message.RequestMessage(msgop=constants.OP_CONFIG, payload={'values':['number_of_points']}))
+        n_daq_points = float(result.payload)
+
+        daq_time = 45. + sweep_time
+        daq_sampling = 5.0 * (1 + numpy.ceil((daq_time/n_daq_points) / 0.005)) # must be in ms and multiple of 5 ms
+        logger.info('\nsweep time is: {}\nsampling time will be: {}'.format(
+                        n_sweep_pts*hf_dwell,
+                        n_daq_points*daq_sampling/1e3
+                   ))
+        logger.info('setting lockin sampling rate to {} ms'.format(daq_sampling))
+        result = connection.send_request(target='lockin_instrument', request=message.RequestMessage(msgop=constants.OP_CONFIG, payload={'values':['sampling_interval', int(daq_sampling)]}))
+
     else:
         start_freq = min(map(float, frequency_limits))
         stop_freq = max(map(float, frequency_limits))
