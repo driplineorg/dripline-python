@@ -475,4 +475,4 @@ class Service(object):
         logger.info("sending a reply")
         if not isinstance(reply, Message):
             reply = ReplyMessage(payload=reply)
-        self.send_message(target=properties.reply_to, message=reply, properties=properties)
+        self.send_message(target=properties.reply_to, message=reply, properties=properties, ensure_delivery=False)
