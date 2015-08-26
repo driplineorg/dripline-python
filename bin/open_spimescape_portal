@@ -52,7 +52,6 @@ if __name__ == '__main__':
                                           tmux_support=True,
                                           twitter_support=True,
                                           slack_support=True,
-                                          user_pass_support=True,
                                          )
     
     args = parser.parse_args()
