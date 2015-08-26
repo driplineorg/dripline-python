@@ -37,7 +37,7 @@ class DataLogger(object):
             alert_routing_key (str): routing key for the alert message send when broadcasting a logging event result. The default value of 'sensor_value' is valid for DataLoggers which represent physical quantities being stored to the slow controls database tables
         
         '''
-        self.alert_routing_key=alert_routing_key
+        self.alert_routing_key=alert_routing_key + '.' + self.name
         self._log_interval = log_interval
         self._max_interval = max_interval
         self._max_fractional_change = max_fractional_change
