@@ -38,7 +38,7 @@ def _log_on_set_decoration(self, fun):
         to_log = {'from': self.name,
                   'values': values,
                  }
-        self.report_log(alert=to_log, severity='sensor_value')
+        self.store_value(alert=to_log, severity='sensor_value')
         return result
     return wrapper
 
@@ -62,12 +62,11 @@ class Spime(Endpoint, DataLogger):
         See :class:`Endpoint <dripline.core.endpoint.Endpoint>` and :class:`DataLogger <dripline.core.data_logger.DataLogger>` for additional parameters
 
         '''
+        # Endpoint stuff
+        Endpoint.__init__(self, **kwargs)
         # DataLogger stuff
         DataLogger.__init__(self, **kwargs)
         self.get_value = self.on_get
-        self.store_value = self.report_log
-        # Endpoint stuff
-        Endpoint.__init__(self, **kwargs)
 
         self._log_on_set = log_on_set
         if log_on_set:
@@ -87,8 +86,8 @@ class Spime(Endpoint, DataLogger):
         
 
     @staticmethod
-    def report_log(alert, severity):
-        logger.info("Should be logging (value,severity): ({},{})".format(alert, severity))
+    def store_value(alert, severity):
+        logger.error("Should be logging (value,severity): ({},{})".format(alert, severity))
 
 
 #@fancy_init_doc

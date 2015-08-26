@@ -57,7 +57,6 @@ class Portal(Service):
             raise ValueError('endpoint ({}) already present'.format(endpoint.name))
         self.endpoints[endpoint.name] = endpoint
         setattr(endpoint, 'store_value', self.send_alert)
-        setattr(endpoint, 'report_log', self.send_alert)
         setattr(endpoint, 'portal', self)
 
     def start_event_loop(self):

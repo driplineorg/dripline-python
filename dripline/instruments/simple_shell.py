@@ -63,7 +63,7 @@ class sensors_command_temp(Spime):
         # DataLogger stuff
         super(sensors_command_temp, self).__init__()
         self.get_value = self.on_get
-        self.store_value = self.report_log
+        self.store_value
 
         # local stuff
         self.name = name
@@ -71,9 +71,6 @@ class sensors_command_temp(Spime):
         self._on_get = ['sensors']  # on_get
         self._on_set = None  # on_set
         self._core = core
-    @staticmethod
-    def report_log(value):
-        logger.info("\n\nShould be logging value: {}\n\n".format(value))
 
     def on_get(self):
         result = None
