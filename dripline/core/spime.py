@@ -9,7 +9,7 @@ import functools
 import types
 
 from .exceptions import *
-from .endpoint import Endpoint, calibrate#, fancy_init_doc
+from .endpoint import Endpoint, calibrate
 from .data_logger import DataLogger
 
 __all__ = ['Spime',
@@ -43,7 +43,6 @@ def _log_on_set_decoration(self, fun):
     return wrapper
 
 
-#@fancy_init_doc
 class Spime(Endpoint, DataLogger):
     '''
     From wikipedia (paraphrased): *A spime is a neologism for a futuristic object, characteristic to the Internet of Things, that can be tracked through space and time throughout its lifetime. A Spime is essentially virtual master objects that can, at various times, have physical incarnations of itself.*
@@ -131,7 +130,6 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
         raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
-#@fancy_init_doc
 class SimpleSCPISetSpime(SimpleSCPISpime):
     '''
     Identical to SimpleSCPISpime, but with an explicit exception if on_get is attempted
@@ -144,7 +142,6 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     def on_get():
         raise DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
 
-#@fancy_init_doc
 class FormatSCPISpime(Spime):
     def __init__(self, get_str=None, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
         '''
