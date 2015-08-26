@@ -32,7 +32,8 @@ def __send_log_message(broker, sensor, value_raw, value_cal=None, extra_memo=Non
                                  exchange = 'alerts',
                                  keys = '#'
                                 )
-    conn.send_alert(severity='sensor_value', alert=to_log)
+    routing_key = 'sensor_value.{}'.format(sensor)
+    conn.send_alert(severity=routing_key, alert=to_log)
     logger.info('log sent')
 
 

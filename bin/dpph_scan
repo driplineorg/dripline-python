@@ -34,7 +34,7 @@ def scdb_log(broker, sensor, value_raw, value_cal=None, extra_memo=None, **kwarg
     # make connection
     # note that we're not consuming, so the exchange and key values here don't really matter
     conn = Service(amqp_url = broker,exchange = 'alerts',keys = '#')
-    conn.send_alert(severity='sensor_value', alert=to_log)
+    conn.send_alert(severity='sensor_value.'.format(sensor), alert=to_log)
     logger.info('log sent')
 
 

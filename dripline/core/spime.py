@@ -38,7 +38,7 @@ def _log_on_set_decoration(self, fun):
         to_log = {'from': self.name,
                   'values': values,
                  }
-        self.store_value(alert=to_log, severity='sensor_value')
+        self.store_value(alert=to_log, severity=self.alert_routing_key)
         return result
     return wrapper
 

@@ -63,7 +63,6 @@ class sensors_command_temp(Spime):
         # DataLogger stuff
         super(sensors_command_temp, self).__init__()
         self.get_value = self.on_get
-        self.store_value
 
         # local stuff
         self.name = name
@@ -90,9 +89,3 @@ class sensors_command_temp(Spime):
             logger.info('set {} to {}'.format(attribute, value))
         else:
             raise AttributeError("No attribute: {}".format(attribute))
-
-    def provider(self):
-        return self._provider
-
-    def set_provider(self, provider):
-        self._provider = provider
