@@ -7,6 +7,8 @@ Note: services using this module will require sqlalchemy (and assuming we're sti
 from __future__ import absolute_import
 
 # std libraries
+import json
+import os
 import types
 
 # 3rd party libraries
@@ -32,11 +34,9 @@ class RunDBInterface(Provider):
     A not-so-flexible provider for getting run_id values.
     '''
     
-    def __init__(self, user, password, database_name, database_server, tables, *args, **kwargs):
+    def __init__(self, database_name, database_server, tables, *args, **kwargs):
         '''
         ~Params
-            user (str): user name for connecting to database
-            password (str): password for connecting to database
             database_name (str): name of the database to connect to
             database_server (str): network resolvable hostname of database server
             tables (list): list of names (str) of tables in the database
@@ -52,7 +52,12 @@ class RunDBInterface(Provider):
     def connect_to_db(self, user, password, database_server, database_name, table_names):
         '''
         '''
-        engine_str = 'postgresql://{}:{}@{}/{}'.format(user, password, database_server, database_name)
+        credentials = json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['postgresql']
+        engine_str = 'postgresql://{}:{}@{}/{}'.format(credentials['user'],
+                                                       credentials['password'],
+                                                       database_server,
+                                                       database_name
+                                                      )
         engine = sqlalchemy.create_engine(engine_str)
         meta = sqlalchemy.MetaData(engine)
         for table in table_names:

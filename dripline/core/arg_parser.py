@@ -38,7 +38,6 @@ class DriplineParser(argparse.ArgumentParser):
                  tmux_support=False,
                  twitter_support=False,
                  slack_support=False,
-                 user_pass_support=False,
                  **kwargs):
         '''
         Keyword Args:
@@ -48,7 +47,6 @@ class DriplineParser(argparse.ArgumentParser):
             tmux_support (bool): enable a '-t' option to start the process in a tmux session rather than on the active shell
             twitter_support (bool): enable a '-T' option to send a logger messages of critical or higher severity as tweets
             slack_support (bool): enable a '-S' option to send log messages to slack channels
-            user_pass_support (bool): enable '-u' and '-p' for user and password specification. **Note:** these options should be replaced with either reading the standard file ~/.project8_authentication.json, and/or prompting the user for values interactively
 
         '''
         self.extra_logger = extra_logger
@@ -112,17 +110,6 @@ class DriplineParser(argparse.ArgumentParser):
                               nargs='?',
                               default=False, # value if option not given
                               const=True, # value if option given with no argument
-                             )
-        if user_pass_support:
-            self.add_argument('-u',
-                              '--user',
-                              help='substitue user lines in config file',
-                              default=None,
-                             )
-            self.add_argument('-p',
-                              '--password',
-                              help='substitue password lines in config file',
-                              default=None,
                              )
 
     def __set_format(self):
@@ -213,20 +200,6 @@ class DriplineParser(argparse.ArgumentParser):
                 try:
                     file_str = open(these_args.config).read()
                     import yaml
-                    if 'user' in these_args:
-                        if these_args.user is not None:
-                            logger.info('updating user')
-                            import re
-                            reg_ex = r'([ ]*[-]? user:[ ]*)([\S]*)(.*)'
-                            new_user = r'\1{}\3'.format(these_args.user)
-                            file_str = re.sub(reg_ex, new_user, file_str)
-                    if 'password' in these_args:
-                        if these_args.password is not None:
-                            logger.info("updating password")
-                            import re
-                            reg_ex = r'([ ]*[-]? password:[ ]*)([\S]*)(.*)'
-                            new_pass = r'\1{}\3'.format(these_args.password)
-                            file_str = re.sub(reg_ex, new_pass, file_str)
                     conf_file = yaml.load(file_str)
                     if 'broker' in args_dict and 'broker' in conf_file:
                         if args_dict['broker'] is None:
