@@ -188,7 +188,9 @@ class Endpoint(object):
         result = None
         retcode = None
         try:
-            these_args = msg.payload['values']
+            these_args = []
+            if 'values' in msg.payload:
+                these_args = msg.payload['values']
             these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
             logger.debug('args are:\n{}'.format(these_args))
             result = endpoint_method(*these_args, **these_kwargs)

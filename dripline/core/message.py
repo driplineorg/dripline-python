@@ -46,7 +46,7 @@ class Message(dict, object):
 
     '''
 
-    def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None, sender_info=None):
+    def __init__(self, msgop=None, timestamp=None, payload={}, retcode=None, sender_info=None):
         '''
         ~Params
             msgop (int): only meaningful for Request messages, indicates the operation being requested
