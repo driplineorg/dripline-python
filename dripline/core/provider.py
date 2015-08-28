@@ -27,6 +27,9 @@ class Provider(Endpoint):
         self._endpoints.update({endpoint.name:endpoint})
         endpoint.provider = self
 
+    def on_send(self, *commands):
+        return self.send(list(commands))
+
     @property
     def endpoint_names(self):
         return self._endpoints.keys()

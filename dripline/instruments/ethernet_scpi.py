@@ -99,5 +99,5 @@ class EthernetRepeater(EthernetSCPI, Endpoint):
         EthernetSCPI.__init__(self, **kwargs)
 
     def on_send(self, *to_send):
-        result = self.send(to_send)
+        result = self.send(list(to_send))
         return result
