@@ -105,7 +105,7 @@ def calibrate(fun):
             if val_dict['value_raw'] in self._calibration_str:
                 val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
             else:
-                raise exceptions.DriplineValueError('raw value not in cal dict')
+                raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])))
         return val_dict
     return wrapper
 
