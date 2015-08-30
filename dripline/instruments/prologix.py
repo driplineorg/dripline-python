@@ -74,7 +74,7 @@ class MuxerGetSpime(SimpleSCPIGetSpime):
         SimpleSCPIGetSpime.__init__(self, base_str=self.base_str, **kwargs)
         self.get_value = self.on_get
     
-    @calibrate
+    @calibrate()
     def on_get(self):
         very_raw = self.provider.send(self.base_str.format(self.ch_number))
         logger.debug('very raw is: {}'.format(very_raw))

@@ -72,7 +72,7 @@ class kv_store_key(Spime):
     def report_log(value):  
         logger.info("Should be logging value: {}\n".format(value))
 
-    @calibrate
+    @calibrate()
     def on_get(self):
         """
         Return the value associated with this

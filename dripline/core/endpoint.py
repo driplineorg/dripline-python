@@ -78,36 +78,41 @@ def pt100_calibration(resistance):
         value = None
     return value
 
-
-def calibrate(fun):
-    @functools.wraps(fun)
-    def wrapper(self):
-        val_dict = {'value_raw':fun(self)}
-        if val_dict['value_raw'] is None:
-            return None
-        #if not self._calibration_str is None:
-        if isinstance(self._calibration_str, types.StringTypes):
-            globals = {
-                       "math": math,
-                       "cernox_calibration": cernox_calibration,
-                       "pt100_calibration": pt100_calibration,
-                      }
-            locals = {}
-            eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
-            logger.debug("formated cal is:\n{}".format(eval_str))
-            try:
-                cal = eval(eval_str, globals, locals)
-            except OverflowError:
-                cal = None
-            if cal is not None:
-                val_dict['value_cal'] = cal
-        elif isinstance(self._calibration_str, dict):
-            if val_dict['value_raw'] in self._calibration_str:
-                val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
-            else:
-                raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])))
-        return val_dict
-    return wrapper
+def calibrate(cal_functions=None):
+    if callable(cal_functions):
+        cal_functions = {cal_functions.__name__: cal_functions}
+    if cal_functions is None:
+        cal_functions = {}
+    def calibration(fun):
+        @functools.wraps(fun)
+        def wrapper(self):
+            val_dict = {'value_raw':fun(self)}
+            if val_dict['value_raw'] is None:
+                return None
+            #if not self._calibration_str is None:
+            if isinstance(self._calibration_str, types.StringTypes):
+                globals = {
+                           "math": math,
+                           "cernox_calibration": cernox_calibration,
+                           "pt100_calibration": pt100_calibration,
+                          }
+                locals = cal_functions
+                eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
+                logger.debug("formated cal is:\n{}".format(eval_str))
+                try:
+                    cal = eval(eval_str, globals, locals)
+                except OverflowError:
+                    cal = None
+                if cal is not None:
+                    val_dict['value_cal'] = cal
+            elif isinstance(self._calibration_str, dict):
+                if val_dict['value_raw'] in self._calibration_str:
+                    val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
+                else:
+                    raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])))
+            return val_dict
+        return wrapper
+    return calibration
 
 #def fancy_init_doc(cls):
 #    params = {}
