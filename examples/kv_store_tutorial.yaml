@@ -16,7 +16,7 @@ providers:
         log_interval: 30
         get_on_set: True
         log_on_set: True
-        cal_str: '1.*{}'
+        cal_str: 'times3({})'
         initial_value: 1.75
       - name: waffles
         module: kv_store_key
