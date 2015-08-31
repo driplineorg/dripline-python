@@ -106,7 +106,7 @@ class SimpleSCPISpime(Spime):
         self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
 
-    @calibrate
+    @calibrate()
     def on_get(self):
         result = self.provider.send(self.cmd_base + '?')
         logger.debug('result is: {}'.format(result))
@@ -158,7 +158,7 @@ class FormatSCPISpime(Spime):
         self._set_str = set_str
         self._set_value_map = set_value_map
 
-    @calibrate
+    @calibrate()
     def on_get(self):
         if self._get_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))

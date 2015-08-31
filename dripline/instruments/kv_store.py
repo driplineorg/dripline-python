@@ -32,6 +32,12 @@ from ..core import Provider, Spime, calibrate
 __all__ = ['kv_store', 'kv_store_key']
 
 
+# Just a few dumb calibration functions for testing
+def times2(value):
+    return 2.*value
+def times3(value):
+    return 3.*value
+
 logger = logging.getLogger(__name__)
 class kv_store(Provider):
     """
@@ -67,7 +73,7 @@ class kv_store_key(Spime):
         self._value = initial_value
         self.get_value = self.on_get
 
-    @calibrate
+    @calibrate([times2, times3])
     def on_get(self):
         """
         Return the value associated with this
