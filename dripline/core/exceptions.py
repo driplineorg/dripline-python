@@ -11,6 +11,9 @@ __all__ = [
 
 class DriplineException(Exception):
     retcode = None
+    def __init__(self, msg, result=None):
+        super(DriplineException, self).__init__(msg)
+        self.result = result
 __all__.append('DriplineException')
 
 
