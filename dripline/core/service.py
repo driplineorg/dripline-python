@@ -36,11 +36,11 @@ class Service(object):
     EXCHANGE_TYPE = 'topic'
 
     def __init__(self, amqp_url, exchange, keys, name=None):
-        """Create a new instance of the consumer class, passing in the AMQP
-        URL used to connect to RabbitMQ.
-
-        :param str amqp_url: The AMQP url to connect with
-
+        """
+        amqp_url (str): The AMQP url to connect with
+        exchange (str): Name of the AMQP exchange to connect to
+        keys (list|str): binding key or list of binding keys to use listen against
+        name (str|None): name for the amqp queue, automatically generated if None
         """
         if name is None:
             name = 'unknown_service_' + str(uuid.uuid4())[1:12]

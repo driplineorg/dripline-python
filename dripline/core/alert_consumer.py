@@ -26,10 +26,9 @@ logger = logging.getLogger(__name__)
 class AlertConsumer(Service):
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#'], name=None, **kwargs): 
         '''
-        Keyword Args:
-            broker_host (str): network address of the amqp broker to connect to
-            exchange (str): AMQP exchange on the broker to which we will be binding
-            keys (list): list of strings, each string will be a routing key bound to the provided exchange.
+        broker_host (str): network address of the amqp broker to connect to
+        exchange (str): AMQP exchange on the broker to which we will be binding
+        keys (list): list of strings, each string will be a routing key bound to the provided exchange.
 
         '''
         logger.debug('AlertConsumer initializing')
