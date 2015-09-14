@@ -15,12 +15,14 @@ import pika
 # internal imports
 from .message import Message
 from .service import Service
+from .utilities import fancy_doc
 
 __all__ = ['AlertConsumer']
 
 logger = logging.getLogger(__name__)
 
 
+@fancy_doc
 class AlertConsumer(Service):
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#'], name=None, **kwargs): 
         '''
@@ -93,8 +95,3 @@ class AlertConsumer(Service):
     def start(self):
         logger.debug("AlertConsmer consume starting")
         self.run()
-#        self.dripline_connection.chan.basic_consume(process_message,
-#                                                    queue=self.queue.method.queue,
-#                                                    no_ack=True
-#                                                   )
-#        self.dripline_connection.chan.start_consuming()

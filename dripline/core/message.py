@@ -48,12 +48,11 @@ class Message(dict, object):
 
     def __init__(self, msgop=None, timestamp=None, payload={}, retcode=None, sender_info=None):
         '''
-        ~Params
-            msgop (int): only meaningful for Request messages, indicates the operation being requested
-            timestamp (str): string representation of datetime object, reflecting the creation time of this message. Note that if the default value of None is provided, the current time will be used.
-            payload (any): actual message content, usually a dict
-            retcode (int): only meaningful in Reply messages, indicates return value and/or error code (see constants)
-            sender_info (dict): several fields providing information about the system which originally generated a message.
+        msgop (int): only meaningful for Request messages, indicates the operation being requested
+        timestamp (str): string representation of datetime object, reflecting the creation time of this message. Note that if the default value of None is provided, the current time will be used.
+        payload (any): actual message content, usually a dict
+        retcode (int): only meaningful in Reply messages, indicates return value and/or error code (see constants)
+        sender_info (dict): several fields providing information about the system which originally generated a message.
         '''
         if msgop is not None:
             self.msgop = msgop
@@ -193,6 +192,9 @@ class ReplyMessage(Message):
     Derrived class for Reply type messages
     '''
     def __init__(self, retcode=None, **kwargs):
+        '''
+        retcode (int): return code indicating status information
+        '''
         if retcode is None:
             retcode=0
         kwargs.update({'retcode':retcode})

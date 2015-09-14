@@ -10,6 +10,7 @@ from .constants import *
 from .exceptions import exception_map, DriplineTimeoutError
 from .message import ReplyMessage, RequestMessage
 from .service import Service
+from .utilities import fancy_doc
 
 
 __all__ = []
@@ -17,6 +18,7 @@ __all__ = []
 logger = logging.getLogger(__name__)
 
 __all__.append('Interface')
+@fancy_doc
 class Interface(Service):
     def __init__(self, amqp_url, name=None, confirm_retcodes=True):
         '''
@@ -68,6 +70,7 @@ class Interface(Service):
 
 
 __all__.append('_InternalInterface')
+@fancy_doc
 class _InternalInterface(Interface):
     def __init__(self, **kwargs):
         if kwargs['name'] is None:

@@ -18,6 +18,7 @@ from .endpoint import Endpoint
 from .message import Message, AlertMessage, RequestMessage
 from .provider import Provider
 from .service import Service
+from .utilities import fancy_doc
 
 __all__ = ['Portal']
 
@@ -25,6 +26,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+@fancy_doc
 class Portal(Service):
     """
     Like a node, but pythonic
