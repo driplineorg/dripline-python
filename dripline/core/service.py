@@ -154,7 +154,8 @@ class Service(object):
         self._channel = channel
         self._channel.confirm_delivery()
         self.add_on_channel_close_callback()
-        self.setup_exchange(self._exchange)
+        self.setup_exchange('requests')
+        self.setup_exchange('alerts')
 
     def add_on_channel_close_callback(self):
         """This method tells pika to call the on_channel_closed method if
