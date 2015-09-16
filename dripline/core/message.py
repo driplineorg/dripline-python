@@ -22,6 +22,7 @@ import msgpack
 # internal imports
 from . import constants
 from . import exceptions
+#from .utilities import fancy_doc
 from .. import __version__, __commit__
 
 import inspect
@@ -46,23 +47,24 @@ class Message(dict, object):
 
     '''
 
-    def __init__(self, msgop=None, timestamp=None, payload=None, retcode=None, sender_info=None):
+    def __init__(self,
+                 timestamp=None,
+                 payload=None,
+                 sender_info=None,
+                 **kwargs):
         '''
         ~Params
-            msgop (int): only meaningful for Request messages, indicates the operation being requested
             timestamp (str): string representation of datetime object, reflecting the creation time of this message. Note that if the default value of None is provided, the current time will be used.
             payload (any): actual message content, usually a dict
-            retcode (int): only meaningful in Reply messages, indicates return value and/or error code (see constants)
             sender_info (dict): several fields providing information about the system which originally generated a message.
         '''
-        if msgop is not None:
-            self.msgop = msgop
+        for key,value in kwargs.items():
+            logger.warning('got unexpected kwarg <{}> with value <{}>\nit will be dropped'.format(key, value))
         if timestamp is None:
             self.timestamp = datetime.utcnow().strftime(constants.TIME_FORMAT)
         else:
             self.timestamp = timestamp
         self.payload = payload
-        self.retcode = retcode
         if sender_info is None:
             this_exe = inspect.stack()[-1][1]
             this_host = socket.gethostname()
@@ -188,14 +190,20 @@ class Message(dict, object):
             raise ValueError('encoding <{}> not recognized'.format(encoding))
 
 
+#@fancy_doc
 class ReplyMessage(Message):
     '''
     Derrived class for Reply type messages
     '''
-    def __init__(self, retcode=None, **kwargs):
+    def __init__(self,
+                 retcode=None,
+                 **kwargs):
+        '''
+        retcode (int): indicates return value and/or error code (see exceptions)
+        '''
         if retcode is None:
-            retcode=0
-        kwargs.update({'retcode':retcode})
+            retcode = 0
+        self.retcode = retcode
         Message.__init__(self, **kwargs)
 
     @property
@@ -203,18 +211,29 @@ class ReplyMessage(Message):
         return constants.T_REPLY
 
 
+#@fancy_doc
 class RequestMessage(Message):
+
+    def __init__(self, msgop, **kwargs):
+        '''
+        msgop (int): only meaningful for Request messages, indicates the operation being requested
+        '''
+        self.msgop = msgop
+        Message.__init__(self, **kwargs)
+
     @property
     def msgtype(self):
         return constants.T_REQUEST
 
 
+#@fancy_doc
 class InfoMessage(Message):
     @property
     def msgtype(self):
         return constants.T_INFO
 
 
+#@fancy_doc
 class AlertMessage(Message):
     @property
     def msgtype(self):
