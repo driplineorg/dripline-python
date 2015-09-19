@@ -38,7 +38,7 @@ def calibrate(cal_functions=None):
             val_dict = {'value_raw':fun(self)}
             if val_dict['value_raw'] is None:
                 return None
-            if isinstance(self._calibration_str, types.StringTypes):
+            if isinstance(self._calibration_str, str):
                 globals = {
                            "math": math,
                           }
@@ -49,13 +49,15 @@ def calibrate(cal_functions=None):
                     cal = eval(eval_str, globals, locals)
                 except OverflowError:
                     cal = None
+                except Exception as e:
+                    raise exceptions.DriplineValueError(repr(e), result=val_dict)
                 if cal is not None:
                     val_dict['value_cal'] = cal
             elif isinstance(self._calibration_str, dict):
                 if val_dict['value_raw'] in self._calibration_str:
                     val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
                 else:
-                    raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])))
+                    raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])), result=val_dict)
             return val_dict
         return wrapper
     return calibration
@@ -109,6 +111,7 @@ class Endpoint(object):
 
         result = None
         retcode = None
+        return_msg = None
         try:
             these_args = []
             if 'values' in msg.payload:
@@ -122,14 +125,15 @@ class Endpoint(object):
         except exceptions.DriplineException as err:
             logger.debug('got a dripine exception')
             retcode = err.retcode
-            result = str(err)
+            result = err.result
+            return_msg = str(err)
         except Exception as err:
             logger.error('got an error: {}'.format(str(err)))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
-            result = str(err)
+            return_msg = str(err)
             retcode = 999
         logger.debug('request method execution complete')
-        reply = ReplyMessage(payload=result, retcode=retcode)
+        reply = ReplyMessage(payload=result, retcode=retcode, return_msg=return_msg)
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
 

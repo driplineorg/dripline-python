@@ -76,6 +76,8 @@ def main(args):
     if not result.retcode == 0:
         color = '\033[91m'
     print('{color}{}(ret:{}): {}\033[0m'.format(print_prefix, result.retcode, result.payload, color=color))
+    if result.return_msg is not '':
+        logger.warning('return message: {}'.format(result.return_msg))
 
 
 if __name__ == '__main__':
