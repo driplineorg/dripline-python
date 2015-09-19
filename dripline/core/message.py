@@ -111,10 +111,10 @@ class Message(dict, object):
 
     @property
     def return_msg(self):
-        return self['return_message']
+        return self['return_msg']
     @return_msg.setter
     def return_msg(self, value):
-        self['return_message'] = value
+        self['return_msg'] = value
 
     @property
     def msgtype(self):
