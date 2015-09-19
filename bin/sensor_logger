@@ -16,7 +16,7 @@ import pika
 #import sqlite3
 import sqlalchemy
 
-from dripline.core import AlertConsumer
+from dripline.core import Gogol
 
 import logging
 from dripline.core import DriplineParser#status_logger
@@ -37,7 +37,7 @@ def start_monitoring(amqp='localhost', exchange='alerts', keys=['sensor_value.#'
     if keys == ['sensor_value']:
         logger.warning('You have used the older format binding_key, this will miss messages in the new format\nUse "sensor_value.#" (the new default) if you want to bind to all sensor data')
     logger.info('making connections')
-    consumer = AlertConsumer(broker_host=amqp, exchange='alerts', keys=keys)
+    consumer = Gogol(broker_host=amqp, exchange='alerts', keys=keys)
     credentials = json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['postgresql']
 
     engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/{}'.format(credentials['username'], credentials['password'], sql_server, sql_database))

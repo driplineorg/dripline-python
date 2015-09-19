@@ -17,13 +17,13 @@ from .message import Message
 from .service import Service
 from .utilities import fancy_doc
 
-__all__ = ['AlertConsumer']
+__all__ = ['Gogol']
 
 logger = logging.getLogger(__name__)
 
 
 @fancy_doc
-class AlertConsumer(Service):
+class Gogol(Service):
     def __init__(self, broker_host='localhost', exchange='alerts', keys=['#'], name=None, **kwargs): 
         '''
         broker_host (str): network address of the amqp broker to connect to
@@ -31,7 +31,7 @@ class AlertConsumer(Service):
         keys (list): list of strings, each string will be a routing key bound to the provided exchange.
 
         '''
-        logger.debug('AlertConsumer initializing')
+        logger.debug('Gogol initializing')
         if name is None:
             name = __name__ + '-' + uuid.uuid1().hex[:12]
         Service.__init__(self, amqp_url=broker_host, exchange=exchange, keys=keys, name=name)

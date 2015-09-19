@@ -16,13 +16,13 @@ import dripline
 import logging
 logger=logging.getLogger(__name__)
 
-class SlackRelay(dripline.core.AlertConsumer):
+class SlackRelay(dripline.core.Gogol):
     '''
     A generic service that will repeat AMQP messages to messages on slack.
     '''
     def __init__(self, **kwargs):
         kwargs.update({'exchange':'alerts','keys':['status_message.#.#']})
-        dripline.core.AlertConsumer.__init__(self, **kwargs)
+        dripline.core.Gogol.__init__(self, **kwargs)
         this_home = os.path.expanduser('~')
         _tokens = json.loads(open(this_home+'/.project8_authentications.json').read())['slack']
         self._slackclients = {}
