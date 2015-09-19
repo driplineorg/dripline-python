@@ -112,7 +112,8 @@ class Message(dict, object):
     @property
     def return_msg(self):
         return self['return_message']
-    @return_msg(self, value):
+    @return_msg.setter
+    def return_msg(self, value):
         self['return_message'] = value
 
     @property
@@ -202,7 +203,7 @@ class ReplyMessage(Message):
     '''
     def __init__(self,
                  retcode=None,
-                 return_msg='',
+                 return_msg=None,
                  **kwargs):
         '''
         retcode (int): indicates return value and/or error code (see exceptions)
@@ -210,6 +211,8 @@ class ReplyMessage(Message):
         '''
         if retcode is None:
             retcode = 0
+        if return_msg is None:
+            return_msg = ''
         self.retcode = retcode
         self.return_msg = return_msg
         Message.__init__(self, **kwargs)
