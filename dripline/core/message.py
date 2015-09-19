@@ -110,6 +110,12 @@ class Message(dict, object):
         self['retcode'] = value
 
     @property
+    def return_msg(self):
+        return self['return_message']
+    @return_msg(self, value):
+        self['return_message'] = value
+
+    @property
     def msgtype(self):
         return None
     @msgtype.setter
@@ -196,13 +202,16 @@ class ReplyMessage(Message):
     '''
     def __init__(self,
                  retcode=None,
+                 return_msg='',
                  **kwargs):
         '''
         retcode (int): indicates return value and/or error code (see exceptions)
+        return_msg (str): human-readable explanation of the return code
         '''
         if retcode is None:
             retcode = 0
         self.retcode = retcode
+        self.return_msg = return_msg
         Message.__init__(self, **kwargs)
 
     @property
