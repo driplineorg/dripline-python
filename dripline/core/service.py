@@ -308,28 +308,35 @@ class Service(object):
                              constants.T_ALERT: self.on_alert_message,
                             }
         message = Message.from_encoded(body, properties.content_encoding)
-        msg_type_handlers[message.msgtype](unused_channel, basic_deliver, properties, body)
+        try:
+            msg_type_handlers[message.msgtype](unused_channel, basic_deliver, properties, body)
+        except exceptions.DriplineMethodNotSupportedError:
+            self.on_any_message(unused_channel, basic_deliver, properties, body)
 
-    def on_request_message():
+    def on_request_message(*args, **kwargs):
         '''
         '''
         raise exceptions.DriplineMethodNotSupportedError('base service does not handle request messages') 
 
-    def on_reply_message():
+    def on_reply_message(*args, **kwargs):
         '''
         '''
-        logger.warning('got a reply... should do something with it')
-        pass
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle reply messages')
 
-    def on_info_message():
+    def on_info_message(*args, **kwargs):
         '''
         '''
         raise exceptions.DriplineMethodNotSupportedError('base service does not handle info messages')
 
-    def on_alert_message():
+    def on_alert_message(*args, **kwargs):
         '''
         '''
         raise exceptions.DriplineMethodNotSupportedError('base service does not handle alert messages') 
+
+    def on_any_message(*args, **kwargs):
+        '''
+        '''
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle generic messages') 
 
     def acknowledge_message(self, delivery_tag):
         """Acknowledge the message delivery from RabbitMQ by sending a

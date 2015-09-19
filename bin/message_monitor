@@ -17,7 +17,7 @@ class Monitor(Service):
         Service.__init__(self, **kwargs)
         self._payload_only = payload_only
 
-    def on_message(self, unused_channel, basic_deliver, properties, body):
+    def on_any_message(self, unused_channel, basic_deliver, properties, body):
         try:
             decoded = Message.from_encoded(body, properties.content_encoding)
             if self._payload_only:
@@ -31,7 +31,8 @@ class Monitor(Service):
                         decoded or body,
                        )
                   )
-        super(Monitor, self).on_message(unused_channel, basic_deliver, properties, body)
+        
+
 
 def start_monitoring(**kwargs):
     monitor = Monitor(
