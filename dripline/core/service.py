@@ -13,6 +13,7 @@ import uuid
 
 import pika
 
+from . import constants
 from .message import Message, AlertMessage, RequestMessage, ReplyMessage
 from . import exceptions
 
@@ -299,18 +300,36 @@ class Service(object):
 
         """
         logger.info('received a message')
-        #try:
-        #    decoded = Message.from_encoded(body, properties.content_encoding)
-        #except exceptions.DriplineDecodingError as err:
-        #        pass
-        #logger.log(35, # NOTICE, between INFO and WARNING
-        #           'Received message #{}\napplication: {}\nrouting_key: {}\n{}'.format(basic_deliver.delivery_tag,
-        #                                                      properties.app_id,
-        #                                                      basic_deliver.routing_key,
-        #                                                      decoded or body,
-        #                                                     )
-        #          )
         self.acknowledge_message(basic_deliver.delivery_tag)
+        msg_type_handlers = {
+                             constants.T_REPLY: self.on_reply_message,
+                             constants.T_REQUEST: self.on_request_message,
+                             constants.T_INFO: self.on_info_message,
+                             constants.T_ALERT: self.on_alert_message,
+                            }
+        message = Message.from_encoded(body, properties.content_encoding)
+        msg_type_handlers[message.msgtype](unused_channel, basic_deliver, properties, body)
+
+    def on_request_message():
+        '''
+        '''
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle request messages') 
+
+    def on_reply_message():
+        '''
+        '''
+        logger.warning('got a reply... should do something with it')
+        pass
+
+    def on_info_message():
+        '''
+        '''
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle info messages')
+
+    def on_alert_message():
+        '''
+        '''
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle alert messages') 
 
     def acknowledge_message(self, delivery_tag):
         """Acknowledge the message delivery from RabbitMQ by sending a

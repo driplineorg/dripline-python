@@ -124,7 +124,7 @@ class pidService(Service):
         self._sensor = sensor
         self.pid = pid_controller(dripline_service=self, **pid_args)
 
-    def on_message(self, ch, method, properties, body):
+    def on_alert_message(self, ch, method, properties, body):
         '''
         '''
         message = Message.from_encoded(body, properties.content_encoding)

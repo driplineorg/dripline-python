@@ -81,7 +81,7 @@ class AlertConsumer(Service):
                 logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
                 raise
 
-    def on_message(self, channel, method, properties, message):
+    def on_alert_message(self, channel, method, properties, message):
         logger.debug('in process_message callback')
         try:
             message_unpacked = Message.from_encoded(message, properties.content_encoding)

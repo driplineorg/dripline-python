@@ -29,7 +29,7 @@ class SlackRelay(dripline.core.AlertConsumer):
         for bot,token in _tokens.items():
             self._slackclients[bot] = slackclient.SlackClient(token)
 
-    def on_message(self, channel, method, properties, message):
+    def on_alert_message(self, channel, method, properties, message):
         # parse the routing key
         logger.debug('parsing routing key')
         key_parser = r'status_message.(?P<channel>[\w]+).(?P<from>[\w]+)'

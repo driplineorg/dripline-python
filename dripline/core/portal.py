@@ -74,13 +74,10 @@ class Portal(Service):
             del(self.conn)
         logger.debug("loop ended")
 
-    def on_message(self, channel, method, header, body):
-        try:
-            logger.info('request received by {}'.format(self.name))
-            self.endpoints[method.routing_key].handle_request(channel, method, header, body)
-            logger.info('request processing complete\n{}'.format('-'*29))
-        finally:
-            self._channel.basic_ack(delivery_tag=method.delivery_tag)
+    def on_request_message(self, channel, method, header, body):
+        logger.info('request received by {}'.format(self.name))
+        self.endpoints[method.routing_key].handle_request(channel, method, header, body)
+        logger.info('request processing complete\n{}'.format('-'*29))
 
     def _handle_reply(self, channel, method, header, body):
         logger.info("got a reply")
