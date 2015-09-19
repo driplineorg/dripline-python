@@ -18,7 +18,7 @@ def open_spimescape_portal(nodename, broker, **kwargs):
     '''
     '''
     # create the portal:
-    portal = dripline.core.Portal(nodename, broker)
+    portal = dripline.core.Spimescape(nodename, broker)
     logger.info('starting {}'.format(nodename))
     ##### need to fix the node class here...
     for provider in kwargs['providers']:

@@ -20,14 +20,14 @@ from .provider import Provider
 from .service import Service
 from .utilities import fancy_doc
 
-__all__ = ['Portal']
+__all__ = ['Spimescape']
 
 import logging
 logger = logging.getLogger(__name__)
 
 
 @fancy_doc
-class Portal(Service):
+class Spimescape(Service):
     """
     Like a node, but pythonic
     """
