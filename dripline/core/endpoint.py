@@ -38,12 +38,12 @@ def calibrate(cal_functions=None):
             val_dict = {'value_raw':fun(self)}
             if val_dict['value_raw'] is None:
                 return None
-            if isinstance(self._calibration_str, str):
+            if isinstance(self._calibration, str):
                 globals = {
                            "math": math,
                           }
                 locals = cal_functions
-                eval_str = self._calibration_str.format(val_dict['value_raw'].strip())
+                eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 logger.debug("formated cal is:\n{}".format(eval_str))
                 try:
                     cal = eval(eval_str, globals, locals)
@@ -53,9 +53,9 @@ def calibrate(cal_functions=None):
                     raise exceptions.DriplineValueError(repr(e), result=val_dict)
                 if cal is not None:
                     val_dict['value_cal'] = cal
-            elif isinstance(self._calibration_str, dict):
-                if val_dict['value_raw'] in self._calibration_str:
-                    val_dict['value_cal'] = self._calibration_str[val_dict['value_raw']]
+            elif isinstance(self._calibration, dict):
+                if val_dict['value_raw'] in self._calibration:
+                    val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
                 else:
                     raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])), result=val_dict)
             return val_dict
@@ -74,16 +74,16 @@ def _get_on_set(self, fun):
 
 class Endpoint(object):
 
-    def __init__(self, name, cal_str=None, get_on_set=False, **kwargs):
+    def __init__(self, name, calibration=None, get_on_set=False, **kwargs):
         '''
         name (str): unique identifier across all dripline services (used to determine routing key)
-        cal_str (str||dict): string use to process raw get result (with .format(raw)) or a dict to use for the same purpose where raw must be a key
+        calibration (str||dict): string use to process raw get result (with .format(raw)) or a dict to use for the same purpose where raw must be a key
         get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
         '''
         self.name = name
         self.provider = None
         self.portal = None
-        self._calibration_str = cal_str
+        self._calibration = calibration
 
         def raiser(self, *args, **kwargs):
             raise exceptions.DriplineMethodNotSupportedError('requested method not supported by this endpoint')
