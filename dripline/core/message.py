@@ -196,7 +196,7 @@ class Message(dict, object):
             raise ValueError('encoding <{}> not recognized'.format(encoding))
 
 
-@fancy_doc
+#@fancy_doc
 class ReplyMessage(Message):
     '''
     Derrived class for Reply type messages
@@ -231,7 +231,7 @@ class ReplyMessage(Message):
         self['payload'] = value
 
 
-@fancy_doc
+#@fancy_doc
 class RequestMessage(Message):
 
     def __init__(self, msgop, **kwargs):
@@ -246,14 +246,14 @@ class RequestMessage(Message):
         return constants.T_REQUEST
 
 
-@fancy_doc
+#@fancy_doc
 class InfoMessage(Message):
     @property
     def msgtype(self):
         return constants.T_INFO
 
 
-@fancy_doc
+#@fancy_doc
 class AlertMessage(Message):
     @property
     def msgtype(self):
