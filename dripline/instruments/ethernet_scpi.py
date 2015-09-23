@@ -6,14 +6,16 @@ import threading
 import types
 
 from ..core import Provider, Endpoint
+from ..core.utilities import fancy_doc
 
 import logging
 logger = logging.getLogger(__name__)
 
-__all__ = ['EthernetSCPI',
-           'EthernetRepeater',
-          ]
+__all__ = []
 
+
+__all__.append('EthernetSCPI')
+@fancy_doc
 class EthernetSCPI(Provider):
     def __init__(self,
                  socket_timeout=1.0,
@@ -23,6 +25,10 @@ class EthernetSCPI(Provider):
                  **kwargs
                  ):
         '''
+        socket_timeout (float): time in seconds for the socket to timeout
+        socket_info (tuple): (<network_address_as_str>, <port_as_int>)
+        response_terminator (str||None): string to rstrip() from responses
+        command_terminator (str||None): string to append to commands
         '''
         Provider.__init__(self, **kwargs)
         self.alock = threading.Lock()
@@ -88,16 +94,3 @@ class EthernetSCPI(Provider):
     @property
     def spimes(self):
         return self.endpoints
-
-
-class EthernetRepeater(EthernetSCPI, Endpoint):
-    '''
-    '''
-
-    def __init__(self, **kwargs):
-        Endpoint.__init__(self, **kwargs)
-        EthernetSCPI.__init__(self, **kwargs)
-
-    def on_send(self, *to_send):
-        result = self.send(list(to_send))
-        return result
