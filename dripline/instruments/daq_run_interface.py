@@ -8,7 +8,7 @@ import logging
 
 # internal imports
 from .. import core
-from .ethernet_scpi import EthernetSCPI
+from .ethernet_provider import EthernetProvider
 
 __all__ = []
 
@@ -129,7 +129,7 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
 
 
 __all__.append('RSAAcquisitionInterface')
-class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
+class RSAAcquisitionInterface(DAQProvider, EthernetProvider):
     '''
     A DAQProvider for interacting with the RSA
     '''
@@ -137,7 +137,7 @@ class RSAAcquisitionInterface(DAQProvider, EthernetSCPI):
                  max_nb_files=10000,
                  **kwargs):
         DAQProvider.__init__(self, **kwargs)
-        EthernetSCPI.__init__(self, **kwargs)
+        EthernetProvider.__init__(self, **kwargs)
         self.max_nb_files = max_nb_files
 
     def start_run(self, run_name):

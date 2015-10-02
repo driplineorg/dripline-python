@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 __all__ = []
 
 
-__all__.append('EthernetSCPI')
+__all__.append('EthernetProvider')
 @fancy_doc
-class EthernetSCPI(Provider):
+class EthernetProvider(Provider):
     def __init__(self,
                  socket_timeout=1.0,
                  socket_info=("localhost",1234),
