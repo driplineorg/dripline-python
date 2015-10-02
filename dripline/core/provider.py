@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 __all__ = ['Provider']
 
 
-#@fancy_init_doc
+@fancy_init_doc
 class Provider(Endpoint):
     '''
     Abstraction/interpretation layer for grouping endpoints and/or representing an instrument.
