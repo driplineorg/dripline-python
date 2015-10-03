@@ -6,27 +6,24 @@ Utility app for printing all of the messages through some exchange
 
 from __future__ import print_function
 
+# standard libs
 import argparse
 import json
 import os
 import sys
 
+# 3rd party libs
 import pika
-
-#import sqlite3
 import sqlalchemy
 
+# internal imports
 from dripline.core import Gogol
 
 import logging
-from dripline.core import DriplineParser#status_logger
+from dripline.core import DriplineParser
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-#logger.addHandler(status_logger.console_handler)
 
-
-def just_print(message):
-    logger.info('[{}] {}'.format(message['payload']['from'], message['payload']['value']))
 
 def start_monitoring(amqp='localhost', exchange='alerts', keys=['sensor_value.#'],
                      user=None, passwd=None, sql_server=None, sql_database=None, **kwargs):

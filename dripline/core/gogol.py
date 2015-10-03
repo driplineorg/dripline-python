@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 # standard libs
 import logging
+import re
 import traceback
 import uuid
 
@@ -56,11 +57,11 @@ class Gogol(Service):
         data = {}
         for key in ['value_raw', 'value_cal', 'memo']:
             try:
-                data[key] = message['payload']['values'][key]
+                data[key] = message.payload[key]
             except:
                 pass
 
-        insert_dict = {'endpoint_name': message['payload']['from'],
+        insert_dict = {'endpoint_name': sender_info,
                        'timestamp': message['timestamp'],
                       }
         insert_dict.update(data)

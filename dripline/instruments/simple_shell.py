@@ -60,7 +60,7 @@ class sensors_command_temp(Spime):
     This assumes that the "sensors" command is installed, which it probably isn't.
     '''
     def __init__(self, name, core=0):  # , on_get='sensors', on_set=None):
-        # DataLogger stuff
+        # Scheduler stuff
         super(sensors_command_temp, self).__init__()
         self.get_value = self.on_get
 

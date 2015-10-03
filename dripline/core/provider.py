@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
-from .endpoint import Endpoint#, fancy_init_doc
+from .endpoint import Endpoint
 from .spime import Spime
+from .utilities import fancy_doc
 
 import logging
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 __all__ = ['Provider']
 
 
-@fancy_init_doc
+@fancy_doc
 class Provider(Endpoint):
     '''
     Abstraction/interpretation layer for grouping endpoints and/or representing an instrument.

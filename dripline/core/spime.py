@@ -8,7 +8,7 @@ import math
 import functools
 import types
 
-from .data_logger import DataLogger
+from .scheduler import Scheduler
 from .exceptions import *
 from .endpoint import Endpoint, calibrate
 from .utilities import fancy_doc
@@ -36,20 +36,17 @@ def _log_on_set_decoration(self, fun):
                 values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
-        to_log = {'from': self.name,
-                  'values': values,
-                 }
-        self.store_value(alert=to_log, severity=self.alert_routing_key)
+        self.store_value(alert=values, severity=self.alert_routing_key)
         return result
     return wrapper
 
 
 @fancy_doc
-class Spime(Endpoint, DataLogger):
+class Spime(Endpoint, Scheduler):
     '''
     From wikipedia (paraphrased): *A spime is a neologism for a futuristic object, characteristic to the Internet of Things, that can be tracked through space and time throughout its lifetime. A Spime is essentially virtual master objects that can, at various times, have physical incarnations of itself.*
 
-    In the context of Dripline, a Spime is an object with which one interacts (Endpoint) and which is able to regularly report on its own state (DataLogger). Examples include obvious sensor readings such as the coldhead_temperature or bore_pressure and instrument settings such as heater_current or lo_ch1_cw_frequency.
+    In the context of Dripline, a Spime is an object with which one interacts (Endpoint) and which is able to regularly report on its own state (Scheduler). Examples include obvious sensor readings such as the coldhead_temperature or bore_pressure and instrument settings such as heater_current or lo_ch1_cw_frequency.
     '''
 
     def __init__(self,
@@ -61,8 +58,8 @@ class Spime(Endpoint, DataLogger):
         '''
         # Endpoint stuff
         Endpoint.__init__(self, **kwargs)
-        # DataLogger stuff
-        DataLogger.__init__(self, **kwargs)
+        # Scheduler stuff
+        Scheduler.__init__(self, **kwargs)
         self.get_value = self.on_get
 
         self._log_on_set = log_on_set

@@ -12,6 +12,7 @@ from __future__ import print_function
 import datetime
 import json
 import os
+import re
 import uuid
 
 import pika
@@ -129,19 +130,24 @@ class pidService(Service):
         '''
         message = Message.from_encoded(body, properties.content_encoding)
         payload = message.payload
-        if not payload['from'] == self._sensor:
+
+        this_sensor = None
+        if '.' in method.routing_key:
+            re_out = re.match(r'sensor_value.(?P<from>\S+)', method.routing_key)
+            this_sensor = re_out.groupdict()['from']
+        if not this_sensor == self._sensor:
+            logger.info('got for another sensor: {}'.format(this_sensor))
             return
         logger.info('got a value for sensor')
-        if not 'values' in payload:
-            return
-        if not 'value_cal' in payload['values']:
+
+        if not 'value_cal' in payload:
             logger.warning('no calibrated value')
             return
-        self.pid.process_new_value(timestamp=message['timestamp'], value=payload['values']['value_cal'])
+        self.pid.process_new_value(timestamp=message['timestamp'], value=payload['value_cal'])
 
 def start_monitoring(sensor, broker='localhost', **kwargs):
     exchange = 'alerts' # this is always alerts
-    keys = ['sensor_value'] # this is always a sensor value
+    keys = ['sensor_value.{}'.format(sensor)] # this is always a sensor value
 
     credentials = pika.PlainCredentials(**json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['amqp'])
 

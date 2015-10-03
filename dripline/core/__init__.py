@@ -8,7 +8,7 @@ from __future__ import absolute_import
 
 from .arg_parser import *
 from .constants import *
-from .data_logger import *
+from .scheduler import *
 from .endpoint import *
 from .exceptions import *
 from .gogol import *

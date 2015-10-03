@@ -2,7 +2,7 @@ nodename: ardbeg
 broker: localhost
 providers:
   - name: agilent5183B
-    module: EthernetSCPI
+    module: EthernetProvider
     socket_info: ("ardbeg.local",5024)
     command_terminator: "\r\n"
     response_terminator: "\r\nSCPI>"

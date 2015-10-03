@@ -12,12 +12,12 @@ import uuid
 
 from .endpoint import Endpoint
 
-__all__ = ['DataLogger',
-          ]
+__all__ = []
 logger = logging.getLogger(__name__)
 
 
-class DataLogger(object):
+__all__.append('Scheduler')
+class Scheduler(object):
     '''
     Base class for objects which need to call their own methods periodically.
     '''
@@ -88,7 +88,7 @@ class DataLogger(object):
         '''
         this_value = None
         try:
-            this_value = float(to_send['values']['value_raw'])
+            this_value = float(to_send['value_raw'])
         except TypeError:
             pass
         if self._last_log_value is None:
@@ -106,15 +106,11 @@ class DataLogger(object):
 
     def _log_a_value(self):
         try:
-            val = self.get_value()
-            if val is None:
-                raise UserWarning
+            to_send = self.get_value()
+            if to_send is None:
                 logger.warning('get returned None')
                 if hasattr(self, 'name'):
                     logger.warning('for: {}'.format(self.name))
-            to_send = {'from':self.name,
-                       'values':val,
-                      }
             self._conditionally_send(to_send)
         except UserWarning:
             logger.warning('get returned None')
