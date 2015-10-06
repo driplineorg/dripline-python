@@ -34,22 +34,19 @@ class PostgreSQLInterface(Provider):
     A not-so-flexible provider for getting run_id values.
     '''
     
-    def __init__(self, database_name, database_server, tables, *args, **kwargs):
+    def __init__(self, database_name, database_server, *args, **kwargs):
         '''
-        ~Params
-            database_name (str): name of the database to connect to
-            database_server (str): network resolvable hostname of database server
-            tables (list): list of names (str) of tables in the database
-        ~Params
+        database_name (str): name of the database to connect to
+        database_server (str): network resolvable hostname of database server
         '''
         if isinstance(tables, types.StringType):
             tables = [tables]
         Provider.__init__(self, *args, **kwargs)
 
         self.tables = {}
-        self._connect_to_db(user, password, database_server, database_name, tables)
+        self._connect_to_db(database_server, database_name, tables)
 
-    def _connect_to_db(self, user, password, database_server, database_name, table_names):
+    def _connect_to_db(self, database_server, database_name, table_names):
         '''
         '''
         credentials = json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['postgresql']
@@ -58,18 +55,18 @@ class PostgreSQLInterface(Provider):
                                                        database_server,
                                                        database_name
                                                       )
-        engine = sqlalchemy.create_engine(engine_str)
-        self.meta = sqlalchemy.MetaData(engine)
+        self.engine = sqlalchemy.create_engine(engine_str)
+        self.meta = sqlalchemy.MetaData(self.engine)
 
    def add_endpoint(self, endpoint):
         Provider.add_endpoint(self, endpoint)
-        if isinstance(endpoint, PostgreSQLTable):
+        if isinstance(endpoint, SQLTable):
             endpoint.table = sqlalchemy.Table(endpoint.table_name, self.meta, autoload=True, schema=endpoint.schema)
 
 
-
-__all__.append("InsertDBEndpoint")
-class InsertDBEndpoint(Endpoint):
+__all__.append("SQLTable")
+@fancy_doc
+class SQLTable(Endpoint):
     '''
     A class for making calls to _insert_with_return
     '''
@@ -80,20 +77,22 @@ class InsertDBEndpoint(Endpoint):
                  *args,
                 **kwargs):
         '''
-        ~Params
-            table_name (str): name of the table to insert to
-            required_insert_names (list): list of names (str) of the table columns which must be included on every requested insert
-            return_col_names (list): list of names (str) of columns whose values should be returned on completion of the insert
-            optional_insert_names (list): list of names (str) of columns which the user may specify on an insert request, but which may be omitted
-            default_insert_values (dict): dictionary of {column_names: values} to serve as defaults when inserting, any values provided explicitly on the insert request will override these values
-        ~Params
+        table_name (str): name of the table to insert to
+        required_insert_names (list): list of names (str) of the table columns which must be included on every requested insert
+        return_col_names (list): list of names (str) of columns whose values should be returned on completion of the insert
+        optional_insert_names (list): list of names (str) of columns which the user may specify on an insert request, but which may be omitted
+        default_insert_values (dict): dictionary of {column_names: values} to serve as defaults when inserting, any values provided explicitly on the insert request will override these values
         '''
         Endpoint.__init__(self, *args, **kwargs)
 
+        self.table = None
         self._table_name = table_name
         self._return_names = return_col_names
         self._required_insert_names = required_insert_names
         self._optional_insert_names = optional_insert_names
+
+    # get type
+    # self.provider.engine.execute(sqlalchemy.select([table.c.type]).where(table.c.endpoint==endpoint_name)).first()[0]
 
     def _insert_with_return(self, table_name, insert_kv_dict, return_col_names_list):
         try:
@@ -131,7 +130,7 @@ class InsertDBEndpoint(Endpoint):
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update(kwargs)
-        return_vals = self.provider._insert_with_return(self._table_name,
+        return_vals = self._insert_with_return(self._table_name,
                                                         this_insert,
                                                         self._return_names,
                                                        )
