@@ -19,3 +19,4 @@ from .service import *
 from .spime import *
 from .spimescape import *
 from .status_logger import *
+from .utilities import *

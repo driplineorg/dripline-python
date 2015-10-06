@@ -6,6 +6,10 @@ providers:
     database_server: localhost
     database_name: project8_testbed
     endpoints:
+      - name: id_map
+        module: PostgreSQLTable
+        schema: public
+        table_name: endpoint_id_map
       - name: numeric_table
         module: PostgreSQLTable
         schema: public
