@@ -390,8 +390,7 @@ class Service(Provider):
         try:
             self.run()
         except KeyboardInterrupt:
-            self.channel.stop_consuming()
-            del(self.conn)
+            self.stop()
         logger.debug('loop ended')
 
     def run(self):

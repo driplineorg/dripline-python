@@ -148,7 +148,7 @@ class SQLTable(Endpoint):
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col in kwargs.keys():
-                raise DriplineDatabaseError('a value for <{}> is required'.format(col))
+                raise DriplineDatabaseError('a value for <{}> is required!\ngot: {}'.format(col, kwargs))
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update(kwargs)

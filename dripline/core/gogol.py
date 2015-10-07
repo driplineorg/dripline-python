@@ -14,6 +14,7 @@ import uuid
 import pika
 
 # internal imports
+from . import exceptions
 from .message import Message
 from .service import Service
 from .utilities import fancy_doc
@@ -45,8 +46,10 @@ class Gogol(Service):
         try:
             message_unpacked = Message.from_encoded(message, properties.content_encoding)
             self.this_consume(message_unpacked, method)
+        except exceptions.DriplineException as err:
+            logger.warning(str(err))
         except Exception as err:
-            logger.warning('got an exception (trying to continue running):\n{}'.format(str(err)))
+            logger.warning('got an exception:\n{}'.format(str(err)))
             logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
             raise
 
