@@ -65,6 +65,12 @@ if __name__ == '__main__':
                                           twitter_support=True,
                                           slack_support=True,
                                          )
+    parser.add_argument('-k', '--keys',
+                        metavar='BINDING_KEYS',
+                        help='amqp binding keys to match against',
+                        default='#',
+                        nargs='*',
+                       )
     
     args = parser.parse_args()
     logger.info('args parsed, reading config')

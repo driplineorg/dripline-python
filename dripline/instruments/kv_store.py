@@ -91,4 +91,4 @@ class kv_store_key(Spime):
             value = float(value)
             self._value = value - value % .01
         except ValueError:
-            raise ValueError('argument to set must be a float!')
+            self._value = value

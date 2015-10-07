@@ -25,13 +25,13 @@ endpoints:
         log_on_set: True
         calibration: '1.*{}'
         initial_value: 4.00
-      - name: chicken
-        module: FormatSCPISpime
-        get_str: 'SOUR:CLOSE? (@101)'
+      - name: peaches_status
+        log_on_set: True
+        module: kv_store_key
+        initial_value: "CLOSE"
         calibration:
-            0: CLOSE
-            1: OPEN
-        set_str: 'SOUR:{} (@101)'
+            CLOSE: "on"
+            OPEN: "off"
         set_value_map:
             1: OPEN
             0: CLOSE

@@ -1,5 +1,6 @@
-name: run_table_interface
+name: slow_control_table_interface
 broker: localhost
+keys: 'sensor_value.#'
 module: SensorLogger
 sensor_type_map_table: id_map
 data_tables_dict:
