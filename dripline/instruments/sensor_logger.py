@@ -53,13 +53,14 @@ class SensorLogger(Gogol, PostgreSQLInterface):
                                              where_eq_dict={'endpoint_name':sensor_name},
                                             )
             self._sensor_types[sensor_name] = this_type[1][0][0]
-        this_data_table = self.endpoints[self._data_tables[self._sensor_types[this_type]]]
+        this_data_table = self.endpoints[self._data_tables[self._sensor_types[sensor_name]]]
         
         ### Log the sensor value
-        insert_data = {'endpoint_name': sender_name,
+        insert_data = {'endpoint_name': sensor_name,
                        'timestamp': message['timestamp'],
                       }
         for key in ['value_raw', 'value_cal', 'memo']:
             if key in message.payload:
                 insert_data[key] = message.payload[key]
         this_data_table.do_insert(**insert_data)
+        logger.info('value logged for <{}>'.format(sensor_name))

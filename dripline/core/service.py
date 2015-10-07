@@ -316,6 +316,7 @@ class Service(Provider):
             msg_type_handlers[message.msgtype](unused_channel, basic_deliver, properties, body)
         except exceptions.DriplineMethodNotSupportedError:
             self.on_any_message(unused_channel, basic_deliver, properties, body)
+        logger.info('Ready for next message\n{}'.format('-'*29))
 
     def on_request_message(*args, **kwargs):
         '''

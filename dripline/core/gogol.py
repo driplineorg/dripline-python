@@ -40,48 +40,6 @@ class Gogol(Service):
     def this_consume(self, message, basic_deliver=None):
         raise NotImplementedError('you must set this_consume to a valid function')
 
-#    @staticmethod
-#    def _print_consume(message, basic_deliver=None):
-#        logger.debug('using default message consumption')
-#        logger.info('{}'.format(message))
-#    def _postgres_consume(self, message, basic_deliver):
-#        sender_info = None
-#        if '.' in basic_deliver.routing_key:
-#            re_out = re.match(r'sensor_value.(?P<from>\S+)', basic_deliver.routing_key)
-#            sender_info = re_out.groupdict()['from']
-#        elif 'from' in message['payload']:
-#            sender_info = message['payload']['from']
-#        else:
-#            raise ValueError('sensor name not provided')
-#        
-#        data = {}
-#        for key in ['value_raw', 'value_cal', 'memo']:
-#            try:
-#                data[key] = message.payload[key]
-#            except:
-#                pass
-#
-#        insert_dict = {'endpoint_name': sender_info,
-#                       'timestamp': message['timestamp'],
-#                      }
-#        insert_dict.update(data)
-#        try:
-#            ins = self.table.insert().values(**insert_dict)
-#            ins.execute()
-#        except Exception as err:
-#            if 'no known endpoint with name' in str(err):
-#                logger.critical("Unable to log for <{}>, sensor not in SQL table".format(str(err).split('with name')[-1]))
-#                return
-#            if 'sqlalchemny' in repr(err):
-#                logger.critical("got an unknown sqlalchemy error: {}".format(repr(err)))
-#                return
-#            if 'psycopg2' in repr(err):
-#                logger.critical("got an unknown psycopg2 error: {}".format(repr(err)))
-#                return
-#            else:
-#                logger.warning('unknown error during sqlalchemy insert:\n{}'.format(err))
-#                raise
-
     def on_alert_message(self, channel, method, properties, message):
         logger.debug('in process_message callback')
         try:
