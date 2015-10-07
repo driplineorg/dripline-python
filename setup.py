@@ -38,9 +38,8 @@ class PyTest(TestCommand):
 
 extras_require={
     'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],
-    'database': ['sqlalchemy', 'psycopg2'],
-    # a note about dpph, I'm purging scipy; I've found that if we need to use it,
-    # it is more reliable to also have cython as a dependency
+    'database': ['cython', 'psycopg2', 'sqlalchemy'], #this may also require system packages
+    'slack': ['slackclient'],
     'dpph': ['numpy'],
     'other': ['colorlog', 'ipython', 'ipdb'],
 }
