@@ -14,18 +14,30 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def open_spimescape_portal(nodename, broker, **kwargs):
+def open_spimescape_portal(**kwargs):
     '''
     '''
     # create the portal:
-    portal = dripline.core.Spimescape(nodename, broker)
-    logger.info('starting {}'.format(nodename))
+    module = None
+    if 'module' not in kwargs:
+        module = dripline.core.Service
+    else:
+        module = kwargs.pop('module')
+        if hasattr(dripline.instruments, module):
+            module = getattr(dripline.instruments, module)
+        elif hasattr(dripline.core, module):
+            module = getattr(dripline.core, module)
+        else:
+            raise NameError('no module "{}" in dripline.core or dripline.instruments'.format(module))
+    these_endpoints = kwargs.pop('endpoints', [])
+    service = module(**kwargs)
+    logger.info('starting {}'.format(service.name))
     ##### need to fix the node class here...
-    for provider in kwargs['providers']:
-        portal.add_endpoint(create_child(portal, provider))
+    for provider in these_endpoints:
+        service.add_endpoint(create_child(service, provider))
     logger.info('spimescapes created and populated')
-    logger.info('Configuration of {} complete, starting consumption'.format(nodename))
-    portal.start_event_loop()
+    logger.info('Configuration of {} complete, starting consumption'.format(service.name))
+    service.start_event_loop()
 
 def create_child(portal, conf_dict):
     module = conf_dict.pop('module')

@@ -1,0 +1,36 @@
+name: run_table_interface
+broker: localhost
+module: SensorLogger
+sensor_type_map_table: id_map
+data_tables_dict:
+  numeric: numeric_table
+  string: string_table
+database_server: localhost
+database_name: project8_testbed
+endpoints:
+  - name: id_map
+    module: SQLTable
+    schema: public
+    table_name: endpoint_id_map
+  - name: numeric_table
+    module: SQLTable
+    schema: public
+    table_name: numeric_data
+    required_insert_names:
+      - endpoint_name
+      - timestamp
+      - value_raw
+    optional_insert_names:
+      - value_cal
+      - memo
+  - name: string_table
+    module: SQLTable
+    schema: public
+    table_name: string_data
+    required_insert_names:
+      - endpoint_name
+      - timestamp
+      - value_raw
+    optional_insert_names:
+      - value_cal
+      - memo

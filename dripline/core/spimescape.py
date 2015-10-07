@@ -31,17 +31,14 @@ class Spimescape(Service):
     """
     Like a node, but pythonic
     """
-    def __init__(self, name, broker):
+    def __init__(self, name, broker, **kwargs):
         '''
         Args:
             name (str): name for the portal instance, represents an AMQP binding key
             broker (str): as always, the network resolvable path to the AMQP broker
         '''
-        # need before Service.__init__ b/c keys is a prop here
-        self.endpoints = {}
         Service.__init__(self, amqp_url=broker, exchange='requests', keys=[], name=name)
         
-        self.providers = {}
         self._responses = {}
 
     @property
@@ -60,19 +57,6 @@ class Spimescape(Service):
         self.endpoints[endpoint.name] = endpoint
         setattr(endpoint, 'store_value', self.send_alert)
         setattr(endpoint, 'portal', self)
-
-    def start_event_loop(self):
-        """
-        Start the event loop for processing messages.
-        """
-        logger.info('starting event loop for node {}\n{}'.format(self.name,'-'*29))
-
-        try:
-            self.run()
-        except KeyboardInterrupt:
-            self.channel.stop_consuming()
-            del(self.conn)
-        logger.debug("loop ended")
 
     def on_request_message(self, channel, method, header, body):
         logger.info('request received by {}'.format(self.name))

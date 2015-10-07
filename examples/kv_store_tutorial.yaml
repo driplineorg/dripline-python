@@ -1,6 +1,7 @@
-nodename: my_store
+name: my_store
 broker: localhost
-providers:
+module: Spimescape
+endpoints:
   - name: my_price_list
     module: kv_store
     endpoints:

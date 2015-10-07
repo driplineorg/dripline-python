@@ -16,12 +16,13 @@ import pika
 from . import constants
 from .message import Message, AlertMessage, RequestMessage, ReplyMessage
 from . import exceptions
+from .provider import Provider
 
 logger = logging.getLogger(__name__)
 
 __all__ = ['Service']
 
-class Service(object):
+class Service(Provider):
     """This is an example consumer that will handle unexpected interactions
     with RabbitMQ such as channel and connection closures.
 
@@ -36,16 +37,19 @@ class Service(object):
     """
     EXCHANGE_TYPE = 'topic'
 
-    def __init__(self, amqp_url, exchange, keys, name=None):
+    def __init__(self, amqp_url, exchange, keys, **kwargs):
         """
         amqp_url (str): The AMQP url to connect with
         exchange (str): Name of the AMQP exchange to connect to
         keys (list|str): binding key or list of binding keys to use listen against
-        name (str|None): name for the amqp queue, automatically generated if None
+        name (str|None): name for the amqp queue, automatically generated if None (this behavior supplements the Endpoint arg of the same name)
         """
-        if name is None:
-            name = 'unknown_service_' + str(uuid.uuid4())[1:12]
-        self.name = name
+        if 'name' not in kwargs:
+            kwargs['name'] = None
+        if kwargs['name'] is None:
+            kwargs['name'] = 'unknown_service_' + str(uuid.uuid4())[1:12]
+        Provider.__init__(self, **kwargs)
+        self.name = kwargs['name']
         self._connection = None
         self._channel = None
         self._closing = False
@@ -376,6 +380,18 @@ class Service(object):
         """
         logger.debug('Closing the channel')
         self._channel.close()
+
+    def start_event_loop(self):
+        '''Call self.run with controlled stop
+        '''
+        logger.info('starting event loop for node {}\n{}.'.format(self.name,'-'*29))
+
+        try:
+            self.run()
+        except KeyboardInterrupt:
+            self.channel.stop_consuming()
+            del(self.conn)
+        logger.debug('loop ended')
 
     def run(self):
         """Run the example consumer by connecting to RabbitMQ and then
