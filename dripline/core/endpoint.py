@@ -36,6 +36,7 @@ def calibrate(cal_functions=None):
         @functools.wraps(fun)
         def wrapper(self):
             val_dict = {'value_raw':fun(self)}
+            logger.debug('attempting to calibrate')
             if val_dict['value_raw'] is None:
                 return None
             if isinstance(self._calibration, str):
@@ -48,16 +49,20 @@ def calibrate(cal_functions=None):
                 try:
                     cal = eval(eval_str, globals, locals)
                 except OverflowError:
+                    logger.debug('GOT AN OVERFLOW ERROR')
                     cal = None
                 except Exception as e:
                     raise exceptions.DriplineValueError(repr(e), result=val_dict)
                 if cal is not None:
                     val_dict['value_cal'] = cal
             elif isinstance(self._calibration, dict):
+                logger.debug('calibration is dictionary, looking up value')
                 if val_dict['value_raw'] in self._calibration:
                     val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
                 else:
                     raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])), result=val_dict)
+            else:
+                logger.warning('the _calibration property is of unknown type')
             return val_dict
         return wrapper
     return calibration
