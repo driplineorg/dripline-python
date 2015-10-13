@@ -127,8 +127,8 @@ class Endpoint(object):
             logger.debug('args are:\n{}'.format(these_args))
             result = endpoint_method(*these_args, **these_kwargs)
             logger.debug('\n endpoint method returned \n')
-            if result is None:
-                result = "operation completed silently"
+            if result is None and return_msg is None:
+                return_msg = "operation completed silently"
         except exceptions.DriplineException as err:
             logger.debug('got a dripine exception')
             retcode = err.retcode
@@ -171,6 +171,9 @@ class Endpoint(object):
         except:
             raise
         return result
+
+    def ping(self, *args, **kwargs):
+        return None
 
     def ping(self, *args, **kwargs):
         return None
