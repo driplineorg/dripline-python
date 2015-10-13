@@ -103,8 +103,10 @@ class Endpoint(object):
             self.on_set = _get_on_set(self, self.on_set)
 
     def handle_request(self, channel, method, properties, request):
+        sub_target = '.'.join(method.routing_key.split(self.name+'.')[1:])
+        logger.info('subtarget is: {}'.format(sub_target))
         logger.debug('handling requst:{}'.format(request))
-        msg = Message.from_msgpack(request)
+        msg = Message.from_encoded(request, properties.content_encoding)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
 
         method_name = ''
@@ -169,3 +171,6 @@ class Endpoint(object):
         except:
             raise
         return result
+
+    def ping(self, *args, **kwargs):
+        return None
