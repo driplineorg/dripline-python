@@ -23,6 +23,7 @@ class DAQProvider(core.Provider):
                  daq_name,
                  run_table_endpoint,
                  directory_path,
+                 debug_mode_without_database=False,
                  **kwargs):
         '''
         '''
@@ -35,12 +36,19 @@ class DAQProvider(core.Provider):
         self.directory_path = directory_path
         self.run_table_endpoint = run_table_endpoint
         self._acquisition_count = None
+        self._debug_without_db = debug_mode_without_database
 
     @property
     def run_name(self):
         return self._run_name
     @run_name.setter
     def run_name(self, value):
+        self._run_name = value
+        self._acquisition_count = 0
+        if self._debug_without_db:
+            logger.debug('not going to try to talk to database')
+            self.run_id = 0
+            return
         request = core.RequestMessage(msgop=core.OP_CMD,
                                       payload={'values':['do_insert'],
                                                'run_name':value,
@@ -50,8 +58,6 @@ class DAQProvider(core.Provider):
                                           request=request,
                                          )
         self.run_id = result.payload['run_id']
-        self._run_name = value
-        self._acquisition_count = 0
 
     def end_run(self):
         run_was = self.run_id
@@ -98,7 +104,9 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         self.log_interval = value
 
     def start_run(self, run_name):
-        result = self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
+        result = self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[self.acquisition_time*1000.]}), target=self.mantis_queue+'.duration')
+        if result.retcode >= 100:
+            logger.warning('retcode indicates an error')
         super(MantisAcquisitionInterface, self).start_run(run_name)
         self.on_get()
         self.logging_status = 'on'
@@ -107,21 +115,25 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         '''
         '''
         super(MantisAcquisitionInterface, self).start_run(run_name)
-        num_acquisitions = run_time // self.acquisition_time
+        num_acquisitions = int(run_time // self.acquisition_time)
         last_run_time = run_time % self.acquisition_time
-        self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
+        logger.info("going to request <{}> runs, then one of <{}> [s]".format(num_acquisitions, last_run_time))
+        result = self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[self.acquisition_time*1000]}), target=self.mantis_queue+'.duration')
+        if result.retcode != 0:
+            logger.warning('bad set')
         for acq in range(num_acquisitions):
             self.on_get()
         if last_run_time != 0:
-            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[last_run_time]}), target=self.mantis_queue+'.duration')
+            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[last_run_time*1000]}), target=self.mantis_queue+'.duration')
             self.on_get()
-            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
+            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[self.acquisition_time*1000]}), target=self.mantis_queue+'.duration')
 
 
     def on_get(self):
         '''
         Setting an on_get so that the logging functionality can be used to queue multiple acquisitions.
         '''
+        logger.info('requesting acquisition <{}>'.format(self._acquisition_count))
         if self.run_id is None:
             raise core.DriplineInternalError('run number is None, must request a run_id assignment prior to starting acquisition')
         filepath = '{}/{}{:09d}_{:09d}.egg'.format(
@@ -152,12 +164,18 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         result = self.portal.send_request(target=self.mantis_queue+'.stop-queue', request=request)
         if not result.retcode == 0:
             logger.warning('error stoping queue:\n{}'.format(result.return_msg))
+        else:
+            logger.warning('queue stopped')
         result = self.portal.send_request(target=self.mantis_queue+'.clear-queue', request=request)
         if not result.retcode == 0:
             logger.warning('error clearing queue:\n{}'.format(result.return_msg))
+        else:
+            logger.warning('queue cleared')
         result = self.portal.send_request(target=self.mantis_queue+'.start-queue', request=request)
         if not result.retcode == 0:
             logger.warning('error restarting queue:\n{}'.format(result.return_msg))
+        else:
+            logger.warning('queue started')
         self._acquisition_count = 0
 
 
