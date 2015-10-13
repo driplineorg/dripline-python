@@ -90,10 +90,33 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         self.mantis_queue = mantis_queue
         self.filename_prefix = filename_prefix
 
+    @property
+    def acquisition_time(self):
+        return self.log_interval
+    @acquisition_time.setter
+    def acquisition_time(self, value):
+        self.log_interval = value
+
     def start_run(self, run_name):
+        result = self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
         super(MantisAcquisitionInterface, self).start_run(run_name)
         self.on_get()
         self.logging_status = 'on'
+
+    def start_timed_run(self, run_name, run_time):
+        '''
+        '''
+        super(MantisAcquisitionInterface, self).start_run(run_name)
+        num_acquisitions = run_time // self.acquisition_time
+        last_run_time = run_time % self.acquisition_time
+        self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
+        for acq in range(num_acquisitions):
+            self.on_get()
+        if last_run_time != 0:
+            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[last_run_time]}), target=self.mantis_queue+'.duration')
+            self.on_get()
+            self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'value':[self.acquisition_time]}), target=self.mantis_queue+'.duration')
+
 
     def on_get(self):
         '''
@@ -125,6 +148,16 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
     def end_run(self):
         self.logging_status = 'stop'
         super(MantisAcquisitionInterface, self).end_run()
+        request = core.RequestMessage(msgop=core.OP_CMD)
+        result = self.portal.send_request(target=self.mantis_queue+'.stop-queue', request=request)
+        if not result.retcode == 0:
+            logger.warning('error stoping queue:\n{}'.format(result.return_msg))
+        result = self.portal.send_request(target=self.mantis_queue+'.clear-queue', request=request)
+        if not result.retcode == 0:
+            logger.warning('error clearing queue:\n{}'.format(result.return_msg))
+        result = self.portal.send_request(target=self.mantis_queue+'.start-queue', request=request)
+        if not result.retcode == 0:
+            logger.warning('error restarting queue:\n{}'.format(result.return_msg))
         self._acquisition_count = 0
 
 
