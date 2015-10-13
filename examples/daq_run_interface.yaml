@@ -1,9 +1,10 @@
-nodename: mantis_service
+name: mantis_service
+module: Spimescape
 broker: localhost
-providers:
+endpoints:
   - name: mantis_interface
     module: MantisAcquisitionInterface
-    daq_name: 'PXIe'
+    daq_name: 'Test'
     run_table_endpoint: run_table
     directory_path: /Users/laroque
     log_interval: 5
