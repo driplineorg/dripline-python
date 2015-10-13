@@ -4,8 +4,9 @@ broker: localhost
 endpoints:
   - name: mantis_interface
     module: MantisAcquisitionInterface
+    debug_mode_without_database: True
     daq_name: 'Test'
     run_table_endpoint: run_table
-    directory_path: /Users/laroque
+    directory_path: /data/tmp
     log_interval: 5
     mantis_queue: mantis
