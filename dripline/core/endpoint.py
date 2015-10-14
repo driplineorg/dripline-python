@@ -79,16 +79,19 @@ def _get_on_set(self, fun):
 
 class Endpoint(object):
 
-    def __init__(self, name, calibration=None, get_on_set=False, **kwargs):
+    def __init__(self, name=None, calibration=None, get_on_set=False, **kwargs):
         '''
         name (str): unique identifier across all dripline services (used to determine routing key)
         calibration (str||dict): string use to process raw get result (with .format(raw)) or a dict to use for the same purpose where raw must be a key
         get_on_set (bool): flag to toggle running 'on_get' after each 'on_set'
         '''
+        if name is None:
+            raise exceptions.DriplineValueError('Endpoint __init__ requres name not be None')
         self.name = name
         self.provider = None
         self.portal = None
         self._calibration = calibration
+        self.__lockout_key = None
 
         def raiser(self, *args, **kwargs):
             raise exceptions.DriplineMethodNotSupportedError('requested method not supported by this endpoint')
@@ -103,11 +106,45 @@ class Endpoint(object):
             self.on_set = _get_on_set(self, self.on_set)
 
     def handle_request(self, channel, method, properties, request):
-        sub_target = '.'.join(method.routing_key.split(self.name+'.')[1:])
-        logger.info('subtarget is: {}'.format(sub_target))
         logger.debug('handling requst:{}'.format(request))
+
+        routing_key_specifier = '.'.join(method.routing_key.split(self.name+'.')[1:])
+        logger.debug('routing key specifier is: {}'.format(sub_target))
+
         msg = Message.from_encoded(request, properties.content_encoding)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
+
+        # construction action
+        these_args = []
+        if 'values' in msg.payload:
+            these_args = msg.payload['values']
+        these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
+        these_kwargs.update({'routing_key_specifier':routing_key_specifier})
+        method_name = ''
+        for const_name in dir(constants):
+            if getattr(constants, const_name) == msg.msgop:
+                method_name = 'on_' + const_name.split('_')[-1].lower()
+        endpoint_method = getattr(self, method_name)
+        logger.debug('method is: {}'.format(endpoint_method))
+
+        operation_allowed = False
+        # execute because unlocked
+        if self.__lockout_key is None:
+            operation_allowed = True
+        # execute if lockout key is present and correct
+        elif msg.get('lockout_key', '').replace('-', '') == self.__lockout_key:
+            pass
+        # execute because OP_GET is always allowed
+        elif msg.msgop == constants.OP_GET:
+            operation_allowed = True
+        # execute because is OP_COMD to unlock with force
+        elif msg.msgop == constants.OP_CMD:
+            if these_kwargs.get('routing_key_specifier') == '.unlock' or these_kwargs.get('values',[None])[0] == 'unlock':
+                if msg.payload.get('force', False):
+                    operation_allowed = True
+        # reject because no acceptable conditions met
+        else:
+            raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked'.format(self.name))
 
         method_name = ''
         for const_name in dir(constants):
@@ -124,6 +161,7 @@ class Endpoint(object):
             if 'values' in msg.payload:
                 these_args = msg.payload['values']
             these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
+            these_kwargs.update({'routing_key_specifier':routing_key_specifier})
             logger.debug('args are:\n{}'.format(these_args))
             result = endpoint_method(*these_args, **these_kwargs)
             logger.debug('\n endpoint method returned \n')
@@ -147,6 +185,8 @@ class Endpoint(object):
     def on_config(self, attribute, value=None):
         '''
         configure a property again
+
+        WARNING! if you override this method, you must ensure you deal with lockout properly
         '''
         result = None
         if hasattr(self, attribute):
@@ -160,6 +200,9 @@ class Endpoint(object):
         return result
 
     def on_cmd(self, *args, **kwargs):  
+        '''
+        WARNING! if you override this method, you must ensure you deal with lockout properly
+        '''
         logger.debug('args are: {}'.format(args))
         logger.debug('kwargs are: {}'.format(kwargs))
         try:
@@ -173,7 +216,17 @@ class Endpoint(object):
         return result
 
     def ping(self, *args, **kwargs):
+        '''
+        ignore all details and respond with an empty message
+        '''
         return None
 
-    def ping(self, *args, **kwargs):
-        return None
+    def lock(self, lockout_key=None, *args, **kwargs):
+        if lockout_key is None:
+            lockout_key = uuid.uuid4().get_hex()
+        lockout_key = lockout_key.replace('-', '')
+        self.__lockout_key = lockout_key
+        return {'key': self.__lockout_key}
+
+    def unlock(self, *args, **kwargs):
+        self.__lockout_key = None

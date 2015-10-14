@@ -234,16 +234,29 @@ class ReplyMessage(Message):
 #@fancy_doc
 class RequestMessage(Message):
 
-    def __init__(self, msgop, **kwargs):
+    def __init__(self, msgop, lockout_key=None, **kwargs):
         '''
         msgop (int): only meaningful for Request messages, indicates the operation being requested
         '''
         self.msgop = msgop
+        self.lockout_key = lockout_key
         Message.__init__(self, **kwargs)
 
     @property
     def msgtype(self):
         return constants.T_REQUEST
+
+    @property
+    def lockout_key(self):
+        value = None
+        if 'lockout_key' in self:
+            value = self['lockout_key']
+        return value
+    @lockout_key.setter
+    def lockout_key(self, value):
+        self['lockout_key'] = value
+        if value is None:
+            self.pop('lockout_key')
 
 
 #@fancy_doc
