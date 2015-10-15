@@ -71,6 +71,7 @@ def main(args):
         result = Message.from_msgpack(reply)
     else:
         result = reply
+    logger.info('response:\n{}'.format(result))
     print_prefix = '->'.join([args.target]+args.values)
     color = ''
     if not result.retcode == 0:
