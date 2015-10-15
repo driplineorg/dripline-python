@@ -40,7 +40,7 @@ class RepeaterProvider(Provider):
         request = message.RequestMessage(msgop=constants.OP_SEND,
                                          payload=to_send,
                                         )
-        return self.send_request(self._repeat_target, request)
+        return self.send_request(self._repeat_target, request)['values']
 
     def on_get(self):
         payload = {'values':[]}

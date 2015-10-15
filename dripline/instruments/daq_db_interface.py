@@ -47,13 +47,13 @@ class RunDBInterface(Provider):
         Provider.__init__(self, *args, **kwargs)
 
         self.tables = {}
-        self.connect_to_db(user, password, database_server, database_name, tables)
+        self.connect_to_db(database_server, database_name, tables)
 
-    def connect_to_db(self, user, password, database_server, database_name, table_names):
+    def connect_to_db(self, database_server, database_name, table_names):
         '''
         '''
         credentials = json.loads(open(os.path.expanduser('~')+'/.project8_authentications.json').read())['postgresql']
-        engine_str = 'postgresql://{}:{}@{}/{}'.format(credentials['user'],
+        engine_str = 'postgresql://{}:{}@{}/{}'.format(credentials['username'],
                                                        credentials['password'],
                                                        database_server,
                                                        database_name

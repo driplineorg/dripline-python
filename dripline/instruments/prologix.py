@@ -59,7 +59,7 @@ class GPIBInstrument(Provider):
         if isinstance(cmd, types.StringType):
             cmd = [cmd]
         to_send = ['++addr {}\r'.format(self.addr)] + cmd
-        result = self.provider.send(to_send)
+        result = self.provider.send(to_send)[0]
         result = ';'.join(result.split(';')[1:])
         logger.debug("instr got back: {}".format(result))
         return result

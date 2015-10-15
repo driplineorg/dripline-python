@@ -39,7 +39,9 @@ def calibrate(cal_functions=None):
             logger.debug('attempting to calibrate')
             if val_dict['value_raw'] is None:
                 return None
-            if isinstance(self._calibration, str):
+            if self._calibration is None:
+                pass
+            elif isinstance(self._calibration, str):
                 globals = {
                            "math": math,
                           }
