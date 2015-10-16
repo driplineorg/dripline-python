@@ -61,7 +61,7 @@ def main(args):
 
     payload.update({'values':values})
     logger.debug('payload will be: {}'.format(payload))
-    request = message.RequestMessage(msgop=msgop, payload=payload)
+    request = message.RequestMessage(msgop=msgop, payload=payload, lockout_key=args.lockout_key)
     try:
         reply = conn.send_request(args.target, request, timeout=args.timeout)
     except exceptions.DriplineException as dripline_error:
@@ -98,6 +98,12 @@ if __name__ == '__main__':
     parser.add_argument('--timeout',
                         default=10,
                         type=float,
+                       )
+    parser.add_argument('--lockout-key',
+                        metavar='lockout_key',
+                        default=None,
+                        type=str,
+                        help='string to provide in the RequestMessage.lockout_key, for locking endpoints or using locked endpoints',
                        )
 
     args = parser.parse_args()
