@@ -8,6 +8,7 @@ import math
 import time
 import traceback
 import types
+import uuid
 
 import pika
 import yaml
@@ -33,8 +34,7 @@ def calibrate(cal_functions=None):
     elif cal_functions is None:
         cal_functions = {}
     def calibration(fun):
-        @functools.wraps(fun)
-        def wrapper(self):
+        def wrapper(self, *args, **kwargs):
             val_dict = {'value_raw':fun(self)}
             logger.debug('attempting to calibrate')
             if val_dict['value_raw'] is None:
@@ -71,7 +71,7 @@ def calibrate(cal_functions=None):
 
 
 def _get_on_set(self, fun):
-    #@functools.wraps(fun)
+    @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         fun(*args, **kwargs)
         result = self.on_get()
@@ -107,11 +107,37 @@ class Endpoint(object):
         if get_on_set:
             self.on_set = _get_on_set(self, self.on_set)
 
+    def _check_lockout_conditions(self, msg, these_args, these_kwargs):
+        operation_allowed = False
+        # execute because unlocked
+        if self.__lockout_key is None:
+            logger.debug('operation allowed because not locked')
+            operation_allowed = True
+        # execute if lockout key is present and correct
+        elif msg.get('lockout_key', '').replace('-', '') == self.__lockout_key:
+            logger.debug('operation allowed because correct lockout key')
+            operation_allowed = True
+        # execute because OP_GET is always allowed
+        elif msg.msgop == constants.OP_GET:
+            logger.debug('operation allowed because it is Get')
+            operation_allowed = True
+        # execute because is OP_COMD to unlock with force
+        elif msg.msgop == constants.OP_CMD:
+            logger.error('a cmd')
+            if these_kwargs.get('routing_key_specifier') == '.unlock' or these_args[0:1] == ['unlock']:
+                logger.error('doing an unlock?')
+                if msg.payload.get('force', False):
+                    operation_allowed = True
+                    logger.debug('operation allowed because forcing unlock')
+        # reject because no acceptable conditions met
+        if not operation_allowed:
+            raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked'.format(self.name))
+
     def handle_request(self, channel, method, properties, request):
         logger.debug('handling requst:{}'.format(request))
 
         routing_key_specifier = '.'.join(method.routing_key.split(self.name+'.')[1:])
-        logger.debug('routing key specifier is: {}'.format(sub_target))
+        logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
 
         msg = Message.from_encoded(request, properties.content_encoding)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
@@ -129,36 +155,11 @@ class Endpoint(object):
         endpoint_method = getattr(self, method_name)
         logger.debug('method is: {}'.format(endpoint_method))
 
-        operation_allowed = False
-        # execute because unlocked
-        if self.__lockout_key is None:
-            operation_allowed = True
-        # execute if lockout key is present and correct
-        elif msg.get('lockout_key', '').replace('-', '') == self.__lockout_key:
-            pass
-        # execute because OP_GET is always allowed
-        elif msg.msgop == constants.OP_GET:
-            operation_allowed = True
-        # execute because is OP_COMD to unlock with force
-        elif msg.msgop == constants.OP_CMD:
-            if these_kwargs.get('routing_key_specifier') == '.unlock' or these_kwargs.get('values',[None])[0] == 'unlock':
-                if msg.payload.get('force', False):
-                    operation_allowed = True
-        # reject because no acceptable conditions met
-        else:
-            raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked'.format(self.name))
-
-        method_name = ''
-        for const_name in dir(constants):
-            if getattr(constants, const_name) == msg.msgop:
-                method_name = 'on_' + const_name.split('_')[-1].lower()
-        endpoint_method = getattr(self, method_name)
-        logger.debug('method is: {}'.format(endpoint_method))
-
         result = None
         retcode = None
         return_msg = None
         try:
+            self._check_lockout_conditions(msg, these_args, these_kwargs)
             these_args = []
             if 'values' in msg.payload:
                 these_args = msg.payload['values']
@@ -224,6 +225,7 @@ class Endpoint(object):
         return None
 
     def lock(self, lockout_key=None, *args, **kwargs):
+        logger.debug('locking <{}>'.format(self.name))
         if lockout_key is None:
             lockout_key = uuid.uuid4().get_hex()
         lockout_key = lockout_key.replace('-', '')
@@ -231,4 +233,5 @@ class Endpoint(object):
         return {'key': self.__lockout_key}
 
     def unlock(self, *args, **kwargs):
+        logger.debug('unlocking <{}>'.format(self.name))
         self.__lockout_key = None
