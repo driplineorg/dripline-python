@@ -43,7 +43,7 @@ class Spimescape(Service):
 
     @property
     def keys(self):
-        return self.endpoints.keys()
+        return [key+'.#' for key in self.endpoints.keys()]
     @keys.setter
     def keys(self, value):
         logger.debug('cannot set keys, use self.endpoints')
@@ -60,7 +60,7 @@ class Spimescape(Service):
 
     def on_request_message(self, channel, method, header, body):
         logger.info('request received by {}'.format(self.name))
-        self.endpoints[method.routing_key].handle_request(channel, method, header, body)
+        self.endpoints[method.routing_key.split('.')[0]].handle_request(channel, method, header, body)
         logger.info('request processing complete\n{}')
 
     def _handle_reply(self, channel, method, header, body):
