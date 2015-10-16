@@ -128,7 +128,7 @@ class Endpoint(object):
                     operation_allowed = True
                     logger.debug('operation allowed because forcing unlock')
                 else:
-                    raise exception.DriplineAccessDenied('cannot unlock without valid lockout_key or force==True')
+                    raise exceptions.DriplineAccessDenied('cannot unlock without valid lockout_key or force==True')
         # reject because no acceptable conditions met
         if not operation_allowed:
             raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked; lockout_key required'.format(self.name))
@@ -136,18 +136,22 @@ class Endpoint(object):
     def handle_request(self, channel, method, properties, request):
         logger.debug('handling requst:{}'.format(request))
 
-        routing_key_specifier = '.'.join(method.routing_key.split(self.name+'.')[1:])
+        routing_key_specifier = method.routing_key.replace(self.name, '', 1).lstrip('.')
         logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
 
         msg = Message.from_encoded(request, properties.content_encoding)
         logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
+        lockout_key = msg.get('lockout_key', None)
 
         # construction action
         these_args = []
         if 'values' in msg.payload:
             these_args = msg.payload['values']
         these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
-        these_kwargs.update({'routing_key_specifier':routing_key_specifier})
+        if routing_key_specifier:
+            these_kwargs.update({'routing_key_specifier':routing_key_specifier})
+        if lockout_key and msg.msgop == constants.OP_CMD:
+            these_kwargs.update({'lockout_key': lockout_key})
         method_name = ''
         for const_name in dir(constants):
             if getattr(constants, const_name) == msg.msgop:
@@ -160,12 +164,8 @@ class Endpoint(object):
         return_msg = None
         try:
             self._check_lockout_conditions(msg, these_args, these_kwargs)
-            these_args = []
-            if 'values' in msg.payload:
-                these_args = msg.payload['values']
-            these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
-            these_kwargs.update({'routing_key_specifier':routing_key_specifier})
             logger.debug('args are:\n{}'.format(these_args))
+            logger.debug('kwargs are:\n{}'.format(these_kwargs))
             result = endpoint_method(*these_args, **these_kwargs)
             logger.debug('\n endpoint method returned \n')
             if result is None and return_msg is None:
@@ -214,6 +214,8 @@ class Endpoint(object):
         else:
             method_name = args[0:1][0]
             args = args[1:len(args)]
+        if method_name != 'lock' and 'lockout_key' in kwargs:
+            kwargs.pop('lockout_key')
         result = getattr(self, method_name)(*args, **kwargs)
         return result
 
