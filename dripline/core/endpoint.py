@@ -113,25 +113,25 @@ class Endpoint(object):
         if self.__lockout_key is None:
             logger.debug('operation allowed because not locked')
             operation_allowed = True
-        # execute if lockout key is present and correct
-        elif msg.get('lockout_key', '').replace('-', '') == self.__lockout_key:
-            logger.debug('operation allowed because correct lockout key')
-            operation_allowed = True
         # execute because OP_GET is always allowed
         elif msg.msgop == constants.OP_GET:
             logger.debug('operation allowed because it is Get')
             operation_allowed = True
+        # execute if lockout key is present and correct
+        elif msg.get('lockout_key', '').replace('-', '') == self.__lockout_key:
+            logger.debug('operation allowed because correct lockout key')
+            operation_allowed = True
         # execute because is OP_COMD to unlock with force
         elif msg.msgop == constants.OP_CMD:
-            logger.error('a cmd')
-            if these_kwargs.get('routing_key_specifier') == '.unlock' or these_args[0:1] == ['unlock']:
-                logger.error('doing an unlock?')
+            if these_kwargs.get('routing_key_specifier') == 'unlock' or these_args[0:1] == ['unlock']:
                 if msg.payload.get('force', False):
                     operation_allowed = True
                     logger.debug('operation allowed because forcing unlock')
+                else:
+                    raise exception.DriplineAccessDenied('cannot unlock without valid lockout_key or force==True')
         # reject because no acceptable conditions met
         if not operation_allowed:
-            raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked'.format(self.name))
+            raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked; lockout_key required'.format(self.name))
 
     def handle_request(self, channel, method, properties, request):
         logger.debug('handling requst:{}'.format(request))
@@ -208,14 +208,13 @@ class Endpoint(object):
         '''
         logger.debug('args are: {}'.format(args))
         logger.debug('kwargs are: {}'.format(kwargs))
-        try:
-            method = getattr(self, args[0])
-        except:
-            raise
-        try:
-            result = method(*args[1:], **kwargs)
-        except:
-            raise
+        method_name = None
+        if kwargs.get('routing_key_specifier'):
+            method_name = kwargs['routing_key_specifier']
+        else:
+            method_name = args[0:1][0]
+            args = args[1:len(args)]
+        result = getattr(self, method_name)(*args, **kwargs)
         return result
 
     def ping(self, *args, **kwargs):
@@ -235,3 +234,4 @@ class Endpoint(object):
     def unlock(self, *args, **kwargs):
         logger.debug('unlocking <{}>'.format(self.name))
         self.__lockout_key = None
+        raise exceptions.DriplineWarning('unlocked')
