@@ -103,6 +103,8 @@ class Endpoint(object):
                 method_name = 'on_' + key.split('_')[-1].lower()
                 if not hasattr(self, method_name):
                     setattr(self, method_name, types.MethodType(raiser, self, Endpoint))
+                if not hasattr(self, '__'+method_name):
+                    setattr(self, '__'+method_name, getattr(self, method_name))
 
         if get_on_set:
             self.on_set = _get_on_set(self, self.on_set)
@@ -155,7 +157,7 @@ class Endpoint(object):
         method_name = ''
         for const_name in dir(constants):
             if getattr(constants, const_name) == msg.msgop:
-                method_name = 'on_' + const_name.split('_')[-1].lower()
+                method_name = '__on_' + const_name.split('_')[-1].lower()
         endpoint_method = getattr(self, method_name)
         logger.debug('method is: {}'.format(endpoint_method))
 
@@ -184,6 +186,12 @@ class Endpoint(object):
         reply = ReplyMessage(payload=result, retcode=retcode, return_msg=return_msg)
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
+
+    def __on_get(self):
+        '''
+        WARNING! you should *NOT* override this method 
+        '''
+        self.on_get()
 
     def on_config(self, attribute, value=None):
         '''
