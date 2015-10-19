@@ -211,13 +211,13 @@ class Endpoint(object):
         value = args
         attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0])
         if value[0] == attribute:
-            value = value[1]
+            value = value[1:len(value)]
         logger.info('dealing with attribute: {}'.format(attribute))
-        logger.info('trying to set to: {}'. format(value))
+        logger.info('trying to set to: {}'. format(value[0]))
         if attribute:
             if hasattr(self, attribute):
-                setattr(self, attribute, value)
-                logger.info('set {} of {} to {}'.format(attribute, self.name, value))
+                setattr(self, attribute, value[0])
+                logger.info('set {} of {} to {}'.format(attribute, self.name, value[0]))
             else:
                 raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
         else:
