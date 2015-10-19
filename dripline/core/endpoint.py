@@ -207,21 +207,24 @@ class Endpoint(object):
         '''
         WARNING! you should *NOT* override this method
         '''
+        logger.warning('args/kwargs\n{}\n{}'.format(args, kwargs))
         result = None
         value = args
-        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0])
-        if value[0] == attribute:
-            value = value[1:len(value)]
-        logger.info('dealing with attribute: {}'.format(attribute))
-        logger.info('trying to set to: {}'. format(value[0]))
+        logger.warning('value here is {}'.format(value))
+        attribute = ''
+        if 'routing_key_specifier' in kwargs:
+            attribute = kwargs['routing_key_specifier']
+            value = args[0]
+        elif len(args) == 2:
+            attribute = args[0]
+            value = args[1]
         if attribute:
             if hasattr(self, attribute):
-                setattr(self, attribute, value[0])
-                logger.info('set {} of {} to {}'.format(attribute, self.name, value[0]))
+                setattr(self, attribute, value)
             else:
                 raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
         else:
-            result = self.on_set(value)
+            result = self.on_set(value[0])
         return result
 
     def on_config(self, attribute, value=None):
