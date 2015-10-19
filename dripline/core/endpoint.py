@@ -103,8 +103,8 @@ class Endpoint(object):
                 method_name = 'on_' + key.split('_')[-1].lower()
                 if not hasattr(self, method_name):
                     setattr(self, method_name, types.MethodType(raiser, self, Endpoint))
-                if not hasattr(self, '__'+method_name):
-                    setattr(self, '__'+method_name, getattr(self, method_name))
+                if not hasattr(self, '_'+method_name):
+                    setattr(self, '_'+method_name, getattr(self, method_name))
 
         if get_on_set:
             self.on_set = _get_on_set(self, self.on_set)
@@ -142,7 +142,7 @@ class Endpoint(object):
         logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
 
         msg = Message.from_encoded(request, properties.content_encoding)
-        logger.debug('got a {} request: {}'.format(msg.msgop, msg.payload))
+        logger.info('got a {} request: {}'.format(msg.msgop, msg.payload))
         lockout_key = msg.get('lockout_key', None)
 
         # construction action
@@ -157,7 +157,8 @@ class Endpoint(object):
         method_name = ''
         for const_name in dir(constants):
             if getattr(constants, const_name) == msg.msgop:
-                method_name = '__on_' + const_name.split('_')[-1].lower()
+                method_name = '_on_' + const_name.split('_')[-1].lower()
+        logger.info('method_name is: {}'.format(method_name))
         endpoint_method = getattr(self, method_name)
         logger.debug('method is: {}'.format(endpoint_method))
 
@@ -187,11 +188,41 @@ class Endpoint(object):
         self.portal.send_reply(properties, reply)
         logger.debug('reply sent')
 
-    def __on_get(self):
+    def _on_get(self, *args, **kwargs):
         '''
         WARNING! you should *NOT* override this method 
         '''
-        self.on_get()
+        result = None
+        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0])
+        if attribute:
+            if hasattr(self, attribute):
+                result = getattr(self, attribute)
+            else:
+                raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
+        else:
+            result = self.on_get()
+        return result
+
+    def _on_set(self, *args, **kwargs):
+        '''
+        WARNING! you should *NOT* override this method
+        '''
+        result = None
+        value = args
+        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0])
+        if value[0] == attribute:
+            value = value[1]
+        logger.info('dealing with attribute: {}'.format(attribute))
+        logger.info('trying to set to: {}'. format(value))
+        if attribute:
+            if hasattr(self, attribute):
+                setattr(self, attribute, value)
+                logger.info('set {} of {} to {}'.format(attribute, self.name, value))
+            else:
+                raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
+        else:
+            result = self.on_set(value)
+        return result
 
     def on_config(self, attribute, value=None):
         '''
