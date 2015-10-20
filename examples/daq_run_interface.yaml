@@ -10,3 +10,12 @@ endpoints:
     directory_path: /data/tmp
     log_interval: 5
     mantis_queue: mantis
+    ensure_sets:
+        peaches: 1.1
+    ensure_locked:
+      - peaches
+      - chips
+    metadata_gets:
+        peaches: value_raw
+        waffles: value_cal
+    lf_lo_endpoint_name: chips
