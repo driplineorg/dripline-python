@@ -142,6 +142,8 @@ class Endpoint(object):
         logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
 
         msg = Message.from_encoded(request, properties.content_encoding)
+        if msg.payload is None:
+            msg.payload = {}
         logger.info('got a {} request: {}'.format(msg.msgop, msg.payload))
         lockout_key = msg.get('lockout_key', None)
 
@@ -193,7 +195,7 @@ class Endpoint(object):
         WARNING! you should *NOT* override this method 
         '''
         result = None
-        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0]).replace('-','_')
+        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [''])[0]).replace('-','_')
         if attribute:
             if hasattr(self, attribute):
                 result = getattr(self, attribute)
@@ -270,6 +272,10 @@ class Endpoint(object):
     @property
     def is_locked(self):
         return bool(self.__lockout_key)
+
+    @property
+    def lockout_key(self):
+        return self.__lockout_key
 
     def lock(self, lockout_key=None, *args, **kwargs):
         logger.debug('locking <{}>'.format(self.name))

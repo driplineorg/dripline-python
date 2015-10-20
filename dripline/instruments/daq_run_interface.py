@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 # standard imports
 import logging
+import uuid
 
 # internal imports
 from .. import core
@@ -20,23 +21,45 @@ class DAQProvider(core.Provider):
     Base class for providing a uniform interface to different DAQ systems
     '''
     def __init__(self,
-                 daq_name,
-                 run_table_endpoint,
-                 directory_path,
+                 daq_name=None,
+                 run_table_endpoint=None,
+                 directory_path=None,
+                 ensure_sets={},
+                 ensure_locked=[],
+                 metadata_gets={},
                  debug_mode_without_database=False,
                  **kwargs):
         '''
+        daq_name (str): name of the DAQ (used with the run table and in metadata)
+        run_table_endpoint (str): name of the endpoint providing an interface to the run table
+        directory_path (str): absolute path to "hot" storage (as seen from the DAQ software, not a network path)
+        ensure_sets (dict): a dictionary of endpoint names as keys, with values to set them to. These will all be set prior to each run and should 
         '''
         core.Provider.__init__(self, **kwargs)
 
+        if daq_name is None:
+            raise core.exceptions.DriplineValueError('<{}> instance <{}> requires a value for "{}" to initialize'.format(self.__class__.__name__, self.name, 'daq_name'))
+        else:
+            self.daq_name = daq_name
+        if run_table_endpoint is None:
+            raise core.exceptions.DriplineValueError('<{}> instance <{}> requires a value for "{}" to initialize'.format(self.__class__.__name__, self.name, 'run_table_endpoint'))
+        else:
+            self.run_table_endpoint = run_table_endpoint
+        if directory_path is None:
+            raise core.exceptions.DriplineValueError('<{}> instance <{}> requires a value for "{}" to initialize'.format(self.__class__.__name__, self.name, 'directory_path'))
+        else:
+            self.directory_path = directory_path
+        
+        self._ensure_sets = ensure_sets
+        self._ensure_locked = ensure_locked
+        self._metadata_gets = metadata_gets
+        self._debug_without_db = debug_mode_without_database
+
         self._stop_handle = None
-        self.daq_name = daq_name
         self._run_name = None
         self.run_id = None
-        self.directory_path = directory_path
-        self.run_table_endpoint = run_table_endpoint
         self._acquisition_count = None
-        self._debug_without_db = debug_mode_without_database
+        self._internal_lockout_key = None
 
     @property
     def run_name(self):
@@ -72,7 +95,52 @@ class DAQProvider(core.Provider):
         '''
         '''
         self.run_name = run_name
+        self._do_prerun_sets()
+        actually_locked = self._do_prerun_lockout()
+        logger.warning('will need to unlock: {}'.format(actually_locked))
+        self._run_meta = {}
+        self._run_meta.update(self._do_prerun_gets())
+        logger.warning('these meta will be {}'.format(self._run_meta))
+        logger.error('start_run finished')
+
+    def _do_prerun_sets(self):
+        logger.info('doing prerun sets')
+        m = core.RequestMessage(msgop=core.OP_SET, payload={'values':[None]})
+        if self._internal_lockout_key:
+            m.lockout_key = self._internal_lockout_key
+        for endpoint,value in self._ensure_sets.items():
+            logger.debug('should set {} -> {}'.format(endpoint,value))
+            m.payload['values'] = [value]
+            result = self.portal.send_request(request=m, target=endpoint)
+            if result.retcode != 0:
+                raise core.exception_map[result.retcode](result.return_msg)
     
+    def _do_prerun_lockout(self):
+        logger.info('doing prerun lockout')
+        this_lockout_key = self._internal_lockout_key or self.lockout_key or uuid.uuid4().get_hex()
+        self._internal_lockout_key = this_lockout_key
+        to_unlock = []
+        lock_query = core.RequestMessage(msgop=core.OP_GET)
+        lock_cmd = core.RequestMessage(msgop=core.OP_CMD, lockout_key=this_lockout_key)
+        for endpoint in self._ensure_locked:
+            logger.warning('ensuring lockout of {}'.format(endpoint))
+            if not self.portal.send_request(request=lock_query, target=endpoint+'.is-locked').payload['values'][0]:
+                self.portal.send_request(request=lock_cmd, target=endpoint+'.lock')
+                to_unlock.append(endpoint)
+        return to_unlock
+
+    def _do_prerun_gets(self):
+        logger.info('doing prerun meta-data gets')
+        query_msg = core.RequestMessage(msgop=core.OP_GET)
+        these_metadata = {}
+        for endpoint,element in self._metadata_gets.items():
+            result = self.portal.send_request(request=query_msg, target=endpoint)
+            these_metadata[endpoint] = result.payload[element]
+        return these_metadata
+
+    def determine_RF_ROI(self):
+        raise core.exceptions.DriplineNotImplementedError('subclass must implement RF ROI determination')
+
     def start_timed_run(self, run_name, run_time):
         '''
         '''
@@ -87,14 +155,29 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
     '''
     def __init__(self,
                  mantis_queue='mantis',
+                 lf_lo_endpoint_name=None,
+                 hf_lo_freq=24.2e9,
+                 analysis_bandwidth=50e6,
                  filename_prefix='',
                  **kwargs
                 ):
+        '''
+        mantis_queue (str): binding key for mantis AMQP service
+        lf_lo_endpoint_name (str): endpoint name for the 2nd stage LO
+        hf_lo_freq (float): local oscillator frequency [Hz] for the 1st stage (default should be correct)
+        analysis_bandwidth (float): total receiver bandwidth [Hz]
+        filename_prefix (str): string which will prefix unique filenames
+        '''
         DAQProvider.__init__(self, **kwargs)
         core.Spime.__init__(self, **kwargs)
         self.alert_routing_key = 'daq_requests'
         self.mantis_queue = mantis_queue
         self.filename_prefix = filename_prefix
+        if lf_lo_endpoint_name is None:
+            raise core.exceptions.DriplineValueError('the mantis interface requires a "lf_lo_endpoint_name"')
+        self._lf_lo_endpoint_name = lf_lo_endpoint_name
+        self._hf_lo_freq = hf_lo_freq
+        self._analysis_bandwidth = analysis_bandwidth
 
     @property
     def acquisition_time(self):
@@ -128,6 +211,10 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
             self.on_get()
             self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[self.acquisition_time*1000]}), target=self.mantis_queue+'.duration')
 
+    def determine_RF_ROI(self):
+        lf_lo_freq = self._run_meta.pop(self._lf_lo_endpoint_name)
+        self._run_meta['RF_ROI_MIN'] = lf_lo_freq + self._hf_lo_freq
+        self._run_meta['RF_ROI_MAX'] = self._analysis_bandwidth + lf_lo_freq + self._hf_lo_freq
 
     def on_get(self):
         '''
