@@ -20,6 +20,27 @@ def verb_list():
     verbs = [v[3:].lower() for v in dir(constants) if v.startswith('OP_')]
     return verbs
 
+def cast_arg(value):
+    '''
+    convert reasonable string arguments from the CLI to python types
+    '''
+    temp_val = value
+    try:
+        temp_val = float(value)
+        temp_val = int(value)
+    except ValueError:
+        if isinstance(temp_val, types.StringType):
+            try:
+                if value.lower() == 'true':
+                    temp_val = True
+                elif value.lower() == 'false':
+                    temp_val = False
+                elif value.lower() in ['none', 'nil', 'null']:
+                    temp_val = None
+            except ValueError:
+                pass
+    return temp_val
+
 
 def main(args):
     request_verb = args.verb
@@ -32,32 +53,16 @@ def main(args):
     values = []
     payload = {}
     for val in args.values:
-        temp_val = val
-        try:
-            temp_val = float(val)
-            temp_val = int(val)
-        except ValueError:
-            if isinstance(temp_val, types.StringType):
-                try:
-                    if val.lower() == 'true':
-                        temp_val = True
-                    elif val.lower() == 'false':
-                        temp_val = False
-                    elif val.lower() in ['none', 'nil', 'null']:
-                        temp_val = None
-                except ValueError:
-                    pass
-            pass
-        finally:
-            if isinstance(temp_val, types.StringType):
-                if len(temp_val.split('=')) > 1:
-                    value = '='.join(temp_val.split('=')[1:])
-                    payload.update({temp_val.split('=')[0]:value})
-                else:
-                    values.append(temp_val)
-                
+        temp_val = cast_arg(val)
+        if isinstance(temp_val, types.StringType):
+            if len(temp_val.split('=')) > 1:
+                value = cast_arg('='.join(temp_val.split('=')[1:]))
+                payload.update({temp_val.split('=')[0]:value})
             else:
                 values.append(temp_val)
+            
+        else:
+            values.append(temp_val)
 
     payload.update({'values':values})
     logger.debug('payload will be: {}'.format(payload))
