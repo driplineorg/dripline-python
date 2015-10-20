@@ -193,7 +193,7 @@ class Endpoint(object):
         WARNING! you should *NOT* override this method 
         '''
         result = None
-        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0])
+        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [False])[0]).replace('-','_')
         if attribute:
             if hasattr(self, attribute):
                 result = getattr(self, attribute)
@@ -213,10 +213,10 @@ class Endpoint(object):
         logger.warning('value here is {}'.format(value))
         attribute = ''
         if 'routing_key_specifier' in kwargs:
-            attribute = kwargs['routing_key_specifier']
+            attribute = kwargs['routing_key_specifier'].replace('-','_')
             value = args[0]
         elif len(args) == 2:
-            attribute = args[0]
+            attribute = args[0].replace('-','_')
             value = args[1]
         if attribute:
             if hasattr(self, attribute):
@@ -252,9 +252,9 @@ class Endpoint(object):
         logger.debug('kwargs are: {}'.format(kwargs))
         method_name = None
         if kwargs.get('routing_key_specifier'):
-            method_name = kwargs['routing_key_specifier']
+            method_name = kwargs['routing_key_specifier'].replace('-', '_')
         else:
-            method_name = args[0:1][0]
+            method_name = args[0:1][0].replace('-', '_')
             args = args[1:len(args)]
         if method_name != 'lock' and 'lockout_key' in kwargs:
             kwargs.pop('lockout_key')
@@ -266,6 +266,10 @@ class Endpoint(object):
         ignore all details and respond with an empty message
         '''
         return None
+
+    @property
+    def is_locked(self):
+        return bool(self.__lockout_key)
 
     def lock(self, lockout_key=None, *args, **kwargs):
         logger.debug('locking <{}>'.format(self.name))
