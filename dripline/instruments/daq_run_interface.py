@@ -27,6 +27,7 @@ class DAQProvider(core.Provider):
                  ensure_sets={},
                  ensure_locked=[],
                  metadata_gets={},
+                 metadata_target=None,
                  debug_mode_without_database=False,
                  **kwargs):
         '''
@@ -53,6 +54,7 @@ class DAQProvider(core.Provider):
         self._ensure_sets = ensure_sets
         self._ensure_locked = ensure_locked
         self._metadata_gets = metadata_gets
+        self._metadata_target = metadata_target
         self._debug_without_db = debug_mode_without_database
 
         self._stop_handle = None
@@ -98,8 +100,10 @@ class DAQProvider(core.Provider):
         self._do_prerun_sets()
         actually_locked = self._do_prerun_lockout()
         logger.warning('will need to unlock: {}'.format(actually_locked))
-        self._run_meta = {}
-        self._run_meta.update(self._do_prerun_gets())
+        self._run_meta = {'DAQ': self.daq_name,
+                         }
+        self._do_prerun_gets()
+        self._send_metadata()
         logger.warning('these meta will be {}'.format(self._run_meta))
         logger.error('start_run finished')
 
@@ -136,10 +140,18 @@ class DAQProvider(core.Provider):
         for endpoint,element in self._metadata_gets.items():
             result = self.portal.send_request(request=query_msg, target=endpoint)
             these_metadata[endpoint] = result.payload[element]
-        return these_metadata
+        self._run_meta.update(these_metadata)
+        self.determine_RF_ROI()
 
     def determine_RF_ROI(self):
         raise core.exceptions.DriplineNotImplementedError('subclass must implement RF ROI determination')
+
+    def _send_metadata(self):
+        '''
+        '''
+        logger.error('metadata should broadcast')
+        alert_msg = core.AlertMessage(payload=self._run_meta)
+        self.portal.send_alert(alert=alert_msg, severity=self._metadata_target+'.{}'.format(self.run_id))
 
     def start_timed_run(self, run_name, run_time):
         '''
@@ -212,9 +224,16 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
             self.portal.send_request(request=core.RequestMessage(msgop=core.OP_SET, payload={'values':[self.acquisition_time*1000]}), target=self.mantis_queue+'.duration')
 
     def determine_RF_ROI(self):
+        logger.warning('trying to get roi')
+        if not self._lf_lo_endpoint_name in self._run_meta:
+            logger.error('meta are:\n{}'.format(self._run_meta))
+            raise core.exceptions.DriplineInternalError('the lf_lo_endpoint_name must be configured in the metadata_gets field')
         lf_lo_freq = self._run_meta.pop(self._lf_lo_endpoint_name)
         self._run_meta['RF_ROI_MIN'] = lf_lo_freq + self._hf_lo_freq
+        logger.warning('RF Min: {}'.format(self._run_meta['RF_ROI_MIN']))
         self._run_meta['RF_ROI_MAX'] = self._analysis_bandwidth + lf_lo_freq + self._hf_lo_freq
+        logger.warning('RF Max: {}'.format(self._run_meta['RF_ROI_MAX']))
+        logger.warning('got roi')
 
     def on_get(self):
         '''
@@ -223,11 +242,11 @@ class MantisAcquisitionInterface(DAQProvider, core.Spime):
         logger.info('requesting acquisition <{}>'.format(self._acquisition_count))
         if self.run_id is None:
             raise core.DriplineInternalError('run number is None, must request a run_id assignment prior to starting acquisition')
-        filepath = '{}/{}{:09d}_{:09d}.egg'.format(
-                                        self.directory_path,
-                                        self.filename_prefix,
-                                        self.run_id,
-                                        self._acquisition_count
+        filepath = '{directory}/{runN:09d}/{prefix}{runN:09d}_{acqN:09d}.egg'.format(
+                                        directory=self.directory_path,
+                                        prefix=self.filename_prefix,
+                                        runN=self.run_id,
+                                        acqN=self._acquisition_count
                                                   )
         request = core.RequestMessage(payload={'values':[], 'file':filepath},
                                       msgop=core.OP_RUN,
