@@ -91,12 +91,15 @@ class SimpleSCPISpime(Spime):
     '''
 
     def __init__(self,
-                 base_str,
+                 base_str=None,
                  **kwargs):
         '''
         base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;*OPC?"
         '''
-        self.cmd_base = base_str
+        if base_str is None:
+            raise DriplineValueError('<base_str> is required to __init__ SimpleSCPISpime instance')
+        else:
+            self.cmd_base = base_str
         Spime.__init__(self, **kwargs)
 
     @calibrate()

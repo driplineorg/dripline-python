@@ -89,7 +89,8 @@ class Endpoint(object):
         '''
         if name is None:
             raise exceptions.DriplineValueError('Endpoint __init__ requres name not be None')
-        self.name = name
+        else:
+            self.name = name
         self.provider = None
         self.portal = None
         self._calibration = calibration
