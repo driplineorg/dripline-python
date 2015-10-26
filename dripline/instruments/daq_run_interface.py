@@ -314,11 +314,14 @@ class RSAAcquisitionInterface(DAQProvider, EthernetProvider):
         self.send(['SENS:ACQ:FSAV:FILE:MAX {:d};*OPC?'.format(self.max_nb_files)])
         # Initialize an attempt to lock to the externl 10 MHz reference clock.
         ext_ref_error = self.send(['SENS:ROSC:SOUR EXT;*OPC?'])
+        # Debugging: print ext_ref_error
+	print('ext_ref_error:')
+        print(ext_ref_error)
         # If the attempt is not successfull return a Dripline Error
-        if ext_ref_error is 2028:
-            raise core.exceptions.DriplineValueError('External frequency reference signal not valid.')
-        if ext_ref_error is 2029:
-            raise core.exceptions.DriplineValueError('Unable to lock to external frequency reference.')
+        if int(ext_ref_error)==2028:
+            raise core.exceptions.DriplineHardwareConnectionError('External frequency reference signal not valid.')
+        if int(ext_ref_error)==2029:
+            raise core.exceptions.DriplineHardwareConnectionError('Unable to lock to external frequency reference.')
         # ensure in triggered mode
         self.send(['TRIG:SEQ:STAT 1;*OPC?'])
         # actually start to FastSave
