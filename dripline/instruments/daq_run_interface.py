@@ -311,6 +311,8 @@ class RSAAcquisitionInterface(DAQProvider, EthernetProvider):
                  )
         # Set the maximum number of events (note that the default is 10k)
         self.send(['SENS:ACQ:FSAV:FILE:MAX {:d};*OPC?'.format(self.max_nb_files)])
+        # Force the RSA to use the external 10 MHz reference clock
+        self.send(['SENS:ROSC:SOUR EXT'])
         # ensure in triggered mode
         self.send(['TRIG:SEQ:STAT 1;*OPC?'])
         # actually start to FastSave
