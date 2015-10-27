@@ -9,4 +9,3 @@ __version__ = pkg_resources.require("dripline")[0].version.split('-')[0]
 __commit__ = pkg_resources.require("dripline")[0].version.split('-')[-1]
 
 from . import core
-from . import instruments

@@ -38,7 +38,7 @@ class Spimescape(Service):
             exchange = 'requests'
         kwargs['exchange'] = exchange
 
-        Service.__init__(self, broker=broker, exchange='requests', **kwargs)
+        Service.__init__(self, **kwargs)
         
         self._responses = {}
 
