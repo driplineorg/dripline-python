@@ -31,13 +31,14 @@ class Spimescape(Service):
     """
     Like a node, but pythonic
     """
-    def __init__(self, broker, **kwargs):
+    def __init__(self, exchange=None, **kwargs):
         '''
-        Args:
-            name (str): name for the portal instance, represents an AMQP binding key
-            broker (str): as always, the network resolvable path to the AMQP broker
         '''
-        Service.__init__(self, amqp_url=broker, exchange='requests', **kwargs)
+        if exchange is None:
+            exchange = 'requests'
+        kwargs['exchange'] = exchange
+
+        Service.__init__(self, broker=broker, exchange='requests', **kwargs)
         
         self._responses = {}
 
