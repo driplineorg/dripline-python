@@ -6,7 +6,6 @@ The core namespace contains the layers of abstraction over AMQP.
 
 from __future__ import absolute_import
 
-from .arg_parser import *
 from .constants import *
 from .scheduler import *
 from .endpoint import *
