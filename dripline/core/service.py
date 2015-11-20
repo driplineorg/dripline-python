@@ -459,13 +459,14 @@ class Service(Provider):
 
         if properties is None:
             properties = pika.BasicProperties(reply_to=result.method.queue,
-                                              content_encoding='application/msgpack',
+                                              content_encoding='application/json',
+                                              #content_encoding='application/msgpack',
                                               correlation_id=correlation_id,
                                               app_id='dripline.core.Service'
                                              )
         publish_success = channel.basic_publish(exchange=exchange,
                                                 routing_key=target,
-                                                body=message.to_msgpack(),
+                                                body=message.to_encoding(properties.content_encoding),
                                                 properties=properties,
                                                 mandatory=True,
                                                )
