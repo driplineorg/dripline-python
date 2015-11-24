@@ -29,6 +29,7 @@ class Provider(Endpoint):
         endpoint.provider = self
 
     def on_send(self, *commands):
+        these_cmds = commands
         return self.send(list(commands))
 
     @property
