@@ -437,7 +437,11 @@ class Service(Provider):
         if not isinstance(message, Message):
             raise TypeError('message must be a dripline.core.Message')
         parameters = pika.ConnectionParameters(host=self._broker, credentials=self.__get_credentials())
-        connection = pika.BlockingConnection(parameters)
+        try:
+            connection = pika.BlockingConnection(parameters)
+        except pika.exceptions.AMQPConnectionError:
+            raise exceptions.DriplineAMQPConnectionError('unable to connect to broker: {}'.format(self._broker))
+            
         channel = connection.channel()
         channel.confirm_delivery()
         result = channel.queue_declare(queue='request_reply'+str(uuid.uuid4()),
