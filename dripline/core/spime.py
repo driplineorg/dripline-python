@@ -104,12 +104,14 @@ class SimpleSCPISpime(Spime):
 
     @calibrate()
     def on_get(self):
-        result = self.provider.send(self.cmd_base + '?')
+        to_send = [self.cmd_base + '?']
+        result = self.provider.send(to_send)
         logger.debug('result is: {}'.format(result))
         return result
 
     def on_set(self, value):
-        return self.provider.send(self.cmd_base + ' {};*OPC?'.format(value))
+        to_send = [self.cmd_base + ' {};*OPC?'.format(value)]
+        return self.provider.send(to_send)
 
 
 @fancy_doc
@@ -158,7 +160,7 @@ class FormatSCPISpime(Spime):
     def on_get(self):
         if self._get_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
-        result = self.provider.send(self._get_str)
+        result = self.provider.send([self._get_str])
         return result
 
     def on_set(self, value):
@@ -174,5 +176,5 @@ class FormatSCPISpime(Spime):
         else:
             raise DriplineInternalError('set_value_map of unsupported type')
         logger.debug('mapped value is: {}'.format(mapped_value))
-        result = self.provider.send(self._set_str.format(mapped_value))
+        result = self.provider.send([self._set_str.format(mapped_value)])
         return result

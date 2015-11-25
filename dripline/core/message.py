@@ -164,6 +164,7 @@ class Message(dict, object):
 
     @classmethod
     def from_json(cls, msg):
+        logger.debug('original msg was: {}'.format(msg))
         message_dict = json.loads(msg)
         message = cls.from_dict(message_dict)
         return message
