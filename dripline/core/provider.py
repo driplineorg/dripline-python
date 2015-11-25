@@ -14,7 +14,7 @@ __all__ = ['Provider']
 class Provider(Endpoint):
     '''
     Abstraction/interpretation layer for grouping endpoints and/or representing an instrument.
-    Providers must implement a send() which takes "RAW" messages, converts them as needed, sends them to hardware (or another provider), receives and parses the response, and sends a meaningful result back.
+    Providers must implement a send() which takes a list of messages, converts them as needed, sends them to hardware (or another provider), receives and parses the response, and sends a meaningful result back.
     '''
 
     def __init__(self, **kwargs):
@@ -29,6 +29,7 @@ class Provider(Endpoint):
         endpoint.provider = self
 
     def on_send(self, *commands):
+        these_cmds = commands
         return self.send(list(commands))
 
     @property
