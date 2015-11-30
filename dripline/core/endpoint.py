@@ -213,10 +213,8 @@ class Endpoint(object):
         '''
         WARNING! you should *NOT* override this method
         '''
-        logger.warning('args/kwargs\n{}\n{}'.format(args, kwargs))
         result = None
         value = args
-        logger.warning('value here is {}'.format(value))
         attribute = ''
         if 'routing_key_specifier' in kwargs:
             attribute = kwargs['routing_key_specifier'].replace('-','_')
