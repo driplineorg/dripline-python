@@ -26,16 +26,19 @@ logger = logging.getLogger(__name__)
 def _log_on_set_decoration(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
+        logger.debug('in log_on_set: {}({}, {})'.format(fun,args,kwargs))
         result = fun(*args, **kwargs)
-            
+
         values = {}
-        if result is not None:
+        if result != [u'']:
             if isinstance(result, types.DictType):
                 values.update(result)
             else:
                 values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
+        logger.debug('result is: {}'.format(result))
+        logger.debug('values are: {}'.format(values))
         self.store_value(alert=values, severity=self.alert_routing_key)
         return result
     return wrapper
@@ -70,14 +73,13 @@ class Spime(Endpoint, Scheduler):
         return self._log_on_set
     @log_on_set.setter
     def log_on_set(self, value):
-        if bool(value) != bool(self._log_on_set):
-            return
+        #if bool(value) != bool(self._log_on_set):
+        #    return
         self._log_on_set = bool(value)
-        if log_on_set:
+        if self._log_on_set:
             self.on_set = _log_on_set_decoration(self, super(Spime, self))
         else:
             self.on_set = super(Spime, self).on_set
-        
 
     @staticmethod
     def store_value(alert, severity):
