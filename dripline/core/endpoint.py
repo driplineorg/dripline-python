@@ -186,7 +186,7 @@ class Endpoint(object):
             return_msg = str(err)
         except Exception as err:
             logger.error('got an error: {}'.format(str(err)))
-            logger.debug('traceback follows:\n{}'.format(traceback.format_exc()))
+            logger.error('traceback follows:\n{}'.format(traceback.format_exc()))
             return_msg = str(err)
             retcode = 999
         logger.debug('request method execution complete')
