@@ -142,6 +142,9 @@ class Endpoint(object):
     def handle_request(self, channel, method, properties, request):
         logger.debug('handling requst:{}'.format(request))
 
+        result = None
+        retcode = None
+        return_msg = None
         try:
             routing_key_specifier = method.routing_key.replace(self.name, '', 1).lstrip('.')
             logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
@@ -169,9 +172,6 @@ class Endpoint(object):
             endpoint_method = getattr(self, method_name)
             logger.debug('method is: {}'.format(endpoint_method))
 
-            result = None
-            retcode = None
-            return_msg = None
             self._check_lockout_conditions(msg, these_args, these_kwargs)
             logger.debug('args are:\n{}'.format(these_args))
             logger.debug('kwargs are:\n{}'.format(these_kwargs))
