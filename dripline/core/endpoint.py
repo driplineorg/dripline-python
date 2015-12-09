@@ -142,36 +142,36 @@ class Endpoint(object):
     def handle_request(self, channel, method, properties, request):
         logger.debug('handling requst:{}'.format(request))
 
-        routing_key_specifier = method.routing_key.replace(self.name, '', 1).lstrip('.')
-        logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
-
-        msg = Message.from_encoded(request, properties.content_encoding)
-        if msg.payload is None:
-            msg.payload = {}
-        logger.info('got a {} request: {}'.format(msg.msgop, msg.payload))
-        lockout_key = msg.get('lockout_key', None)
-
-        # construction action
-        these_args = []
-        if 'values' in msg.payload:
-            these_args = msg.payload['values']
-        these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
-        if routing_key_specifier:
-            these_kwargs.update({'routing_key_specifier':routing_key_specifier})
-        if lockout_key and msg.msgop == constants.OP_CMD:
-            these_kwargs.update({'lockout_key': lockout_key})
-        method_name = ''
-        for const_name in dir(constants):
-            if getattr(constants, const_name) == msg.msgop:
-                method_name = '_on_' + const_name.split('_')[-1].lower()
-        logger.info('method_name is: {}'.format(method_name))
-        endpoint_method = getattr(self, method_name)
-        logger.debug('method is: {}'.format(endpoint_method))
-
-        result = None
-        retcode = None
-        return_msg = None
         try:
+            routing_key_specifier = method.routing_key.replace(self.name, '', 1).lstrip('.')
+            logger.debug('routing key specifier is: {}'.format(routing_key_specifier))
+
+            msg = Message.from_encoded(request, properties.content_encoding)
+            if msg.payload is None:
+                msg.payload = {}
+            logger.info('got a {} request: {}'.format(msg.msgop, msg.payload))
+            lockout_key = msg.get('lockout_key', None)
+
+            # construction action
+            these_args = []
+            if 'values' in msg.payload:
+                these_args = msg.payload['values']
+            these_kwargs = {k:v for k,v in msg.payload.items() if k!='values'}
+            if routing_key_specifier:
+                these_kwargs.update({'routing_key_specifier':routing_key_specifier})
+            if lockout_key and msg.msgop == constants.OP_CMD:
+                these_kwargs.update({'lockout_key': lockout_key})
+            method_name = ''
+            for const_name in dir(constants):
+                if getattr(constants, const_name) == msg.msgop:
+                    method_name = '_on_' + const_name.split('_')[-1].lower()
+            logger.info('method_name is: {}'.format(method_name))
+            endpoint_method = getattr(self, method_name)
+            logger.debug('method is: {}'.format(endpoint_method))
+
+            result = None
+            retcode = None
+            return_msg = None
             self._check_lockout_conditions(msg, these_args, these_kwargs)
             logger.debug('args are:\n{}'.format(these_args))
             logger.debug('kwargs are:\n{}'.format(these_kwargs))
