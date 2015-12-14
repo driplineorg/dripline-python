@@ -39,7 +39,7 @@ class Service(Provider):
 
     def __init__(self, broker=None, exchange=None, keys=None, **kwargs):
         """
-        amqp_url (str): The AMQP url to connect with
+        broker (str): The AMQP url to connect with
         exchange (str): Name of the AMQP exchange to connect to
         keys (list|str): binding key or list of binding keys to use listen against
         name (str|None): name for the amqp queue, automatically generated if None (this behavior supplements the Endpoint arg of the same name)
