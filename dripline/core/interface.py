@@ -47,9 +47,10 @@ class Interface(Service):
         reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         return reply
 
-    def set(self, endpoint, value):
+    def set(self, endpoint, value, **kwargs):
         msgop = OP_SET
         payload = {'values':[value]}
+        payload.update(kwargs)
         reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         return reply
 
@@ -63,7 +64,7 @@ class Interface(Service):
 
     def cmd(self, endpoint, method_name, *args, **kwargs):
         msgop = OP_CMD
-        payload = {'values':[method_name] + args}
+        payload = {'values':[method_name] + list(args)}
         payload.update(kwargs)
         reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         return reply
