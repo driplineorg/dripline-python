@@ -256,7 +256,7 @@ class Endpoint(object):
         logger.debug('kwargs are: {}'.format(kwargs))
         method_name = None
         if kwargs.get('routing_key_specifier'):
-            method_name = kwargs['routing_key_specifier'].replace('-', '_')
+            method_name = kwargs.pop('routing_key_specifier').replace('-', '_')
         else:
             method_name = args[0:1][0].replace('-', '_')
             args = args[1:len(args)]
