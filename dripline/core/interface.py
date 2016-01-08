@@ -30,15 +30,17 @@ class Interface(Service):
         Service.__init__(self, amqp_url, exchange='requests', keys='', name=name)
         self._confirm_retcode = confirm_retcodes
     
-    def _send_request(self, target, msgop, payload):
+    def _send_request(self, target, msgop, payload, lockout_key=False):
         request = RequestMessage(msgop=msgop, payload=payload)
+        if lockout_key:
+            request.lockout_key = lockout_key
         try:
             reply = self.send_request(target, request)
         except DriplineTimeoutError as err:
             reply = ReplyMessage(retcode=DriplineTimeoutError.retcode, payload=str(err))
         if self._confirm_retcode:
             if not reply.retcode == 0:
-                raise exception_map[reply.retcode]
+                raise exception_map[reply.retcode](reply.return_msg)
         return reply
 
     def get(self, endpoint):
@@ -47,11 +49,11 @@ class Interface(Service):
         reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         return reply
 
-    def set(self, endpoint, value, **kwargs):
+    def set(self, endpoint, value, lockout_key=False, **kwargs):
         msgop = OP_SET
         payload = {'values':[value]}
         payload.update(kwargs)
-        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
+        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload, lockout_key=lockout_key)
         return reply
 
     def config(self, endpoint, property, value=None):
@@ -62,11 +64,11 @@ class Interface(Service):
         reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         return reply
 
-    def cmd(self, endpoint, method_name, *args, **kwargs):
+    def cmd(self, endpoint, method_name, lockout_key=False, *args, **kwargs):
         msgop = OP_CMD
         payload = {'values':[method_name] + list(args)}
         payload.update(kwargs)
-        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
+        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload, lockout_key=lockout_key)
         return reply
 
 
