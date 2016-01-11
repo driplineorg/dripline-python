@@ -83,13 +83,6 @@ class Message(dict, object):
         return json.dumps(self, indent=4)
 
     @property
-    def msgop(self):
-        return self['msgop']
-    @msgop.setter
-    def msgop(self, value):
-        self['msgop'] = int(value)
-
-    @property
     def timestamp(self):
         return self['timestamp']
     @timestamp.setter
@@ -247,6 +240,15 @@ class RequestMessage(Message):
         self.msgop = msgop
         self.lockout_key = lockout_key
         Message.__init__(self, **kwargs)
+
+    @property
+    def msgop(self):
+        return self['msgop']
+    @msgop.setter
+    def msgop(self, value):
+        if value == constants.OP_CONFIG:
+            logger.warning('OP_CONFIG is deprecated')
+        self['msgop'] = int(value)
 
     @property
     def msgtype(self):

@@ -68,6 +68,7 @@ class Interface(Service):
         return reply
 
     def config(self, endpoint, property, value=None):
+        logger.warning('op config is deprecated, you should use get/set endpoint.<property>')
         msgop = OP_CONFIG
         payload = {'values':[property]}
         if value is not None:

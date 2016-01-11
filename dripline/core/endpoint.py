@@ -201,6 +201,8 @@ class Endpoint(object):
         result = None
         attribute = kwargs.get('routing_key_specifier', (args[0:1] or [''])[0]).replace('-','_')
         if attribute:
+            if 'routing_key_specifier' not in kwargs:
+                logger.warning('attribute specification in values is deprecated')
             if hasattr(self, attribute):
                 result = getattr(self, attribute)
             else:
