@@ -15,6 +15,7 @@ import json
 import os
 import pwd
 import socket
+import traceback
 
 # 3rd party libs
 import msgpack
@@ -149,7 +150,7 @@ class Message(dict, object):
             msg_type = int(msg_dict.pop('msgtype'))
             logger.debug('msgtype is {}'.format(msg_type))
             if 'target' in msg_dict:
-                logger.warning('this is a hack')
+                logger.warning('this is a hack & should not happen')
                 msg_dict.pop('target')
             return subclasses_dict[msg_type](**msg_dict)
         except KeyError:
@@ -158,6 +159,7 @@ class Message(dict, object):
 
     @classmethod
     def from_msgpack(cls, msg):
+        logger.warning('decoding message from msgpack, this is deprecated')
         message_dict = msgpack.unpackb(msg)
         message = cls.from_dict(message_dict)
         return message
@@ -174,11 +176,14 @@ class Message(dict, object):
         if encoding.endswith('json'):
             return cls.from_json(msg)
         elif encoding.endswith('msgpack'):
+            logger.warning('received message encoded with msgpack, this is deprecated')
             return cls.from_msgpack(msg)
         else:
             raise exceptions.DriplineDecodingError('encoding <{}> not recognized'.format(encoding))
 
     def to_msgpack(self):
+        logger.warning('encoding message to msgpack, this is deprecated')
+        logger.warning('traceback for that call is:\n{}'.format(traceback.format_exc()))
         temp_dict = self.copy()
         temp_dict.update({'msgtype': self.msgtype})
         return msgpack.packb(temp_dict)
