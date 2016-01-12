@@ -176,6 +176,8 @@ class Endpoint(object):
             logger.debug('args are:\n{}'.format(these_args))
             logger.debug('kwargs are:\n{}'.format(these_kwargs))
             result = endpoint_method(*these_args, **these_kwargs)
+            if isinstance(result, types.MethodType):
+                raise exceptions.DriplineValueError('endpoint returned a method reference; perhaps OP_GET was used for a cmd?', result=repr(result))
             logger.debug('\n endpoint method returned \n')
             if result is None and return_msg is None:
                 return_msg = "operation completed silently"
