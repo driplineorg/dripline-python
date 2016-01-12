@@ -246,6 +246,8 @@ class Service(Provider):
                         )
             self._channel.queue_bind(self.on_bindok, self.name,
                                      self._exchange, key)
+            self._channel.queue_bind(self.on_bindok, self.name,
+                                     self._exchange, 'broadcast.#')
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this

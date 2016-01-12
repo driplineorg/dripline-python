@@ -39,6 +39,7 @@ class Spimescape(Service):
         kwargs['exchange'] = exchange
 
         Service.__init__(self, **kwargs)
+        self.add_endpoint(self)
         
         self._responses = {}
 
@@ -61,7 +62,13 @@ class Spimescape(Service):
 
     def on_request_message(self, channel, method, header, body):
         logger.info('request received by {}'.format(self.name))
-        self.endpoints[method.routing_key.split('.')[0]].handle_request(channel, method, header, body)
+        target = method.routing_key.split('.')[0]
+        # messages to "broadcast" should be handled by the service
+        if target == 'broadcast':
+            method.routing_key = method.routing_key.replace('broadcast', self.name)
+            self.handle_request(channel, method, header, body)
+        else:
+            self.endpoints[target].handle_request(channel, method, header, body)
         logger.info('request processing complete\n{}')
 
     def _handle_reply(self, channel, method, header, body):

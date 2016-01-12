@@ -222,6 +222,7 @@ class Endpoint(object):
             attribute = kwargs['routing_key_specifier'].replace('-','_')
             value = args[0]
         elif len(args) == 2:
+            logger.warning('providing attribute names in values is deprecated')
             attribute = args[0].replace('-','_')
             value = args[1]
         if attribute:
@@ -239,6 +240,7 @@ class Endpoint(object):
 
         WARNING! if you override this method, you must ensure you deal with lockout properly
         '''
+        logger.warning('on_config use is deprecated')
         result = None
         if hasattr(self, attribute):
             if value is not None:
@@ -260,6 +262,7 @@ class Endpoint(object):
         if kwargs.get('routing_key_specifier'):
             method_name = kwargs.pop('routing_key_specifier').replace('-', '_')
         else:
+            logger.warning('specifying cmd name in values array is deprecated (use an RKS)')
             method_name = args[0:1][0].replace('-', '_')
             args = args[1:len(args)]
         if method_name != 'lock' and 'lockout_key' in kwargs:
