@@ -534,7 +534,11 @@ class Service(Provider):
     def send_reply(self, properties, reply):
         '''
         '''
+        #import ipdb;ipdb.set_trace()
         logger.info("sending a reply")
         if not isinstance(reply, Message):
-            reply = ReplyMessage(payload=reply)
+            logger.warning('should now send a reply')
+            reply = ReplyMessage(payload=reply)#, sender_info={'service_name':self.name})
+        reply.sender_info['service_name'] = self.name
+        #import ipdb;ipdb.set_trace()
         self.send_message(target=properties.reply_to, message=reply, properties=properties, ensure_delivery=False)

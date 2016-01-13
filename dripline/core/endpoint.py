@@ -168,7 +168,6 @@ class Endpoint(object):
             for const_name in dir(constants):
                 if getattr(constants, const_name) == msg.msgop:
                     method_name = '_on_' + const_name.split('_')[-1].lower()
-            logger.info('method_name is: {}'.format(method_name))
             endpoint_method = getattr(self, method_name)
             logger.debug('method is: {}'.format(endpoint_method))
 
@@ -297,4 +296,4 @@ class Endpoint(object):
     def unlock(self, *args, **kwargs):
         logger.debug('unlocking <{}>'.format(self.name))
         self.__lockout_key = None
-        raise exceptions.DriplineWarning('unlocked')
+        #raise exceptions.DriplineWarning('unlocked')

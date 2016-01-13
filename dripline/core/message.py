@@ -65,19 +65,23 @@ class Message(dict, object):
         else:
             self.timestamp = timestamp
         self.payload = payload
-        if sender_info is None:
-            this_exe = inspect.stack()[-1][1]
-            this_host = socket.gethostname()
-            this_username = pwd.getpwuid(os.getuid())[0]
-            self.sender_info = {'package': 'dripline',
-                                'exe': this_exe,
-                                'version': __version__,
-                                'commit': __commit__,
-                                'hostname': this_host,
-                                'username': this_username,
-                               }
-        else:
-            self.sender_info = sender_info
+        # determine default sender info
+        this_exe = inspect.stack()[-1][1]
+        this_host = socket.gethostname()
+        this_username = pwd.getpwuid(os.getuid())[0]
+        this_sender_info = {'package': 'dripline',
+                            'exe': this_exe,
+                            'version': __version__,
+                            'commit': __commit__,
+                            'hostname': this_host,
+                            'username': this_username,
+                            'service_name': '',
+                           }
+        # replace default sender info with anything provided
+        this_sender_info.update(sender_info or {})
+        self.sender_info = this_sender_info
+        #if self.msgtype == constants.T_REPLY:
+        #    import ipdb;ipdb.set_trace()
 
     def __str__(self):
         return json.dumps(self, indent=4)
