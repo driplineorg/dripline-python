@@ -489,7 +489,7 @@ class Service(Provider):
             return
         return connection
 
-    def send_request(self, target, request, timeout=10):
+    def send_request(self, target, request, timeout=10, multi_reply=False):
         '''
         It seems like there should be a way to do this with the existing SelectConnection.
         The problem is that the message handler needs to send a request and then be called
@@ -505,16 +505,22 @@ class Service(Provider):
         connection = self.send_message(target, request, return_queue=result_queue, return_connection=True, exchange='requests')
         self.__ret_val = None
         def _get_result(result_queue):
-            while result_queue.empty():
+            while result_queue.empty() or multi_reply:
                 connection.process_data_events()
         process = multiprocessing.Process(target=_get_result, kwargs={'result_queue':result_queue})
         process.start()
         process.join(timeout)
         if process.is_alive():
             process.terminate()
-            raise exceptions.DriplineTimeoutError('request response timed out')
+            if not multi_reply:
+                raise exceptions.DriplineTimeoutError('request response timed out')
         connection.close()
-        return result_queue.get()
+        results = []
+        while not result_queue.empty():
+            results.append(result_queue.get())
+        if len(results) == 1:
+            results = results[0]
+        return results
 
     def send_alert(self, alert, severity):
         '''
