@@ -9,6 +9,7 @@ import json
 import logging
 import multiprocessing
 import os
+import traceback
 import uuid
 
 import pika
@@ -405,7 +406,11 @@ class Service(Provider):
 
         """
         self._connection = self.connect()
-        self._connection.ioloop.start()
+        try:
+            self._connection.ioloop.start()
+        except Exception as this_err:
+            logger.critical('Service <{}> crashing with error message:\n{}'.format(self.name, this_err))
+            logger.error(traceback.format_exc())
 
     def stop(self):
         """Cleanly shutdown the connection to RabbitMQ by stopping the consumer
