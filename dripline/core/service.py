@@ -497,8 +497,7 @@ class Service(Provider):
         The non-blocking part seems tricky. I'm sure there exists a good solution for this,
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
-        logger.info('sending a request')
-        logger.debug('request to <{}> is: {}'.format(target, request))
+        logger.debug('request to send to <{}> is: {}'.format(target, request))
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
         result_queue = multiprocessing.Queue()
