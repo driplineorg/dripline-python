@@ -10,6 +10,7 @@ import traceback
 import types
 import uuid
 
+import asteval
 import pika
 import yaml
 
@@ -45,14 +46,15 @@ def calibrate(cal_functions=None):
             if self._calibration is None:
                 pass
             elif isinstance(self._calibration, str):
-                globals = {
-                           "math": math,
-                          }
-                locals = cal_functions
+                #globals = {
+                #           "math": math,
+                #          }
+                #locals = cal_functions
+                evaluator = asteval.Interpreter()
                 eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 logger.debug("formated cal is:\n{}".format(eval_str))
                 try:
-                    cal = eval(eval_str, globals, locals)
+                    cal = evaluator(eval_str)
                 except OverflowError:
                     logger.debug('GOT AN OVERFLOW ERROR')
                     cal = None
