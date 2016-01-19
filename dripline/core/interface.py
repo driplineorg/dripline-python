@@ -77,10 +77,17 @@ class Interface(Service):
         return reply
 
     def cmd(self, endpoint, method_name, lockout_key=False, *args, **kwargs):
+        '''
+        Send a request to call endpoint.methodname(*args, **kwargs)
+
+        Note that while a request message expects the method name to be provided as an RKS,
+        here it is a separate argument which is combined with the endpoint name.
+        '''
         msgop = OP_CMD
-        payload = {'values':[method_name] + list(args)}
+        payload = {'values': list(args)}
         payload.update(kwargs)
-        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload, lockout_key=lockout_key)
+        target = endpoint + '.' + method_name
+        reply = self._send_request(target=target, msgop=msgop, payload=payload, lockout_key=lockout_key)
         return reply
 
 
