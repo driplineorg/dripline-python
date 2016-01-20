@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import logging
 
 from .constants import *
-from .exceptions import exception_map, DriplineTimeoutError
+from .exceptions import exception_map, DriplineTimeoutError, DriplineDeprecated
 from .message import ReplyMessage, RequestMessage
 from .service import Service
 from .utilities import fancy_doc
@@ -68,13 +68,13 @@ class Interface(Service):
         return reply
 
     def config(self, endpoint, property, value=None):
-        logger.warning('op config is deprecated, you should use get/set endpoint.<property>')
-        msgop = OP_CONFIG
-        payload = {'values':[property]}
-        if value is not None:
-            payload['values'].append(value)
-        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
-        return reply
+        raise DriplineDeprecated('op config is deprecated, you should use get/set endpoint.<property>')
+        #msgop = OP_CONFIG
+        #payload = {'values':[property]}
+        #if value is not None:
+        #    payload['values'].append(value)
+        #reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
+        #return reply
 
     def cmd(self, endpoint, method_name, lockout_key=False, *args, **kwargs):
         '''
