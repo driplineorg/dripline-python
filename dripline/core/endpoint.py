@@ -10,6 +10,7 @@ import traceback
 import types
 import uuid
 
+import asteval
 import pika
 import yaml
 
@@ -45,14 +46,15 @@ def calibrate(cal_functions=None):
             if self._calibration is None:
                 pass
             elif isinstance(self._calibration, str):
-                globals = {
-                           "math": math,
-                          }
-                locals = cal_functions
+                #globals = {
+                #           "math": math,
+                #          }
+                #locals = cal_functions
+                evaluator = asteval.Interpreter()
                 eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 logger.debug("formated cal is:\n{}".format(eval_str))
                 try:
-                    cal = eval(eval_str, globals, locals)
+                    cal = evaluator(eval_str)
                 except OverflowError:
                     logger.debug('GOT AN OVERFLOW ERROR')
                     cal = None
@@ -168,7 +170,6 @@ class Endpoint(object):
             for const_name in dir(constants):
                 if getattr(constants, const_name) == msg.msgop:
                     method_name = '_on_' + const_name.split('_')[-1].lower()
-            logger.info('method_name is: {}'.format(method_name))
             endpoint_method = getattr(self, method_name)
             logger.debug('method is: {}'.format(endpoint_method))
 
@@ -176,6 +177,8 @@ class Endpoint(object):
             logger.debug('args are:\n{}'.format(these_args))
             logger.debug('kwargs are:\n{}'.format(these_kwargs))
             result = endpoint_method(*these_args, **these_kwargs)
+            if isinstance(result, types.MethodType):
+                raise exceptions.DriplineValueError('endpoint returned a method reference; perhaps OP_GET was used for a cmd?', result=repr(result))
             logger.debug('\n endpoint method returned \n')
             if result is None and return_msg is None:
                 return_msg = "operation completed silently"
@@ -199,7 +202,7 @@ class Endpoint(object):
         WARNING! you should *NOT* override this method 
         '''
         result = None
-        attribute = kwargs.get('routing_key_specifier', (args[0:1] or [''])[0]).replace('-','_')
+        attribute = kwargs.get('routing_key_specifier', [''][0]).replace('-','_')
         if attribute:
             if hasattr(self, attribute):
                 result = getattr(self, attribute)
@@ -219,9 +222,6 @@ class Endpoint(object):
         if 'routing_key_specifier' in kwargs:
             attribute = kwargs['routing_key_specifier'].replace('-','_')
             value = args[0]
-        elif len(args) == 2:
-            attribute = args[0].replace('-','_')
-            value = args[1]
         if attribute:
             if hasattr(self, attribute):
                 setattr(self, attribute, value)
@@ -237,16 +237,17 @@ class Endpoint(object):
 
         WARNING! if you override this method, you must ensure you deal with lockout properly
         '''
-        result = None
-        if hasattr(self, attribute):
-            if value is not None:
-                setattr(self, attribute, value)
-                logger.info('set {} of {} to {}'.format(attribute, self.name, value))
-            else:
-                result = getattr(self, attribute)
-        else:
-            raise exceptions.DriplineValueError("No attribute: {}".format(attribute))
-        return result
+        raise exceptions.DriplineDeprecated('on_config use is deprecated')
+        #result = None
+        #if hasattr(self, attribute):
+        #    if value is not None:
+        #        setattr(self, attribute, value)
+        #        logger.info('set {} of {} to {}'.format(attribute, self.name, value))
+        #    else:
+        #        result = getattr(self, attribute)
+        #else:
+        #    raise exceptions.DriplineValueError("No attribute: {}".format(attribute))
+        #return result
 
     def on_cmd(self, *args, **kwargs):  
         '''
@@ -258,8 +259,9 @@ class Endpoint(object):
         if kwargs.get('routing_key_specifier'):
             method_name = kwargs.pop('routing_key_specifier').replace('-', '_')
         else:
-            method_name = args[0:1][0].replace('-', '_')
-            args = args[1:len(args)]
+            raise exceptions.DriplineDeprecated('specifying cmd name in values array is deprecated (use an RKS)')
+            #method_name = args[0:1][0].replace('-', '_')
+            #args = args[1:len(args)]
         if method_name != 'lock' and 'lockout_key' in kwargs:
             kwargs.pop('lockout_key')
         result = getattr(self, method_name)(*args, **kwargs)
@@ -290,4 +292,4 @@ class Endpoint(object):
     def unlock(self, *args, **kwargs):
         logger.debug('unlocking <{}>'.format(self.name))
         self.__lockout_key = None
-        raise exceptions.DriplineWarning('unlocked')
+        #raise exceptions.DriplineWarning('unlocked')

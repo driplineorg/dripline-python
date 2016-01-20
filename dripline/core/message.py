@@ -15,9 +15,10 @@ import json
 import os
 import pwd
 import socket
+import traceback
 
 # 3rd party libs
-import msgpack
+#import msgpack
 
 # internal imports
 from . import constants
@@ -64,29 +65,26 @@ class Message(dict, object):
         else:
             self.timestamp = timestamp
         self.payload = payload
-        if sender_info is None:
-            this_exe = inspect.stack()[-1][1]
-            this_host = socket.gethostname()
-            this_username = pwd.getpwuid(os.getuid())[0]
-            self.sender_info = {'package': 'dripline',
-                                'exe': this_exe,
-                                'version': __version__,
-                                'commit': __commit__,
-                                'hostname': this_host,
-                                'username': this_username,
-                               }
-        else:
-            self.sender_info = sender_info
+        # determine default sender info
+        this_exe = inspect.stack()[-1][1]
+        this_host = socket.gethostname()
+        this_username = pwd.getpwuid(os.getuid())[0]
+        this_sender_info = {'package': 'dripline',
+                            'exe': this_exe,
+                            'version': __version__,
+                            'commit': __commit__,
+                            'hostname': this_host,
+                            'username': this_username,
+                            'service_name': '',
+                           }
+        # replace default sender info with anything provided
+        this_sender_info.update(sender_info or {})
+        self.sender_info = this_sender_info
+        #if self.msgtype == constants.T_REPLY:
+        #    import ipdb;ipdb.set_trace()
 
     def __str__(self):
         return json.dumps(self, indent=4)
-
-    @property
-    def msgop(self):
-        return self['msgop']
-    @msgop.setter
-    def msgop(self, value):
-        self['msgop'] = int(value)
 
     @property
     def timestamp(self):
@@ -149,7 +147,7 @@ class Message(dict, object):
             msg_type = int(msg_dict.pop('msgtype'))
             logger.debug('msgtype is {}'.format(msg_type))
             if 'target' in msg_dict:
-                logger.warning('this is a hack')
+                logger.warning('this is a hack & should not happen')
                 msg_dict.pop('target')
             return subclasses_dict[msg_type](**msg_dict)
         except KeyError:
@@ -158,15 +156,20 @@ class Message(dict, object):
 
     @classmethod
     def from_msgpack(cls, msg):
-        message_dict = msgpack.unpackb(msg)
-        message = cls.from_dict(message_dict)
-        return message
+        raise exceptions.DriplineDeprecated('decoding message from msgpack is deprecated')
+        #message_dict = msgpack.unpackb(msg)
+        #message = cls.from_dict(message_dict)
+        #return message
 
     @classmethod
     def from_json(cls, msg):
         logger.debug('original msg was: {}'.format(msg))
-        message_dict = json.loads(msg)
-        message = cls.from_dict(message_dict)
+        try:
+            message_dict = json.loads(msg)
+            message = cls.from_dict(message_dict)
+        except Exception as e:
+            logger.error('error while decoding message:\n{}'.format(msg))
+            raise exceptions.DriplineDecodingError('unable to decode message; received: {}'.format(e.msg))
         return message
 
     @classmethod
@@ -174,14 +177,18 @@ class Message(dict, object):
         if encoding.endswith('json'):
             return cls.from_json(msg)
         elif encoding.endswith('msgpack'):
+            logger.warning('received message encoded with msgpack, this is deprecated')
             return cls.from_msgpack(msg)
         else:
             raise exceptions.DriplineDecodingError('encoding <{}> not recognized'.format(encoding))
 
     def to_msgpack(self):
-        temp_dict = self.copy()
-        temp_dict.update({'msgtype': self.msgtype})
-        return msgpack.packb(temp_dict)
+        raise exceptions.DriplineDeprecated('encoding message to msgpack is deprecated')
+        #logger.warning('encoding message to msgpack, this is deprecated')
+        #logger.warning('traceback for that call is:\n{}'.format(traceback.format_exc()))
+        #temp_dict = self.copy()
+        #temp_dict.update({'msgtype': self.msgtype})
+        #return msgpack.packb(temp_dict)
 
     def to_json(self):
         temp_dict = self.copy()
@@ -242,6 +249,13 @@ class RequestMessage(Message):
         self.msgop = msgop
         self.lockout_key = lockout_key
         Message.__init__(self, **kwargs)
+
+    @property
+    def msgop(self):
+        return self['msgop']
+    @msgop.setter
+    def msgop(self, value):
+        self['msgop'] = int(value)
 
     @property
     def msgtype(self):

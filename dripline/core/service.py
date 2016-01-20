@@ -247,6 +247,8 @@ class Service(Provider):
                         )
             self._channel.queue_bind(self.on_bindok, self.name,
                                      self._exchange, key)
+            self._channel.queue_bind(self.on_bindok, self.name,
+                                     self._exchange, 'broadcast.#')
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this
@@ -492,7 +494,7 @@ class Service(Provider):
             return
         return connection
 
-    def send_request(self, target, request, timeout=10):
+    def send_request(self, target, request, timeout=10, multi_reply=False):
         '''
         It seems like there should be a way to do this with the existing SelectConnection.
         The problem is that the message handler needs to send a request and then be called
@@ -500,24 +502,29 @@ class Service(Provider):
         The non-blocking part seems tricky. I'm sure there exists a good solution for this,
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
-        logger.info('sending a request')
-        logger.debug('request to <{}> is: {}'.format(target, request))
+        logger.debug('request to send to <{}> is: {}'.format(target, request))
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
         result_queue = multiprocessing.Queue()
         connection = self.send_message(target, request, return_queue=result_queue, return_connection=True, exchange='requests')
         self.__ret_val = None
         def _get_result(result_queue):
-            while result_queue.empty():
+            while result_queue.empty() or multi_reply:
                 connection.process_data_events()
         process = multiprocessing.Process(target=_get_result, kwargs={'result_queue':result_queue})
         process.start()
         process.join(timeout)
         if process.is_alive():
             process.terminate()
-            raise exceptions.DriplineTimeoutError('request response timed out')
+            if not multi_reply:
+                raise exceptions.DriplineTimeoutError('request response timed out')
         connection.close()
-        return result_queue.get()
+        results = []
+        while not result_queue.empty():
+            results.append(result_queue.get())
+        if len(results) == 1:
+            results = results[0]
+        return results
 
     def send_alert(self, alert, severity):
         '''
@@ -531,7 +538,11 @@ class Service(Provider):
     def send_reply(self, properties, reply):
         '''
         '''
+        #import ipdb;ipdb.set_trace()
         logger.info("sending a reply")
         if not isinstance(reply, Message):
-            reply = ReplyMessage(payload=reply)
+            logger.warning('should now send a reply')
+            reply = ReplyMessage(payload=reply)#, sender_info={'service_name':self.name})
+        reply.sender_info['service_name'] = self.name
+        #import ipdb;ipdb.set_trace()
         self.send_message(target=properties.reply_to, message=reply, properties=properties, ensure_delivery=False)

@@ -28,6 +28,24 @@ class Provider(Endpoint):
         self._endpoints.update({endpoint.name:endpoint})
         endpoint.provider = self
 
+    def lock(self, *args, **kwargs):
+        this_key = Endpoint.lock(self, *args, **kwargs)['key']
+        kwargs.update({'lockout_key':this_key})
+        for name, endpoint in self.endpoints.items():
+            if endpoint.is_locked:
+                continue
+            logger.info('calling <{}>.lock'.format(name))
+            endpoint.lock(*args, **kwargs)
+
+    def unlock(self, *args, **kwargs):
+        logger.info("hey hey hey hey")
+        Endpoint.unlock(self, *args, **kwargs)
+        for name, endpoint in self.endpoints.items():
+            if name == self.name:
+                continue
+            logger.info('calling <{}>.unlock'.format(name))
+            endpoint.unlock(*args, **kwargs)
+
     def on_send(self, *commands):
         these_cmds = commands
         return self.send(list(commands))

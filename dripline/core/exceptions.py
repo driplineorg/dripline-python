@@ -99,6 +99,10 @@ class DriplineInvalidKey(DriplineError):
     retcode = 308
 __all__.append('DriplineInvalidKey')
 
+class DriplineDeprecated(DriplineError):
+    retcode = 309
+__all__.append('DriplineDeprecated')
+
 class DriplineDatabaseError(DriplineError):
     retcode = 400
 __all__.append("DriplineDatabaseError")

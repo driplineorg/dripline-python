@@ -5,7 +5,7 @@ Constant definitions
 # Operation constants.
 OP_SET = 0
 OP_GET = 1
-OP_CONFIG = 6
+#OP_CONFIG = 6 # config is deprecated
 OP_SEND = 7
 OP_RUN = 8
 OP_CMD = 9
