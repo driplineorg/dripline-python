@@ -28,14 +28,14 @@ logger = logging.getLogger(__name__)
 class Gogol(Service):
     def __init__(self, exchange='alerts', keys=['#'], name=None, **kwargs): 
         '''
-        exchange (str): AMQP exchange on the broker to which we will be binding
-        keys (list): list of strings, each string will be a routing key bound to the provided exchange.
+        exchange (str): (overrides Service default)
+        keys (list): (overrides Service default)
 
         '''
         logger.debug('Gogol initializing')
         if name is None:
             name = __name__ + '-' + uuid.uuid1().hex[:12]
-        Service.__init__(self, amqp_url=broker_host, exchange=exchange, keys=keys, name=name)
+        Service.__init__(self, exchange=exchange, keys=keys, name=name, **kwargs)
 
     def this_consume(self, message, basic_deliver=None):
         raise NotImplementedError('you must set this_consume to a valid function')
