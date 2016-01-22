@@ -50,6 +50,9 @@ class Provider(Endpoint):
         these_cmds = commands
         return self.send(list(commands))
 
+    def on_set(self, *args, **kwargs):
+        return self._on_set(*args, **kwargs)
+
     @property
     def endpoint_names(self):
         return self._endpoints.keys()

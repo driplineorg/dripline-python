@@ -38,12 +38,13 @@ class Service(Provider):
     """
     EXCHANGE_TYPE = 'topic'
 
-    def __init__(self, broker=None, exchange=None, keys=None, **kwargs):
+    def __init__(self, broker=None, exchange=None, keys=None, setup_calls=[], **kwargs):
         """
         broker (str): The AMQP url to connect with
         exchange (str): Name of the AMQP exchange to connect to
         keys (list|str): binding key or list of binding keys to use listen against
         name (str|None): name for the amqp queue, automatically generated if None (this behavior supplements the Endpoint arg of the same name)
+        setup_calls (list of dicts): each element is a dictionary describing a method to call. Valid keys are target, method, args, and kwargs, which will be called as service.endpoints[target].method(*args,**kwargs). Note that on_set can be used to assign values to attributes in this syntax.
         """
         self._broker = broker
         if exchange is None:
@@ -60,6 +61,7 @@ class Service(Provider):
             kwargs['name'] = 'unknown_service_' + str(uuid.uuid4())[1:12]
         Provider.__init__(self, **kwargs)
         self.name = kwargs['name']
+        self._setup_calls = setup_calls
         self._connection = None
         self._channel = None
         self._closing = False
@@ -394,7 +396,7 @@ class Service(Provider):
     def start_event_loop(self):
         '''Call self.run with controlled stop
         '''
-        logger.info('starting event loop for node {}\n{}.'.format(self.name,'-'*29))
+        logger.info('starting event loop for node {}\n{}'.format(self.name,'-'*29))
 
         try:
             self.run()
@@ -402,13 +404,34 @@ class Service(Provider):
             self.stop()
         logger.debug('loop ended')
 
+    def _do_setup_calls(self):
+        '''
+        '''
+        logger.warning("hey there, this is where extra calls should all get done...")
+        for a_call in self._setup_calls:
+            this_endpoint = self.endpoints[a_call['target']]
+            this_method = getattr(this_endpoint, a_call['method'])
+            these_args = a_call.get('args', [])
+            if not isinstance(these_args, list):
+                these_args = [these_args]
+            these_kwargs = a_call.get('kwargs', {})
+            logger.info('attempting to call:\n{}.{}(*{}, **{})'.format(this_endpoint.name, this_method.__name__, these_args, these_kwargs))
+            try:
+                this_method(*these_args, **these_kwargs)
+            except Exception as e:
+                logger.error('unable to do a setup call')
+        logger.info('startup calls complete\n'+'-'*29)
+
     def run(self):
         """Run the example consumer by connecting to RabbitMQ and then
         starting the IOLoop to block and allow the SelectConnection to operate.
 
         """
         self._connection = self.connect()
+        self._connection.add_timeout(0, self._do_setup_calls)
+        logger.warning('initialization call timeout added')
         try:
+            logger.warning('sleep done, starting loop')
             self._connection.ioloop.start()
         except Exception as this_err:
             logger.critical('Service <{}> crashing with error message:\n{}'.format(self.name, this_err))
