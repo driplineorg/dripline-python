@@ -407,7 +407,7 @@ class Service(Provider):
     def _do_setup_calls(self):
         '''
         '''
-        logger.warning("hey there, this is where extra calls should all get done...")
+        logger.info('calling setup methods')
         for a_call in self._setup_calls:
             this_endpoint = self.endpoints[a_call['target']]
             this_method = getattr(this_endpoint, a_call['method'])
@@ -415,7 +415,7 @@ class Service(Provider):
             if not isinstance(these_args, list):
                 these_args = [these_args]
             these_kwargs = a_call.get('kwargs', {})
-            logger.info('attempting to call:\n{}.{}(*{}, **{})'.format(this_endpoint.name, this_method.__name__, these_args, these_kwargs))
+            logger.debug('attempting to call:\n{}.{}(*{}, **{})'.format(this_endpoint.name, this_method.__name__, these_args, these_kwargs))
             try:
                 this_method(*these_args, **these_kwargs)
             except Exception as e:
@@ -429,9 +429,7 @@ class Service(Provider):
         """
         self._connection = self.connect()
         self._connection.add_timeout(0, self._do_setup_calls)
-        logger.warning('initialization call timeout added')
         try:
-            logger.warning('sleep done, starting loop')
             self._connection.ioloop.start()
         except Exception as this_err:
             logger.critical('Service <{}> crashing with error message:\n{}'.format(self.name, this_err))
