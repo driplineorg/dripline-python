@@ -50,7 +50,7 @@ def calibrate(cal_functions=None):
                 #           "math": math,
                 #          }
                 locals = cal_functions
-                evaluator = asteval.Interpreter()
+                evaluator = asteval.Interpreter(symtable=locals)
                 eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 logger.debug("formated cal is:\n{}".format(eval_str))
                 try:
