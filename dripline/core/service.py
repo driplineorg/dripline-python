@@ -420,6 +420,7 @@ class Service(Provider):
                 this_method(*these_args, **these_kwargs)
             except Exception as e:
                 logger.error('unable to do a setup call')
+                logger.debug('error is:\n{}'.format(e))
         logger.info('startup calls complete\n'+'-'*29)
 
     def run(self):
