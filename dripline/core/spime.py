@@ -7,6 +7,7 @@ import logging
 import math
 import functools
 import types
+import re
 
 from .scheduler import Scheduler
 from .exceptions import *
@@ -146,7 +147,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
 @fancy_doc
 class FormatSCPISpime(Spime):
-    def __init__(self, get_str=None, get_reply_format_str = None, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
+    def __init__(self, get_str=None, get_reply_float = False, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
         '''
         get_str (str): if not None, sent verbatim in the event of on_get; (exception if None)
         set_str (str): if not None, sent as set_str.format(value) in the event of on_set (exception if None)
@@ -154,21 +155,26 @@ class FormatSCPISpime(Spime):
         set_value_lowercase (bool): convenience option to use .lower() on set value if it is a string
         '''
         Spime.__init__(self, **kwargs)
-        self._get_reply_format_str = get_reply_format_str
+        self._get_reply_float = get_reply_float
         self._get_str = get_str
         self._set_str = set_str
         self._set_value_map = set_value_map
 
     @calibrate()
     def on_get(self):
+        to_send = [self._get_str]
         if self._get_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
-        result = self.provider.send([self._get_str])
-        #if not result.endswith(self._get_reply_format_str):
-        #    print "Does not end with"
-        #    return result
-	print result
-        #return result[:len(result)-len(seld._get_reply_format_str)]
+        result = self.provider.send(to_send)
+        # result = '0.0810A'
+        logger.debug('result is: {}'.format(result))
+        if self._get_reply_float:
+            logger.debug('desired format is: float')
+            logger.debug('formatting result')
+            formatted_result = map(float, re.findall("\d+\.\d+",format(result)))
+            logger.debug('formatted result is {}'.format(formatted_result[0]))
+            return formatted_result[0]
+        return result
 
     def on_set(self, value):
         if self._set_str is None:
