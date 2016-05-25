@@ -146,7 +146,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
 @fancy_doc
 class FormatSCPISpime(Spime):
-    def __init__(self, get_str=None, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
+    def __init__(self, get_str=None, get_reply_format_str = None, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
         '''
         get_str (str): if not None, sent verbatim in the event of on_get; (exception if None)
         set_str (str): if not None, sent as set_str.format(value) in the event of on_set (exception if None)
@@ -154,6 +154,7 @@ class FormatSCPISpime(Spime):
         set_value_lowercase (bool): convenience option to use .lower() on set value if it is a string
         '''
         Spime.__init__(self, **kwargs)
+        self._get_reply_format_str = get_reply_format_str
         self._get_str = get_str
         self._set_str = set_str
         self._set_value_map = set_value_map
@@ -163,7 +164,9 @@ class FormatSCPISpime(Spime):
         if self._get_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
         result = self.provider.send([self._get_str])
-        return result
+        if not result.endswith(self._get_reply_format_str):
+            return result
+        return result[:len(text)-len(suffix)]
 
     def on_set(self, value):
         if self._set_str is None:
