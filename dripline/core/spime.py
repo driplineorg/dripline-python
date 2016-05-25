@@ -164,9 +164,11 @@ class FormatSCPISpime(Spime):
         if self._get_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
         result = self.provider.send([self._get_str])
-        if not result.endswith(self._get_reply_format_str):
-            return result
-        return result[:len(text)-len(suffix)]
+        #if not result.endswith(self._get_reply_format_str):
+        #    print "Does not end with"
+        #    return result
+	print result
+        #return result[:len(result)-len(seld._get_reply_format_str)]
 
     def on_set(self, value):
         if self._set_str is None:
