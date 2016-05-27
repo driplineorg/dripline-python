@@ -51,7 +51,10 @@ def calibrate(cal_functions=None):
                 #          }
                 locals = cal_functions
                 evaluator = asteval.Interpreter(symtable=locals)
-                eval_str = self._calibration.format(val_dict['value_raw'].strip())
+                if isinstance(val_dict['value_raw'],float):
+                    eval_str = self._calibration.format(val_dict['value_raw'])
+                else:
+                    eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 logger.debug("formated cal is:\n{}".format(eval_str))
                 try:
                     cal = evaluator(eval_str)
@@ -199,7 +202,7 @@ class Endpoint(object):
 
     def _on_get(self, *args, **kwargs):
         '''
-        WARNING! you should *NOT* override this method 
+        WARNING! you should *NOT* override this method
         '''
         result = None
         attribute = kwargs.get('routing_key_specifier', [''][0]).replace('-','_')
@@ -249,7 +252,7 @@ class Endpoint(object):
         #    raise exceptions.DriplineValueError("No attribute: {}".format(attribute))
         #return result
 
-    def on_cmd(self, *args, **kwargs):  
+    def on_cmd(self, *args, **kwargs):
         '''
         WARNING! if you override this method, you must ensure you deal with lockout properly
         '''
