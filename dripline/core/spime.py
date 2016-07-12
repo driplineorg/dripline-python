@@ -145,18 +145,20 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
 
 @fancy_doc
 class FormatSCPISpime(Spime):
-    def __init__(self, get_str=None, get_reply_float = False, set_str=None, set_value_map=None, set_value_lowercase=False, **kwargs):
+    def __init__(self, get_str=None, get_reply_float = False, set_str=None, set_value_map=None, set_value_lowercase=True, **kwargs):
         '''
         get_str (str): if not None, sent verbatim in the event of on_get; (exception if None)
         set_str (str): if not None, sent as set_str.format(value) in the event of on_set (exception if None)
         set_value_map (dict): dictionary of mappings for values to on_set; note that the result of set_value_map[value] will be used as the input to set_str.format(value) if this dict is present
-        set_value_lowercase (bool): convenience option to use .lower() on set value if it is a string
+        set_value_lowercase (bool): default option to map all string set value to .lower()
+            **WARNING: if you change this option in your config file, you have broken convention in using a non lower-case set_value_map
         '''
         Spime.__init__(self, **kwargs)
         self._get_reply_float = get_reply_float
         self._get_str = get_str
         self._set_str = set_str
         self._set_value_map = set_value_map
+        self._set_value_lowercase = set_value_lowercase
 
     @calibrate()
     def on_get(self):
@@ -178,7 +180,7 @@ class FormatSCPISpime(Spime):
     def on_set(self, value):
         if self._set_str is None:
             raise DriplineMethodNotSupportedError('<{}> has no set string available'.format(self.name))
-        if isinstance(value, types.StringTypes):
+        if isinstance(value, types.StringTypes) and self._set_value_lowercase:
             value = value.lower()
         logger.debug('value is: {}'.format(value))
         if isinstance(self._set_value_map, types.DictType):
