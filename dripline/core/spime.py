@@ -126,8 +126,7 @@ class SimpleSCPIGetSpime(SimpleSCPISpime):
     def __init__(self, **kwargs):
         SimpleSCPISpime.__init__(self, **kwargs)
 
-    @staticmethod
-    def on_set():
+    def on_set(self, value):
         raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
 
 
@@ -140,8 +139,7 @@ class SimpleSCPISetSpime(SimpleSCPISpime):
     def __init__(self, **kwargs):
         SimpleSCPISpime.__init__(self, **kwargs)
 
-    @staticmethod
-    def on_get():
+    def on_get(self):
         raise DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
 
 
