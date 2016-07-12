@@ -171,8 +171,8 @@ class FormatSCPISpime(Spime):
         if self._get_reply_float:
             logger.debug('desired format is: float')
             logger.debug('formatting result')
-            # formatted_result = map(float, re.findall("\d+\.\d+",format(result)))
-            formatted_result = map(float, re.findall("[-+]?(?: \d* \. \d+ )(?: [Ee] [+-]? \d+ ) ?",format(result)))
+            formatted_result = map(float, re.findall("[-+]?\d+\.\d+",format(result)))
+            # formatted_result = map(float, re.findall("[-+]?(?: \d* \. \d+ )(?: [Ee] [+-]? \d+ )",format(result)))
             logger.debug('formatted result is {}'.format(formatted_result[0]))
             return formatted_result[0]
         return result
