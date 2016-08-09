@@ -29,7 +29,7 @@ class Interface(Service):
             name = 'scripting_interface_' + str(uuid.uuid4())[1:12]
         Service.__init__(self, amqp_url, exchange='requests', keys='', name=name)
         self._confirm_retcode = confirm_retcodes
-    
+
     def _send_request(self, target, msgop, payload, timeout=None, lockout_key=False):
         request = RequestMessage(msgop=msgop, payload=payload)
         request_kwargs = {'target':target,
@@ -64,7 +64,14 @@ class Interface(Service):
         msgop = OP_SET
         payload = {'values':[value]}
         payload.update(kwargs)
-        reply = self._send_request(target=endpoint, msgop=msgop, payload=payload, lockout_key=lockout_key)
+        request_args = {'target': endpoint,
+                        'msgop':msgop,
+                        'payload':payload,
+                        'lockout_key':lockout_key
+                       }
+        if timeout is not None:
+            request_args.update({'timeout':timeout})
+        reply = self._send_request(**request_args)
         return reply
 
     def config(self, endpoint, property, value=None):
@@ -86,8 +93,14 @@ class Interface(Service):
         msgop = OP_CMD
         payload = {'values': list(args)}
         payload.update(kwargs)
-        target = endpoint + '.' + method_name
-        reply = self._send_request(target=target, msgop=msgop, payload=payload, lockout_key=lockout_key)
+        request_args = {'target': endpoint + '.' + method_name,
+                        'msgop':msgop,
+                        'payload':payload,
+                        'lockout_key':lockout_key
+                       }
+        if timeout is not None:
+            request_args.update({'timeout':timeout})
+        reply = self._send_request(**request_args)
         return reply
 
 
