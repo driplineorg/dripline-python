@@ -60,7 +60,7 @@ class Interface(Service):
         reply = self._send_request(**request_args)
         return reply
 
-    def set(self, endpoint, value, lockout_key=False, **kwargs):
+    def set(self, endpoint, value, lockout_key=False, timeout=None, **kwargs):
         msgop = OP_SET
         payload = {'values':[value]}
         payload.update(kwargs)
@@ -83,7 +83,7 @@ class Interface(Service):
         #reply = self._send_request(target=endpoint, msgop=msgop, payload=payload)
         #return reply
 
-    def cmd(self, endpoint, method_name, lockout_key=False, *args, **kwargs):
+    def cmd(self, endpoint, method_name, lockout_key=False, timeout=None, *args, **kwargs):
         '''
         Send a request to call endpoint.methodname(*args, **kwargs)
 
