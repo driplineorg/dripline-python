@@ -99,3 +99,46 @@ class Provider(Endpoint):
 
     def list_endpoints(self):
         raise NotImplementedError
+
+    def _send_request(self, target, msgop, payload, timeout=None, lockout_key=False, ignore_retcode=False):
+        request = RequestMessage(msgop=msgop, payload=payload)
+        request_kwargs = {'target':target, 'request':request}
+        if timeout is not None:
+            request_kwargs.update({'timeout':timeout})
+        if lockout_key:
+            request.lockout_key = lockout_key
+        try:
+            reply = self.service.send_request(**request_kwargs)
+        except DriplineTimeoutError as err:
+            reply = ReplyMessage(retcode=DriplineTimeoutError.retcode, payload=str(err))
+        if (not reply.retcode == 0) and (not ignore_retcode):
+            raise exception_map[reply.retcode](reply.return_msg)
+        return reply
+
+    def get(self, target, timeout=None, ignore_retcode=False):
+        request_args = {'target': target,
+                        'msgop': OP_GET,
+                        'timeout': timeout,
+                       }
+        reply = self._send_request(**request_args)
+        return reply.payload
+
+    def set(self, target, value, lockout_key=False, timeout=None, ignore_retcode=False):
+        request_args = {'target': target,
+                        'msgop': OP_SET,
+                        'payload': {'values':[value]},
+                        'lockout_key': lockout_key,
+                        'timeout': timeout,
+                       }
+        reply = self._send_request(**request_args)
+        return reply.payload
+
+    def cmd(self, target, method_name, lockout_key=False, timeout=None, ignore_retcode=False, *args, **kwargs):
+        request_args = {'target': endpoint + '.' + method_name,
+                        'msgop':OP_CMD,
+                        'payload': {'values': list(args)},
+                        'lockout_key': lockout_key,
+                        'timeout': timeout,
+                       }
+        reply = self._send_request(**request_args)
+        return reply.payload
