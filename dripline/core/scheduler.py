@@ -122,12 +122,12 @@ class Scheduler(object):
         logger.info('value sent')
         if (self._log_interval <= 0) or (not self._is_logging):
             return
-        self._timeout_handle = self.portal._connection.add_timeout(self._log_interval, self._log_a_value)
+        self._timeout_handle = self.service._connection.add_timeout(self._log_interval, self._log_a_value)
 
     def _stop_loop(self):
         try:
             self._is_logging = False
-            self.portal._connection.remove_timeout(self._timeout_handle)
+            self.service._connection.remove_timeout(self._timeout_handle)
         except Warning:
             pass
         except:
@@ -139,7 +139,7 @@ class Scheduler(object):
         if self._log_interval <= 0:
             raise Warning("log interval must be > 0")
         else:
-            self.portal._connection.remove_timeout(self._timeout_handle)
+            self.service._connection.remove_timeout(self._timeout_handle)
             self._log_a_value()
             logger.info("log loop started")
 

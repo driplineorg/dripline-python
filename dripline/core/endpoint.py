@@ -100,7 +100,7 @@ class Endpoint(object):
         else:
             self.name = name
         self.provider = None
-        self.portal = None
+        self.service = None
         self._calibration = calibration
         self.__lockout_key = None
 
@@ -197,7 +197,7 @@ class Endpoint(object):
             retcode = 999
         logger.debug('request method execution complete')
         reply = ReplyMessage(payload=result, retcode=retcode, return_msg=return_msg)
-        self.portal.send_reply(properties, reply)
+        self.service.send_reply(properties, reply)
         logger.debug('reply sent')
 
     def _on_get(self, *args, **kwargs):

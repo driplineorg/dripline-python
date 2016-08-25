@@ -40,7 +40,7 @@ class Spimescape(Service):
 
         Service.__init__(self, **kwargs)
         self.add_endpoint(self)
-        
+
         self._responses = {}
 
     @property
@@ -58,7 +58,7 @@ class Spimescape(Service):
             raise ValueError('endpoint ({}) already present'.format(endpoint.name))
         self.endpoints[endpoint.name] = endpoint
         setattr(endpoint, 'store_value', self.send_alert)
-        setattr(endpoint, 'portal', self)
+        setattr(endpoint, 'service', self)
 
     def on_request_message(self, channel, method, header, body):
         logger.info('request received by {}'.format(self.name))
