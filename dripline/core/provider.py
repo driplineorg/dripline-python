@@ -107,12 +107,9 @@ class Provider(Endpoint):
             request_kwargs.update({'timeout':timeout})
         if lockout_key:
             request.lockout_key = lockout_key
-        try:
-            reply = self.service.send_request(**request_kwargs)
-        except DriplineTimeoutError as err:
-            reply = ReplyMessage(retcode=DriplineTimeoutError.retcode, payload=str(err))
+        reply = self.service.send_request(**request_kwargs)
         if (not reply.retcode == 0) and (not ignore_retcode):
-            raise exception_map[reply.retcode](reply.return_msg)
+            raise exception_map[reply.retcode](reply.return_msg, result=reply.payload)
         return reply
 
     def get(self, target, timeout=None, ignore_retcode=False):
