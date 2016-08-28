@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
+from .constants import *
 from .endpoint import Endpoint
+from .message import RequestMessage
 from .spime import Spime
 from .utilities import fancy_doc
 
@@ -115,6 +117,7 @@ class Provider(Endpoint):
     def get(self, target, timeout=None, ignore_retcode=False):
         request_args = {'target': target,
                         'msgop': OP_GET,
+                        'payload': {'values':[]},
                         'timeout': timeout,
                        }
         reply = self._send_request(**request_args)
