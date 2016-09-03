@@ -5,6 +5,7 @@ from .endpoint import Endpoint
 from .message import RequestMessage
 from .spime import Spime
 from .utilities import fancy_doc
+from .exceptions import exception_map
 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,7 +17,8 @@ __all__ = ['Provider']
 class Provider(Endpoint):
     '''
     Abstraction/interpretation layer for grouping endpoints and/or representing an instrument.
-    Providers must implement a send() which takes a list of messages, converts them as needed, sends them to hardware (or another provider), receives and parses the response, and sends a meaningful result back.
+    Providers must implement a send() which takes a list of messages, converts them as needed,
+      sends them to hardware (or another provider), receives and parses the response, and sends a meaningful result back.
     '''
 
     def __init__(self, **kwargs):
@@ -24,7 +26,7 @@ class Provider(Endpoint):
         self._endpoints = {}
 
     def add_endpoint(self, endpoint):
-        if endpoint.name in self._endpoints.keys():
+        if endpoint.name in self._endpoints:
             logger.warning('endpoint "{}" already present'.format(endpoint.name))
             return
         self._endpoints.update({endpoint.name:endpoint})

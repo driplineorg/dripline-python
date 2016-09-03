@@ -43,8 +43,12 @@ class Service(Provider):
         broker (str): The AMQP url to connect with
         exchange (str): Name of the AMQP exchange to connect to
         keys (list|str): binding key or list of binding keys to use listen against
-        name (str|None): name for the amqp queue, automatically generated if None (this behavior supplements the Endpoint arg of the same name)
-        setup_calls (list of dicts): each element is a dictionary describing a method to call. Valid keys are target, method, args, and kwargs, which will be called as service.endpoints[target].method(*args,**kwargs). Note that on_set can be used to assign values to attributes in this syntax.
+        name (str|None): name for the amqp queue, automatically generated if None
+            (this behavior supplements the Endpoint arg of the same name)
+        setup_calls (list of dicts): each element is a dictionary describing a method to call.
+            Valid keys are target, method, args, and kwargs, which will be called as
+            service.endpoints[target].method(*args,**kwargs). Note that on_set can be used to
+            assign values to attributes in this syntax.
         """
         self._broker = broker
         if exchange is None:
@@ -55,9 +59,7 @@ class Service(Provider):
             raise exceptions.DriplineValueError('<keys> is required to __init__ a Service instance')
         else:
             self.keys = keys
-        if 'name' not in kwargs:
-            kwargs['name'] = None
-        if kwargs['name'] is None:
+        if 'name' not in kwargs or kwargs['name'] is None:
             kwargs['name'] = 'unknown_service_' + str(uuid.uuid4())[1:12]
         Provider.__init__(self, **kwargs)
         self.name = kwargs['name']
