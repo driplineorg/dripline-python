@@ -16,7 +16,8 @@ import pika
 # internal imports
 from . import exceptions
 from .message import Message
-from .service import Service, Spimescape
+from .service import Service
+from .spimescape import Spimescape
 from .utilities import fancy_doc
 
 __all__ = ['Gogol']
@@ -53,5 +54,22 @@ class Gogol(Spimescape):
             raise
 
     def start(self):
-        logger.debug("AlertConsmer consume starting")
+        logger.debug("AlertConsumer consume starting")
         self.run()
+
+    def on_queue_declareok(self, method_frame):
+        """Method invoked by pika when the Queue.Declare RPC call made in
+        setup_queue has completed. In this method we will bind the queue
+        and exchange together with the routing key by issuing the Queue.Bind
+        RPC command. When this command is complete, the on_bindok method will
+        be invoked by pika.
+
+        :param pika.frame.Method method_frame: The Queue.DeclareOk frame
+
+        """
+        print('Doing Gogol.on_queue_declareok')
+        logger.debug('Binding {} to {} with {}'.format(
+                         'alerts', self.name, '#')
+                        )
+        self._channel.queue_bind(self.on_bindok, self.name, 'alerts', '#')
+        Service.on_queue_declareok(self, method_frame)
