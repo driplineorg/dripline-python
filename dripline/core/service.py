@@ -245,14 +245,13 @@ class Service(Provider):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
 
         """
+        logger.debug('Binding {} to {} with {}'.format('requests', self.name, 'broadcast.#'))
+        self._channel.queue_bind(self.on_bindok, self.name, 'requests', 'broadcast.#')
+
         for key in self.keys:
-            logger.debug('Binding {} to {} with {}'.format(
-                         self._exchange, self.name, key)
-                        )
-            self._channel.queue_bind(self.on_bindok, self.name,
-                                     self._exchange, key)
-            self._channel.queue_bind(self.on_bindok, self.name,
-                                     self._exchange, 'broadcast.#')
+            logger.debug('Binding {} to {} with {}'.format('requests', self.name, key))
+            self._channel.queue_bind(self.on_bindok, self.name,'requests', key)
+
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this
@@ -334,7 +333,7 @@ class Service(Provider):
     def on_request_message(*args, **kwargs):
         '''
         '''
-        raise exceptions.DriplineMethodNotSupportedError('base service does not handle request messages') 
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle request messages')
 
     def on_reply_message(*args, **kwargs):
         '''
@@ -349,12 +348,12 @@ class Service(Provider):
     def on_alert_message(*args, **kwargs):
         '''
         '''
-        raise exceptions.DriplineMethodNotSupportedError('base service does not handle alert messages') 
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle alert messages')
 
     def on_any_message(*args, **kwargs):
         '''
         '''
-        raise exceptions.DriplineMethodNotSupportedError('base service does not handle generic messages') 
+        raise exceptions.DriplineMethodNotSupportedError('base service does not handle generic messages')
 
     def acknowledge_message(self, delivery_tag):
         """Acknowledge the message delivery from RabbitMQ by sending a
@@ -472,7 +471,7 @@ class Service(Provider):
             connection = pika.BlockingConnection(parameters)
         except pika.exceptions.AMQPConnectionError:
             raise exceptions.DriplineAMQPConnectionError('unable to connect to broker: {}'.format(self._broker))
-            
+
         channel = connection.channel()
         channel.confirm_delivery()
         result = channel.queue_declare(queue='request_reply'+str(uuid.uuid4()),
@@ -483,7 +482,7 @@ class Service(Provider):
                            queue=result.method.queue,
                            routing_key=result.method.queue,
                           )
-        
+
         correlation_id = str(uuid.uuid4())
         self.__ret_val = None
         def on_response(ch, method, props, body):
