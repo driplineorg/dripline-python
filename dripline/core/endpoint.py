@@ -145,8 +145,7 @@ class Endpoint(object):
             raise exceptions.DriplineAccessDenied('Endpoint <{}> is locked; lockout_key required'.format(self.name))
 
     def handle_request(self, channel, method, properties, request):
-        logger.debug('handling requst:{}'.format(request))
-
+        logger.debug('handling request:{}'.format(request))
         result = None
         retcode = None
         return_msg = None

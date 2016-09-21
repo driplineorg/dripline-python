@@ -56,6 +56,7 @@ class Spimescape(Service):
             raise ValueError('endpoint ({}) already present'.format(endpoint.name))
         setattr(endpoint, 'store_value', self.send_alert)
         setattr(endpoint, 'service', self)
+        self._bindings.append(["requests", endpoint.name+'.#'])
         Provider.add_endpoint(self, endpoint)
 
     def on_request_message(self, channel, method, header, body):

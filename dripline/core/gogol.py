@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 @fancy_doc
 class Gogol(Spimescape):
-    def __init__(self, exchange='alerts', keys=['#'], name=None, **kwargs):
+    def __init__(self, exchange='requests', keys=['#'], name=None, **kwargs):
         '''
         exchange (str): (overrides Service default)
         keys (list): (overrides Service default)
@@ -37,6 +37,7 @@ class Gogol(Spimescape):
         if name is None:
             name = __name__ + '-' + uuid.uuid1().hex[:12]
         Spimescape.__init__(self, exchange=exchange, keys=keys, name=name, **kwargs)
+        self._bindings.append(["alerts", keys[0]])
 
     def this_consume(self, message, basic_deliver=None):
         raise NotImplementedError('you must set this_consume to a valid function')
@@ -56,20 +57,3 @@ class Gogol(Spimescape):
     def start(self):
         logger.debug("AlertConsumer consume starting")
         self.run()
-
-    def on_queue_declareok(self, method_frame):
-        """Method invoked by pika when the Queue.Declare RPC call made in
-        setup_queue has completed. In this method we will bind the queue
-        and exchange together with the routing key by issuing the Queue.Bind
-        RPC command. When this command is complete, the on_bindok method will
-        be invoked by pika.
-
-        :param pika.frame.Method method_frame: The Queue.DeclareOk frame
-
-        """
-        print('Doing Gogol.on_queue_declareok')
-        logger.debug('Binding {} to {} with {}'.format(
-                         'alerts', self.name, '#')
-                        )
-        self._channel.queue_bind(self.on_bindok, self.name, 'alerts', '#')
-        Service.on_queue_declareok(self, method_frame)

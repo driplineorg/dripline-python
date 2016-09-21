@@ -59,6 +59,7 @@ class Service(Provider):
             raise exceptions.DriplineValueError('<keys> is required to __init__ a Service instance')
         else:
             self.keys = keys
+        self._bindings=[['requests', "broadcast.#"]]
         if 'name' not in kwargs or kwargs['name'] is None:
             kwargs['name'] = 'unknown_service_' + str(uuid.uuid4())[1:12]
         Provider.__init__(self, **kwargs)
@@ -245,12 +246,9 @@ class Service(Provider):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
 
         """
-        logger.debug('Binding {} to {} with {}'.format('requests', self.name, 'broadcast.#'))
-        self._channel.queue_bind(self.on_bindok, self.name, 'requests', 'broadcast.#')
-
-        for key in self.keys:
-            logger.debug('Binding {} to {} with {}'.format('requests', self.name, key))
-            self._channel.queue_bind(self.on_bindok, self.name,'requests', key)
+        for a_binding in self._bindings:
+            logger.debug('Binding {} to {} with {}'.format(a_binding[0], self.name, a_binding[1]))
+            self._channel.queue_bind(self.on_bindok, self.name,a_binding[0], a_binding[1])
 
 
     def on_bindok(self, unused_frame):
@@ -482,7 +480,6 @@ class Service(Provider):
                            queue=result.method.queue,
                            routing_key=result.method.queue,
                           )
-
         correlation_id = str(uuid.uuid4())
         self.__ret_val = None
         def on_response(ch, method, props, body):
@@ -569,3 +566,4 @@ class Service(Provider):
         reply.sender_info['service_name'] = self.name
         #import ipdb;ipdb.set_trace()
         self.send_message(target=properties.reply_to, message=reply, properties=properties, ensure_delivery=False)
+        logger.info("reply sent")
