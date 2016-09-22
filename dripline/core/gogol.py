@@ -37,7 +37,9 @@ class Gogol(Spimescape):
         if name is None:
             name = __name__ + '-' + uuid.uuid1().hex[:12]
         Spimescape.__init__(self, exchange=exchange, keys=keys, name=name, **kwargs)
-        self._bindings.append(["alerts", keys[0]])
+        if isinstance(keys, str):
+           keys = [keys]
+        self._bindings += [["alerts", a_key] for a_key in keys]
 
     def this_consume(self, message, basic_deliver=None):
         raise NotImplementedError('you must set this_consume to a valid function')
