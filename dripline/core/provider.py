@@ -136,7 +136,7 @@ class Provider(Endpoint):
         return reply.payload
 
     def cmd(self, target, method_name, lockout_key=False, timeout=None, ignore_retcode=False, *args, **kwargs):
-        request_args = {'target': endpoint + '.' + method_name,
+        request_args = {'target': target + '.' + method_name,
                         'msgop':OP_CMD,
                         'payload': {'values': list(args)},
                         'lockout_key': lockout_key,
