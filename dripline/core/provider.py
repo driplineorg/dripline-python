@@ -104,7 +104,7 @@ class Provider(Endpoint):
     def list_endpoints(self):
         raise NotImplementedError
 
-    def _send_request(self, target, msgop, payload, timeout=None, lockout_key=False, ignore_retcode=False):
+    def _send_request(self, target, msgop, payload, timeout, ignore_retcode, lockout_key=False):
         request = RequestMessage(msgop=msgop, payload=payload)
         request_kwargs = {'target':target, 'request':request}
         if timeout is not None:
@@ -114,16 +114,16 @@ class Provider(Endpoint):
         reply = self.service.send_request(**request_kwargs)
         if (not reply.retcode == 0) and (not ignore_retcode):
             raise exception_map[reply.retcode](reply.return_msg, result=reply.payload)
-        return reply
+        return reply.payload
 
     def get(self, target, timeout=None, ignore_retcode=False):
         request_args = {'target': target,
                         'msgop': OP_GET,
                         'payload': {'values':[]},
                         'timeout': timeout,
+                        'ignore_retcode': ignore_retcode,
                        }
-        reply = self._send_request(**request_args)
-        return reply.payload
+        return self._send_request(**request_args)
 
     def set(self, target, value, lockout_key=False, timeout=None, ignore_retcode=False):
         request_args = {'target': target,
@@ -131,16 +131,17 @@ class Provider(Endpoint):
                         'payload': {'values':[value]},
                         'lockout_key': lockout_key,
                         'timeout': timeout,
+                        'ignore_retcode': ignore_retcode,
                        }
-        reply = self._send_request(**request_args)
-        return reply.payload
+        return self._send_request(**request_args)
 
-    def cmd(self, target, method_name, lockout_key=False, timeout=None, ignore_retcode=False, *args, **kwargs):
+    def cmd(self, target, method_name, value=[], payload={}, lockout_key=False, timeout=None, ignore_retcode=False):
+        payload.update({'values': list(value)})
         request_args = {'target': target + '.' + method_name,
-                        'msgop':OP_CMD,
-                        'payload': {'values': list(args)},
+                        'msgop': OP_CMD,
+                        'payload': payload,
                         'lockout_key': lockout_key,
                         'timeout': timeout,
+                        'ignore_retcode': ignore_retcode,
                        }
-        reply = self._send_request(**request_args)
-        return reply.payload
+        return self._send_request(**request_args)
