@@ -137,7 +137,9 @@ class Provider(Endpoint):
 
     def cmd(self, target, method_name, value=[], payload={}, lockout_key=False, timeout=None, ignore_retcode=False):
         payload.update({'values': list(value)})
-        request_args = {'target': target + '.' + method_name,
+        if method_name is not None:
+            target = target + '.' + method_name
+        request_args = {'target': target,
                         'msgop': OP_CMD,
                         'payload': payload,
                         'lockout_key': lockout_key,
