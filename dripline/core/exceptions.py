@@ -10,6 +10,13 @@ __all__ = [
 
 
 class DriplineException(Exception):
+    '''Base class for all dripline exceptions.
+
+    Implements the optional result field when raising exceptions; can be used to catch all dripline exception types.
+    *Not* intended to be raised directly, you should always be raising a more specific derived class.
+
+    Intended primarily to extended the features of the python Exception class, and to allow all dripline-related exceptions to be caught together (but independent of unrelated exceptions).
+    '''
     retcode = None
     def __init__(self, msg, result=None):
         super(DriplineException, self).__init__(msg)
@@ -18,11 +25,28 @@ __all__.append('DriplineException')
 
 
 class DriplineError(DriplineException):
+    '''Base class for errors with dripline
+
+    Base class for all error-type exceptions (retcode >= 100).
+    *Not* intended as a generic exception or to be used directly, you should always raise a more specific derived class.
+    Note that the multiples of 100 are intended as generic within their class of exception sources.
+    New generic exceptions (multiples of 100) or specific exceptions (intermediate values) can be added as needed.
+
+    Intended primarily to facilitate catching and handling Errors independently from Warnings
+    '''
     retcode = None
 __all__.append('DriplineError')
 
 
 class DriplineWarning(DriplineException):
+    '''Generic dripline warning class
+
+    A generic class for "warning" type exceptions (0 < retcode < 100).
+    Used to break an execution block and/or return a non-success (!=0) retcode, when a problem or concern exists, but has been recovered.
+    Also useful in debugging as warnings can easily be caught and handled separately from errors (ie, by catching this class).
+
+    May be used as a base class for more specific warning-type exceptions, but may also be raised directly.
+    '''
     retcode = 0
 __all__.append('DriplineWarning')
 
