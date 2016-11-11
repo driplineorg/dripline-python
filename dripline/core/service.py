@@ -555,6 +555,17 @@ class Service(Provider):
             alert = AlertMessage(payload=alert)
         self.send_message(target=severity, message=alert, exchange='alerts', ensure_delivery=False)
 
+
+    def send_status_message(self, alert, severity):
+        '''
+        '''
+        # logger.info('sending a status message')
+        # logger.debug('to {} sending {}'.format(severity,alert))
+        if not isinstance(alert, AlertMessage):
+            alert = AlertMessage(payload=alert)
+        self.send_message(target=severity, message=alert, exchange='alerts', ensure_delivery=False)
+
+
     def send_reply(self, properties, reply):
         '''
         '''
