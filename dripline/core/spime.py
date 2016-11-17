@@ -4,22 +4,14 @@
 from __future__ import absolute_import
 
 import logging
-import math
 import functools
-import types
-import re
 
 from .scheduler import Scheduler
 from .exceptions import *
 from .endpoint import Endpoint, calibrate
 from .utilities import fancy_doc
 
-__all__ = ['Spime',
-           'SimpleSCPISpime',
-           'SimpleSCPIGetSpime',
-           'SimpleSCPISetSpime',
-           'FormatSCPISpime',
-          ]
+__all__ = ['Spime']
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +24,7 @@ def _log_on_set_decoration(self, fun):
 
         values = {}
         if result != [u'']:
-            if isinstance(result, types.DictType):
+            if isinstance(result, dict):
                 values.update(result)
             else:
                 values.update({'value_raw': result})
@@ -85,110 +77,3 @@ class Spime(Endpoint, Scheduler):
     @staticmethod
     def store_value(alert, severity):
         logger.error("Should be logging (value,severity): ({},{})".format(alert, severity))
-
-
-@fancy_doc
-class SimpleSCPISpime(Spime):
-    '''
-    Utility spime for interacting with SCPI endpoints that support basic set and query syntax.
-    '''
-
-    def __init__(self,
-                 base_str=None,
-                 **kwargs):
-        '''
-        base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;*OPC?"
-        '''
-        if base_str is None:
-            raise DriplineValueError('<base_str> is required to __init__ SimpleSCPISpime instance')
-        else:
-            self.cmd_base = base_str
-        Spime.__init__(self, **kwargs)
-
-    @calibrate()
-    def on_get(self):
-        to_send = [self.cmd_base + '?']
-        result = self.provider.send(to_send)
-        logger.debug('result is: {}'.format(result))
-        return result
-
-    def on_set(self, value):
-        to_send = [self.cmd_base + ' {};*OPC?'.format(value)]
-        return self.provider.send(to_send)
-
-
-@fancy_doc
-class SimpleSCPIGetSpime(SimpleSCPISpime):
-    '''
-    Identical to SimpleSCPISpime, but with an explicit exception if on_set is attempted
-    '''
-
-    def __init__(self, **kwargs):
-        SimpleSCPISpime.__init__(self, **kwargs)
-
-    def on_set(self, value):
-        raise DriplineMethodNotSupportedError('setting not available for {}'.format(self.name))
-
-
-@fancy_doc
-class SimpleSCPISetSpime(SimpleSCPISpime):
-    '''
-    Identical to SimpleSCPISpime, but with an explicit exception if on_get is attempted
-    '''
-
-    def __init__(self, **kwargs):
-        SimpleSCPISpime.__init__(self, **kwargs)
-
-    def on_get(self):
-        raise DriplineMethodNotSupportedError('getting not available for {}'.format(self.name))
-
-
-@fancy_doc
-class FormatSCPISpime(Spime):
-    def __init__(self, get_str=None, get_reply_float = False, set_str=None, set_value_map=None, set_value_lowercase=True, **kwargs):
-        '''
-        get_str (str): if not None, sent verbatim in the event of on_get; (exception if None)
-        set_str (str): if not None, sent as set_str.format(value) in the event of on_set (exception if None)
-        set_value_map (dict): dictionary of mappings for values to on_set; note that the result of set_value_map[value] will be used as the input to set_str.format(value) if this dict is present
-        set_value_lowercase (bool): default option to map all string set value to .lower()
-            **WARNING: if you change this option in your config file, you have broken convention in using a non lower-case set_value_map
-        '''
-        Spime.__init__(self, **kwargs)
-        self._get_reply_float = get_reply_float
-        self._get_str = get_str
-        self._set_str = set_str
-        self._set_value_map = set_value_map
-        self._set_value_lowercase = set_value_lowercase
-
-    @calibrate()
-    def on_get(self):
-        to_send = [self._get_str]
-        if self._get_str is None:
-            raise DriplineMethodNotSupportedError('<{}> has no get string available'.format(self.name))
-        result = self.provider.send(to_send)
-        # result = '0.0810A'
-        logger.debug('result is: {}'.format(result))
-        if self._get_reply_float:
-            logger.debug('desired format is: float')
-            logger.debug('formatting result')
-            formatted_result = map(float, re.findall("[-+]?\d+\.\d+",format(result)))
-            # formatted_result = map(float, re.findall("[-+]?(?: \d* \. \d+ )(?: [Ee] [+-]? \d+ )",format(result)))
-            logger.debug('formatted result is {}'.format(formatted_result[0]))
-            return formatted_result[0]
-        return result
-
-    def on_set(self, value):
-        if self._set_str is None:
-            raise DriplineMethodNotSupportedError('<{}> has no set string available'.format(self.name))
-        if isinstance(value, types.StringTypes) and self._set_value_lowercase:
-            value = value.lower()
-        logger.debug('value is: {}'.format(value))
-        if isinstance(self._set_value_map, types.DictType):
-            mapped_value = self._set_value_map[value]
-        elif self._set_value_map is None:
-            mapped_value = value
-        else:
-            raise DriplineInternalError('set_value_map of unsupported type')
-        logger.debug('mapped value is: {}'.format(mapped_value))
-        result = self.provider.send([self._set_str.format(mapped_value)])
-        return result
