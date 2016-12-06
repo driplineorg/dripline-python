@@ -275,6 +275,13 @@ class Endpoint(object):
         '''
         return None
 
+    def set_condition(self, *args, **kwargs):
+        '''
+        ignore all details and respond with an empty message
+        To actually do something inside a class, the set_condition should be implemented in the class itself.
+        '''
+        return None
+
     @property
     def is_locked(self):
         return bool(self.__lockout_key)
