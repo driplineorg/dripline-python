@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 __all__ = ['ReplyMessage',
            'RequestMessage',
-           'InfoMessage',
            'AlertMessage',
            'Message']
 
@@ -141,7 +140,6 @@ class Message(dict, object):
             constants.T_REPLY: ReplyMessage,
             constants.T_REQUEST: RequestMessage,
             constants.T_ALERT: AlertMessage,
-            constants.T_INFO: InfoMessage,
         }
         try:
             msg_type = int(msg_dict.pop('msgtype'))
@@ -272,14 +270,6 @@ class RequestMessage(Message):
         self['lockout_key'] = value
         if value is None:
             self.pop('lockout_key')
-
-
-#@fancy_doc
-class InfoMessage(Message):
-    @property
-    def msgtype(self):
-        return constants.T_INFO
-
 
 #@fancy_doc
 class AlertMessage(Message):
