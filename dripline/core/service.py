@@ -318,7 +318,6 @@ class Service(Provider):
         msg_type_handlers = {
                              constants.T_REPLY: self.on_reply_message,
                              constants.T_REQUEST: self.on_request_message,
-                             constants.T_INFO: self.on_info_message,
                              constants.T_ALERT: self.on_alert_message,
                             }
         message = Message.from_encoded(body, properties.content_encoding)
@@ -337,11 +336,6 @@ class Service(Provider):
         '''
         '''
         raise exceptions.DriplineMethodNotSupportedError('base service does not handle reply messages')
-
-    def on_info_message(*args, **kwargs):
-        '''
-        '''
-        raise exceptions.DriplineMethodNotSupportedError('base service does not handle info messages')
 
     def on_alert_message(*args, **kwargs):
         '''

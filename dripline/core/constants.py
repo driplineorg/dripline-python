@@ -14,7 +14,6 @@ OP_CMD = 9
 T_REPLY = 2
 T_REQUEST = 3
 T_ALERT = 4
-T_INFO = 5
 
 # Timestamp format (RFC3339)
 TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
