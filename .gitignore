@@ -4,8 +4,8 @@
 #*
 *.pyc
 *__pycache__
-python/dripline.egg-info/*
-python/build/*
-python/doc/_build/*
+dripline.egg-info/*
+build/*
+doc/_build/*
 *.egg
-python/dripline.sublime-workspace
+dripline.sublime-workspace
