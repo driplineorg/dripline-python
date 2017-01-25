@@ -131,6 +131,14 @@ class DriplineDatabaseError(DriplineError):
     retcode = 400
 __all__.append("DriplineDatabaseError")
 
+class DriplineGenericDAQError(DriplineError):
+    retcode = 500
+__all__.append("DriplineGenericDAQError")
+
+class DriplineDAQNotEnabled(DriplineError):
+    retcode = 501
+__all__.append("DriplineDAQNotEnabled")
+
 exception_map = {}
 for exception in __all__:
     exception_map[locals()[exception].retcode] = locals()[exception]
