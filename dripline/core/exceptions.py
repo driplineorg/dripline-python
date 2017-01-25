@@ -139,6 +139,10 @@ class DriplineDAQNotEnabled(DriplineError):
     retcode = 501
 __all__.append("DriplineDAQNotEnabled")
 
+class DriplineDAQRunning(DriplineError):
+    retcode = 502
+__all__.append("DriplineDAQRunning")
+
 exception_map = {}
 for exception in __all__:
     exception_map[locals()[exception].retcode] = locals()[exception]
