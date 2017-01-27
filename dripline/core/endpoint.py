@@ -55,7 +55,7 @@ def calibrate(cal_functions=None):
                     eval_str = self._calibration.format(val_dict['value_raw'])
                 else:
                     eval_str = self._calibration.format(val_dict['value_raw'].strip())
-                logger.debug("formated cal is:\n{}".format(eval_str))
+                logger.debug("formatted cal is:\n{}".format(eval_str))
                 try:
                     cal = evaluator(eval_str)
                 except OverflowError:
@@ -185,7 +185,7 @@ class Endpoint(object):
             if result is None and return_msg is None:
                 return_msg = "operation completed silently"
         except exceptions.DriplineException as err:
-            logger.debug('got a dripine exception')
+            logger.debug("got a dripline exception: {}".format(err.retcode))
             retcode = err.retcode
             result = err.result
             return_msg = str(err)

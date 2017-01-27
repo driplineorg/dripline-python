@@ -1,0 +1,11 @@
+*~
+*#
+*.swp
+#*
+*.pyc
+*__pycache__
+dripline.egg-info/*
+build/*
+doc/_build/*
+*.egg
+dripline.sublime-workspace
