@@ -74,7 +74,8 @@ The following table is direct from the current error codes as defined in driplin
 | 500  | Generic DAQ Error |    
 | 501  | DAQ Not Enabled |    
 | 502  | DAQ Running |  
-| >=600 | Unallocated |  
+| 600-998 | Unallocated |  
+| 999 | Unhandled Error |  
 
 Software Implementations
 ========================
