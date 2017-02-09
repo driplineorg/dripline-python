@@ -143,6 +143,10 @@ class DriplineDAQRunning(DriplineError):
     retcode = 502
 __all__.append("DriplineDAQRunning")
 
+class DriplineUnhandledError(DriplineError):
+    retcode = 999
+__all__.append("DriplineUnhandledError")
+
 exception_map = {}
 for exception in __all__:
     exception_map[locals()[exception].retcode] = locals()[exception]
