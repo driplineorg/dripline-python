@@ -162,10 +162,10 @@ class Message(dict, object):
 
     @classmethod
     def from_encoded(cls, msg, encoding):
-        if encoding.endswith('json'):
-            return cls.from_json(msg)
-        elif encoding is None:
+        if encoding is None:
             logger.warning("No encoding is provided: will try with json")
+            return cls.from_json(msg)
+        elif encoding.endswith('json'):
             return cls.from_json(msg)
         else:
             raise exceptions.DriplineDecodingError('encoding <{}> not recognized'.format(encoding))
@@ -176,10 +176,10 @@ class Message(dict, object):
         return json.dumps(temp_dict)
 
     def to_encoding(self, encoding):
-        if encoding.endswith('json'):
-            return self.to_json()
-        elif encoding is None:
+        if encoding is None:
             logger.warning("No encoding is provided: will try with json")
+            return self.to_json()
+        elif encoding.endswith('json'):
             return self.to_json()
         else:
             raise ValueError('encoding <{}> not recognized'.format(encoding))
