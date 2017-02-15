@@ -17,9 +17,6 @@ import pwd
 import socket
 import traceback
 
-# 3rd party libs
-#import msgpack
-
 # internal imports
 from . import constants
 from . import exceptions
@@ -153,13 +150,6 @@ class Message(dict, object):
             raise ValueError('msgtype must be defined as in spec!')
 
     @classmethod
-    def from_msgpack(cls, msg):
-        raise exceptions.DriplineDeprecated('decoding message from msgpack is deprecated')
-        #message_dict = msgpack.unpackb(msg)
-        #message = cls.from_dict(message_dict)
-        #return message
-
-    @classmethod
     def from_json(cls, msg):
         logger.debug('original msg was: {}'.format(msg))
         try:
@@ -172,21 +162,13 @@ class Message(dict, object):
 
     @classmethod
     def from_encoded(cls, msg, encoding):
-        if encoding.endswith('json'):
+        if encoding is None:
+            logger.warning("No encoding is provided: will try with json")
             return cls.from_json(msg)
-        elif encoding.endswith('msgpack'):
-            logger.warning('received message encoded with msgpack, this is deprecated')
-            return cls.from_msgpack(msg)
+        elif encoding.endswith('json'):
+            return cls.from_json(msg)
         else:
             raise exceptions.DriplineDecodingError('encoding <{}> not recognized'.format(encoding))
-
-    def to_msgpack(self):
-        raise exceptions.DriplineDeprecated('encoding message to msgpack is deprecated')
-        #logger.warning('encoding message to msgpack, this is deprecated')
-        #logger.warning('traceback for that call is:\n{}'.format(traceback.format_exc()))
-        #temp_dict = self.copy()
-        #temp_dict.update({'msgtype': self.msgtype})
-        #return msgpack.packb(temp_dict)
 
     def to_json(self):
         temp_dict = self.copy()
@@ -194,10 +176,11 @@ class Message(dict, object):
         return json.dumps(temp_dict)
 
     def to_encoding(self, encoding):
-        if encoding.endswith('json'):
+        if encoding is None:
+            logger.warning("No encoding is provided: will try with json")
             return self.to_json()
-        elif encoding.endswith("msgpack"):
-            return self.to_msgpack()
+        elif encoding.endswith('json'):
+            return self.to_json()
         else:
             raise ValueError('encoding <{}> not recognized'.format(encoding))
 

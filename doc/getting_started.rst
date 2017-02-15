@@ -24,8 +24,6 @@ Required
 
 `Pika <http://pika.readthedocs.org>`_ is an amqp library for python 2 (not 3.x).
 
-`msgpack <http://msgpack.org>`_ is used to store payloads in messages transferred via amqp.
-
 `PyYAML <http://pyyaml.org>`_ is used to read yaml formatted configuration files.
 It could in principle (and perhaps should) be moved to "optional" status (since it is possible to run several aspects without a config file, and json based config files would be easy to use.
 Nevertheless, PyYAML is pervasive and we've had no motivation to refactor to make it cleanly optional.
@@ -87,7 +85,7 @@ For the complete experience, you would run the following three commands (the las
 This will install the local dripline source into your same virtual environment. If you are going to develop on the source replace the last line with the following two:
 
 .. code-block:: bash
-	
+
         $ pip install pika msgpack-python PyYAML [whichever optionals you want]
 		$ python setup.py develop
 
