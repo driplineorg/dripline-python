@@ -8,15 +8,15 @@ import abc
 import datetime
 import logging
 import traceback
-import uuid
 
-from .endpoint import Endpoint
+from .utilities import fancy_doc
 
 __all__ = []
 logger = logging.getLogger(__name__)
 
 
 __all__.append('Scheduler')
+@fancy_doc
 class Scheduler(object):
     '''
     Base class for objects which need to call their own methods periodically.
@@ -34,7 +34,7 @@ class Scheduler(object):
         max_interval (float): If > 0, any log event exceding this number of seconds since the last broadcast will trigger a broadcast.
         max_fractional_change (float): If > 0, any log event which produces a value which differs from the previous value by more than this amount (expressed as a fraction, ie 10% change is 0.1) will trigger a broadcast
         alert_routing_key (str): routing key for the alert message send when broadcasting a logging event result. The default value of 'sensor_value' is valid for DataLoggers which represent physical quantities being stored to the slow controls database tables
-        
+
         '''
         self.alert_routing_key=alert_routing_key + '.' + self.name
         self._log_interval = log_interval
@@ -164,4 +164,3 @@ class Scheduler(object):
             self._restart_loop()
         else:
             raise ValueError('unrecognized logger status setting')
-

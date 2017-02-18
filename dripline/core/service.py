@@ -14,15 +14,15 @@ import uuid
 
 import pika
 
-from . import constants
+from . import constants, exceptions
 from .message import Message, AlertMessage, RequestMessage, ReplyMessage
-from . import exceptions
 from .provider import Provider
+from .utilities import fancy_doc
 
 logger = logging.getLogger(__name__)
 
 __all__ = ['Service']
-
+@fancy_doc
 class Service(Provider):
     """This is an example consumer that will handle unexpected interactions
     with RabbitMQ such as channel and connection closures.

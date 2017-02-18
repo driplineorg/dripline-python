@@ -3,20 +3,15 @@ from __future__ import absolute_import
 from abc import ABCMeta, abstractproperty, abstractmethod
 
 import functools
-import inspect
-import math
-import time
 import traceback
 import types
 import uuid
 
 import asteval
-import pika
-import yaml
 
+from . import exceptions, constants
 from .message import Message, RequestMessage, ReplyMessage
-from . import exceptions
-from . import constants
+from .utilities import fancy_doc
 
 
 __all__ = ['Endpoint',
@@ -86,7 +81,7 @@ def _get_on_set(self, fun):
         return result
     return wrapper
 
-
+@fancy_doc
 class Endpoint(object):
 
     def __init__(self, name=None, calibration=None, get_on_set=False, **kwargs):
