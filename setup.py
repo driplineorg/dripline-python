@@ -37,8 +37,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 extras_require={
-    'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput'],
-    'other': ['colorlog', 'ipython', 'ipdb'],
+    'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput']
 }
 everything = set()
 for deps in extras_require.values():
@@ -49,7 +48,7 @@ setup(
     name='dripline',
     version=verstr,
     packages=['dripline','dripline/core'],
-    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'msgpack-python'],
+    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'asteval'],
     extras_require=extras_require,
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],

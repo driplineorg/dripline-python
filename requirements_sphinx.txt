@@ -15,7 +15,6 @@ gnureadline==6.3.3
 ipdb==0.8.1
 ipython==4.0.0
 ipython-genutils==0.1.0
-msgpack-python==0.4.6
 path.py==8.1.2
 pexpect==4.0.1
 pickleshare==0.5
