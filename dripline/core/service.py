@@ -4,7 +4,7 @@ This file is based upon the example in the pika docs.
 
 from __future__ import absolute_import
 
-
+import inspect
 import json
 import logging
 import multiprocessing
@@ -80,7 +80,8 @@ class Service(Provider):
         except:
             logger.warning('unable to read project8 authentications file, trying default')
             pass
-        return pika.PlainCredentials(**credentials)
+        cred_kwargs = {k:credentials[k] for k in credentials if k in inspect.getargspec(pika.PlainCredentials.__init__).args}
+        return pika.PlainCredentials(**cred_kwargs)
 
     def connect(self):
         """This method connects to RabbitMQ, returning the connection handle.
