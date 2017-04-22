@@ -89,7 +89,7 @@ class Scheduler(object):
         this_value = None
         try:
             this_value = float(to_send['value_raw'])
-        except TypeError:
+        except (TypeError, ValueError):
             pass
         if self._last_log_value is None:
             logger.debug("log b/c no last log")
