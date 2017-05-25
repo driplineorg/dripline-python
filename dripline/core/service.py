@@ -130,8 +130,8 @@ class Service(Provider):
         if self._closing:
             self._connection.ioloop.stop()
         else:
-            logger.warning('Connection closed, reopening in 5 seconds: (%s) %s',
-                           reply_code, reply_text)
+            logger.warning('Connection closed, reopening in 5 seconds: ({}) {}'.format(
+                           reply_code, reply_text))
             self._connection.add_timeout(5, self.reconnect)
 
     def reconnect(self):
@@ -195,8 +195,8 @@ class Service(Provider):
         :param str reply_text: The text reason the channel was closed
 
         """
-        logger.warning('Channel %i was closed: (%s) %s',
-                       channel, reply_code, reply_text)
+        logger.warning('Channel {} was closed: ({}) {}'.format(
+                       int(channel), reply_code, reply_text))
         self._connection.close()
 
     def setup_exchange(self, exchange_name):
