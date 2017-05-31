@@ -65,28 +65,34 @@ class Provider(Endpoint):
         raise AttributeError('endpoint name list cannot be directly modified')
 
     @property
-    def logging_status(self):
+    def schedule_status(self):
         if isinstance(self, Spime):
-            return Spime.logging_status.fget(self)
-        logger.info('getting logging status for endpoints of: {}'.format(self.name))
+            return Spime.schedule_status.fget(self)
+        logger.info('getting logging schedule status for endpoints of: {}'.format(self.name))
         results = []
         for (name,endpoint) in self._endpoints.items():
+            if name == self.name:
+                logger.debug('skipping self')
+                continue
             logger.debug('getting status of: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'logging_status'):
-                results.append((name,endpoint.logging_status))
+            if hasattr(endpoint, 'schedule_status'):
+                results.append((name,endpoint.schedule_status))
         return results
-    @logging_status.setter
-    def logging_status(self, value):
+    @schedule_status.setter
+    def schedule_status(self, value):
         if isinstance(self, Spime):
-            Spime.logging_status.fset(self, value)
+            Spime.schedule_status.fset(self, value)
             return
-        logger.info('setting logging status for endpoints of: {}'.format(self.name))
+        logger.info('setting logging schedule status for endpoints of: {}'.format(self.name))
         results = []
         for (name,endpoint) in self._endpoints.items():
+            if name == self.name:
+                logger.debug('skipping self')
+                continue
             logger.debug('trying to set for: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'logging_status'):
+            if hasattr(endpoint, 'schedule_status'):
                 try:
-                    results.append((name, setattr(endpoint, 'logging_status', value)))
+                    results.append((name, setattr(endpoint, 'schedule_status', value)))
                 except Warning as err:
                     logger.warning('got warning: {}'.format(str(err)))
         return results
