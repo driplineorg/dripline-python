@@ -64,9 +64,7 @@ class Spime(Endpoint, Scheduler):
                 logger.error('Cannot define both log_interval and loop_interval for Spime <{}>'.format(kwargs['name']))
             kwargs['schedule_interval'] = kwargs.pop('log_interval')
 
-        # Endpoint stuff
         Endpoint.__init__(self, **kwargs)
-        # Scheduler stuff
         Scheduler.__init__(self, **kwargs)
 
         self.alert_routing_key=alert_routing_key + '.' + self.name
@@ -88,6 +86,22 @@ class Spime(Endpoint, Scheduler):
             self.on_set = _log_on_set_decoration(self, super(Spime, self))
         else:
             self.on_set = super(Spime, self).on_set
+
+    # Redirect logging_status to scheduler schedule_status for backwards compatibility
+    @property
+    def logging_status(self):
+        return self.schedule_status
+    @logging_status.setter
+    def logging_status(self, value):
+        self.schedule_status = value
+
+    # Redirect log_interval to scheduler schedule_interval for backwards compatibility
+    @property
+    def log_interval(self):
+        return self.schedule_interval
+    @log_interval.setter
+    def log_interval(self, value):
+        self.schedule_interval = value
 
     @property
     def max_interval(self):

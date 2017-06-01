@@ -64,6 +64,16 @@ class Provider(Endpoint):
     def endpoint_names(self, value):
         raise AttributeError('endpoint name list cannot be directly modified')
 
+    # Redirect logging_status to schedule_status for backwards compatibility
+    @property
+    def logging_status(self):
+        logger.warning('use of logging_status is deprecated, switch to using schedule_status')
+        return self.schedule_status
+    @logging_status.setter
+    def logging_status(self, value):
+        logger.warning('use of logging_status is deprecated, switch to using schedule_status')
+        self.schedule_status = value
+
     @property
     def schedule_status(self):
         if isinstance(self, Spime):
@@ -91,6 +101,9 @@ class Provider(Endpoint):
                 continue
             logger.debug('trying to set for: {}'.format(endpoint.name))
             if hasattr(endpoint, 'schedule_status'):
+                if endpoint.schedule_interval == -1:
+                    logger.debug('skipping scheduling {} because schedule_interval set to -1'.format(endpoint.name))
+                    continue
                 try:
                     results.append((name, setattr(endpoint, 'schedule_status', value)))
                 except Warning as err:
