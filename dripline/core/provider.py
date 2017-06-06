@@ -84,9 +84,11 @@ class Provider(Endpoint):
             if name == self.name:
                 logger.debug('skipping self')
                 continue
-            logger.debug('getting status of: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'schedule_status'):
+            try:
                 results.append((name,endpoint.schedule_status))
+                logger.debug('got <schedule_status> for: {}'.format(endpoint.name))
+            except AttributeError:
+                logger.debug('{} has no <schedule_status> attribute, skipping'.format(endpoint.name))
         return results
     @schedule_status.setter
     def schedule_status(self, value):
@@ -99,15 +101,16 @@ class Provider(Endpoint):
             if name == self.name:
                 logger.debug('skipping self')
                 continue
-            logger.debug('trying to set for: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'schedule_status'):
+            try:
                 if endpoint.schedule_interval == -1:
                     logger.debug('skipping scheduling {} because schedule_interval set to -1'.format(endpoint.name))
                     continue
-                try:
-                    results.append((name, setattr(endpoint, 'schedule_status', value)))
-                except Warning as err:
-                    logger.warning('got warning: {}'.format(str(err)))
+                results.append((name, setattr(endpoint, 'schedule_status', value)))
+                logger.debug('set <schedule_status> for: {}'.format(endpoint.name))
+            except AttributeError:
+                logger.debug('{} has no <schedule_status> attribute, skipping'.format(endpoint.name))
+            except Warning as err:
+                logger.warning('got warning: {}'.format(str(err)))
         return results
 
     @property

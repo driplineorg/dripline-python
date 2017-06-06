@@ -44,6 +44,9 @@ class Scheduler(object):
         if value < 0:
             raise ValueError('Schedule loop interval cannot be < 0')
         self._schedule_interval = value
+        if self.schedule_status:
+            logger.info('Restarting schedule loop with new interval')
+            self._restart_loop()
 
     @property
     def schedule_status(self):
