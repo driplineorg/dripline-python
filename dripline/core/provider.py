@@ -64,31 +64,53 @@ class Provider(Endpoint):
     def endpoint_names(self, value):
         raise AttributeError('endpoint name list cannot be directly modified')
 
+    # Redirect logging_status to schedule_status for backwards compatibility
     @property
     def logging_status(self):
-        if isinstance(self, Spime):
-            return Spime.logging_status.fget(self)
-        logger.info('getting logging status for endpoints of: {}'.format(self.name))
-        results = []
-        for (name,endpoint) in self._endpoints.items():
-            logger.debug('getting status of: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'logging_status'):
-                results.append((name,endpoint.logging_status))
-        return results
+        logger.warning('use of logging_status is deprecated, switch to using schedule_status')
+        return self.schedule_status
     @logging_status.setter
     def logging_status(self, value):
+        logger.warning('use of logging_status is deprecated, switch to using schedule_status')
+        self.schedule_status = value
+
+    @property
+    def schedule_status(self):
         if isinstance(self, Spime):
-            Spime.logging_status.fset(self, value)
-            return
-        logger.info('setting logging status for endpoints of: {}'.format(self.name))
+            return Spime.schedule_status.fget(self)
+        logger.info('getting logging schedule status for endpoints of: {}'.format(self.name))
         results = []
         for (name,endpoint) in self._endpoints.items():
-            logger.debug('trying to set for: {}'.format(endpoint.name))
-            if hasattr(endpoint, 'logging_status'):
-                try:
-                    results.append((name, setattr(endpoint, 'logging_status', value)))
-                except Warning as err:
-                    logger.warning('got warning: {}'.format(str(err)))
+            if name == self.name:
+                logger.debug('skipping self')
+                continue
+            try:
+                results.append((name,endpoint.schedule_status))
+                logger.debug('got <schedule_status> for: {}'.format(endpoint.name))
+            except AttributeError:
+                logger.debug('{} has no <schedule_status> attribute, skipping'.format(endpoint.name))
+        return results
+    @schedule_status.setter
+    def schedule_status(self, value):
+        if isinstance(self, Spime):
+            Spime.schedule_status.fset(self, value)
+            return
+        logger.info('setting logging schedule status for endpoints of: {}'.format(self.name))
+        results = []
+        for (name,endpoint) in self._endpoints.items():
+            if name == self.name:
+                logger.debug('skipping self')
+                continue
+            try:
+                if endpoint.schedule_interval == -1:
+                    logger.debug('skipping scheduling {} because schedule_interval set to -1'.format(endpoint.name))
+                    continue
+                results.append((name, setattr(endpoint, 'schedule_status', value)))
+                logger.debug('set <schedule_status> for: {}'.format(endpoint.name))
+            except AttributeError:
+                logger.debug('{} has no <schedule_status> attribute, skipping'.format(endpoint.name))
+            except Warning as err:
+                logger.warning('got warning: {}'.format(str(err)))
         return results
 
     @property
