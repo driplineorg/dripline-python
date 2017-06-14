@@ -201,9 +201,9 @@ class Endpoint(object):
         result = None
         attribute = kwargs.get('routing_key_specifier', [''][0]).replace('-','_')
         if attribute:
-            if hasattr(self, attribute):
+            try:
                 result = getattr(self, attribute)
-            else:
+            except AttributeError:
                 raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
         else:
             result = self.on_get()
@@ -220,9 +220,9 @@ class Endpoint(object):
             attribute = kwargs['routing_key_specifier'].replace('-','_')
             value = args[0]
         if attribute:
-            if hasattr(self, attribute):
+            try:
                 setattr(self, attribute, value)
-            else:
+            except AttributeError:
                 raise exceptions.DriplineValueError('{}({}) has no <{}> attribute'.format(self.name, self.__class__.__name__, attribute))
         else:
             result = self.on_set(value[0])
@@ -282,10 +282,10 @@ class Endpoint(object):
             #     logger.debug('{} is a Spimescape service: skipped!'.format(key))
             #     continue
             logger.info('Setting condition of {}: {}'.format(key,args))
-            if hasattr(endpoint, '_set_condition'):
+            try:
                 result = getattr(endpoint, '_set_condition')(*args, **kwargs)
                 print(result)
-            else:
+            except AttributeError:
                 logger.debug('{} has no _set_condition attribute, skipped!'.format(key))
         return None
 
