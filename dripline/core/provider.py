@@ -134,6 +134,9 @@ class Provider(Endpoint):
         if lockout_key:
             request.lockout_key = lockout_key
         reply = self.service.send_request(**request_kwargs)
+        # broadcast commands should not expect a well-formatted response dict, but rather a variable-length list of response dicts
+        if target.startswith('broadcast'):
+            return
         if (not reply.retcode == 0) and (not ignore_retcode):
             raise exception_map[reply.retcode](reply.return_msg, result=reply.payload)
         return reply.payload
