@@ -6,12 +6,8 @@ from __future__ import absolute_import
 
 # standard libs
 import logging
-import re
 import traceback
 import uuid
-
-# 3rd party libs
-import pika
 
 # internal imports
 from . import exceptions
@@ -41,7 +37,7 @@ class Gogol(Spimescape):
            keys = [keys]
         self._bindings += [["alerts", a_key] for a_key in keys]
 
-    def this_consume(self, message, basic_deliver=None):
+    def this_consume(self, message, method):
         raise NotImplementedError('you must set this_consume to a valid function')
 
     def on_alert_message(self, channel, method, properties, message):

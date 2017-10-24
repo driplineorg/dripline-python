@@ -517,10 +517,11 @@ class Service(Provider):
         The non-blocking part seems tricky. I'm sure there exists a good solution for this,
         maybe within asyncio and/or asyncore, but I don't know where it is. This seems to work.
         '''
-        logger.debug('request to send to <{}> is: {}'.format(target, request))
         if not isinstance(request, RequestMessage):
             raise TypeError('request must be a dripline.core.RequestMessage')
+        request.sender_info['service_name'] = self.name
         result_queue = multiprocessing.Queue()
+        logger.debug('request to send to <{}> is: {}'.format(target, request))
         connection = self.send_message(target, request, return_queue=result_queue, return_connection=True, exchange='requests')
         self.__ret_val = None
         def _get_result(result_queue):
@@ -545,9 +546,10 @@ class Service(Provider):
         '''
         '''
         logger.info('sending an alert')
-        logger.debug('to {} sending {}'.format(severity,alert))
         if not isinstance(alert, AlertMessage):
             alert = AlertMessage(payload=alert)
+        alert.sender_info['service_name'] = self.name
+        logger.debug('to {} sending {}'.format(severity,alert))
         self.send_message(target=severity, message=alert, exchange='alerts', ensure_delivery=False)
 
 
@@ -556,6 +558,7 @@ class Service(Provider):
         '''
         # logger.info('sending a status message')
         # logger.debug('to {} sending {}'.format(severity,alert))
+        logger.warning("Method deprecated")
         if not isinstance(alert, AlertMessage):
             alert = AlertMessage(payload=alert)
         self.send_message(target=severity, message=alert, exchange='alerts', ensure_delivery=False)
