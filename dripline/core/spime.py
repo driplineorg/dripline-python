@@ -137,6 +137,7 @@ class Spime(Endpoint, Scheduler):
         result = self.on_get()
         if result is None:
             logger.warning('Spime scheduled get returned None for <{}>'.format(self.name))
+            return
         # Create float cast of value_raw for max_fractional_change test
         try:
             this_value = float(result['value_raw'])
