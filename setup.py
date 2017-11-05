@@ -7,7 +7,8 @@ from setuptools.command.test import test as TestCommand
 verstr = "none"
 try:
     import subprocess
-    verstr = subprocess.check_output(['git','describe','--long']).decode('utf-8').strip()
+    verstr = subprocess.check_output(
+        ['git', 'describe', '--long']).decode('utf-8').strip()
 except EnvironmentError:
     pass
 except Exception as err:
@@ -36,7 +37,8 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
-extras_require={
+
+extras_require = {
     'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput']
 }
 everything = set()
@@ -47,8 +49,8 @@ extras_require['all'] = everything
 setup(
     name='dripline',
     version=verstr,
-    packages=['dripline','dripline/core'],
-    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'asteval'],
+    packages=['dripline', 'dripline/core'],
+    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'asteval<=0.9.8'],
     extras_require=extras_require,
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],
