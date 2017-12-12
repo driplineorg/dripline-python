@@ -499,7 +499,7 @@ class Service(Provider):
         if not publish_success and ensure_delivery:
             if return_queue is not None:
                 return_queue.put(ReplyMessage(retcode=exceptions.DriplineAMQPRoutingKeyError.retcode,
-                                              payload='message not deliverable'
+                                              return_msg='message not deliverable'
                                              )
                             )
             else:

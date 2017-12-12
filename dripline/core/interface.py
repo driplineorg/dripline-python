@@ -45,7 +45,7 @@ class Interface(Service):
             reply = ReplyMessage(retcode=DriplineTimeoutError.retcode, payload=str(err))
         if self._confirm_retcode:
             if not reply.retcode == 0:
-                raise exception_map[reply.retcode](reply.return_msg)
+                raise exception_map[reply.retcode](reply.return_msg, result=reply.payload)
         return reply
 
     def get(self, endpoint, timeout=None):
