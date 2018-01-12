@@ -34,7 +34,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.programoutput',
+    #'sphinxcontrib.programoutput',
     'sphinx.ext.napoleon',
     #'sphinxarg.ext',
 ]
