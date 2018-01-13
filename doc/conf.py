@@ -24,7 +24,7 @@ import os
 
 import better_apidocs
 better_apidocs.main([
-    'better-apidoc',
+    'better_apidoc',
     '--force', # overwrite existing files
     '--separate', # split modules into their own files
     '-o', 'better_apidoc_out', #output location
