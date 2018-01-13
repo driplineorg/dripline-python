@@ -6,6 +6,7 @@
 .. automodule:: {{ fullname }}
     {% if members -%}
     :members: {{ members|join(", ") }}
+    {%- endif %}
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
