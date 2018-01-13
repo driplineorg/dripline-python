@@ -10,7 +10,7 @@ Contents:
 
 .. toctree::
     :maxdepth: 2
-    
+
     introduction
     getting_started
 
@@ -30,7 +30,7 @@ These docs have fallen way behind. Sections following this text block may not ha
     :hidden:
 
     glossary
-    .. apidocs/modules
+..    apidocs/modules
 
 Indices and tables
 ==================
