@@ -1,6 +1,11 @@
 {{ fullname }} module
 {% for item in range(7 + fullname|length) -%}={%- endfor %}
 
+Members are:
+{% for item in members %}
+{{ item }}
+{% endfor %}
+
 .. currentmodule:: {{ fullname }}
 
 .. automodule:: {{ fullname }}
