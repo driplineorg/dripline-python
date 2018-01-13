@@ -30,7 +30,7 @@ These docs have fallen way behind. Sections following this text block may not ha
     :hidden:
 
     glossary
-..    apidocs/modules
+    better_apidoc_out/modules
 
 Indices and tables
 ==================
