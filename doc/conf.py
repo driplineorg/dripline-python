@@ -65,13 +65,14 @@ copyright = '2014, The Project 8 Collaboration'
 #
 # The short X.Y version.
 #version = #'0.0.1'
-import pkg_resources
+#import pkg_resources
 try:
-    version = pkg_resources.require("dripline")[0].version
-    # The full version, including alpha/beta/rc tags.
-    release = version
+    import dripline, subprocess
+    version = dripline.__version__#pkg_resources.require("dripline")[0].version
+# The full version, including alpha/beta/rc tags.
+    release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
 except pkg_resources.DistributionNotFound as e:
-    print(e.message)
+    print("error message is:\n{}".format(e.message))
     version = "unknown"
     release = "unknown"
 print('version/release are: {}/{}'.format(version,release))
