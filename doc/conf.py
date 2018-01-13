@@ -71,7 +71,7 @@ try:
     version = dripline.__version__#pkg_resources.require("dripline")[0].version
 # The full version, including alpha/beta/rc tags.
     release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
-except pkg_resources.DistributionNotFound as e:
+except Exception as e:
     print("error message is:\n{}".format(e.message))
     version = "unknown"
     release = "unknown"
