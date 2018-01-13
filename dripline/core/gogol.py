@@ -53,5 +53,8 @@ class Gogol(Spimescape):
             raise
 
     def start(self):
+        '''
+        Begin consuming by calling `self.run` (from Spimescape)
+        '''
         logger.debug("AlertConsumer consume starting")
         self.run()
