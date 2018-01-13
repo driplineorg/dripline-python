@@ -29,7 +29,7 @@
     Classes:
 
     .. autosummary::
-
+        :nosignature:
 {% for item in classes %}
         {{ item }}
 {%- endfor %}
@@ -40,7 +40,7 @@
     Functions:
 
     .. autosummary::
-
+        :nosignature:
 {% for item in functions %}
         {{ item }}
 {%- endfor %}
@@ -52,7 +52,7 @@
     Data:
 
     .. autosummary::
-
+        :nosignature:
 {% for item in data %}
         {{ item }}
 {%- endfor %}
