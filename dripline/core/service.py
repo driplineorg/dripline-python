@@ -12,7 +12,10 @@ import os
 import traceback
 import uuid
 
-import pika
+try:
+    import pika
+except ImportError:
+    pass
 
 from . import constants, exceptions
 from .message import Message, AlertMessage, RequestMessage, ReplyMessage
