@@ -19,7 +19,11 @@ class DriplineException(Exception):
     '''
     retcode = None
     def __init__(self, msg, result=None):
+        '''
+        extended the default exception to have a result member containing data to pass (especially useful with warnings)
+        '''
         super(DriplineException, self).__init__(msg)
+        #: result data to pass back
         self.result = result
 __all__.append('DriplineException')
 
