@@ -1,12 +1,14 @@
 {{ fullname }} module
 {% for item in range(7 + fullname|length) -%}={%- endfor %}
 
-Members are:
-{% for item in members %}
-{{ item }}
-{% endfor %}
 
 .. currentmodule:: {{ fullname }}
+
+Some template vars
+==================
+Members: {{ members|join(" ") }}
+Functions: {{ functions|join(" ") }}
+Classes: {{ classes|join(" ") }}
 
 .. automodule:: {{ fullname }}
     {% if members -%}
@@ -51,6 +53,7 @@ Members are:
 {%- endfor %}
     {%- endif %}
 {%- endif %}
+End of modules condition
 
     {%- if data %}
 
@@ -62,6 +65,7 @@ Members are:
         {{ item }}
 {%- endfor %}
     {%- endif %}
+End of data condition
 
 {% if all_refs %}
     ``__all__``: {{ all_refs|join(", ") }}
