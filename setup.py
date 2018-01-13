@@ -50,7 +50,7 @@ setup(
     name='dripline',
     version=verstr,
     packages=['dripline', 'dripline/core'],
-    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'asteval'],
+    install_requires=[],#'pika>=0.9.8,<0.10', 'PyYAML', 'asteval'],
     extras_require=extras_require,
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],
