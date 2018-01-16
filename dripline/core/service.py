@@ -12,7 +12,10 @@ import os
 import traceback
 import uuid
 
-import pika
+try:
+    import pika
+except ImportError:
+    pass
 
 from . import constants, exceptions
 from .message import Message, AlertMessage, RequestMessage, ReplyMessage
@@ -36,6 +39,7 @@ class Service(Provider):
     commands that were issued and that should surface in the output as well.
 
     """
+    #: Service class constant setting what type of exchanges to ensure when they are "ensured"
     EXCHANGE_TYPE = 'topic'
 
     def __init__(self, broker=None, exchange=None, keys=None, setup_calls=[], **kwargs):

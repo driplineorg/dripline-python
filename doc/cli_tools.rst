@@ -14,18 +14,18 @@ Command Line Tools
 
 dripline_agent
 --------------
-.. program-output:: dripline_agent --help
+.. .. program-output:: dripline_agent --help
 
 
 .. _open_spimescape_portal:
 
 open_spimescap_portal
 ---------------------
-.. program-output:: open_spimescape_portal --help
+.. .. program-output:: open_spimescape_portal --help
 
 
 .. _message_monitor:
 
 message_monitor
 ---------------
-.. program-output:: message_monitor --help
+.. .. program-output:: message_monitor --help

@@ -1,8 +1,10 @@
 from setuptools import setup
 from glob import glob
 
-import sys
+import sys, os
 from setuptools.command.test import test as TestCommand
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 verstr = "none"
 try:
@@ -46,11 +48,19 @@ for deps in extras_require.values():
     everything.update(deps)
 extras_require['all'] = everything
 
+requirements = list()
+if not on_rtd:
+    requirements.append('pika>=0.9.8,<0.10')
+    requirements.append('PyYAML')
+    requirements.append('asteval')
+else:
+    requirements.append("better-apidoc")
+
 setup(
     name='dripline',
     version=verstr,
     packages=['dripline', 'dripline/core'],
-    install_requires=['pika>=0.9.8,<0.10', 'PyYAML', 'asteval'],
+    install_requires=requirements,
     extras_require=extras_require,
     url='http://www.github.com/project8/dripline',
     tests_require=['pytest'],

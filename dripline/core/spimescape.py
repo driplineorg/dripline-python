@@ -12,8 +12,6 @@ import time
 import traceback
 import uuid
 
-import pika
-
 from .endpoint import Endpoint
 from .message import Message, AlertMessage, RequestMessage
 from .provider import Provider
