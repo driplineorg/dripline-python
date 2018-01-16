@@ -7,7 +7,11 @@ import traceback
 import types
 import uuid
 
-import asteval
+try:
+    import asteval
+except ImportError:
+    # optional only when doing a docs build
+    pass
 
 from . import exceptions, constants
 from .message import Message, RequestMessage, ReplyMessage
