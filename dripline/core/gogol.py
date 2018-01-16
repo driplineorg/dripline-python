@@ -21,7 +21,7 @@ __all__ = ['Gogol']
 logger = logging.getLogger(__name__)
 
 
-#@fancy_doc
+@fancy_doc
 class Gogol(Spimescape):
     def __init__(self, exchange='requests', keys=['#'], name=None, **kwargs):
         '''

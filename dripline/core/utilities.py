@@ -34,6 +34,7 @@ def fancy_doc(cls):
     except:
         pass
     new_doc = '\n'.join([base_doc, arg_section])
+    clsdict = dict(inspect.getmembers(cls))
     clsdict = {'__doc__': new_doc}
 
     return type(cls.__name__, (cls,), clsdict)
