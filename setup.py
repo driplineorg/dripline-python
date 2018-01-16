@@ -55,6 +55,7 @@ if not on_rtd:
     requirements.append('asteval')
 else:
     requirements.append("better-apidoc")
+    requirements += extras_require['doc']
 
 setup(
     name='dripline',
