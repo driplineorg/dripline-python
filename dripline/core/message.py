@@ -3,7 +3,7 @@ Base and derived classes for implementing the Project 8 wire protocol.
 
 The Message class should implement the protocol generally, and the types of emssage represent types of messages that dripline expects to send, possibly with extra restrictions.
 
-These classes are responsible both for enforcing compliance with the protocol, and with encoding and decoding support formats for AMQP payloads (currently json and yaml).
+These classes are responsible both for enforcing compliance with the protocol, and with encoding and decoding support formats for AMQP payloads (currently json).
 '''
 
 
