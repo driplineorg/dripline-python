@@ -7,7 +7,7 @@ System Requirements
 The development of dripline is being done primarily on OS X (with packages installed via homebrew and python packages through pip) and debian linux (with any system-packages from apt and python pacakges through pip).
 
 We have made no attempt to determine the exact minimal system requirements, but develop primarily in python 2.7 with "current" versions of dependencies from PyPI.
-No effort is made to maintain compatibility with python < 2.7; the code should be compatible with python 3.x and we hope to transition to primarily (exclusively?) python 3 usage in the future.
+No effort is made to maintain compatibility with python < 2.7; the code should be compatible with python 3.x and we hope to transition to primarily (and possibly exclusively) python 3 usage in the future.
 
 Installation
 ************
