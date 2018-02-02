@@ -25,7 +25,7 @@ import os
 import better_apidoc
 better_apidoc.main([
     'better_apidoc',
-    #'-t', '_templates', # path to jinja templates
+    '-t', '_templates', # path to jinja templates
     '--force', # overwrite existing files
     '--separate', # split modules into their own files
     '-o', 'better_apidoc_out', #output location

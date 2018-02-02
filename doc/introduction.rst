@@ -23,24 +23,5 @@ If AMQP defines a protocol for message routing, the Project 8 wire protocol defi
 By having a standard that all messages follow, it is possible for any appropriately implemented application, regardless of host system, programming language, etc., to interact with any other successfully.
 That is, as long as your C++ application on Windows and my python application on Linux are both speaking the same version of the Project 8 Wire Protocol over the same AMQP broker, they will get along just fine.
 
-The official definition of the wire protocol can be found on the `the dripline repository <https://github.com/project8/dripline>`_ available also `rendered <https://dripline.readthedocs.io/en/latest/Wire-Protocol.html>`_.
+The official definition of the dripline protocol can be found on the `the dripline repository <https://github.com/project8/dripline>`_ available also `rendered <https://dripline.readthedocs.io/en/latest/>`_.
 
-Dripline Payload Syntax
-=======================
-While the wire protocol allows for the payload field to be of any type, meaningful interactions must constrain this field.
-Here I'll describe the standards expected by dripline for various message types.
-
-Request Messages
-++++++++++++++++
-
-.. todo:: add request message standard
-
-Reply Messages
-++++++++++++++
-
-.. todo:: add reply message standard
-
-Alert Messages
-++++++++++++++
-
-.. todo:: add alert message standard
