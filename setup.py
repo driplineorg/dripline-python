@@ -55,7 +55,6 @@ extras_require['all'] = everything
 requirements = list()
 if not on_rtd:
     requirements.append('pika>=0.9.8,<0.10')
-    requirements.append('PyYAML')
     requirements.append('asteval')
 else:
     requirements += extras_require['doc']
