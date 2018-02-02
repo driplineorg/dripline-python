@@ -23,10 +23,7 @@ If AMQP defines a protocol for message routing, the Project 8 wire protocol defi
 By having a standard that all messages follow, it is possible for any appropriately implemented application, regardless of host system, programming language, etc., to interact with any other successfully.
 That is, as long as your C++ application on Windows and my python application on Linux are both speaking the same version of the Project 8 Wire Protocol over the same AMQP broker, they will get along just fine.
 
-The *official* definition of the wire protocol can be found on the `Project 8 wiki <https://github.com/project8/hardware/wiki/Wire-Protocol>`_ (this page requires authentication to github and membership in the Project 8 organization).
-I will duplicate that information here now, but assume it will immediately be out of date; please request (via email or github issue) an update to this information if you suspect it is stale.
-
-.. literalinclude:: wire_protocol.txt
+The official definition of the wire protocol can be found on the `the dripline repository <https://github.com/project8/dripline>`_ available also `rendered <https://dripline.readthedocs.io/en/latest/Wire-Protocol.html>`_.
 
 Dripline Payload Syntax
 =======================
