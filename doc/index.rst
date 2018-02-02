@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to dripline's documentation!
+Welcome to dripline-python's documentation!
 ====================================
 
 Contents:
@@ -14,15 +14,12 @@ Contents:
     introduction
     getting_started
 
-These docs have fallen way behind. Sections following this text block may not have yet been reviewed and updated.
-
 
 .. toctree::
     :maxdepth: 2
 
     contribute
     tutorials/tutorials
-    cli_tools
 
 .. todolist:: 
 
