@@ -35,5 +35,6 @@ Based on that we prefer the following:
   - Generally we try to follow `PEP-8 <https://www.python.org/dev/peps/pep-0008/>`_
   - The 80 column limit makes things harder to read more of then easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed
   - When creating new classes which inherit from local classes, decorate them with ``@fancy_doc`` so that the class's docstring gets updated
+
     - The description of the class belongs in the class's doc string
     - The doc string for the ``__init__`` method should just include description of the kwargs for that class (the decorator will add kwargs from inherited classes)
