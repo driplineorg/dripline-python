@@ -13,7 +13,7 @@ Glossary
         A subset of :term:`endpoint`\ s which can "provide" access to or interpretation for a set of endpoints. Providers, for example, are responsible for taking the raw SCPI command for reading a particular quantity (which and endpoint knows it wants to issue) and actually sending it over a network socket to a physical device and getting a response.
 
     message
-        An object delivered by AMQP and conformant to the :ref:`wire-protocol` .
+        An object delivered by AMQP and conformant to the `wire-protocol <https://dripline.readthedocs.io/en/latest/Wire-Protocol.html>`_.
 
     mesh
         The complete set of components in a slow control system. It is centered around an AMQP server (such as rabbitmq) and referrs to everything connected to it.
