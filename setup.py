@@ -41,7 +41,11 @@ class PyTest(TestCommand):
 
 
 extras_require = {
-    'doc': ['sphinx', 'sphinx_rtd_theme', 'sphinxcontrib-programoutput']
+    'doc': ['sphinx',
+            'sphinx_rtd_theme',
+            'sphinxcontrib-programoutput',
+            'better-apidoc',
+           ]
 }
 everything = set()
 for deps in extras_require.values():
@@ -54,7 +58,6 @@ if not on_rtd:
     requirements.append('PyYAML')
     requirements.append('asteval')
 else:
-    requirements.append("better-apidoc")
     requirements += extras_require['doc']
 
 setup(
