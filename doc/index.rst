@@ -15,7 +15,6 @@ Contents:
     getting_started
     contribute
 
-
 .. todolist:: 
 
 .. toctree::
