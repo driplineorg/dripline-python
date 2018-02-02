@@ -13,13 +13,7 @@ Contents:
 
     introduction
     getting_started
-
-
-.. toctree::
-    :maxdepth: 2
-
     contribute
-    tutorials/tutorials
 
 .. todolist:: 
 
