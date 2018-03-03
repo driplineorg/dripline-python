@@ -148,7 +148,8 @@ class Spime(Endpoint, Scheduler):
             logger.debug("log b/c no last log")
         elif (datetime.datetime.utcnow() - self._last_log_time).seconds > self._max_interval:
             logger.debug('log b/c too much time')
-        elif this_value and (abs(self._last_log_value - this_value)/self._last_log_value)>self.max_fractional_change:
+        elif this_value and (self._last_log_value==0 or
+                (abs(self._last_log_value - this_value)/self._last_log_value)>self.max_fractional_change):
             logger.debug('log b/c change is too large')
         else:
             logger.debug('no log condition met, not logging')

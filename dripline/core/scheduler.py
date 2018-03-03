@@ -24,11 +24,13 @@ class Scheduler(object):
 
     def __init__(self,
                  schedule_interval=0.,
+                 delay_start=False,
                  **kwargs):
         '''
         schedule_interval (float): time in seconds between scheduled events
         '''
         self._schedule_interval = schedule_interval
+        self._delay_start = delay_start
         self._is_looping = False
         self._timeout_handle = None
 
@@ -85,8 +87,12 @@ class Scheduler(object):
             raise Warning("schedule loop interval must be > 0")
         self.service._connection.remove_timeout(self._timeout_handle)
         self._is_looping = True
-        self._process_schedule()
-        logger.info("schedule loop started")
+        if self._delay_start:
+            self._timeout_handle = self.service._connection.add_timeout(self._schedule_interval, self._process_schedule)
+            logger.info("schedule loop started with delay")
+        else:
+            self._process_schedule()
+            logger.info("schedule loop started")
 
     def _stop_loop(self):
         try:
