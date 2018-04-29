@@ -45,11 +45,7 @@ def calibrate(cal_functions=None):
             if self._calibration is None:
                 pass
             elif isinstance(self._calibration, str):
-                #globals = {
-                #           "math": math,
-                #          }
-                locals = cal_functions
-                evaluator = asteval.Interpreter(symtable=locals)
+                evaluator = asteval.Interpreter(usersyms=cal_functions)
                 if isinstance(val_dict['value_raw'],float):
                     eval_str = self._calibration.format(val_dict['value_raw'])
                 else:
