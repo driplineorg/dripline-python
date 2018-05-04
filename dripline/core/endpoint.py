@@ -106,7 +106,7 @@ class Endpoint(object):
             if key.startswith('OP_'):
                 method_name = 'on_' + key.split('_')[-1].lower()
                 if not hasattr(self, method_name):
-                    setattr(self, method_name, types.MethodType(raiser, self, Endpoint))
+                    setattr(self, method_name, types.MethodType(raiser, self))
                 if not hasattr(self, '_'+method_name):
                     setattr(self, '_'+method_name, getattr(self, method_name))
 
