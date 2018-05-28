@@ -157,7 +157,7 @@ class Message(dict, object):
             message = cls.from_dict(message_dict)
         except Exception as e:
             logger.error('error while decoding message:\n{}'.format(msg))
-            raise exceptions.DriplineDecodingError('unable to decode message; received: {}'.format(e.msg))
+            raise exceptions.DriplineDecodingError('unable to decode message; received: {}'.format(msg))
         return message
 
     @classmethod
