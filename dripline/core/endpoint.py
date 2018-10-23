@@ -36,8 +36,6 @@ def calibrate(cal_functions=None):
     def calibration(fun):
         def wrapper(self, *args, **kwargs):
             very_raw = fun(self)
-            if isinstance(very_raw, list):
-                very_raw = very_raw[0]
             val_dict = {'value_raw':very_raw}
             logger.debug('attempting to calibrate')
             if val_dict['value_raw'] is None:
