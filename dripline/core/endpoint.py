@@ -7,6 +7,8 @@ import traceback
 import types
 import uuid
 
+import six
+
 try:
     import asteval
 except ImportError:
@@ -46,10 +48,12 @@ def calibrate(cal_functions=None):
                 pass
             elif isinstance(self._calibration, str):
                 evaluator = asteval.Interpreter(usersyms=cal_functions)
-                if isinstance(val_dict['value_raw'],float):
+                if isinstance(val_dict['value_raw'], float):
                     eval_str = self._calibration.format(val_dict['value_raw'])
-                else:
+                elif isinstance(val_dict['value_raw'], six.string_types):
                     eval_str = self._calibration.format(val_dict['value_raw'].strip())
+                else:
+                    eval_str = self._calibration.format(val_dict['value_raw'])
                 logger.debug("formatted cal is:\n{}".format(eval_str))
                 try:
                     cal = evaluator(eval_str)
