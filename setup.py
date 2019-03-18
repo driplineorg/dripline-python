@@ -15,7 +15,7 @@ except EnvironmentError:
     pass
 except Exception as err:
     print(err)
-    verstr = 'v0.0.0-???'
+    verstr = 'v0.0.0'
 
 
 class PyTest(TestCommand):
@@ -54,7 +54,7 @@ extras_require['all'] = everything
 
 requirements = list()
 if not on_rtd:
-    requirements.append('pika')
+    requirements.append('pika<=0.11.2')
     requirements.append('asteval')
 else:
     requirements += extras_require['doc']
