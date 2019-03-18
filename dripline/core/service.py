@@ -199,8 +199,10 @@ class Service(Provider):
         :param str reply_text: The text reason the channel was closed
 
         """
-        logger.warning('Channel {} was closed: ({}) {}'.format(
-                       int(channel), reply_code, reply_text))
+        if reply_code == 405:
+            logger.error('crashing because unable to obtain exclusive lock')
+            raise exceptions.DriplineAMQPError(reply_text)
+        logger.warning('Channel {} was closed: ({}) {}'.format( int(channel), reply_code, reply_text))
         self._connection.close()
 
     def setup_exchange(self, exchange_name):
