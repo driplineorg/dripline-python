@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  pybind:
+    build:
+      context: .
+      dockerfile: Dockerfile-bind
+    volumes:
+      - .:/usr/local/src

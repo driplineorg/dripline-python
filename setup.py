@@ -1,71 +1,75 @@
-from setuptools import setup
-from glob import glob
+import os
+import re
+import sys
+import platform
+import subprocess
 
-import sys, os
-from setuptools.command.test import test as TestCommand
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-verstr = "none"
-try:
-    import subprocess
-    verstr = subprocess.check_output(
-        ['git', 'describe', '--long']).decode('utf-8').strip()
-except EnvironmentError:
-    pass
-except Exception as err:
-    print(err)
-    verstr = 'v0.0.0'
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+from distutils.version import LooseVersion
 
 
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = None
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-
-        # for some reason we have to do this to get it to function correctly.
-        self.pytest_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, because outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=''):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
 
-extras_require = {
-    'doc': ['sphinx',
-            'sphinx_rtd_theme',
-            'sphinxcontrib-programoutput',
-            'better-apidoc',
-           ]
-}
-everything = set()
-for deps in extras_require.values():
-    everything.update(deps)
-extras_require['all'] = everything
+class CMakeBuild(build_ext):
+    def run(self):
+        try:
+            out = subprocess.check_output(['cmake', '--version'])
+        except OSError:
+            raise RuntimeError("CMake must be installed to build the following extensions: " +
+                               ", ".join(e.name for e in self.extensions))
 
-requirements = list()
-if not on_rtd:
-    requirements.append('pika<=0.11.2')
-    requirements.append('asteval')
-else:
-    requirements += extras_require['doc']
+        if platform.system() == "Windows":
+            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
+            if cmake_version < '3.1.0':
+                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
+
+        for ext in self.extensions:
+            self.build_extension(ext)
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+                      '-DPYTHON_EXECUTABLE=' + sys.executable,
+                      '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
+                     ]
+
+        cfg = 'Debug' if self.debug else 'Release'
+        build_args = ['--config', cfg]
+
+        if platform.system() == "Windows":
+            cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
+            if sys.maxsize > 2**32:
+                cmake_args += ['-A', 'x64']
+            build_args += ['--', '/m']
+        else:
+            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
+            build_args += ['--', '-j2']
+
+        env = os.environ.copy()
+        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
+                                                              self.distribution.get_version())
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+        print("should make a cmake call:")
+        print(' '.join(['cmake', ext.sourcedir] + cmake_args), 'cwd={}'.format(self.build_temp), 'env={}'.format(env))
+        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        print("should make a build call:")
+        print(['cmake', '--build', '.'] + build_args, 'cwd={}'.format(self.build_temp))
+        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
 setup(
     name='dripline',
-    version=verstr,
-    packages=['dripline', 'dripline/core'],
-    install_requires=requirements,
-    extras_require=extras_require,
-    url='http://www.github.com/project8/dripline',
-    tests_require=['pytest'],
-    cmdclass={'test': PyTest}
+    version='0.0.1',
+    author='us',
+    author_email='driplineorg@email.tld',
+    description='a description would be good',
+    long_description='',
+    ext_modules=[CMakeExtension('dripline_python')],
+    cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
 )
