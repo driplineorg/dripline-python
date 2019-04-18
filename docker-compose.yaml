@@ -5,5 +5,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-bind
-    volumes:
-      - .:/usr/local/src
+    #volumes:
+    #  - .:/usr/local/src
