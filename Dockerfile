@@ -23,6 +23,6 @@ RUN echo "# cmake installed libraries" > /etc/ld.so.conf.d/dripline.conf &&\
     ldconfig
 
 RUN cd /usr/local/src && \
-    pip -v install . && \
+    #pip -v install . && \
     ldconfig && \
     /bin/true
