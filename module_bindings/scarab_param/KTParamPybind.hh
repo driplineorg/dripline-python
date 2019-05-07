@@ -40,8 +40,10 @@ namespace scarab_pybind
 
             .def( "set", (void (scarab::param_value::*)(bool)) &scarab::param_value::set, "Set a bool value" )
             //.def( "set", (void (scarab::param_value::*)(unsigned)) &scarab::param_value::set<uint64_t>, "Set an unsigned integer value" )
-            //.def( "set", (void (scarab::param_value::*)(int)) &scarab::param_value::set<int64_t>, "Set a signed integer value" )
-            .def( "set", (void (scarab::param_value::*)(double)) &scarab::param_value::set, "Set an float value" )
+            .def("set",&scarab::param_value::set<uint64_t>, "Set an unsigned integer value")
+	    //.def( "set", (void (scarab::param_value::*)(int)) &scarab::param_value::set<int64_t>, "Set a signed integer value" )
+            .def("set", &scarab::param_value::set<int64_t>, "Set a signed integer value")
+	    .def( "set", (void (scarab::param_value::*)(double)) &scarab::param_value::set, "Set an float value" )
             .def( "set", (void (scarab::param_value::*)(std::string)) &scarab::param_value::set, "Set an string value" )
             ;
 
