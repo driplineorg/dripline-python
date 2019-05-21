@@ -146,17 +146,19 @@ class Message(dict, object):
                 msg_dict.pop('target')
             return subclasses_dict[msg_type](**msg_dict)
         except KeyError:
-            logger.debug('present keys are: {}'.format(msg_dict.keys()))
+            logger.debug('present keys are: {}'.format(list(msg_dict.keys())))
             raise ValueError('msgtype must be defined as in spec!')
 
     @classmethod
     def from_json(cls, msg):
         logger.debug('original msg was: {}'.format(msg))
         try:
+            if isinstance(msg, bytes): #python 3 requirement
+                msg=msg.decode('utf-8')
             message_dict = json.loads(msg)
             message = cls.from_dict(message_dict)
         except Exception as e:
-            logger.error('error while decoding message:\n{}'.format(msg))
+            logger.error('error while decoding message:\n{} with error {}'.format(msg, e))
             raise exceptions.DriplineDecodingError('unable to decode message; received: {}'.format(msg))
         return message
 
