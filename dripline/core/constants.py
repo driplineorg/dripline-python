@@ -21,4 +21,4 @@ T_REQUEST = 3
 T_ALERT = 4
 
 # Timestamp format (RFC3339)
-TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
