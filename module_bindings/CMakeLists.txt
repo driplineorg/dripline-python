@@ -21,6 +21,7 @@ pybind11_add_module( scarab_param ${PB_PARAM_SOURCEFILES} )
 target_link_libraries( scarab_param PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
 pbuilder_install_libraries( scarab_param )
 
+
 # dripline_cpp_error
 set( PB_DC_ERROR_HEADERFILES
     dripline_cpp/error/DriplineCppError.hh
@@ -32,13 +33,16 @@ pybind11_add_module( dripline_error ${PB_DC_ERROR_SOURCEFILES} )
 target_link_libraries( dripline_error PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
 pbuilder_install_libraries( dripline_error )
 
+
+
 # dripline_cpp_constants
-set( PB_DC_ERROR_HEADERFILES
+set( PB_DC_CONSTANTS_HEADERFILES
     dripline_cpp/constants/DriplineCppConstants.hh
 )
-set( PB_DC_ERROR_SOURCEFILES
+set( PB_DC_CONSTANTS_SOURCEFILES
     dripline_cpp/constants/dripline_cpp_constants_namespace_pybind.cc
 )
+
 pybind11_add_module( dripline_constants ${PB_DC_CONSTANTS_SOURCEFILES} )
 target_link_libraries( dripline_constants PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
 pbuilder_install_libraries( dripline_constants )
