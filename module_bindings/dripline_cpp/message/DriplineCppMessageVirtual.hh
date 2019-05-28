@@ -1,0 +1,121 @@
+#include "message.hh"
+
+#include "pybind11/pybind11.h"
+
+namespace dripline
+{
+    class py_message: public message {
+    public:
+        using message::message;  // Inheriting constructors
+
+        bool is_request() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,         /* Return type */
+                message,      /* Parent class */
+                is_request,   /* Name of function */
+                              /* Argument(s) */
+            );
+        }
+
+        bool is_reply() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                message,
+                is_reply,
+
+            );
+        }
+
+        bool is_alert() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                message,
+                is_alert,
+
+            );
+        }
+
+        bool derived_modify_amqp_message( amqp_message_ptr t_amqp_msg ) const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                message,
+                derived_modify_amqp_message,
+                t_amqp_msg
+            );
+        }
+
+        bool derived_modify_message_body( scarab::param_node& a_node ) const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                message,
+                derived_modify_message_body,
+                a_node
+            );
+        }
+
+        msg_t message_type() const override {
+            PYBIND11_OVERLOAD_PURE(
+                msg_t,
+                message,
+                message_type,
+
+            );
+        }
+
+    };
+/*
+    class py_msg_request: public msg_request {
+    public:
+        using msg_request::msg_request;
+
+        bool is_request() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,         
+                msg_request, 
+                is_request, 
+
+            );
+        }
+
+        bool is_reply() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_request,
+                is_reply,
+
+            );
+        }
+
+        bool is_alert() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_request,
+                is_alert,
+
+            );
+        }
+
+        msg_t message_type() const override {
+            PYBIND11_OVERLOAD_PURE(
+                msg_t,
+                msg_request,
+                message_type,
+
+            );
+        }
+
+    }
+
+    class py_msg_reply: public msg_reply {
+
+
+
+    }
+
+    class py_msg_alert: public msg_alert {
+
+
+
+    }
+*/
+}
