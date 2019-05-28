@@ -71,24 +71,58 @@ namespace dripline_cpp_pybind
         message.def("encoding_ostream", [](std::ostream& a_os, message::encoding a_enc) { a_os << a_enc })
                .def("message_ostream", [](std::ostream& a_os, const dripline::message& a_message) { a_os << a_message });
 */
-/*
+
         /************
          msg_request
-        ************
+        ************/
         pybind11::class_<dripline::msg_request, dripline::py_msg_request> msg_request (mod, "dripline_msg_request")
-            .def(pybind11::init< >( ))
+            //.def(pybind11::init< >( ))
 
             .def_static("create", &dripline::msg_request::create)
 
             .def("is_request", &dripline::msg_request::is_request)
             .def("is_reply", &dripline::msg_request::is_reply)
-            .def("is_alert", &dripline::msg_request::is_alert);
+            .def("is_alert", &dripline::msg_request::is_alert)
 
             .def("reply", &dripline::msg_request::reply)
 
             .def("message_type", &dripline::msg_request::message_type);
 
             //TODO: other 4 functions without return type
+
+        /************
+         msg_reply
+        ************
+        pybind11::class_<dripline::msg_reply, dripline::py_msg_reply> msg_reply (mod, "dripline_msg_reply")
+            .def(pybind11::init< >( ))
+
+            .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json)
+            .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const dripline::msg_request&)) &dripline::msg_r::create)
+            .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json)
+
+            .def("is_request", &dripline::msg_reply::is_request)
+            .def("is_reply", &dripline::msg_reply::is_reply)
+            .def("is_alert", &dripline::msg_reply::is_alert)
+
+            .def("message_type", &dripline::msg_reply::message_type);
+
+            //TODO: other 3 functions without return type
+
+        /************
+         msg_alert
+        ************
+        pybind11::class_<dripline::msg_alert, dripline::py_msg_alert> msg_alert (mod, "dripline_msg_alert")
+            .def(pybind11::init< >( ))
+
+            .def_static("create", &dripline::msg_alert::create)
+
+            .def("is_request", &dripline::msg_alert::is_request)
+            .def("is_reply", &dripline::msg_alert::is_reply)
+            .def("is_alert", &dripline::msg_alert::is_alert)
+
+            .def("message_type", &dripline::msg_alert::message_type);
+
+            //TODO: other 1 function without return type
 */
     }
     

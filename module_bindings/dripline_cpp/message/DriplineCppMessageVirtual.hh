@@ -63,7 +63,7 @@ namespace dripline
         }
 
     };
-/*
+
     class py_msg_request: public msg_request {
     public:
         using msg_request::msg_request;
@@ -104,18 +104,91 @@ namespace dripline
             );
         }
 
-    }
-
+    };
+/*
     class py_msg_reply: public msg_reply {
+    public:
+        using msg_reply::msg_reply;
 
+        bool is_request() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,         
+                msg_reply, 
+                is_request, 
 
+            );
+        }
 
-    }
+        bool is_reply() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_reply,
+                is_reply,
+
+            );
+        }
+
+        bool is_alert() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_reply,
+                is_alert,
+
+            );
+        }
+
+        msg_t message_type() const override {
+            PYBIND11_OVERLOAD_PURE(
+                msg_t,
+                msg_reply,
+                message_type,
+
+            );
+        }
+
+    };
 
     class py_msg_alert: public msg_alert {
+    public:
+        using msg_alert::msg_alert;
+
+        bool is_request() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,         
+                msg_alert, 
+                is_request, 
+
+            );
+        }
+
+        bool is_reply() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_alert,
+                is_reply,
+
+            );
+        }
+
+        bool is_alert() const override {
+            PYBIND11_OVERLOAD_PURE(
+                bool,
+                msg_alert,
+                is_alert,
+
+            );
+        }
+
+        msg_t message_type() const override {
+            PYBIND11_OVERLOAD_PURE(
+                msg_t,
+                msg_alert,
+                message_type,
+
+            );
+        }
 
 
-
-    }
+    };
 */
 }
