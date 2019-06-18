@@ -28,31 +28,27 @@ namespace dripline_cpp_pybind
                .def("create_amqp_message", &dripline::message::create_amqp_message, "From message object to AMQP")
                .def("encode_message_body", &dripline::message::encode_message_body, "From message object to string");
 
-        // not tested yet
-/*              
                 // mv_referrable
         message.def("get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key)
                .def("get_correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id)
-               .def("get_reply_to", (std::string& (dripline::message::*)() &dripline::message::reply_to)
-               .def("get_timestamp", (std::string& (dripline::message::*)() &dripline::message::timestamp)
+               .def("get_reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to)
+               .def("get_timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp)
 
                 // mv_accessible
-               .def("get_encoding", (void (dripline::message::*)(dripline::message::encoding) &dripline::message::get_encoding)
+               .def("get_encoding", (void (dripline::message::*)(dripline::message::encoding)) &dripline::message::get_encoding)
 
                 // mv_referrable_const
                .def("get_sender_package", &dripline::message::sender_package)
                .def("get_sender_exe", &dripline::message::sender_exe)
                .def("get_sender_version", &dripline::message::sender_version)
                .def("get_sender_commit", &dripline::message::sender_commit)
-               .def("get_sender_hostname", &dripline::message::get_sender_hostname)
-               .def("get_sender_username", &dripline::message::get_sender_username)
-               .def("get_sender_service_name", &dripline::message::get_sender_service_name)
+               .def("get_sender_hostname", &dripline::message::sender_hostname)
+               .def("get_sender_username", &dripline::message::sender_username)
+               .def("get_sender_service_name", &dripline::message::sender_service_name)
                .def("get_sender_info", &dripline::message::sender_info);
 
-        message.def("parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier);
+        message.def("parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier)
                .def("message_type", &dripline::message::message_type);
-*/
-
 
         message.def("set_sender_package", &dripline::message::set_sender_package)
                .def("set_sender_exe", &dripline::message::set_sender_version)
@@ -62,13 +58,12 @@ namespace dripline_cpp_pybind
                .def("set_sender_username", &dripline::message::set_sender_username)
                .def("set_sender_service_name", &dripline::message::set_sender_service_name)
                .def("set_sender_info", &dripline::message::set_sender_info);
-/*
-        message.def("payload", (const scarab::param& (dripline::message::*)())&dripline::message::payload)
-               .def("set_payload", &dripline::message::set_payload);
 
-        message.def("__repr__", [std::string]() { std::string t_msg;
-                                       return this->encode_message_body(t_msg); });
-*/
+        message.def("payload", (scarab::param& (dripline::message::*)())&dripline::message::payload);
+//               .def("set_payload", &dripline::message::set_payload);
+
+        message.def("__repr__", [](const dripline::message& a_message) { std::string t_msg;
+                                       return a_message.encode_message_body(t_msg); });
 
         /************
          msg_request
@@ -129,11 +124,11 @@ namespace dripline_cpp_pybind
         msg_alert.def(pybind11::init< >( ));
 /*
         msg_alert.def_static("create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json);
-
+*/
         msg_alert.def("is_request", &dripline::msg_alert::is_request)
                  .def("is_reply", &dripline::msg_alert::is_reply)
                  .def("is_alert", &dripline::msg_alert::is_alert);
-*/
+
         msg_alert.def("message_type", &dripline::msg_alert::message_type);
 
 //        msg_alert.def_static("get_message_type", &dripline::msg_alert::get_message_type);
