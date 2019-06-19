@@ -99,9 +99,10 @@ namespace dripline_cpp_pybind
                    .def("set_message_op", (void (dripline::msg_request::*)(op_t) &dripline::msg_request::set_message_op);
 */
 
-        /************
+/*
+        ++++++++++++
          msg_reply
-        ************
+        ++++++++++++
         pybind11::class_<dripline::msg_reply, dripline::py_msg_reply> msg_reply (mod, "dripline_msg_reply");
         msg_reply.def(pybind11::init< >( ));
 
@@ -121,10 +122,12 @@ namespace dripline_cpp_pybind
                  .def("get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg)
                   // mv_accessible
                  .def("set_return_code", (void (dripline::msg_request::*)(unsigned) &dripline::msg_reply::set_return_code);
+*/
 
-        /************
+/*
+        +++++++++++
          msg_alert
-        ************
+        +++++++++++
         pybind11::class_<dripline::msg_alert, dripline::py_msg_alert> msg_alert (mod, "dripline_msg_alert");
             
         msg_alert.def(pybind11::init< >( ));
