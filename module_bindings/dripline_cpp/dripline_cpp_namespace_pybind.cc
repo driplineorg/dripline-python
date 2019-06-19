@@ -1,6 +1,6 @@
 #include "DriplineCppConstants.hh"
 #include "DriplineCppError.hh"
-#include "DriplineCppMessage.hh"
+//#include "DriplineCppMessage.hh"
 
 PYBIND11_MODULE( dripline_cpp, dripline_cpp_mod )
 {
