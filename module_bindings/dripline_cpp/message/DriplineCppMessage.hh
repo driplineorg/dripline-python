@@ -97,11 +97,11 @@ namespace dripline_cpp_pybind
         ************/
         pybind11::class_<dripline::msg_reply, dripline::py_msg_reply> msg_reply (mod, "dripline_msg_reply", message);
         msg_reply.def(pybind11::init< >( ));
-/*
-        msg_reply.def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json)
-                 .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const dripline::msg_request&)) &dripline::msg_r::create)
-                 .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json);
-*/
+
+//        msg_reply.def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json)
+//                 .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create)
+//                 .def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json);
+
         msg_reply.def("is_request", &dripline::msg_reply::is_request)
                  .def("is_reply", &dripline::msg_reply::is_reply)
                  .def("is_alert", &dripline::msg_reply::is_alert);
@@ -121,9 +121,9 @@ namespace dripline_cpp_pybind
         pybind11::class_<dripline::msg_alert, dripline::py_msg_alert> msg_alert (mod, "dripline_msg_alert", message);
             
         msg_alert.def(pybind11::init< >( ));
-/*
-        msg_alert.def_static("create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::encoding::json);
-*/
+
+//        msg_alert.def_static("create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json);
+
         msg_alert.def("is_request", &dripline::msg_alert::is_request)
                  .def("is_reply", &dripline::msg_alert::is_reply)
                  .def("is_alert", &dripline::msg_alert::is_alert);
