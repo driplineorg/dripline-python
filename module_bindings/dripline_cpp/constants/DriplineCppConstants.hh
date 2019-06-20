@@ -20,8 +20,6 @@ namespace dripline_cpp_pybind
 
         mod.def("to_uint", (uint32_t (*)(dripline::op_t))&dripline::to_uint, "Convert an op_t to int");
         mod.def("to_op_t", (dripline::op_t (*)(uint32_t))&dripline::to_op_t, "Convert an uint to op_t");
-        // originally operator << - need a better one
-        mod.def("op_t_ostream", [](std::ostream& a_os, dripline::op_t an_op) { a_os << an_op; });
         mod.def("to_string", &dripline::to_string, "Convert an op_t to string");
         mod.def("to_op_t", (dripline::op_t (*)(std::string))&dripline::to_op_t, "Convert an string to op_t");
 
@@ -34,8 +32,8 @@ namespace dripline_cpp_pybind
 
         mod.def("to_uint", (uint32_t (*)(dripline::msg_t))&dripline::to_uint, "Convert a msg_t to int");
         mod.def("to_msg_t", &dripline::to_msg_t, "Convert an uint to msg_t");
-        // originally operator << - need a better one
-        mod.def("msg_t_ostream", [](std::ostream& a_os, dripline::msg_t a_msg) { a_os << a_msg; });
+
+        // operator << ?
 
     }
     

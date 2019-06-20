@@ -64,6 +64,7 @@ namespace dripline_cpp_pybind
 
         message.def("__repr__", [](const dripline::message& a_message) { std::string t_msg;
                                        return a_message.encode_message_body(t_msg); });
+        // operator << ?
 
         /************
          msg_request
@@ -81,17 +82,15 @@ namespace dripline_cpp_pybind
 
 
         msg_request.def("message_type", &dripline::msg_request::message_type);
-/*
+
                     // mv_accessible_static_noset
         msg_request.def_static("get_message_type", &dripline::msg_request::get_message_type)
                     // mv_referrable
-                    // TODO: have not found where the definition of uuid is
-                   .def("get_lockout_key", (uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key)
+                   .def("get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key)
                     // mv_accessible
-                   .def("get_lockout_key_valid", (void (dripline::msg_request::*)(bool) &dripline::msg_request::get_lockout_key_valid)
-                    // TODO: have not found where the definition of op_t is
-                   .def("get_message_op", (void (dripline::msg_request::*)(op_t) &dripline::msg_request::get_message_op);
-*/
+                   .def("get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid);
+//                   .def("get_message_op", (void (dripline::msg_request::*)(op_t)) &dripline::msg_request::get_message_op);
+
 
         /************
          msg_reply
@@ -108,14 +107,14 @@ namespace dripline_cpp_pybind
                  .def("is_alert", &dripline::msg_reply::is_alert);
 
         msg_reply.def("message_type", &dripline::msg_reply::message_type);
-/*
+
                   // mv_accessible_static_noset
         msg_reply.def_static("get_message_type", &dripline::msg_reply::get_message_type)
                   // mv_referrable
                  .def("get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg)
                   // mv_accessible
-                 .def("get_return_code", (void (dripline::msg_request::*)(unsigned) &dripline::msg_reply::get_return_code);
-*/
+                 .def("get_return_code", (void (dripline::msg_reply::*)(unsigned)) &dripline::msg_reply::get_return_code);
+
         /************
          msg_alert
         ************/
@@ -130,8 +129,8 @@ namespace dripline_cpp_pybind
                  .def("is_alert", &dripline::msg_alert::is_alert);
 
         msg_alert.def("message_type", &dripline::msg_alert::message_type);
-
-//        msg_alert.def_static("get_message_type", &dripline::msg_alert::get_message_type);
+                  // mv_accessible_static_noset
+        msg_alert.def_static("get_message_type", &dripline::msg_alert::get_message_type);
 
     }
     
