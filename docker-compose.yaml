@@ -3,5 +3,9 @@ version: '2'
 services:
   pybind:
     build: .
-    #volumes:
-    #  - .:/usr/local/src
+    volumes:
+      #- .:/usr/local/src
+      #- ./module_bindings:/usr/local/src/module_bindings
+      #- ./CMakeLists.txt:/usr/local/src/CMakeLists.txt
+      #- ./setup.py:/usr/local/src/setup.py
+      - .:/usr/local/src

@@ -1,61 +1,29 @@
 
-# provided example
-set( PB_EXAMPLE_HEADERFILES
-)
-set( PB_EXAMPLE_SOURCEFILES
-    example.cc
-)
-set( LIB_DEPENDENCIES Dripline_dripline_python )
-pybind11_add_module( bind_example ${PB_EXAMPLE_SOURCEFILES} )
-target_link_libraries( bind_example PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( bind_example )
+set( LIB_DEPENDENCIES Dripline_DriplinePy )
 
-# param things
+# pybind11 bindings of scarab::param
 set( PB_PARAM_HEADERFILES
-    scarab_param/KTParamPybind.hh
+    scarab_param/param_pybind.hh
+    scarab_param/param_value.hh
+    scarab_param/param_array.hh
+    scarab_param/param_node.hh
 )
 set( PB_PARAM_SOURCEFILES
     scarab_param/scarab_param_namespace_pybind.cc
 )
-pybind11_add_module( scarab_param ${PB_PARAM_SOURCEFILES} )
-target_link_libraries( scarab_param PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( scarab_param )
+pybind11_add_module( scarab ${PB_PARAM_SOURCEFILES} )
+target_link_libraries( scarab PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+pbuilder_install_libraries( scarab )
 
-
-# dripline_cpp_error
-set( PB_DC_ERROR_HEADERFILES
-    dripline_cpp/error/DriplineCppError.hh
+# pybind11 bindings of dripline-cpp into dripline.core
+set( PB_DRIPLINE_CORE_HEADERFILES
+    dripline_core/DriplineCppError.hh
+    dripline_core/DriplineCppConstants.hh
+    #dripline_core/DriplineCppMessage.hh
 )
-set( PB_DC_ERROR_SOURCEFILES
-    dripline_cpp/error/dripline_cpp_error_namespace_pybind.cc
+set( PB_DRIPLINE_CORE_SOURCEFILES
+    dripline_core/dripline_core_namespace_pybind.cc
 )
-pybind11_add_module( dripline_error ${PB_DC_ERROR_SOURCEFILES} )
-target_link_libraries( dripline_error PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( dripline_error )
-
-
-# dripline_cpp_constants
-set( PB_DC_CONSTANTS_HEADERFILES
-    dripline_cpp/constants/DriplineCppConstants.hh
-)
-set( PB_DC_CONSTANTS_SOURCEFILES
-    dripline_cpp/constants/dripline_cpp_constants_namespace_pybind.cc
-)
-
-pybind11_add_module( dripline_constants ${PB_DC_CONSTANTS_SOURCEFILES} )
-target_link_libraries( dripline_constants PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( dripline_constants )
-
-
-
-# dripline_cpp_message
-set( PB_DC_MESSAGE_HEADERFILES
-    dripline_cpp/message/DriplineCppMessage.hh
-)
-set( PB_DC_MESSAGE_SOURCEFILES
-    dripline_cpp/message/dripline_cpp_message_namespace_pybind.cc
-)
-
-pybind11_add_module( dripline_message ${PB_DC_MESSAGE_SOURCEFILES} )
-target_link_libraries( dripline_message PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( dripline_message )
+pybind11_add_module( dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
+target_link_libraries( dripline PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+pbuilder_install_libraries( dripline)
