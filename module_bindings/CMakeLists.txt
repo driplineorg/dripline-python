@@ -1,5 +1,5 @@
 
-set( LIB_DEPENDENCIES Dripline_dripline_python )
+set( LIB_DEPENDENCIES Dripline_DriplinePy )
 
 # provided example
 set( PB_EXAMPLE_HEADERFILES
