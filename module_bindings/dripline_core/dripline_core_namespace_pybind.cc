@@ -1,0 +1,14 @@
+#include "DriplineCppConstants.hh"
+#include "DriplineCppError.hh"
+//#include "DriplineCppMessage.hh"
+
+PYBIND11_MODULE( dripline, dripline_mod )
+{
+    // The bound classes belong in a submodule, create that
+    pybind11::module dripline_core_mod = dripline_mod.def_submodule("core", "Core dripline standard implementation classes");
+    // Call exporters for the dripline.core namespace
+    dripline_cpp_pybind::ExportDriplineCppConstantsPybind( dripline_core_mod );
+    dripline_cpp_pybind::ExportDriplineCppErrorPybind( dripline_core_mod );
+    //dripline_cpp_pybind::ExportDriplineCppMessagePybind( dripline_cpp_mod );
+}
+

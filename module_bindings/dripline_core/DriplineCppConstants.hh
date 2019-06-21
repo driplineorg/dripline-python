@@ -7,7 +7,7 @@ namespace dripline_cpp_pybind
 
     void ExportDriplineCppConstantsPybind( pybind11::module& mod )
     {
-       
+
         pybind11::enum_<dripline::op_t>(mod, "op_t", pybind11::arithmetic())
             .value("set", dripline::op_t::set)
             .value("get", dripline::op_t::get)
