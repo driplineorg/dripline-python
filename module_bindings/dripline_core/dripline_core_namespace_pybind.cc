@@ -5,7 +5,7 @@
 PYBIND11_MODULE( dripline, dripline_mod )
 {
     // The bound classes belong in a submodule, create that
-    pybind11::module dripline_core_mod = dripline_mod.def_submodule("core", "Core dripline standard implementation classes");
+    pybind11::module dripline_core_mod = dripline_mod.def_submodule( "core", "Core dripline standard implementation classes" );
     // Call exporters for the dripline.core namespace
     dripline_pybind::export_constants( dripline_core_mod );
     dripline_pybind::export_error( dripline_core_mod );

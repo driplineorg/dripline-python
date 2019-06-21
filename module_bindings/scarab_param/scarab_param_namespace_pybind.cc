@@ -5,9 +5,16 @@
  *     Author: B.H. LaRoque
  */
 
-#include "KTParamPybind.hh"
+#include "param_pybind.hh"
+#include "param_value_pybind.hh"
+#include "param_array_pybind.hh"
+#include "param_node_pybind.hh"
 
-PYBIND11_MODULE( scarab_param, param_mod )
+PYBIND11_MODULE( scarab, scarab_mod )
 {
-    scarab_pybind::ExportParamPybind( param_mod );
+    pybind11::module param_mod = scarab_mod.def_submodule( "param", "param data types" );
+    scarab_pybind::export_param( param_mod );
+    scarab_pybind::export_param_value( param_mod );
+    scarab_pybind::export_param_array( param_mod );
+    scarab_pybind::export_param_node( param_mod );
 }
