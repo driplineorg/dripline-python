@@ -31,8 +31,8 @@ namespace dripline_pybind
             .value("alert", dripline::msg_t::alert)
             .value("unknown", dripline::msg_t::unknown)
             // helpers for type conversion
-            .def("to_uint", (uint32_t (*)(dripline::msg_t))&dripline::to_uint, "Convert a msg_t to int");
-            .def_static("to_msg_t", &dripline::to_msg_t, "Convert an uint to msg_t");
+            .def("to_uint", (uint32_t (*)(dripline::msg_t))&dripline::to_uint, "Convert a msg_t to int")
+            .def_static("to_msg_t", &dripline::to_msg_t, "Convert an uint to msg_t")
             ;
 
     }
