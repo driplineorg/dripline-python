@@ -105,7 +105,7 @@ namespace dripline
         }
 
     };
-/*
+
     class py_msg_reply: public msg_reply {
     public:
         using msg_reply::msg_reply;
@@ -190,5 +190,5 @@ namespace dripline
 
 
     };
-*/
+
 }

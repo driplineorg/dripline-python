@@ -2,10 +2,10 @@
 
 #include "pybind11/pybind11.h"
 
-namespace dripline_cpp_pybind
+namespace dripline_pybind
 {
 
-    void ExportDriplineCppErrorPybind( pybind11::module& mod )
+    void export_error( pybind11::module& mod )
     {
 
         static pybind11::exception<dripline::dripline_error> ex(mod, "dripline_error");
@@ -19,5 +19,5 @@ namespace dripline_cpp_pybind
         });
 
     }
-    
+
 } /* namespace dripline_cpp_pybind */
