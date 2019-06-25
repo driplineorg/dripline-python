@@ -1,5 +1,5 @@
 
-set( LIB_DEPENDENCIES Dripline_DriplinePy )
+set( LIB_DEPENDENCIES Dripline_DriplinePy DriplineExamples_DriplinePy )
 
 # pybind11 bindings of scarab::param
 set( PB_PARAM_HEADERFILES
