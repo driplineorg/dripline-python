@@ -1,6 +1,6 @@
 #include "message.hh"
 
-#include "message_virtual_pybind.hh"
+#include "message_trampoline.hh"
 
 #include "pybind11/pybind11.h"
 
