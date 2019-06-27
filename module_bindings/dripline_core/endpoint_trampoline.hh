@@ -9,10 +9,11 @@ namespace dripline_pybind
 
     class endpoint_trampoline : public dripline::endpoint
     {
+
     public:
 	using dripline::endpoint::endpoint;
-	
-	// Override for virtual do_get_request
+
+    	// Override for virtual do_get_request
 	dripline::reply_ptr_t do_get_request( const dripline::request_ptr_t a_request ) override
 	{
 	    PYBIND11_OVERLOAD( dripline::reply_ptr_t, dripline::endpoint, do_get_request, a_request );
@@ -29,7 +30,7 @@ namespace dripline_pybind
 	{
 	    PYBIND11_OVERLOAD( dripline::reply_ptr_t, dripline::endpoint, do_cmd_request, a_request );
 	}
-    } // end class endpoint_trampoline
+    }; // end class endpoint_trampoline
 } //end namespace dripline_pybind
 
 #endif /* DRIPLINE_PYBIND_ENDPOINT_TRAMPOLINE */

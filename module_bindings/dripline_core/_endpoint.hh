@@ -3,17 +3,26 @@
 
 #include "endpoint.hh"
 #include "pybind11/pybind11.h"
+#include "endpoint_trampoline.hh"
 
 namespace dripline_pybind
 {
+    class _endpoint : public dripline::endpoint
+    {
+    public:
+	using dripline::endpoint::do_get_request;
+	using dripline::endpoint::do_set_request;
+	using dripline::endpoint::do_cmd_request;
+    };
+    
     void export_endpoint( pybind11::module& mod )
     {
 	pybind11::class_< dripline::endpoint, endpoint_trampoline >( mod, "_Endpoint", "Endpoint binding" )
 	    .def( pybind11::init< const std::string& >() )
 	    .def( "submit_request_message", &dripline::endpoint::submit_request_message )
-	    .def( "do_get_request", &dripline::endpoint::do_get_request )
-	    .def( "do_set_request", &dripline::endpoint::do_set_request )
-	    .def( "do_cmd_request", &dripline::endpoint::do_cmd_request );
+	    .def( "do_get_request", &_endpoint::do_get_request )
+	    .def( "do_set_request", &_endpoint::do_set_request )
+	    .def( "do_cmd_request", &_endpoint::do_cmd_request );
 	
     } //end export_endpoint
 } //end dripline_pybind namespace
