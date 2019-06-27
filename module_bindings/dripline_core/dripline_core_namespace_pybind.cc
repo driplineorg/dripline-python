@@ -1,5 +1,6 @@
 #include "constants_pybind.hh"
 #include "error_pybind.hh"
+#include "run_simple_service_pybind.hh"
 //#include "DriplineCppMessage.hh"
 
 PYBIND11_MODULE( dripline, dripline_mod )
@@ -9,6 +10,7 @@ PYBIND11_MODULE( dripline, dripline_mod )
     // Call exporters for the dripline.core namespace
     dripline_pybind::export_constants( dripline_core_mod );
     dripline_pybind::export_error( dripline_core_mod );
+    dripline_pybind::export_run_simple_service( dripline_core_mod );
     //dripline_cpp_pybind::ExportDriplineCppMessagePybind( dripline_cpp_mod );
 }
 
