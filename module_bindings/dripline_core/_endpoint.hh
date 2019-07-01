@@ -17,7 +17,7 @@ namespace dripline_pybind
     
     void export_endpoint( pybind11::module& mod )
     {
-	pybind11::class_< dripline::endpoint, endpoint_trampoline >( mod, "_Endpoint", "Endpoint binding" )
+	pybind11::class_< dripline::endpoint, endpoint_trampoline, std::shared_ptr< dripline::endpoint > >( mod, "_Endpoint", "Endpoint binding" )
 	    .def( pybind11::init< const std::string& >() )
 	    .def( "submit_request_message", &dripline::endpoint::submit_request_message )
 	    .def( "do_get_request", &_endpoint::do_get_request )
