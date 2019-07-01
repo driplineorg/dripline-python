@@ -133,7 +133,7 @@ namespace dripline_pybind
                   // mv_referrable
                  .def("get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg)
                   // mv_accessible
-                 .def("get_return_code", (void (dripline::msg_reply::*)(unsigned)) &dripline::msg_reply::get_return_code);
+	    .def("get_return_code", (unsigned (dripline::msg_reply::*)()) &dripline::msg_reply::get_return_code);
 
         /***********
          msg_alert
