@@ -6,7 +6,7 @@ namespace dripline
 {
     class py_message: public message {
     public:
-        using message::message;  // Inheriting constructors
+        using message::message; // Inheriting constructors
 
         bool is_request() const override {
             PYBIND11_OVERLOAD_PURE(
@@ -35,24 +35,24 @@ namespace dripline
             );
         }
 
-        bool derived_modify_amqp_message( amqp_message_ptr t_amqp_msg ) const override {
+        void derived_modify_amqp_message( amqp_message_ptr t_amqp_msg, AmqpClient::Table& a_properties ) const override {
             PYBIND11_OVERLOAD_PURE(
-                bool,
+                void,
                 message,
                 derived_modify_amqp_message,
-                t_amqp_msg
+		t_amqp_msg, a_properties
             );
         }
-
-        bool derived_modify_message_body( scarab::param_node& a_node ) const override {
+	
+        void derived_modify_message_param( scarab::param_node& a_node ) const override {
             PYBIND11_OVERLOAD_PURE(
-                bool,
+                void,
                 message,
                 derived_modify_message_body,
                 a_node
             );
         }
-
+	
         msg_t message_type() const override {
             PYBIND11_OVERLOAD_PURE(
                 msg_t,
