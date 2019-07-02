@@ -70,6 +70,8 @@ setup(
     author_email='driplineorg@email.tld',
     description='a description would be good',
     long_description='',
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
     ext_modules=[CMakeExtension('dripline_python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
