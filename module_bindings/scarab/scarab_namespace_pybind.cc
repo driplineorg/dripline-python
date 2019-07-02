@@ -1,5 +1,5 @@
 /*
- * scarab_param_namespace_pybind.cc
+ * scarab_namespace_pybind.cc
  *
  * Created on: April 18, 2019
  *     Author: B.H. LaRoque
