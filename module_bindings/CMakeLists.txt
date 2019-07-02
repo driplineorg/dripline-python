@@ -4,9 +4,10 @@ set( LIB_DEPENDENCIES Dripline_DriplinePy DriplineExamples_DriplinePy )
 # pybind11 bindings of scarab::param
 set( PB_PARAM_HEADERFILES
     scarab_param/param_pybind.hh
-    scarab_param/param_value.hh
-    scarab_param/param_array.hh
-    scarab_param/param_node.hh
+    scarab_param/param_value_pybind.hh
+    scarab_param/param_array_pybind.hh
+    scarab_param/param_node_pybind.hh
+    scarab_param/signal_handler_pybind.hh
 )
 set( PB_PARAM_SOURCEFILES
     scarab_param/scarab_param_namespace_pybind.cc
