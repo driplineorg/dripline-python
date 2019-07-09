@@ -136,15 +136,15 @@ class DriplineDatabaseError(DriplineError):
 __all__.append("DriplineDatabaseError")
 
 class DriplineGenericDAQError(DriplineError):
-    retcode = 500
+    retcode = 1100
 __all__.append("DriplineGenericDAQError")
 
 class DriplineDAQNotEnabled(DriplineError):
-    retcode = 501
+    retcode = 1101
 __all__.append("DriplineDAQNotEnabled")
 
 class DriplineDAQRunning(DriplineError):
-    retcode = 502
+    retcode = 1102
 __all__.append("DriplineDAQRunning")
 
 class DriplineUnhandledError(DriplineError):
