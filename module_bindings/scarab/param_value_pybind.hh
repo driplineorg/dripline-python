@@ -63,4 +63,4 @@ namespace scarab_pybind
             ;
     }
 
-} /* namespace Nymph */
+} /* namespace scarab_pybind */

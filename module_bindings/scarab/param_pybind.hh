@@ -1,5 +1,5 @@
 /*
- * KTPyNymph.cc
+ * param_pybind.hh
  *
  *  Created on: Feb 1, 2018
  *      Author: N. Oblath, L. Gladstone, B.H. LaRoque
@@ -18,4 +18,4 @@ namespace scarab_pybind
         pybind11::class_< scarab::param >( mod, "Param" );
     }
 
-} /* namespace Nymph */
+} /* namespace scarab_pybind */
