@@ -23,7 +23,6 @@ namespace dripline_pybind
 
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
                 .value( "json", dripline::message::encoding::json )
-                .export_values() //TODO do we actually want to export these values? I suspect no.
                 ;
 
         message.def( pybind11::init< >() )
@@ -90,61 +89,59 @@ namespace dripline_pybind
                 ;
 
         /************
-        msg_request
-        ************/
+         msg_request
+         ************/
         pybind11::class_< dripline::msg_request, dripline::py_msg_request, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
+        msg_request.def( pybind11::init< >() )
+                //.def_static( "create", &dripline::msg_request::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_reply_to") = "", pybind11::arg("a_encoding") = dripline::encoding::json );
+                .def( "is_request", &dripline::msg_request::is_request )
+                .def( "is_reply", &dripline::msg_request::is_reply )
+                .def( "is_alert", &dripline::msg_request::is_alert )
+                //.def( "reply", &dripline::msg_request::reply, pybind11::arg("a_payload") = scarab::param_ptr_t(new scarab::param()) )
+                .def( "message_type", &dripline::msg_request::message_type )
 
-        msg_request.def( pybind11::init< >() );
-        //msg_request.def_static( "create", &dripline::msg_request::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_reply_to") = "", pybind11::arg("a_encoding") = dripline::encoding::json );
-
-        msg_request.def( "is_request", &dripline::msg_request::is_request).def("is_reply", &dripline::msg_request::is_reply).def("is_alert", &dripline::msg_request::is_alert );
-
-        //msg_request.def( "reply", &dripline::msg_request::reply, pybind11::arg("a_payload") = scarab::param_ptr_t(new scarab::param()) );
-
-        msg_request.def( "message_type", &dripline::msg_request::message_type );
-
-        // mv_accessible_static_noset
-        msg_request.def_static( "get_message_type", &dripline::msg_request::get_message_type )
+                // mv_accessible_static_noset
+                .def_static( "get_message_type", &dripline::msg_request::get_message_type )
                 // mv_referrable
-                .def("get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key)
+                .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
                 // mv_accessible
-                .def("get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid);
-                //.def("get_message_op", (void (dripline::msg_request::*)(op_t)) &dripline::msg_request::get_message_op);
+                .def( "get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
+                //.def( "get_message_op", (void (dripline::msg_request::*)(op_t)) &dripline::msg_request::get_message_op )
+                ;
 
         /************
          msg_reply
          ************/
-        pybind11::class_< dripline::msg_reply, dripline::py_msg_reply, std::shared_ptr< dripline::msg_reply > > msg_reply(mod, "MsgReply", message);
-        msg_reply.def(pybind11::init< >());
-
-        //msg_reply.def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json)
-        //.def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create)
-        //.def_static("create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json);
-
-        msg_reply.def("is_request", &dripline::msg_reply::is_request).def("is_reply", &dripline::msg_reply::is_reply).def("is_alert", &dripline::msg_reply::is_alert);
-
-        msg_reply.def("message_type", &dripline::msg_reply::message_type);
-
-        // mv_accessible_static_noset
-        msg_reply.def_static("get_message_type", &dripline::msg_reply::get_message_type)
+        pybind11::class_< dripline::msg_reply, dripline::py_msg_reply, std::shared_ptr< dripline::msg_reply > > msg_reply( mod, "MsgReply", message );
+        msg_reply.def( pybind11::init< >() )
+                //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
+                //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create )
+                //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
+                .def( "is_request", &dripline::msg_reply::is_request)
+                .def("is_reply", &dripline::msg_reply::is_reply)
+                .def("is_alert", &dripline::msg_reply::is_alert )
+                .def( "message_type", &dripline::msg_reply::message_type )
+                // mv_accessible_static_noset
+                .def_static( "get_message_type", &dripline::msg_reply::get_message_type )
                 // mv_referrable
-                .def("get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg)
+                .def( "get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg )
                 // mv_accessible
-                .def("get_return_code", (unsigned (dripline::msg_reply::*)()) &dripline::msg_reply::get_return_code);
+                .def( "get_return_code", (unsigned (dripline::msg_reply::*)()) &dripline::msg_reply::get_return_code )
+                ;
 
         /***********
          msg_alert
          ************/
-        pybind11::class_< dripline::msg_alert, dripline::py_msg_alert, std::shared_ptr< dripline::msg_alert > > msg_alert(mod, "MsgAlert", message);
-        msg_alert.def(pybind11::init< >());
-
-        //msg_alert.def_static("create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json);
-
-        msg_alert.def("is_request", &dripline::msg_alert::is_request).def("is_reply", &dripline::msg_alert::is_reply).def("is_alert", &dripline::msg_alert::is_alert);
-
-        msg_alert.def("message_type", &dripline::msg_alert::message_type);
-        // mv_accessible_static_noset
-        msg_alert.def_static("get_message_type", &dripline::msg_alert::get_message_type);
+        pybind11::class_< dripline::msg_alert, dripline::py_msg_alert, std::shared_ptr< dripline::msg_alert > > msg_alert( mod, "MsgAlert", message );
+        msg_alert.def( pybind11::init< >() )
+                //.def_static( "create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
+                .def( "is_request", &dripline::msg_alert::is_request )
+                .def( "is_reply", &dripline::msg_alert::is_reply )
+                .def( "is_alert", &dripline::msg_alert::is_alert )
+                .def( "message_type", &dripline::msg_alert::message_type )
+                // mv_accessible_static_noset
+                .def_static( "get_message_type", &dripline::msg_alert::get_message_type )
+                ;
 
     }
 
