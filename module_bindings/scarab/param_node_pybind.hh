@@ -35,5 +35,4 @@ namespace scarab_pybind
                     "Get parameter node value as a string" )
         ;
     }
-}
-/* namespace Nymph */
+} /* namespace scarab_pybind */
