@@ -1,3 +1,6 @@
+#ifndef DRIPLINE_PYBIND_SIMPLE_SERVICE
+#define DRIPLINE_PYBIND_SIMPLE_SERVICE
+
 #include "simple_service.hh"
 #include "pybind11/pybind11.h"
 
@@ -9,5 +12,7 @@ namespace dripline_pybind
                 .def( pybind11::init< const scarab::param_node& >() )
                 .def( "execute", &dripline::simple_service::execute );
 
-    } //end export_simple_service
-} //end dripline_pybind namespace
+    }
+} /* namespace dripline_pybind */
+
+#endif /* DRIPLINE_PYBIND_SIMPLE_SERVICE */

@@ -30,8 +30,8 @@ namespace dripline_pybind
             {
                 PYBIND11_OVERLOAD( dripline::reply_ptr_t, dripline::endpoint, do_cmd_request, a_request );
             }
-        }; // end class endpoint_trampoline
-    }
-    //end namespace dripline_pybind
+    };
+    
+} /* namespace dripline_pybind */
 
 #endif /* DRIPLINE_PYBIND_ENDPOINT_TRAMPOLINE */

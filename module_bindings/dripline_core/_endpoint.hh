@@ -24,7 +24,7 @@ namespace dripline_pybind
                 .def( "do_set_request", &_endpoint::do_set_request )
                 .def( "do_cmd_request", &_endpoint::do_cmd_request );
 
-    } //end export_endpoint
-} //end dripline_pybind namespace
+    }
+} /* namespace dripline_pybind */
 
 #endif /* DRIPLINE_PYBIND_ENDPOINT */

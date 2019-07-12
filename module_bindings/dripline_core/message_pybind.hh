@@ -1,7 +1,8 @@
+#ifndef DRIPLINE_PYBIND_MESSAGE
+#define DRIPLINE_PYBIND_MESSAGE
+
 #include "message.hh"
-
 #include "message_trampoline.hh"
-
 #include "pybind11/pybind11.h"
 
 namespace dripline_pybind
@@ -24,12 +25,12 @@ namespace dripline_pybind
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
                 .value( "json", dripline::message::encoding::json )
                 ;
-
+        
         message.def( pybind11::init< >() )
                 // methods to check message type
-                .def( "is_request", &dripline::message::is_request )
-                .def( "is_reply", &dripline::message::is_reply )
-                .def( "is_alert", &dripline::message::is_alert )
+                .def( "is_request", &dripline::message::is_request, "Returns true if the message is a request, false otherwise" )
+                .def( "is_reply", &dripline::message::is_reply, "Returns true if the message is a reply, false otherwise" )
+                .def( "is_alert", &dripline::message::is_alert, "Returns true if the message is an alert, false otherwise" )
                 // methods to convert between dripline message, amqp types, etc.
                 /*.def_static( "process_envelope", &dripline::message::process_envelope,
                         "From AMQP to message object" ) */
@@ -42,7 +43,8 @@ namespace dripline_pybind
                 .def( "derived_modify_message_param", &message_pybind::derived_modify_message_param,
                         "derived_modify_amqp_message function" )
                 // mv_referrable
-                .def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key )
+                .def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+                        "Returns the routing key of a message (the routing key determines where the message goes)" )
                 .def( "get_correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id )
                 .def( "get_reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to )
                 .def( "get_timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp )
@@ -94,9 +96,9 @@ namespace dripline_pybind
         pybind11::class_< dripline::msg_request, dripline::py_msg_request, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
         msg_request.def( pybind11::init< >() )
                 //.def_static( "create", &dripline::msg_request::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_reply_to") = "", pybind11::arg("a_encoding") = dripline::encoding::json );
-                .def( "is_request", &dripline::msg_request::is_request )
-                .def( "is_reply", &dripline::msg_request::is_reply )
-                .def( "is_alert", &dripline::msg_request::is_alert )
+                .def( "is_request", &dripline::msg_request::is_request, "Returns true if the message is a request, false otherwise" )
+                .def( "is_reply", &dripline::msg_request::is_reply, "Returns true if the message is a reply, false otherwise" )
+                .def( "is_alert", &dripline::msg_request::is_alert, "Returns true if the message is an alert, false otherwise" )
                 //.def( "reply", &dripline::msg_request::reply, pybind11::arg("a_payload") = scarab::param_ptr_t(new scarab::param()) )
                 .def( "message_type", &dripline::msg_request::message_type )
 
@@ -117,9 +119,9 @@ namespace dripline_pybind
                 //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
                 //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create )
                 //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
-                .def( "is_request", &dripline::msg_reply::is_request)
-                .def("is_reply", &dripline::msg_reply::is_reply)
-                .def("is_alert", &dripline::msg_reply::is_alert )
+                .def( "is_request", &dripline::msg_reply::is_request, "Returns true if the message is a request, false otherwise" )
+                .def( "is_reply", &dripline::msg_reply::is_reply, "Returns true if the message is a reply, false otherwise" )
+                .def( "is_alert", &dripline::msg_reply::is_alert, "Returns true if the message is an alert, false otherwise" )
                 .def( "message_type", &dripline::msg_reply::message_type )
                 // mv_accessible_static_noset
                 .def_static( "get_message_type", &dripline::msg_reply::get_message_type )
@@ -135,14 +137,16 @@ namespace dripline_pybind
         pybind11::class_< dripline::msg_alert, dripline::py_msg_alert, std::shared_ptr< dripline::msg_alert > > msg_alert( mod, "MsgAlert", message );
         msg_alert.def( pybind11::init< >() )
                 //.def_static( "create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
-                .def( "is_request", &dripline::msg_alert::is_request )
-                .def( "is_reply", &dripline::msg_alert::is_reply )
-                .def( "is_alert", &dripline::msg_alert::is_alert )
+                .def( "is_request", &dripline::msg_alert::is_request, "Returns true if the message is a request, false otherwise" )
+                .def( "is_reply", &dripline::msg_alert::is_reply, "Returns true if the message is a reply, false otherwise" )
+                .def( "is_alert", &dripline::msg_alert::is_alert, "Returns true if the message is an alert, false otherwise" )
                 .def( "message_type", &dripline::msg_alert::message_type )
                 // mv_accessible_static_noset
                 .def_static( "get_message_type", &dripline::msg_alert::get_message_type )
                 ;
 
-    }
+    } /* export_message */
 
 } /* namespace dripline_pybind */
+
+#endif /* DRIPLINE_PYBIND_MESSAGE */

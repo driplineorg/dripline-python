@@ -1,5 +1,7 @@
-#include "message.hh"
+#ifndef DRIPLINE_PYBIND_MESSAGE_TRAMPOLINE
+#define DRIPLINE_PYBIND_MESSAGE_TRAMPOLINE
 
+#include "message.hh"
 #include "pybind11/pybind11.h"
 
 namespace dripline
@@ -130,4 +132,6 @@ namespace dripline
 
     };
 
-}
+} /* namespace dripline */
+
+#endif /* DRIPLINE_PYBIND_MESSAGE_TRAMPOLINE */

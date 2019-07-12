@@ -1,3 +1,6 @@
+#ifndef DRIPLINE_PYBIND_SPECIFIER
+#define DRIPLINE_PYBIND_SPECIFIER
+
 #include "specifier.hh"
 #include "pybind11/pybind11.h"
 
@@ -11,6 +14,7 @@ namespace dripline_pybind
             .def( "parse", &dripline::specifier::parse )
             .def( "reparse", &dripline::specifier::reparse )
             .def( "to_string", &dripline::specifier::to_string );
+    }
+} /* namespace dripline_pybind */
 
-    } //end export_specifier
-} //end dripline_pybind namespace
+#endif /* DRIPLINE_PYBIND_SPECIFIER */

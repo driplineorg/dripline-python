@@ -1,3 +1,6 @@
+#ifndef DRIPLINE_PYBIND_SERVICE
+#define DRIPLINE_PYBIND_SERVICE
+
 #include "service.hh"
 #include "pybind11/pybind11.h"
 #include "pybind11/iostream.h"
@@ -14,5 +17,7 @@ namespace dripline_pybind
                 .def( "add_child", &dripline::service::add_child )
                 .def( "add_async_child", &dripline::service::add_async_child )
                 .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));});
-    } //end export_service
-} //end dripline_pybind namespace
+    }
+} /* namespace dripline_pybind */
+
+#endif /* DRIPLINE_PYBIND_SERVICE */
