@@ -7,5 +7,7 @@
 dripline.egg-info/*
 build/*
 doc/_build/*
+.eggs/*
 *.egg
+*.so*
 dripline.sublime-workspace

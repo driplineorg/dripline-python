@@ -14,10 +14,10 @@ namespace scarab_pybind
     {
         // param_node
         pybind11::class_< scarab::param_node, scarab::param >( mod, "ParamNode" )
-            .def( pybind11::init<>() )
+            .def( pybind11::init< >() )
 
-            .def( "add",(bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
-                    "Add a param object to a node" )
+            .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
+                    "Add a param object to a node")
 
             .def( "at", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
                     "Get the param object for a given key" )
@@ -33,6 +33,6 @@ namespace scarab_pybind
                     "Get parameter node value as a float" )
             .def( "get_value", (std::string (scarab::param_node::*)(const std::string&, const std::string& ) const) &scarab::param_node::get_value,
                     "Get parameter node value as a string" )
-            ;
+        ;
     }
-} /* namespace Nymph */
+} /* namespace scarab_pybind */

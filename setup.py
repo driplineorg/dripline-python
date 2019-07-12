@@ -37,6 +37,7 @@ class CMakeBuild(build_ext):
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
                       '-DDripline_BUILD_EXAMPLES:bool=1',
+                      '-DScarab_PYBIND:bool=1',
                      ]
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -49,7 +50,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j2', 'VERBOSE=1']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
@@ -70,6 +71,8 @@ setup(
     author_email='driplineorg@email.tld',
     description='a description would be good',
     long_description='',
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
     ext_modules=[CMakeExtension('dripline_python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

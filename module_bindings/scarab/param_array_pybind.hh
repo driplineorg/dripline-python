@@ -16,19 +16,14 @@ namespace scarab_pybind
     {
         // param_array
         pybind11::class_< scarab::param_array, scarab::param >( mod, "ParamArray" )
-            .def( pybind11::init<>() )
+            .def( pybind11::init< >() )
 
             .def( "size", (unsigned (scarab::param_array::*)() const) &scarab::param_array::size,
                     "Returns the size of the array" )
-
             .def( "resize", (void (scarab::param_array::*)(unsigned)) &scarab::param_array::resize,
-                    "Sets the size of the array; if smaller than the current size, the extra elements are deleted")
-
+                    "Sets the size of the array; if smaller than the current size, the extra elements are deleted" )
             .def( "assign", (void (scarab::param_array::*)(unsigned, const scarab::param&)) &scarab::param_array::assign,
                     "Add a param object to the specified index in a array" )
-
-            .def( "at", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
-                    "Get the param object for a given index" )
 
             // Get value of the parameter, bringing along the default value
             .def( "get_value", (bool (scarab::param_array::*)(unsigned, bool) const) &scarab::param_array::get_value<bool>,
@@ -44,4 +39,4 @@ namespace scarab_pybind
             ;
     }
 
-} /* namespace Nymph */
+} /* namespace scarab_pybind */
