@@ -151,7 +151,7 @@ class Spime(Endpoint, Scheduler):
         elif (this_value is not False) and\
              ((self._last_log_value == 0 and this_value != 0) or
               (self._last_log_value != 0 and\
-                (abs(self._last_log_value - this_value)/self._last_log_value)>self.max_fractional_change)):
+                abs((self._last_log_value - this_value)/self._last_log_value)>self.max_fractional_change)):
             logger.debug('log b/c change is too large')
         else:
             logger.debug('no log condition met, not logging')

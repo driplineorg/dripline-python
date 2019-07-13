@@ -59,11 +59,9 @@ class DriplineAMQPError(DriplineError):
     retcode = 100
 __all__.append('DriplineAMQPError')
 
-
 class DriplineAMQPConnectionError(DriplineError):
     retcode = 101
 __all__.append('DriplineAMQPConnectionError')
-
 
 class DriplineAMQPRoutingKeyError(DriplineError):
     retcode = 102
@@ -74,11 +72,9 @@ class DriplineHardwareError(DriplineError):
     retcode = 200
 __all__.append('DriplineHardwareError')
 
-
 class DriplineHardwareConnectionError(DriplineError):
     retcode = 201
 __all__.append('DriplineHardwareConnectionError')
-
 
 class DriplineHardwareResponselessError(DriplineError):
     retcode = 202
@@ -89,31 +85,25 @@ class DriplineInternalError(DriplineError):
     retcode = 300
 __all__.append('DriplineInternalError')
 
-
 class DriplineNoMessageEncodingError(DriplineError):
     retcode = 301
 __all__.append('DriplineNoMessageEncodingError')
-
 
 class DriplineDecodingError(DriplineError):
     retcode = 302
 __all__.append('DriplineDecodingError')
 
-
 class DriplinePayloadError(DriplineError):
     retcode = 303
 __all__.append('DriplinePayloadError')
-
 
 class DriplineValueError(DriplineError):
     retcode = 304
 __all__.append('DriplineValueError')
 
-
 class DriplineTimeoutError(DriplineError):
     retcode = 305
 __all__.append('DriplineTimeoutError')
-
 
 class DriplineMethodNotSupportedError(DriplineError):
     retcode = 306
@@ -131,21 +121,45 @@ class DriplineDeprecated(DriplineError):
     retcode = 309
 __all__.append('DriplineDeprecated')
 
-class DriplineDatabaseError(DriplineError):
+
+class DriplineClientError(DriplineError):
     retcode = 400
-__all__.append("DriplineDatabaseError")
+__all__.append('DriplineClientError')
+
+class DriplineClientRequestError(DriplineError):
+    retcode = 401
+__all__.append('DriplineClientRequestError')
+
+class DriplineClientReplyError(DriplineError):
+    retcode = 402
+__all__.append('DriplineClientReplyError')
+
+class DriplineClientSendError(DriplineError):
+    retcode = 403
+__all__.append('DriplineClientSendError')
+
+class DriplineClientTimeoutError(DriplineError):
+    retcode = 404
+__all__.append('DriplineClientTimeoutError')
+
 
 class DriplineGenericDAQError(DriplineError):
-    retcode = 500
+    retcode = 1100
 __all__.append("DriplineGenericDAQError")
 
 class DriplineDAQNotEnabled(DriplineError):
-    retcode = 501
+    retcode = 1101
 __all__.append("DriplineDAQNotEnabled")
 
 class DriplineDAQRunning(DriplineError):
-    retcode = 502
+    retcode = 1102
 __all__.append("DriplineDAQRunning")
+
+
+class DriplineDatabaseError(DriplineError):
+    retcode = 1200
+__all__.append("DriplineDatabaseError")
+
 
 class DriplineUnhandledError(DriplineError):
     retcode = 999
