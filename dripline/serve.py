@@ -1,6 +1,8 @@
 import yaml
+  
+file_name = file( "../examples/kv_store_tutorial.yaml", "r" )
+#print yaml.dump( yaml.load(file_name), default_flow_style=False )
 
-class Serve:
-    
-file_name = file( "../examples/ky_store_tutorial.yaml", "r" )
-yaml.load(file_name)
+for data in yaml.load(file_name):
+    print data
+    print "-----------------------------------------"
