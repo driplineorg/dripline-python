@@ -1,13 +1,13 @@
-import ruamel.yaml
+import yaml
 import dripline
 
 with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
     
     try:
-        store = ruamel.yaml.safe_load( stream, Loader = ruamel.yaml.RoundTripLoader )
-        print ( ruamel.yaml.dump(store, Dumper = ruamel.yaml.RoundTripDumper) )
+        store = yaml.safe_load( stream )
+        print ( yaml.dump(store) )
         
-    except ruamel.yaml.YAMLError as exc:
+    except yaml.YAMLError as exc:
         print( exc )
         
 #file_name = file( "../examples/kv_store_tutorial.yaml", "r" )
