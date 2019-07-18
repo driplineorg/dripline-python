@@ -6,6 +6,7 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
     try:
         store = yaml.safe_load( stream )
         print ( yaml.dump(store) )
+        foo = dripline.core.Service()
         
     except yaml.YAMLError as exc:
         print( exc )
