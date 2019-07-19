@@ -2,26 +2,31 @@ import yaml
 import scarab
 import dripline
 
+def add_endpoints( this_service, this_endpoint_list ):
+    for endpoint in this_endpoint_list:
+        new_endpoint = dripline.core._Endpoint(endpoint.get("name"))
+        this_service.add_child( new_endpoint )
+        print( "Added endpoint " + new_endpoint.get_name() + " as a child to service" )
+
 with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
+
+    store = yaml.safe_load( stream )
     
-    try:
-        store = yaml.safe_load( stream )
+    if("module") not in store:
+        service = dripline.core.Service()
+        print( "No service module found, creating new service with default parameters" )
         
-        for key, value in store.items():
-            
-            if( key == "module" and value == "Service" ):
-                
-                service = dripline.core.Service()
-                print( "created new service with default parameters" )
-                
-            elif( key == "endpoints" ):
-                
-                for sub_key in value:
-                    service.add_child( dripline.core._Endpoint(sub_key.get("name")) )
+    else:
+        module = store.pop( "module" )
+        # This service is meant to be used when the yaml file speficies more details about the service
+        service = dripline.core.Service()
 
-    except yaml.YAMLError as exc:
-        print( exc )
+    endpoint_list = store.pop( "endpoints", [] )
+    add_endpoints( service, endpoint_list )
         
-#file_name = file( "../examples/kv_store_tutorial.yaml", "r" )
-#print yaml.dump( yaml.load(file_name), default_flow_style=False )
+    endpoint_dict = service.sync_children()
+    request = dripline.core.MsgRequest()
 
+    print( endpoint_dict.get("peaches").submit_request_message(request) )
+    service.start()
+    service.listen()

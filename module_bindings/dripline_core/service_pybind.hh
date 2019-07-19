@@ -3,6 +3,7 @@
 
 #include "service.hh"
 #include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 #include "pybind11/iostream.h"
 
 namespace dripline_pybind
@@ -30,6 +31,8 @@ namespace dripline_pybind
             .def( "stop", &dripline::service::stop )
             .def( "add_child", &dripline::service::add_child )
             .def( "add_async_child", &dripline::service::add_async_child )
+            .def( "sync_children", (std::map <std::string, dripline::endpoint_ptr_t>& (dripline::service::*)()) &dripline::service::sync_children )
+            .def( "async_children", (std::map <std::string, dripline::lr_ptr_t>& (dripline::service::*)()) &dripline::service::async_children )
             .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
             ;
     }
