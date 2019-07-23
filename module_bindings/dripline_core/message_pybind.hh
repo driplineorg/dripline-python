@@ -95,7 +95,14 @@ namespace dripline_pybind
          ************/
         pybind11::class_< dripline::msg_request, dripline::py_msg_request, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
         msg_request.def( pybind11::init< >() )
-                //.def_static( "create", &dripline::msg_request::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_reply_to") = "", pybind11::arg("a_encoding") = dripline::encoding::json );
+            .def_static( "create", &dripline::msg_request::create, pybind11::return_value_policy::move,
+                         pybind11::arg( "a_payload" ) = scarab::param_ptr_t( new scarab::param() ),
+                         pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
+                         pybind11::arg( "a_routing_key" ) = "",
+                         pybind11::arg( "a_specifier" ) = "",
+                         pybind11::arg( "a_reply_to" ) = "",
+                         pybind11::arg( "a_encoding" ) = dripline::message::encoding::json,
+                         )
                 .def( "is_request", &dripline::msg_request::is_request, "Returns true if the message is a request, false otherwise" )
                 .def( "is_reply", &dripline::msg_request::is_reply, "Returns true if the message is a reply, false otherwise" )
                 .def( "is_alert", &dripline::msg_request::is_alert, "Returns true if the message is an alert, false otherwise" )
