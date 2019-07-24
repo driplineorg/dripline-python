@@ -23,9 +23,11 @@ namespace dripline_pybind
                 .def( "do_get_request", &_endpoint::do_get_request )
                 .def( "do_set_request", &_endpoint::do_set_request )
                 .def( "do_cmd_request", &_endpoint::do_cmd_request )
-                .def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
-                      "Get name of an endpoint as a string" );
-
+                .def_property("name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
+                              [](dripline::endpoint& an_obj, const std::string& a_name ){ an_obj.name() = a_name; } )
+            //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
+            //          "Get name of an endpoint as a string" )
+                ;
     }
 } /* namespace dripline_pybind */
 

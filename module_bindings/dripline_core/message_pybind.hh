@@ -43,8 +43,10 @@ namespace dripline_pybind
                 .def( "derived_modify_message_param", &message_pybind::derived_modify_message_param,
                         "derived_modify_amqp_message function" )
                 // mv_referrable
-                .def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
-                        "Returns the routing key of a message (the routing key determines where the message goes)" )
+                .def_property("routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+                          [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
+                /*.def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+                  "Returns the routing key of a message (the routing key determines where the message goes)" )*/
                 .def( "get_correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id )
                 .def( "get_reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to )
                 .def( "get_timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp )
@@ -108,6 +110,7 @@ namespace dripline_pybind
                 .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
                 // mv_accessible
                 .def( "get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
+                .def_property( "op_t", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
                 //.def( "get_message_op", (void (dripline::msg_request::*)(op_t)) &dripline::msg_request::get_message_op )
                 ;
 
