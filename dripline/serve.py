@@ -28,8 +28,12 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
     add_endpoints( service, endpoint_list )
         
     endpoint_dict = service.sync_children()
-    request = dripline.core.MsgRequest()
+    request = dripline.core.MsgRequest().create()
+    print( "Routing key: " + request.get_routing_key() )
 
+    if request.get_routing_key() in endpoint_dict:
+        print( endpoint_dict.get(request.get_routing_key()).submit_request_message(request) )
+    
     #print( endpoint_dict.get("peaches").submit_request_message(request) )
-    service.start()
-    service.listen()
+    #service.start()
+    #service.listen()
