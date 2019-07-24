@@ -79,15 +79,7 @@ namespace dripline_pybind
                 .def( "payload", (scarab::param& (dripline::message::*)())&dripline::message::payload )
                 //.def( "set_payload", &dripline::message::set_payload )
 
-                //Temporary removal, function has different parameters and a void return type in message.hh
-                /*
-                .def( "__repr__", [](const dripline::message& a_message)
-                    {
-                        std::string t_msg;
-                        return a_message.encode_message_body(t_msg);
-                    }
-                )
-                */
+            .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
                 ;
 
         /************
