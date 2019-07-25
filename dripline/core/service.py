@@ -176,8 +176,13 @@ class Service(Provider):
         self._channel = channel
         self._channel.confirm_delivery()
         self.add_on_channel_close_callback()
-        self.setup_exchange('requests')
-        self.setup_exchange('alerts')
+        for exchange in set(['requests', 'alerts'] + [bind[0] for bind in self._bindings]):
+            self.setup_exchange(exchange)
+        self.setup_queue(self.name)
+        for a_binding in self._bindings:
+            logger.debug('Binding {} to {} with {}'.format(a_binding[0], self.name, a_binding[1]))
+            self._channel.queue_bind(self.on_bindok, self.name, a_binding[0], a_binding[1])
+
 
     def add_on_channel_close_callback(self):
         """This method tells pika to call the on_channel_closed method if
@@ -226,7 +231,6 @@ class Service(Provider):
 
         """
         logger.debug('Exchange declared')
-        self.setup_queue(self.name)
 
     def setup_queue(self, queue_name):
         """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -253,10 +257,7 @@ class Service(Provider):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
 
         """
-        for a_binding in self._bindings:
-            logger.debug('Binding {} to {} with {}'.format(a_binding[0], self.name, a_binding[1]))
-            self._channel.queue_bind(self.on_bindok, self.name,a_binding[0], a_binding[1])
-
+        logger.debug('Queue declared')
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this
@@ -429,7 +430,7 @@ class Service(Provider):
 
         """
         self._connection = self.connect()
-        self._connection.add_timeout(0, self._do_setup_calls)
+        self._connection.add_timeout(0.1, self._do_setup_calls)
         try:
             self._connection.ioloop.start()
         except Exception as this_err:
