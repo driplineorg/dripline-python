@@ -31,9 +31,9 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD( dripline::reply_ptr_t, dripline::endpoint, do_cmd_request, a_request );
             }
 
-            std::string test_function( dripline::endpoint *an_endpoint ) override
+            std::string test_function() override
             {
-                PYBIND11_OVERLOAD( std::string, dripline::endpoint, test_function, an_endpoint );
+                PYBIND11_OVERLOAD( std::string, dripline::endpoint, test_function );
             }
     };
     
