@@ -26,7 +26,7 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( bool, dripline::message, is_alert, );
             }
 
-            void derived_modify_amqp_message( amqp_message_ptr t_amqp_msg, AmqpClient::Table& a_properties ) const override
+            void derived_modify_amqp_message( dripline::amqp_message_ptr t_amqp_msg, AmqpClient::Table& a_properties ) const override
             {
                 PYBIND11_OVERLOAD_PURE( void, dripline::message, derived_modify_amqp_message, t_amqp_msg, a_properties );
             }
@@ -36,7 +36,7 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( void, dripline::message, derived_modify_message_body, a_node );
             }
 
-            msg_t message_type() const override
+            dripline::msg_t message_type() const override
             {
                 PYBIND11_OVERLOAD_PURE( dripline::msg_t, dripline::message, message_type, );
             }
@@ -63,7 +63,7 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE(bool, dripline::msg_request, is_alert, );
             }
 
-            msg_t message_type() const override
+            dripline::msg_t message_type() const override
             {
                 PYBIND11_OVERLOAD_PURE(dripline::msg_t, dripline::msg_request, message_type, );
             }
@@ -90,7 +90,7 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( bool, dripline::msg_reply, is_alert, );
             }
 
-            msg_t message_type() const override
+            dripline::msg_t message_type() const override
             {
                 PYBIND11_OVERLOAD_PURE( dripline::msg_t, dripline::msg_reply, message_type, );
             }
@@ -117,7 +117,7 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( bool, dripline::msg_alert, is_alert, );
             }
 
-            msg_t message_type() const override
+            dripline::msg_t message_type() const override
             {
                 PYBIND11_OVERLOAD_PURE( dripline::msg_t, dripline::msg_alert, message_type, );
             }
