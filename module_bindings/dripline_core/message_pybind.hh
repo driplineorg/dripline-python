@@ -20,7 +20,7 @@ namespace dripline_pybind
         /********
          message
          ********/
-        pybind11::class_< dripline::message, dripline::message_trampoline, std::shared_ptr< dripline::message > > message(mod, "Message");
+        pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message(mod, "Message");
 
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
                 .value( "json", dripline::message::encoding::json )
@@ -87,7 +87,7 @@ namespace dripline_pybind
         /************
          msg_request
          ************/
-        pybind11::class_< dripline::msg_request, dripline::msg_request_trampoline, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
+        pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
         msg_request.def( pybind11::init< >() )
             .def_static( "create", [](){ return dripline::msg_request::create( scarab::param_ptr_t(new scarab::param()), dripline::op_t::unknown, "", "", "", dripline::message::encoding::json ); } )
             //.def_static( "create", &dripline::msg_request::create, 
@@ -117,7 +117,7 @@ namespace dripline_pybind
         /************
          msg_reply
          ************/
-        pybind11::class_< dripline::msg_reply, dripline::msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > > msg_reply( mod, "MsgReply", message );
+        pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > > msg_reply( mod, "MsgReply", message );
         msg_reply.def( pybind11::init< >() )
                 //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
                 //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create )
@@ -137,7 +137,7 @@ namespace dripline_pybind
         /***********
          msg_alert
          ************/
-        pybind11::class_< dripline::msg_alert, dripline::msg_alert_trampoline, std::shared_ptr< dripline::msg_alert > > msg_alert( mod, "MsgAlert", message );
+        pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert > > msg_alert( mod, "MsgAlert", message );
         msg_alert.def( pybind11::init< >() )
                 //.def_static( "create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
                 .def( "is_request", &dripline::msg_alert::is_request, "Returns true if the message is a request, false otherwise" )
