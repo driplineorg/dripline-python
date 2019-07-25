@@ -9,7 +9,6 @@ def add_endpoints( this_service, this_endpoint_list ):
         if module in globals():
             new_endpoint = globals()[module](**an_endpoint)
             this_service.add_child( new_endpoint )
-            #print( "Added endpoint " + new_endpoint.get_name() + " as a child to service" )
 
 with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
 
@@ -29,11 +28,15 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
         
     endpoint_dict = service.sync_children()
     request = dripline.core.MsgRequest().create()
-    print( "Routing key: " + request.get_routing_key() )
+    request.routing_key = "peaches"
+    request.op_t = dripline.core.op_t.to_op_t( "get" )
+    print( "Request encode_full_message:" )
+    print( request.encode_full_message() )
 
-    if request.get_routing_key() in endpoint_dict:
-        print( endpoint_dict.get(request.get_routing_key()).submit_request_message(request) )
+    if request.routing_key in endpoint_dict:
+        message_reply_payload = endpoint_dict.get(request.routing_key).submit_request_message(request).encode_full_message()
+        print( "Reply encode_full_message:" )
+        print( message_reply_payload )
     
-    #print( endpoint_dict.get("peaches").submit_request_message(request) )
     #service.start()
     #service.listen()
