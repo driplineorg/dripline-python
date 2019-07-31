@@ -26,17 +26,17 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
     endpoint_list = store.pop( "endpoints", [] )
     add_endpoints( service, endpoint_list )
         
-    endpoint_dict = service.sync_children()
-    request = dripline.core.MsgRequest().create()
-    request.routing_key = "peaches"
-    request.op_t = dripline.core.op_t.to_op_t( "get" )
-    print( "Request encode_full_message:" )
-    print( request.encode_full_message() )
+    #endpoint_dict = service.sync_children()
+    #request = dripline.core.MsgRequest().create()
+    #request.routing_key = "peaches"
+    #request.op_t = dripline.core.op_t.to_op_t( "get" )
+    #print( "Request encode_full_message:" )
+    #print( request.encode_full_message() )
 
-    if request.routing_key in endpoint_dict:
-        message_reply_payload = endpoint_dict.get(request.routing_key).submit_request_message(request).encode_full_message()
-        print( "Reply encode_full_message:" )
-        print( message_reply_payload )
+    #if request.routing_key in endpoint_dict:
+    #    message_reply_payload = endpoint_dict.get(request.routing_key).submit_request_message(request).encode_full_message()
+    #    print( "Reply encode_full_message:" )
+    #    print( message_reply_payload )
     
-    #service.start()
-    #service.listen()
+    service.start()
+    service.listen()

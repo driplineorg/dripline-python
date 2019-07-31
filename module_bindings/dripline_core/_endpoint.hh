@@ -29,6 +29,7 @@ namespace dripline_pybind
             //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
             //          "Get name of an endpoint as a string" )
                 ;
+                mod.def( "do_test_function", &dripline::do_test_function );
     }
 } /* namespace dripline_pybind */
 
