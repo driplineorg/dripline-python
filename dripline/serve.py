@@ -4,11 +4,14 @@ import dripline
 from endpoint import Endpoint
 
 def add_endpoints( this_service, this_endpoint_list ):
+    new_endpoints = []
     for an_endpoint in this_endpoint_list:
         module = an_endpoint.pop( "module" )
         if module in globals():
             new_endpoint = globals()[module](**an_endpoint)
+            new_endpoints.append(new_endpoint)
             this_service.add_child( new_endpoint )
+            return new_endpoints
 
 with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
 
@@ -24,7 +27,7 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
         service = dripline.core.Service()
 
     endpoint_list = store.pop( "endpoints", [] )
-    add_endpoints( service, endpoint_list )
+    all_endpoints = add_endpoints( service, endpoint_list )
         
     #endpoint_dict = service.sync_children()
     #request = dripline.core.MsgRequest().create()
