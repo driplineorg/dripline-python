@@ -33,7 +33,7 @@ namespace dripline_pybind
 
             std::string test_function() override
             {
-                PYBIND11_OVERLOAD( std::string, dripline::endpoint, test_function );
+                PYBIND11_OVERLOAD( std::string, dripline::endpoint, test_function, );
             }
     };
     

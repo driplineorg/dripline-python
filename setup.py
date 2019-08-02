@@ -40,7 +40,8 @@ class CMakeBuild(build_ext):
                       '-DScarab_PYBIND:bool=1',
                      ]
 
-        cfg = 'Debug' if self.debug else 'Release'
+        #cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'DEBUG'
         build_args = ['--config', cfg]
 
         if platform.system() == "Windows":
