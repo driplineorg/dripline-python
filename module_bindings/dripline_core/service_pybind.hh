@@ -17,7 +17,9 @@ namespace dripline_pybind
                                    const unsigned int,
                                    const std::string&,
                                    const bool
-                                 >(),
+                                   >(),
+                   pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                   pybind11::scoped_estream_redirect>(),
                    pybind11::arg( "a_config" ) = scarab::param_node(),
                    pybind11::arg( "a_queue_name" ) = "",
                    pybind11::arg( "a_broker_address" ) = "",
@@ -26,13 +28,21 @@ namespace dripline_pybind
                    pybind11::arg( "a_make_connection" ) = true
             )
 
-            .def( "start", &dripline::service::start )
-            .def( "listen", &dripline::service::listen )
-            .def( "stop", &dripline::service::stop )
-            .def( "add_child", &dripline::service::add_child )
-            .def( "add_async_child", &dripline::service::add_async_child )
-            .def( "sync_children", (std::map <std::string, dripline::endpoint_ptr_t>& (dripline::service::*)()) &dripline::service::sync_children )
-            .def( "async_children", (std::map <std::string, dripline::lr_ptr_t>& (dripline::service::*)()) &dripline::service::async_children )
+            .def( "start", &dripline::service::start,
+                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                          pybind11::scoped_estream_redirect>() )
+            .def( "listen", &dripline::service::listen,
+                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                          pybind11::scoped_estream_redirect>() )
+            .def( "stop", &dripline::service::stop,
+                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                          pybind11::scoped_estream_redirect>() )
+            .def( "add_child", &dripline::service::add_child,
+                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                          pybind11::scoped_estream_redirect>() )
+            .def( "add_async_child", &dripline::service::add_async_child,
+                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                          pybind11::scoped_estream_redirect>() )
             .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
             ;
     }
