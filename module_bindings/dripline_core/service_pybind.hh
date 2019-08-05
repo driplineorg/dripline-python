@@ -28,8 +28,9 @@ namespace dripline_pybind
                    pybind11::arg( "a_make_connection" ) = true
             )
 
-            .def( "start", &dripline::service::start,
-                  pybind11::call_guard<pybind11::gil_scoped_release, pybind11::scoped_ostream_redirect,
+            .def( "start", [](service& a_service){ py::gil_scoped_release a_release;
+                          a_service.start(); }, //&dripline::service::start,
+                  pybind11::call_guard<pybind11::scoped_ostream_redirect,
                           pybind11::scoped_estream_redirect>() )
             .def( "listen", &dripline::service::listen,
                   pybind11::call_guard<//pybind11::gil_scoped_release,
