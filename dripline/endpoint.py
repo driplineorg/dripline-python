@@ -5,7 +5,7 @@ class Endpoint(dripline.core._Endpoint):
         
     def do_get_request( self, a_request_message ):
         print( "|||||||||||||||||||||||||||||||||||||||||||||||||||||" )
-        return dripline.core.MsgReply()
+        return a_request_message.reply()
     #    if ( a_request_message.parsed_specifier().to_string() != "" ):
     #        try:
     #            if ( getattr(self, a_request_message.parced_specifier().to_string(), "NotFound") != "NotFound"):

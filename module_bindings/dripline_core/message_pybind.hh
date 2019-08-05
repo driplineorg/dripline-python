@@ -52,7 +52,7 @@ namespace dripline_pybind
                         pybind11::call_guard<pybind11::scoped_ostream_redirect,
                                        pybind11::scoped_estream_redirect>() )
                 // mv_referrable
-                .def_property("routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+                .def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
                            [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
                 /*.def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
                   "Returns the routing key of a message (the routing key determines where the message goes)" )*/
@@ -63,7 +63,8 @@ namespace dripline_pybind
                 .def_property( "timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp,
                            [](dripline::message& an_obj, const std::string& a_timestamp ){ an_obj.timestamp() = a_timestamp; } )
                 // mv_accessible
-                .def( "get_encoding", (void (dripline::message::*)(dripline::message::encoding)) &dripline::message::get_encoding )
+                .def_property( "encoding", &dripline::message::get_encoding, &dripline::message::set_encoding )
+                //.def( "get_encoding", (void (dripline::message::*)(dripline::message::encoding)) &dripline::message::get_encoding )
                 // mv_referrable_const
 
                 // Temporary removal, until  &dripline::message::<some_function> where <some_function> gets defined
@@ -113,7 +114,10 @@ namespace dripline_pybind
                 .def( "is_request", &dripline::msg_request::is_request, "Returns true if the message is a request, false otherwise" )
                 .def( "is_reply", &dripline::msg_request::is_reply, "Returns true if the message is a reply, false otherwise" )
                 .def( "is_alert", &dripline::msg_request::is_alert, "Returns true if the message is an alert, false otherwise" )
-                //.def( "reply", &dripline::msg_request::reply, pybind11::arg("a_payload") = scarab::param_ptr_t(new scarab::param()) )
+            .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
+                      //pybind11::arg( "a_retcode" ) = 0,
+                      //pybind11::arg( "a_ret_msg" ) = "",
+                      //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
                 .def( "message_type", &dripline::msg_request::message_type )
 
                 // mv_accessible_static_noset
