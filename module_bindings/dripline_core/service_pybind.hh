@@ -29,7 +29,7 @@ namespace dripline_pybind
             )
 
             .def( "start", &dripline::service::start,
-                    pybind11::call_guard<pybind11::scoped_ostream_redirect,
+                  pybind11::call_guard<pybind11::gil_scoped_release, pybind11::scoped_ostream_redirect,
                           pybind11::scoped_estream_redirect>() )
             .def( "listen", &dripline::service::listen,
                   pybind11::call_guard<//pybind11::gil_scoped_release,
