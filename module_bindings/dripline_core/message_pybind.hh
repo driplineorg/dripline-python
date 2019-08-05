@@ -53,12 +53,15 @@ namespace dripline_pybind
                                        pybind11::scoped_estream_redirect>() )
                 // mv_referrable
                 .def_property("routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
-                          [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
+                           [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
                 /*.def( "get_routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
                   "Returns the routing key of a message (the routing key determines where the message goes)" )*/
-                .def( "get_correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id )
-                .def( "get_reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to )
-                .def( "get_timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp )
+                .def_property( "correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id,
+                           [](dripline::message& an_obj, const std::string& a_correlation_id ){ an_obj.correlation_id() = a_correlation_id; } )
+                .def_property( "reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to,
+                           [](dripline::message& an_obj, const std::string& a_reply_to ){ an_obj.reply_to() = a_reply_to; } )
+                .def_property( "timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp,
+                           [](dripline::message& an_obj, const std::string& a_timestamp ){ an_obj.timestamp() = a_timestamp; } )
                 // mv_accessible
                 .def( "get_encoding", (void (dripline::message::*)(dripline::message::encoding)) &dripline::message::get_encoding )
                 // mv_referrable_const
