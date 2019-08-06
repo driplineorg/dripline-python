@@ -1,3 +1,4 @@
+import scarab
 import dripline
 class Endpoint(dripline.core._Endpoint):
     def __init__( self, name ):
@@ -9,7 +10,7 @@ class Endpoint(dripline.core._Endpoint):
         if ( specifier ):
             try:
                 if ( getattr(self, specifier, "NotFound") != "NotFound"):
-                    return a_request_message.reply( 1, getattr(self, specifier) )
+                    return a_request_message.reply( 1, "Successs", scarab.ParamNode(getattr(self, specifier)) )
                 else:
                     raise dripline.NotImplemented
             except AttributeError:
