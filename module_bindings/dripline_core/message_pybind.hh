@@ -102,7 +102,7 @@ namespace dripline_pybind
          ************/
         pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request > > msg_request( mod, "MsgRequest", message );
         msg_request.def( pybind11::init< >() )
-            .def_static( "create", [](){ return dripline::msg_request::create( scarab::param_ptr_t(new scarab::param()), dripline::op_t::unknown, "", "", "", dripline::message::encoding::json ); } )
+                .def_static( "create", [](){ return dripline::msg_request::create( scarab::param_ptr_t(new scarab::param()), dripline::op_t::unknown, "", "", "", dripline::message::encoding::json ); } )
             //.def_static( "create", &dripline::msg_request::create, 
                          //pybind11::arg( "a_payload" ),
                          //pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
@@ -114,10 +114,12 @@ namespace dripline_pybind
                 .def( "is_request", &dripline::msg_request::is_request, "Returns true if the message is a request, false otherwise" )
                 .def( "is_reply", &dripline::msg_request::is_reply, "Returns true if the message is a reply, false otherwise" )
                 .def( "is_alert", &dripline::msg_request::is_alert, "Returns true if the message is an alert, false otherwise" )
-            .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
+                .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
                       //pybind11::arg( "a_retcode" ) = 0,
                       //pybind11::arg( "a_ret_msg" ) = "",
                       //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
+            //.def( "reply", (dripline::reply_ptr_t (dripline::msg_request::*)(const unsigned, const std::string&, scarab::param_ptr_t) const) &dripline::msg_request::reply )
+            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
                 .def( "message_type", &dripline::msg_request::message_type )
 
                 // mv_accessible_static_noset

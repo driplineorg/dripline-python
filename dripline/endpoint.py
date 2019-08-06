@@ -5,18 +5,21 @@ class Endpoint(dripline.core._Endpoint):
         
     def do_get_request( self, a_request_message ):
         print( "|||||||||||||||||||||||||||||||||||||||||||||||||||||" )
-        return a_request_message.reply()
-    #    if ( a_request_message.parsed_specifier().to_string() != "" ):
-    #        try:
-    #            if ( getattr(self, a_request_message.parced_specifier().to_string(), "NotFound") != "NotFound"):
-    #                return a_request_message.parsed_specifier()
-    #            else:
-    #                raise dripline.NotImplemented
-    #        except AttributeError:
-    #            print("Specifier not found and 'default' argument not passed for getattr()")
-    #    else:
-    #        print("No specifier declared (empty string)")
-                
+        specifier =  a_request_message.parsed_specifier().to_string()
+        if ( specifier ):
+            try:
+                if ( getattr(self, specifier, "NotFound") != "NotFound"):
+                    return a_request_message.reply( 1, getattr(self, specifier) )
+                else:
+                    raise dripline.NotImplemented
+            except AttributeError:
+                return a_request_message.reply( 201, "Attribute '" + specifier + "' does not exist in endpoint <" + self.name + ">" )
+        else:
+            return self.on_get( a_request_message )
+
+    def on_get( self, a_request ):
+        return a_request.reply( 200, "Endpoint <{}> of type {} does not support Get".format(self.name, type(self)) )
+
     def do_set( self, _value ):
         self.value = _value
 
