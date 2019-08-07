@@ -17,6 +17,7 @@ namespace scarab_pybind
         // param_array
         pybind11::class_< scarab::param_array, scarab::param >( mod, "ParamArray" )
             .def( pybind11::init< >() )
+            .def( "__str__", &scarab::param_array::to_string )
 
             .def( "size", (unsigned (scarab::param_array::*)() const) &scarab::param_array::size,
                     "Returns the size of the array" )
