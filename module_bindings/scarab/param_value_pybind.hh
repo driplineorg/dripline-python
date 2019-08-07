@@ -24,6 +24,11 @@ namespace scarab_pybind
             .def( pybind11::init< const char* >() )
             .def( "__str__", &scarab::param_value::to_string )
 
+            .def( "is_null", &scarab::param_value::is_null )
+            .def( "is_node", &scarab::param_value::is_node )
+            .def( "is_array", &scarab::param_value::is_array )
+            .def( "is_value", &scarab::param_value::is_value )
+
             // type checking methods
             .def( "is_bool", (bool (scarab::param_value::*)() const) &scarab::param_value::is_bool,
                     "Return whether the param_value stores a boolean value" )

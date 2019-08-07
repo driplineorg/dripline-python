@@ -19,6 +19,11 @@ namespace scarab_pybind
             .def( pybind11::init< >() )
             .def( "__str__", &scarab::param_array::to_string )
 
+            .def( "is_null", &scarab::param_array::is_null )
+            .def( "is_node", &scarab::param_array::is_node )
+            .def( "is_array", &scarab::param_array::is_array )
+            .def( "is_value", &scarab::param_array::is_value )
+
             .def( "size", (unsigned (scarab::param_array::*)() const) &scarab::param_array::size,
                     "Returns the size of the array" )
             .def( "resize", (void (scarab::param_array::*)(unsigned)) &scarab::param_array::resize,
