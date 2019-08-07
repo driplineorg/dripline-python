@@ -22,6 +22,7 @@ namespace scarab_pybind
             .def( pybind11::init< double >() )
             .def( pybind11::init< const std::string& >() )
             .def( pybind11::init< const char* >() )
+            .def( "__str__", &scarab::param_value::to_string )
 
             // type checking methods
             .def( "is_bool", (bool (scarab::param_value::*)() const) &scarab::param_value::is_bool,
