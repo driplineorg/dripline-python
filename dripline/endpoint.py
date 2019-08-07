@@ -34,7 +34,8 @@ class Endpoint(dripline.core._Endpoint):
             try:
                 if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
                     an_attribute = getattr( self, a_specifier )
-                    print( "Request message payload: " + a_request_message.payload().as_node().__str__() )
+                    print( type( a_request_message.payload() ) )
+                    print( "Request message payload: {}".format(a_request_message.payload()) )
                     return a_request_message.reply( 201, "TESTING" )
                     #the_value = scarab.ParamValue( an_attribute )
                     #the_array = scarab.ParamArray()
@@ -45,7 +46,8 @@ class Endpoint(dripline.core._Endpoint):
                     #return a_request_message.reply( 0, "Success", the_node )
                 else:
                     return a_request_message.reply( 200, "Dripline.NotImplemented temporary message" )
-            except AttributeError:
+            except AttributeError as this_error:
+                print( "attribute error: {}".format(this_error.message ) )
                 return a_request_message.reply( 201, "Attribute '" + a_specifier + "' does not exist in endpoint <" + self.name + ">" )
         else:
             return self.on_get( a_request_message )
