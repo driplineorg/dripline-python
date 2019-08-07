@@ -15,6 +15,7 @@ namespace scarab_pybind
         // param_node
         pybind11::class_< scarab::param_node, scarab::param >( mod, "ParamNode" )
             .def( pybind11::init< >() )
+            .def( "__str__", &scarab::param_node::to_string )
 
             .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
                     "Add a param object to a node")
