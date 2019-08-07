@@ -6,6 +6,9 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/iostream.h"
 
+#include "logger.hh"
+LOGGER( dlog_mph, "message_pybind.hh" )
+
 namespace dripline_pybind
 {
     class _message : public dripline::message
@@ -119,8 +122,12 @@ namespace dripline_pybind
                       //pybind11::arg( "a_ret_msg" ) = "",
                       //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
             //.def( "reply", (dripline::reply_ptr_t (dripline::msg_request::*)(const unsigned, const std::string&, scarab::param_ptr_t) const) &dripline::msg_request::reply )
-            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
-            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg, scarab::param_node& a_payload){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(&a_payload)); } )
+                .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
+                .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg, scarab::param_node& a_payload)
+                      {
+                          //LDEBUG( dlog_mph, "Here is the payload: " << a_payload );
+                          return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(&a_payload));
+                      } )
                 .def( "message_type", &dripline::msg_request::message_type )
 
                 // mv_accessible_static_noset
@@ -129,6 +136,7 @@ namespace dripline_pybind
                 .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
                 // mv_accessible
                 .def( "get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
+            //.def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid)
                 .def_property( "op_t", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
                 //.def( "get_message_op", (void (dripline::msg_request::*)(op_t)) &dripline::msg_request::get_message_op )
                 ;
