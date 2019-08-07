@@ -5,7 +5,6 @@ class Endpoint(dripline.core._Endpoint):
         dripline.core._Endpoint.__init__( self, name )
         
     def do_get_request( self, a_request_message ):
-        print( "|||||||||||||||||||||||||||||||||||||||||||||||||||||" )
         a_specifier =  a_request_message.parsed_specifier().to_string()
         if ( a_specifier ):
             try:

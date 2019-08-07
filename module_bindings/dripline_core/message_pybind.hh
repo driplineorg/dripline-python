@@ -126,7 +126,7 @@ namespace dripline_pybind
                 .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg, scarab::param_node& a_payload)
                       {
                           //LDEBUG( dlog_mph, "Here is the payload: " << a_payload );
-                          return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(&a_payload));
+                          return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param_node(a_payload)) );
                       } )
                 .def( "message_type", &dripline::msg_request::message_type )
 
