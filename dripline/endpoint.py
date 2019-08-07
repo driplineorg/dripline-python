@@ -3,6 +3,7 @@ import dripline
 class Endpoint(dripline.core._Endpoint):
     def __init__( self, name ):
         dripline.core._Endpoint.__init__( self, name )
+        self.test_attribute = 3
         
     def do_get_request( self, a_request_message ):
         a_specifier =  a_request_message.parsed_specifier().to_string()
