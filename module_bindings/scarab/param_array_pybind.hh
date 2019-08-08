@@ -25,12 +25,14 @@ namespace scarab_pybind
             //TODO: has_subset()
 
             .def( "__len__", &scarab::param_array::size, "Returns the size of the array" )
-            .def( "size", (unsigned (scarab::param_array::*)() const) &scarab::param_array::size,
+            //TODO: remove size(), which is not part of the pythonic API
+            .def( "size", &scarab::param_array::size,
                     "Returns the size of the array" )
             .def( "empty", &scarab::param_array::empty, "True if the length is zero" )
 
-            .def( "resize", (void (scarab::param_array::*)(unsigned)) &scarab::param_array::resize,
+            .def( "resize", &scarab::param_array::resize,
                     "Sets the size of the array; if smaller than the current size, the extra elements are deleted" )
+
             .def( "assign", (void (scarab::param_array::*)(unsigned, const scarab::param&)) &scarab::param_array::assign,
                     "Add a param object to the specified index in a array" )
 

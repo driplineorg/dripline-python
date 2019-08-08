@@ -24,24 +24,30 @@ namespace scarab_pybind
             .def( "is_array", &scarab::param::is_array )
             .def( "is_value", &scarab::param::is_value )
 
-            //TODO: as_value(), as_array(), as_node()
+            .def( "as_array", (scarab::param_array& (scarab::param::*)()) &scarab::param::as_array(),
+                    pybind11::return_value_policy::reference_internal )
+            .def( "as_node", (scarab::param_node& (scarab::param::*)()) &scarab::param::as_node(),
+                    pybind11::return_value_policy::reference_internal )
+            .def( "as_value", (scarab::param_value& (scarab::param::*)()) &scarab::param::as_value(),
+                    pybind11::return_value_policy::reference_internal )
 
             //TODO: has_subset()
 
-            .def( "__call__", (scarab::param_value& (scarab::param::*)())&scarab::param::operator() )
+            .def( "__call__", (scarab::param_value& (scarab::param::*)())&scarab::param::operator(),
+                    pybind11::return_value_policy::reference_internal )
 
             .def( "__getitem__",
                     [](scarab::param& a_param, unsigned a_index)
                     {
                         return a_param[a_index];
                     },
-                    pybind11::return_value_policy::reference_internal)
+                    pybind11::return_value_policy::reference_internal )
             .def( "__getitem__",
                     [](scarab::param& a_param, const std::string& a_key)
                     {
                         return a_param[a_key];
                     },
-                    pybind11::return_value_policy::reference_internal)
+                    pybind11::return_value_policy::reference_internal )
 
             //TODO: do we need __setitem__?
 
