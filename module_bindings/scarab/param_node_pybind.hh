@@ -19,8 +19,20 @@ namespace scarab_pybind
 
             .def( "is_null", &scarab::param_node::is_null )
             .def( "is_node", &scarab::param_node::is_node )
-            .def( "is_array", &scarab::param_node::is_array )
-            .def( "is_value", &scarab::param_node::is_value )
+
+            //TODO: has_subset()
+
+            .def( "__len__", &scarab::param_node::size )
+            .def( "empty", &scarab::param_node::empty )
+
+            //TODO: has(), count()
+
+            .def( "__getitem__",
+                    [](scarab::param& a_param, const std::string& a_key)
+                    {
+                        return a_param[a_key];
+                    },
+                    pybind11::return_value_policy::reference_internal)
 
             .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
                     "Add a param object to a node")
@@ -39,6 +51,14 @@ namespace scarab_pybind
                     "Get parameter node value as a float" )
             .def( "get_value", (std::string (scarab::param_node::*)(const std::string&, const std::string& ) const) &scarab::param_node::get_value,
                     "Get parameter node value as a string" )
-        ;
+
+            //TODO: replace()
+
+            //TODO: merge(), erase(), remove(), clear()
+
+            //TODO: iterators
+
+
+            ;
     }
 } /* namespace scarab_pybind */

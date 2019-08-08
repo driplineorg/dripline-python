@@ -24,6 +24,31 @@ namespace scarab_pybind
             .def( "is_array", &scarab::param::is_array )
             .def( "is_value", &scarab::param::is_value )
 
+            //TODO: as_value(), as_array(), as_node()
+
+            //TODO: has_subset()
+
+            .def( "__call__", &scarab::param::operator() )
+
+            .def( "__getitem__",
+                    [](scarab::param& a_param, unsigned a_index)
+                    {
+                        return a_param[a_index];
+                    },
+                    pybind11::return_value_policy::reference_internal)
+            .def( "__getitem__",
+                    [](scarab::param& a_param, const std::string& a_key)
+                    {
+                        return a_param[a_key];
+                    },
+                    pybind11::return_value_policy::reference_internal)
+
+            //TODO: do we need __setitem__?
+
+            //TODO: get_value() in its various types
+
+            //TODO: merge()
+
             ;
     }
 
