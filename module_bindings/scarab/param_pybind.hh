@@ -28,7 +28,7 @@ namespace scarab_pybind
 
             //TODO: has_subset()
 
-            .def( "__call__", &scarab::param::operator() )
+            .def( "__call__", (scarab::param_value& (scarab::param::*)())&scarab::param::operator() )
 
             .def( "__getitem__",
                     [](scarab::param& a_param, unsigned a_index)

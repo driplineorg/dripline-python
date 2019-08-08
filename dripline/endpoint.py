@@ -36,7 +36,7 @@ class Endpoint(dripline.core._Endpoint):
                 if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
                     an_attribute = getattr( self, a_specifier )
                     print( type( a_request_message.payload() ) )
-                    #ipdb.set_trace()
+                    ipdb.set_trace()
                     print( "Request message payload: {}".format(a_request_message.payload()) )
                     print( "Payload value: {}".format(a_request_message.payload().at("values")) )
                     #self.test_attribute = a_request_message.payload().at("values")
