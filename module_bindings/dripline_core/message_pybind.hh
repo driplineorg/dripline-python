@@ -127,7 +127,7 @@ namespace dripline_pybind
                       {
                           //LDEBUG( dlog_mph, "Here is the payload: " << a_payload );
                           return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param_node(a_payload)) );
-                      } )
+                      }, pybind11::return_value_policy::reference_internal )
                 .def( "message_type", &dripline::msg_request::message_type )
 
                 // mv_accessible_static_noset

@@ -1,5 +1,6 @@
 import scarab
 import dripline
+import ipdb
 class Endpoint(dripline.core._Endpoint):
     def __init__( self, name ):
         dripline.core._Endpoint.__init__( self, name )
@@ -35,6 +36,7 @@ class Endpoint(dripline.core._Endpoint):
                 if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
                     an_attribute = getattr( self, a_specifier )
                     print( type( a_request_message.payload() ) )
+                    ipdb.set_trace()
                     print( "Request message payload: {}".format(a_request_message.payload()) )
                     return a_request_message.reply( 201, "TESTING" )
                     #the_value = scarab.ParamValue( an_attribute )
