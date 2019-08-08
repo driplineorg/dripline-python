@@ -81,7 +81,8 @@ namespace dripline_pybind
                 .def( "get_sender_service_name", &dripline::message::sender_service_name )
                 .def( "get_sender_info", &dripline::message::sender_info )
                 */
-                .def( "parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier )
+                .def( "parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier,
+                        pybind11::return_value_policy::reference_internal )
                 .def( "message_type", &dripline::message::message_type )
                 //Temporary removal, corresponding functions in message.hh are commented out
                 /*
@@ -94,10 +95,11 @@ namespace dripline_pybind
                 .def( "set_sender_service_name", &dripline::message::set_sender_service_name )
                 .def( "set_sender_info", &dripline::message::set_sender_info )
                 */
-            .def( "payload", (scarab::param& (dripline::message::*)())&dripline::message::payload, pybind11::return_value_policy::reference_internal )
+                .def( "payload", (scarab::param& (dripline::message::*)())&dripline::message::payload,
+                        pybind11::return_value_policy::reference_internal )
                 //.def( "set_payload", &dripline::message::set_payload )
 
-            .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
+                .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
                 ;
 
         /************
