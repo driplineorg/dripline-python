@@ -33,11 +33,6 @@ namespace dripline_pybind
                 pybind11::gil_scoped_acquire t_acquire;
                 PYBIND11_OVERLOAD( dripline::reply_ptr_t, dripline::endpoint, do_cmd_request, a_request );
             }
-
-            std::string test_function() override
-            {
-                PYBIND11_OVERLOAD( std::string, dripline::endpoint, test_function, );
-            }
     };
     
 } /* namespace dripline_pybind */

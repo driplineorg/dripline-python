@@ -14,7 +14,6 @@ namespace dripline_pybind
             using dripline::endpoint::do_get_request;
             using dripline::endpoint::do_set_request;
             using dripline::endpoint::do_cmd_request;
-            using dripline::endpoint::test_function;
     };
 
     void export_endpoint( pybind11::module& mod )
@@ -39,13 +38,11 @@ namespace dripline_pybind
                         pybind11::call_guard<
                                 pybind11::scoped_ostream_redirect,
                                 pybind11::scoped_estream_redirect>() )
-                .def( "test_function", &_endpoint::test_function )
                 .def_property("name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
                               [](dripline::endpoint& an_obj, const std::string& a_name ){ an_obj.name() = a_name; } )
             //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
             //          "Get name of an endpoint as a string" )
                 ;
-                mod.def( "do_test_function", &dripline::do_test_function );
     }
 } /* namespace dripline_pybind */
 #endif /* DRIPLINE_PYBIND_ENDPOINT */
