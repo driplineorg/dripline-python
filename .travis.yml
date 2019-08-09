@@ -41,4 +41,4 @@ jobs:
     - stage: assemble manifest
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:latest-travis
+        - .travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
