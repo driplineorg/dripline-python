@@ -6,6 +6,8 @@ class Endpoint(dripline.core._Endpoint):
         dripline.core._Endpoint.__init__( self, name )
         self.int_attribute = 3
         self.float_attribute = 6.87
+        self.bool_attribute = False
+        self.str_attribute = "Hi"
         
     def do_get_request( self, a_request_message ):
         a_specifier =  a_request_message.parsed_specifier().to_string()
@@ -38,9 +40,12 @@ class Endpoint(dripline.core._Endpoint):
                     print( "Current value of {} is: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
                     if( isinstance(getattr(self, a_specifier, "NotFound"), int) ):
                         a_payload_value = a_request_message.payload()["values"][0]().as_int()
-                        
                     elif( isinstance(getattr(self, a_specifier, "NotFound"), float) ):
                         a_payload_value = a_request_message.payload()["values"][0]().as_double()
+                    elif( isinstance(getattr(self, a_specifier, "NotFound"), bool) ):
+                        a_payload_value = a_request_message.payload()["values"][0]().as_bool()
+                    elif( isinstance(getattr(self, a_specifier, "NotFound"), str) ):
+                        a_payload_value = a_request_message.payload()["values"][0]().as_string()
                         
                     print( "Request message payload: {}".format(a_request_message.payload()) )
                     print( "Payload value: {}".format(a_payload_value) )
