@@ -39,21 +39,21 @@ namespace dripline_pybind
                 /*.def_static( "process_envelope", &dripline::message::process_envelope,
                         "From AMQP to message object" ) */
                 .def( "create_amqp_messages", &dripline::message::create_amqp_messages,
-                        "From message object to AMQP",
-                        pybind11::call_guard<pybind11::scoped_ostream_redirect,
-                                       pybind11::scoped_estream_redirect>() )
+                      "From message object to AMQP",
+                      pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                            pybind11::scoped_estream_redirect >() )
                 .def( "encode_message_body", &dripline::message::encode_message_body,
-                        "From message object to string",
-                        pybind11::call_guard<pybind11::scoped_ostream_redirect,
-                                       pybind11::scoped_estream_redirect>() )
+                      "From message object to string",
+                      pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                            pybind11::scoped_estream_redirect >() )
                 .def( "derived_modify_amqp_message", &_message::derived_modify_amqp_message,
-                        "derived_modify_amqp_message function",
-                        pybind11::call_guard<pybind11::scoped_ostream_redirect,
-                                       pybind11::scoped_estream_redirect>() )
+                      "derived_modify_amqp_message function",
+                      pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                            pybind11::scoped_estream_redirect >() )
                 .def( "derived_modify_message_param", &_message::derived_modify_message_param,
-                        "derived_modify_amqp_message function",
-                        pybind11::call_guard<pybind11::scoped_ostream_redirect,
-                                       pybind11::scoped_estream_redirect>() )
+                      "derived_modify_amqp_message function",
+                      pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                            pybind11::scoped_estream_redirect >() )
                 // mv_referrable
                 .def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
                            [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
