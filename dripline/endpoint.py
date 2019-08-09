@@ -38,14 +38,19 @@ class Endpoint(dripline.core._Endpoint):
             try:
                 if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
                     print( "Current value of {} is: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
-                    if( isinstance(getattr(self, a_specifier, "NotFound"), int) ):
-                        a_payload_value = a_request_message.payload()["values"][0]().as_int()
-                    elif( isinstance(getattr(self, a_specifier, "NotFound"), float) ):
-                        a_payload_value = a_request_message.payload()["values"][0]().as_double()
-                    elif( isinstance(getattr(self, a_specifier, "NotFound"), bool) ):
+                    #ipdb.set_trace()
+                    if( isinstance(getattr(self, a_specifier, "NotFound"), bool) ):
+                        print("bool test")
                         a_payload_value = a_request_message.payload()["values"][0]().as_bool()
-                    elif( isinstance(getattr(self, a_specifier, "NotFound"), str) ):
-                        a_payload_value = a_request_message.payload()["values"][0]().as_string()
+                    elif( isinstance(getattr(self, a_specifier, "NotFound"), float) ):
+                        print("float test")
+                        a_payload_value = a_request_message.payload()["values"][0]().as_double()
+                    elif( isinstance(getattr(self, a_specifier, "NotFound"), int) ):
+                        print("int test")
+                        a_payload_value = a_request_message.payload()["values"][0]().as_int()
+                    #elif( isinstance(getattr(self, a_specifier, "NotFound"), str) ):
+                    #    print("str test")
+                    #    a_payload_value = a_request_message.payload()["values"][0]().as_string()
                         
                     print( "Request message payload: {}".format(a_request_message.payload()) )
                     print( "Payload value: {}".format(a_payload_value) )
