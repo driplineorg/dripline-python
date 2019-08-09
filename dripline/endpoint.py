@@ -1,6 +1,6 @@
 import scarab
 import dripline
-import ipdb
+#import ipdb
 class Endpoint(dripline.core._Endpoint):
     def __init__( self, name ):
         dripline.core._Endpoint.__init__( self, name )
