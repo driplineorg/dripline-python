@@ -29,11 +29,11 @@ namespace scarab_pybind
             .def( "has", &scarab::param_node::has )
             .def( "count", &scarab::param_node::count )
 
-            .def( "__getitem__",
-                    [](scarab::param& a_param, const std::string& a_key)
-                    {
-                        return a_param[a_key];
-                    },
+            .def( "__getitem__", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
+            //      [](scarab::param& a_param, const std::string& a_key)
+            //{
+                        //return a_param[a_key];
+                        //},
                     pybind11::return_value_policy::reference_internal)
 
             .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,

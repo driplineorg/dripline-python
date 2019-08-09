@@ -24,11 +24,11 @@ namespace scarab_pybind
             .def( "is_array", &scarab::param::is_array )
             .def( "is_value", &scarab::param::is_value )
 
-            .def( "as_array", (scarab::param_array& (scarab::param::*)()) &scarab::param::as_array(),
+            .def( "as_array", (scarab::param_array& (scarab::param::*)()) &scarab::param::as_array,
                     pybind11::return_value_policy::reference_internal )
-            .def( "as_node", (scarab::param_node& (scarab::param::*)()) &scarab::param::as_node(),
+            .def( "as_node", (scarab::param_node& (scarab::param::*)()) &scarab::param::as_node,
                     pybind11::return_value_policy::reference_internal )
-            .def( "as_value", (scarab::param_value& (scarab::param::*)()) &scarab::param::as_value(),
+            .def( "as_value", (scarab::param_value& (scarab::param::*)()) &scarab::param::as_value,
                     pybind11::return_value_policy::reference_internal )
 
             //TODO: has_subset()
