@@ -23,21 +23,16 @@ namespace dripline_pybind
                         pybind11::call_guard<pybind11::scoped_ostream_redirect,
                                 pybind11::scoped_estream_redirect>() )
                 .def( "submit_request_message", &dripline::endpoint::submit_request_message,
-                        pybind11::call_guard<pybind11::gil_scoped_release,
-                                pybind11::scoped_ostream_redirect,
-                                pybind11::scoped_estream_redirect>() )
+                      pybind11::call_guard<pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect,
+                      pybind11::gil_scoped_release>() )
                 .def( "do_get_request", &_endpoint::do_get_request,
-                        pybind11::call_guard<pybind11::gil_scoped_release,
-                                pybind11::scoped_ostream_redirect,
-                                pybind11::scoped_estream_redirect>() )
+                      pybind11::call_guard<pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect,
+                      pybind11::gil_scoped_release>() )
                 .def( "do_set_request", &_endpoint::do_set_request,
-                        pybind11::call_guard<pybind11::gil_scoped_release,
-                                pybind11::scoped_ostream_redirect,
-                                pybind11::scoped_estream_redirect>() )
+                      pybind11::call_guard<pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect,
+                      pybind11::gil_scoped_release>() )
                 .def( "do_cmd_request", &_endpoint::do_cmd_request,
-                        pybind11::call_guard<
-                                pybind11::scoped_ostream_redirect,
-                                pybind11::scoped_estream_redirect>() )
+                        pybind11::call_guard<pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect>() )
                 .def_property("name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
                               [](dripline::endpoint& an_obj, const std::string& a_name ){ an_obj.name() = a_name; } )
             //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
