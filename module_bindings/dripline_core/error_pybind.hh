@@ -1,5 +1,7 @@
-#include "dripline_error.hh"
+#ifndef DRIPLINE_PYBIND_ERROR
+#define DRIPLINE_PYBIND_ERROR
 
+#include "dripline_error.hh"
 #include "pybind11/pybind11.h"
 
 namespace dripline_pybind
@@ -26,3 +28,5 @@ namespace dripline_pybind
     }
 
 } /* namespace dripline_pybind */
+
+#endif /* DRIPLINE_PYBIND_ERROR */

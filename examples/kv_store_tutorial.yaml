@@ -1,40 +1,37 @@
 name: my_store
 broker: localhost
-module: Spimescape
+module: Service
 endpoints:
-  - name: my_price_list
-    module: kv_store
-    endpoints:
       - name: peaches
-        module: kv_store_key
-        calibration: '2*{}'
-        initial_value: 0.75
-        log_interval: 30
-        get_on_set: True
-        log_on_set: True
+        module: Endpoint
+       #calibration: '2*{}'
+       #initial_value: 0.75
+       #log_interval: 30
+       #get_on_set: True
+       #log_on_set: True
       - name: chips
-        module: kv_store_key
-        log_interval: 30
-        get_on_set: True
-        log_on_set: True
-        calibration: 'times3({})'
-        initial_value: 1.75
+        module: Endpoint
+       #log_interval: 30
+       #get_on_set: True
+       #log_on_set: True
+       #calibration: 'times3({})'
+       #initial_value: 1.75
       - name: waffles
-        module: kv_store_key
-        log_interval: 30
-        log_on_set: True
-        calibration: '1.*{}'
-        initial_value: 4.00
+        module: Endpoint
+       #log_interval: 30
+       #log_on_set: True
+       #calibration: '1.*{}'
+       #initial_value: 4.00
       - name: peaches_status
-        log_on_set: True
-        module: kv_store_key
-        initial_value: "CLOSE"
-        calibration:
-            CLOSE: "on"
-            OPEN: "off"
-        set_value_map:
-            1: OPEN
-            0: CLOSE
-            "on": OPEN
-            "off": CLOSE
-        set_value_lowercase: True
+       #log_on_set: True
+        module: Endpoint
+       #initial_value: "CLOSE"
+       #calibration:
+       #    CLOSE: "on"
+       #    OPEN: "off"
+       #set_value_map:
+       #    1: OPEN
+       #    0: CLOSE
+       #    "on": OPEN
+       #    "off": CLOSE
+       #set_value_lowercase: True

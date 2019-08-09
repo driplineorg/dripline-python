@@ -24,6 +24,9 @@ namespace scarab_pybind
             .def( pybind11::init< const char* >() )
             .def( "__str__", &scarab::param_value::to_string )
 
+            .def( "is_null", &scarab::param_value::is_null )
+            .def( "is_value", &scarab::param_value::is_value )
+
             // type checking methods
             .def( "is_bool", (bool (scarab::param_value::*)() const) &scarab::param_value::is_bool,
                     "Return whether the param_value stores a boolean value" )
@@ -61,6 +64,10 @@ namespace scarab_pybind
                     "Set an float value" )
             .def( "set", (void (scarab::param_value::*)(std::string)) &scarab::param_value::set,
                     "Set an string value" )
+
+            //TODO: empty(), clear(), has_subset()
+
+
             ;
     }
 

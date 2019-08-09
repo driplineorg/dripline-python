@@ -1,0 +1,46 @@
+import yaml
+import scarab
+import dripline
+from endpoint import Endpoint
+
+def add_endpoints( this_service, this_endpoint_list ):
+    new_endpoints = []
+    for an_endpoint in this_endpoint_list:
+        module = an_endpoint.pop( "module" )
+        if module in globals():
+            new_endpoint = globals()[module](**an_endpoint)
+            new_endpoints.append(new_endpoint)
+            this_service.add_child( new_endpoint )
+    return new_endpoints
+
+with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
+
+    store = yaml.safe_load( stream )
+    
+    if "module" not in store:
+        service = dripline.core.Service()
+        print( "No service module found, creating new service with default parameters" )
+        
+    else:
+        module = store.pop( "module" )
+        # This service is meant to be used when the yaml file speficies more details about the service
+        service = dripline.core.Service()
+
+    endpoint_list = store.pop( "endpoints", [] )
+    all_endpoints = add_endpoints( service, endpoint_list )
+    
+    #endpoint_dict = service.sync_children()
+    #request = dripline.core.MsgRequest().create()
+    #request.routing_key = "peaches"
+    #request.op_t = dripline.core.op_t.to_op_t( "get" )
+    #print( "Request encode_full_message:" )
+    #print( request.encode_full_message() )
+
+    #if request.routing_key in endpoint_dict:
+    #    message_reply_payload = endpoint_dict.get(request.routing_key).submit_request_message(request).encode_full_message()
+    #    print( "Reply encode_full_message:" )
+    #    print( message_reply_payload )
+    print "Service starting"
+    service.start()
+    print "Service started"
+    service.listen()

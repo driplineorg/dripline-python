@@ -17,9 +17,25 @@ namespace scarab_pybind
             .def( pybind11::init< >() )
             .def( "__str__", &scarab::param_node::to_string )
 
+            .def( "is_null", &scarab::param_node::is_null )
+            .def( "is_node", &scarab::param_node::is_node )
+
+            //TODO: has_subset()
+
+            .def( "__len__", &scarab::param_node::size )
+            .def( "empty", &scarab::param_node::empty )
+
+            //TODO: are there more pythonic ways to do these?
+            .def( "has", &scarab::param_node::has )
+            .def( "count", &scarab::param_node::count )
+
+            .def( "__getitem__", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
+                    pybind11::return_value_policy::reference_internal)
+
             .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
                     "Add a param object to a node")
 
+            //TODO: remove this; it's not part of the actual param API
             .def( "at", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
                     "Get the param object for a given key" )
 
@@ -34,6 +50,14 @@ namespace scarab_pybind
                     "Get parameter node value as a float" )
             .def( "get_value", (std::string (scarab::param_node::*)(const std::string&, const std::string& ) const) &scarab::param_node::get_value,
                     "Get parameter node value as a string" )
-        ;
+
+            //TODO: replace()
+
+            //TODO: merge(), erase(), remove(), clear()
+
+            //TODO: iterators
+
+
+            ;
     }
 } /* namespace scarab_pybind */

@@ -1,5 +1,7 @@
-#include "dripline_constants.hh"
+#ifndef DRIPLINE_PYBIND_CONSTANTS
+#define DRIPLINE_PYBIND_CONSTANTS
 
+#include "dripline_constants.hh"
 #include "pybind11/pybind11.h"
 
 namespace dripline_pybind
@@ -37,7 +39,7 @@ namespace dripline_pybind
                 .def_static( "to_msg_t", (dripline::msg_t (*)(std::string))&dripline::to_msg_t, "Convert a string to msg_t" )
                 ;
 
-    }
+    } /* export_constants */
+} /* namespace dripline_pybind */
 
-}
-/* namespace dripline_pybind */
+#endif /* DRIPLINE_PYBIND_CONSTANTS */
