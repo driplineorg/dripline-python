@@ -11,8 +11,8 @@ addons:
       - docker-ce
       - qemu-user-static
 
-#env:
-#  - DOCKER_CLI_EXPERIMENTAL=enabled
+env:
+  - DOCKER_CLI_EXPERIMENTAL=enabled
 
 branches:
   only:
