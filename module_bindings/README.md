@@ -1,25 +1,23 @@
-mv_referrable function bindings (used for complex types)
-
+# mv_referrable function bindings (used for complex types)
 mv_referrable expands into 2 functions
-  -- [return_type]& [function_name]()
-    -- const [return_type]& [function_name]() const
+- ``[return_type]& [function_name]()``
+- ``const [return_type]& [function_name]() const``
 
 The following is an exmaple of binding a mv_referrable
 
-.def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+```.def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
     [](dripline::message& an_obj, const std::string& a_routing_key )
-            { an_obj.routing_key() = a_routing_key; } )
+            { an_obj.routing_key() = a_routing_key; } )```
 
-
-mv_accessible function bindings (used for simple types)
+# mv_accessible function bindings (used for simple types)
 
 mv_accessible functions should be bound using the pattern found here
-https://pybind11.readthedocs.io/en/master/classes.html#instance-and-static-fields
+- https://pybind11.readthedocs.io/en/master/classes.html#instance-and-static-fields
 which results in the following binding
 
-  .def_property( "name", &some::class::get_name, &some::class::set_name)
+``.def_property( "name", &some::class::get_name, &some::class::set_name)``
 
-
+# Other quick references to common problems
 
 When there appears to be a problem with bindings returning a non-trivial type, refer to here
 https://pybind11.readthedocs.io/en/stable/advanced/functions.html?highlight=policy#return-value-policies
