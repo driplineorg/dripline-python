@@ -33,20 +33,12 @@ namespace scarab_pybind
 
             //TODO: has_subset()
 
-            .def( "__call__", (scarab::param_value& (scarab::param::*)())&scarab::param::operator(),
+            .def( "__call__", (scarab::param_value& (scarab::param::*)()) &scarab::param::operator(),
                     pybind11::return_value_policy::reference_internal )
 
-            .def( "__getitem__",
-                    [](scarab::param& a_param, unsigned a_index)
-                    {
-                        return a_param[a_index];
-                    },
+            .def( "__getitem__", (scarab::param& (scarab::param::*)(unsigned)) &scarab::param::operator[],
                     pybind11::return_value_policy::reference_internal )
-            .def( "__getitem__",
-                    [](scarab::param& a_param, const std::string& a_key)
-                    {
-                        return a_param[a_key];
-                    },
+            .def( "__getitem__", (scarab::param& (scarab::param::*)(const std::string&)) &scarab::param::operator[],
                     pybind11::return_value_policy::reference_internal )
 
             //TODO: do we need __setitem__?
