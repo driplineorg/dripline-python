@@ -36,11 +36,7 @@ namespace scarab_pybind
             .def( "assign", (void (scarab::param_array::*)(unsigned, const scarab::param&)) &scarab::param_array::assign,
                     "Add a param object to the specified index in a array" )
 
-            .def( "__getitem__",
-                    [](scarab::param& a_param, unsigned a_index)
-                    {
-                        return a_param[a_index];
-                    },
+            .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
                     pybind11::return_value_policy::reference_internal)
 
             // Get value of the parameter, bringing along the default value
