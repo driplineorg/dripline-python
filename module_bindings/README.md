@@ -5,9 +5,11 @@ mv_referrable expands into 2 functions
 
 The following is an exmaple of binding a mv_referrable
 
-```.def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
+```
+.def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
     [](dripline::message& an_obj, const std::string& a_routing_key )
-            { an_obj.routing_key() = a_routing_key; } )```
+            { an_obj.routing_key() = a_routing_key; } )
+```
 
 # mv_accessible function bindings (used for simple types)
 
