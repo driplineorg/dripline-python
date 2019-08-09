@@ -62,7 +62,3 @@ class Endpoint(dripline.core._Endpoint):
                 return a_request_message.reply( 201, "attribute error: {}".format(this_error.message) )
         else:
             return self.on_get( a_request_message )
-
-            
-    def test_function( self ):
-        return "Inside python function"
