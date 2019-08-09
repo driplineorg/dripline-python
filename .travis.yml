@@ -17,6 +17,7 @@ addons:
 branches:
   only:
     - master
+    - feature/travis-setup
     - /^v\d+\.\d+\.\d+(-S*)?$/
 
 jobs:
