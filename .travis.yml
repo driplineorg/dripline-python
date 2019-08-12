@@ -1,0 +1,44 @@
+language: cpp
+
+dist: xenial
+
+services:
+  - docker
+
+addons:
+  apt:
+    packages:
+      - docker-ce
+      - qemu-user-static
+
+env:
+  - DOCKER_CLI_EXPERIMENTAL=enabled
+
+branches:
+  only:
+    - master
+    - develop
+    - /^v\d+\.\d+\.\d+(-S*)?$/
+
+jobs:
+  include:
+    ## amd64
+    - stage: build images
+      name: amd64
+      before_install: .travis/setup_emulation.sh
+      script:
+        - set -e
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - .travis/bootstrap_image.sh -u amd64 -r debian -t 10 -a amd64 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
+    ## arm
+    - stage: build images
+      name: arm32v7
+      before_install: .travis/setup_emulation.sh
+      script:
+        - set -e
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - .travis/bootstrap_image.sh -u arm32v7 -r debian -t 10 -a arm7 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
+    - stage: assemble manifest
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - .travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
