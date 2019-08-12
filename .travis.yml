@@ -18,6 +18,7 @@ branches:
   only:
     - master
     - develop
+    - hotfix/*
     - /^v\d+\.\d+\.\d+(-S*)?$/
 
 jobs:
@@ -29,7 +30,7 @@ jobs:
       script:
         - set -e
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/bootstrap_image.sh -u amd64 -r debian -t 10 -a amd64 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
+        - .travis/bootstrap_image.sh -u amd64 -r debian -t 9 -a amd64 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
     ## arm
     - stage: build images
       name: arm32v7
@@ -37,7 +38,7 @@ jobs:
       script:
         - set -e
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/bootstrap_image.sh -u arm32v7 -r debian -t 10 -a arm7 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
+        - .travis/bootstrap_image.sh -u arm32v7 -r debian -t 9 -a arm7 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
     - stage: assemble manifest
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
