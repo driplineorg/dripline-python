@@ -18,7 +18,7 @@ branches:
   only:
     - master
     - develop
-    - hotfix/*
+    - hotfix/pyversion
     - /^v\d+\.\d+\.\d+(-S*)?$/
 
 jobs:
