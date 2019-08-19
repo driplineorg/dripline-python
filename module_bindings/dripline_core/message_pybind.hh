@@ -24,7 +24,7 @@ namespace dripline_pybind
         /********
          message
          ********/
-        pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message(mod, "Message");
+        pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message( mod, "Message" );
 
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
             .value( "json", dripline::message::encoding::json )
@@ -57,13 +57,13 @@ namespace dripline_pybind
                                         pybind11::scoped_estream_redirect >() )
             // mv_referrable
             .def_property( "routing_key", (std::string& (dripline::message::*)()) &dripline::message::routing_key,
-                       [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
+                  [](dripline::message& an_obj, const std::string& a_routing_key ){ an_obj.routing_key() = a_routing_key; } )
             .def_property( "correlation_id", (std::string& (dripline::message::*)()) &dripline::message::correlation_id,
-                       [](dripline::message& an_obj, const std::string& a_correlation_id ){ an_obj.correlation_id() = a_correlation_id; } )
+                  [](dripline::message& an_obj, const std::string& a_correlation_id ){ an_obj.correlation_id() = a_correlation_id; } )
             .def_property( "reply_to", (std::string& (dripline::message::*)()) &dripline::message::reply_to,
-                       [](dripline::message& an_obj, const std::string& a_reply_to ){ an_obj.reply_to() = a_reply_to; } )
+                  [](dripline::message& an_obj, const std::string& a_reply_to ){ an_obj.reply_to() = a_reply_to; } )
             .def_property( "timestamp", (std::string& (dripline::message::*)()) &dripline::message::timestamp,
-                       [](dripline::message& an_obj, const std::string& a_timestamp ){ an_obj.timestamp() = a_timestamp; } )
+                  [](dripline::message& an_obj, const std::string& a_timestamp ){ an_obj.timestamp() = a_timestamp; } )
             // mv_accessible
             .def_property( "encoding", &dripline::message::get_encoding, &dripline::message::set_encoding )
 
@@ -80,7 +80,7 @@ namespace dripline_pybind
             */
             .def( "parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier,
                     pybind11::return_value_policy::reference_internal )
-            .def( "message_type", &dripline::message::message_type )
+            .def_property_readonly( "message_type", &dripline::message::message_type )
 
             //Temporary removal, corresponding functions in message.hh are commented out
             /*
