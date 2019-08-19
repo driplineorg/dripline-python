@@ -79,7 +79,7 @@ namespace dripline_pybind
             .def( "get_sender_info", &dripline::message::sender_info )
             */
             .def( "parsed_specifier", (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier,
-                    pybind11::return_value_policy::reference_internal )
+                  pybind11::return_value_policy::reference_internal )
             .def_property_readonly( "message_type", &dripline::message::message_type )
 
             //Temporary removal, corresponding functions in message.hh are commented out
@@ -95,7 +95,7 @@ namespace dripline_pybind
             */
 
             .def( "payload", (scarab::param& (dripline::message::*)())&dripline::message::payload,
-                    pybind11::return_value_policy::reference_internal )
+                  pybind11::return_value_policy::reference_internal )
 
             .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
             ;
@@ -129,7 +129,7 @@ namespace dripline_pybind
                       //LDEBUG( dlog_mph, "Here is the payload: " << a_payload );
                       return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param_node(a_payload)) );
                   } )
-            .def( "message_type", &dripline::msg_request::message_type )
+            .def_property_readonly( "message_type", &dripline::msg_request::message_type )
 
             // mv_accessible_static_noset
             .def_static( "get_message_type", &dripline::msg_request::get_message_type )
@@ -153,7 +153,7 @@ namespace dripline_pybind
             .def( "is_request", &dripline::msg_reply::is_request, "Returns true if the message is a request, false otherwise" )
             .def( "is_reply", &dripline::msg_reply::is_reply, "Returns true if the message is a reply, false otherwise" )
             .def( "is_alert", &dripline::msg_reply::is_alert, "Returns true if the message is an alert, false otherwise" )
-            .def( "message_type", &dripline::msg_reply::message_type )
+            .def_property_readonly( "message_type", &dripline::msg_reply::message_type )
             // mv_accessible_static_noset
             .def_static( "get_message_type", &dripline::msg_reply::get_message_type )
             // mv_referrable
@@ -172,7 +172,7 @@ namespace dripline_pybind
             .def( "is_request", &dripline::msg_alert::is_request, "Returns true if the message is a request, false otherwise" )
             .def( "is_reply", &dripline::msg_alert::is_reply, "Returns true if the message is a reply, false otherwise" )
             .def( "is_alert", &dripline::msg_alert::is_alert, "Returns true if the message is an alert, false otherwise" )
-            .def( "message_type", &dripline::msg_alert::message_type )
+            .def_property_readonly( "message_type", &dripline::msg_alert::message_type )
             // mv_accessible_static_noset
             .def_static( "get_message_type", &dripline::msg_alert::get_message_type )
             ;
