@@ -1,3 +1,6 @@
+# Integration statuses
+Master: [![Build Status](https://travis-ci.com/driplineorg/dripline-python.svg?branch=master)](https://travis-ci.com/driplineorg/dripline-python)
+
 # dripline-python
 Python implementation of the Dripline framework
 
