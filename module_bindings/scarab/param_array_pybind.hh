@@ -18,26 +18,27 @@ namespace scarab_pybind
         pybind11::class_< scarab::param_array, scarab::param >( mod, "ParamArray" )
             .def( pybind11::init< >() )
             .def( "__str__", &scarab::param_array::to_string )
+            .def( "__len__", &scarab::param_array::size,
+                    "Returns the size of the array" )
+            .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
+                    pybind11::return_value_policy::reference_internal)
 
             .def( "is_null", &scarab::param_array::is_null )
             .def( "is_array", &scarab::param_array::is_array )
 
             //TODO: has_subset()
 
-            .def( "__len__", &scarab::param_array::size, "Returns the size of the array" )
             //TODO: remove size(), which is not part of the pythonic API
             .def( "size", &scarab::param_array::size,
                     "Returns the size of the array" )
-            .def( "empty", &scarab::param_array::empty, "True if the length is zero" )
+            .def( "empty", &scarab::param_array::empty,
+                    "True if the length is zero" )
 
             .def( "resize", &scarab::param_array::resize,
                     "Sets the size of the array; if smaller than the current size, the extra elements are deleted" )
 
             .def( "assign", (void (scarab::param_array::*)(unsigned, const scarab::param&)) &scarab::param_array::assign,
                     "Add a param object to the specified index in a array" )
-
-            .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
-                    pybind11::return_value_policy::reference_internal)
 
             // Get value of the parameter, bringing along the default value
             .def( "get_value", (bool (scarab::param_array::*)(unsigned, bool) const) &scarab::param_array::get_value<bool>,

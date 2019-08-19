@@ -12,14 +12,13 @@ namespace dripline_pybind
     {
         pybind11::class_< dripline::service, std::shared_ptr< dripline::service > >( mod, "Service", "Used to send and receive simple messages" )
             .def( pybind11::init< const scarab::param_node&,
-                                   const std::string&,
-                                   const std::string&,
-                                   const unsigned int,
-                                   const std::string&,
-                                   const bool
-                                   >(),
-                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                         pybind11::scoped_estream_redirect >(),
+                                  const std::string&,
+                                  const std::string&,
+                                  const unsigned int,
+                                  const std::string&,
+                                  const bool
+                                >(),
+                   pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
                    pybind11::arg( "a_config" ) = scarab::param_node(),
                    pybind11::arg( "a_queue_name" ) = "",
                    pybind11::arg( "a_broker_address" ) = "",

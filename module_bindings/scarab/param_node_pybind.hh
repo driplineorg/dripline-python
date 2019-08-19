@@ -17,20 +17,21 @@ namespace scarab_pybind
             .def( pybind11::init< >() )
             .def( "__str__", &scarab::param_node::to_string )
 
+            .def( "__getitem__", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
+                    pybind11::return_value_policy::reference_internal)
+            .def( "__len__", &scarab::param_node::size )
+
             .def( "is_null", &scarab::param_node::is_null )
             .def( "is_node", &scarab::param_node::is_node )
 
             //TODO: has_subset()
 
-            .def( "__len__", &scarab::param_node::size )
             .def( "empty", &scarab::param_node::empty )
 
             //TODO: are there more pythonic ways to do these?
             .def( "has", &scarab::param_node::has )
             .def( "count", &scarab::param_node::count )
 
-            .def( "__getitem__", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
-                    pybind11::return_value_policy::reference_internal)
 
             .def( "add", (bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
                     "Add a param object to a node")
