@@ -16,11 +16,11 @@ def add_endpoints( this_service, this_endpoint_list ):
 with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
 
     store = yaml.safe_load( stream )
-    
+
     if "module" not in store:
         service = dripline.core.Service()
         print( "No service module found, creating new service with default parameters" )
-        
+
     else:
         module = store.pop( "module" )
         # This service is meant to be used when the yaml file speficies more details about the service
@@ -28,7 +28,7 @@ with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
 
     endpoint_list = store.pop( "endpoints", [] )
     all_endpoints = add_endpoints( service, endpoint_list )
-    
+
     #endpoint_dict = service.sync_children()
     #request = dripline.core.MsgRequest().create()
     #request.routing_key = "peaches"
