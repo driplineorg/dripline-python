@@ -1,5 +1,5 @@
 #include "constants_pybind.hh"
-#include "_endpoint.hh"
+#include "_endpoint_pybind.hh"
 #include "endpoint_trampoline.hh"
 #include "error_pybind.hh"
 #include "message_pybind.hh"
