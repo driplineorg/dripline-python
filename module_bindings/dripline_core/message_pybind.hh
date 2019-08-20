@@ -132,7 +132,6 @@ namespace dripline_pybind
             .def_property_readonly( "message_type", &dripline::msg_request::message_type )
 
             // mv_accessible_static_noset
-            .def_static( "get_message_type", &dripline::msg_request::get_message_type )
             // mv_referrable
             .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
             // mv_accessible
@@ -155,7 +154,6 @@ namespace dripline_pybind
             .def( "is_alert", &dripline::msg_reply::is_alert, "Returns true if the message is an alert, false otherwise" )
             .def_property_readonly( "message_type", &dripline::msg_reply::message_type )
             // mv_accessible_static_noset
-            .def_static( "get_message_type", &dripline::msg_reply::get_message_type )
             // mv_referrable
             .def( "get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg )
             // mv_accessible
@@ -174,7 +172,6 @@ namespace dripline_pybind
             .def( "is_alert", &dripline::msg_alert::is_alert, "Returns true if the message is an alert, false otherwise" )
             .def_property_readonly( "message_type", &dripline::msg_alert::message_type )
             // mv_accessible_static_noset
-            .def_static( "get_message_type", &dripline::msg_alert::get_message_type )
             ;
 
     } /* export_message */
