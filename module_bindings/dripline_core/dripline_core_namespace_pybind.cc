@@ -7,7 +7,7 @@
 #include "specifier_pybind.hh"
 #include "service_pybind.hh"
 
-PYBIND11_MODULE( dripline, dripline_mod )
+PYBIND11_MODULE( _dripline, dripline_mod )
 {
     // The bound classes belong in a submodule, create that
     pybind11::module dripline_core_mod = dripline_mod.def_submodule( "core", "Core dripline standard implementation classes" );
