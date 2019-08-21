@@ -31,10 +31,12 @@ namespace dripline_pybind
         all_items.push_back( "Message" );
         pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message( mod, "Message" );
 
+        // internal types
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
             .value( "json", dripline::message::encoding::json )
             ;
 
+        // the message class itself
         message
             // constructor(s)
             .def( pybind11::init< >() )
@@ -55,12 +57,15 @@ namespace dripline_pybind
             .def_property( "specifier",
                            (dripline::specifier& (dripline::message::*)())&dripline::message::parsed_specifier,
                            [](dripline::message& an_obj, const dripline::specifier& a_specifier ){ an_obj.parsed_specifier() = a_specifier; },
-                           pybind11::return_value_policy::reference_internal )
+                           pybind11::return_value_policy::reference_internal
+                         )
             .def_property_readonly( "message_type", &dripline::message::message_type )
             .def_property( "sender_info", &dripline::message::get_sender_info, &dripline::message::set_sender_info )
-            //TODO this should be a property
-            .def( "payload", (scarab::param& (dripline::message::*)())&dripline::message::payload,
-                  pybind11::return_value_policy::reference_internal )
+            .def_property( "payload",
+                           (scarab::param& (dripline::message::*)())&dripline::message::payload,
+                           [](dripline::request_ptr_t a_req, scarab::param& a_payload){ a_req->set_payload(a_payload.clone()); },
+                           pybind11::return_value_policy::reference_internal
+                         )
 
             // methods to check message type
             .def( "is_request", &dripline::message::is_request, "Returns true if the message is a request, false otherwise" )
@@ -70,22 +75,30 @@ namespace dripline_pybind
             // methods to convert between dripline message, amqp types, etc.
             /*.def_static( "process_envelope", &dripline::message::process_envelope,
                 "From AMQP to message object" ) */
-            .def( "create_amqp_messages", &dripline::message::create_amqp_messages,
+            .def( "create_amqp_messages",
+                  &dripline::message::create_amqp_messages,
                   "From message object to AMQP",
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "encode_message_body", &dripline::message::encode_message_body,
+                                        pybind11::scoped_estream_redirect >()
+                )
+            .def( "encode_message_body",
+                  &dripline::message::encode_message_body,
                   "From message object to string",
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "derived_modify_amqp_message", &_message::derived_modify_amqp_message,
+                                        pybind11::scoped_estream_redirect >()
+                )
+            .def( "derived_modify_amqp_message",
+                  &_message::derived_modify_amqp_message,
                   "derived_modify_amqp_message function",
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "derived_modify_message_param", &_message::derived_modify_message_param,
+                                        pybind11::scoped_estream_redirect >()
+                )
+            .def( "derived_modify_message_param",
+                  &_message::derived_modify_message_param,
                   "derived_modify_amqp_message function",
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
+                                        pybind11::scoped_estream_redirect >()
+                )
 
             .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
             ;
