@@ -157,7 +157,7 @@ namespace dripline_pybind
          msg_reply
          ************/
         all_items.push_back( "MsgReply" );
-        pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > >( mod, "MsgReply", message );
+        pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > >( mod, "MsgReply", message )
             // constructor(s)
             .def( pybind11::init< >() )
 
@@ -203,12 +203,11 @@ namespace dripline_pybind
          msg_alert
          ************/
         all_items.push_back( "MsgAlert" );
-        pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert > >( mod, "MsgAlert", message );
+        pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert > >( mod, "MsgAlert", message )
             // constructor(s)
             .def( pybind11::init< >() )
 
             // general methods
-            //.def_static( "create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
             .def_static( "create",
                          []( scarab::param& a_payload,
                              std::string& a_routing_key,
