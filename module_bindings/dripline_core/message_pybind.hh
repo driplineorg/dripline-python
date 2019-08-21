@@ -159,14 +159,45 @@ namespace dripline_pybind
         all_items.push_back( "MsgReply" );
         pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > > msg_reply( mod, "MsgReply", message );
         msg_reply
+            // constructor(s)
             .def( pybind11::init< >() )
-            //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
-            //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(const dripline::return_code&, const std::string&, const dripline::msg_request&)) &dripline::msg_reply::create )
-            //.def_static( "create", (dripline::reply_ptr_t (dripline::msg_reply::*)(unsigned, const std::string&, scarab::param_ptr_t, const std::string&, const std::string&, dripline::message::encoding)) &dripline::msg_reply::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
+
+            // properties
             // mv_referrable
-            .def( "get_return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg )
+            .def_property( "return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg,
+                           []( dripline::msg_reply& an_obj, const std::string& a_msg ){ an_obj.return_msg() = a_msg; } )
             // mv_accessible
-            .def( "get_return_code", (unsigned (dripline::msg_reply::*)()) &dripline::msg_reply::get_return_code )
+            .def_property( "return_code", &dripline::msg_reply::get_return_code, &dripline::msg_reply::set_return_code )
+
+            // general methods
+            //TODO the C++ interface has two more overloads where the input return code is a dripline::return_code;
+            //     if we wrap that then we should add those overloads. (are we going to want to do that?)
+            .def_static( "create",
+                         [](unsigned a_retcode_value,
+                            const std::string& a_ret_msg,
+                            scarab::param& a_payload,
+                            std::string& a_routing_key,
+                            std::string& a_specifier,
+                            dripline::message::encoding an_encoding)
+                           {return dripline::msg_reply::create( a_retcode_value, a_ret_msg, a_payload.clone(), a_routing_key, a_specifier, an_encoding);},
+                         pybind11::arg( "retcode" ) = 0,
+                         pybind11::arg( "ret_msg" ) = "",
+                         pybind11::arg( "payload" ) = scarab::param(),
+                         pybind11::arg( "routing_key" ) = "",
+                         pybind11::arg( "specifier" ) = "",
+                         pybind11::arg( "encoding" ) = dripline::message::encoding::json
+                       )
+            .def_static( "create",
+                         [](unsigned a_retcode_value,
+                            const std::string& a_ret_msg,
+                            scarab::param& a_payload,
+                            const dripline::msg_request& a_msg_request)
+                           {return dripline::msg_reply::create( a_retcode_value, a_ret_msg, a_payload.clone(), a_msg_request);},
+                         pybind11::arg( "retcode" ) = 0,
+                         pybind11::arg( "ret_msg" ) = "",
+                         pybind11::arg( "payload" ) = scarab::param(),
+                         pybind11::arg( "msg_request" ) = dripline::message::encoding::json
+                       )
             ;
 
         /***********
