@@ -18,12 +18,14 @@ namespace dripline_pybind
             using dripline::message::derived_modify_message_param;
     };
 
-    void export_message( pybind11::module& mod )
+    std::list< std::string >  export_message( pybind11::module& mod )
     {
+        std::list< std::string > all_items;
 
         /********
          message
          ********/
+        all_items.push_back( "Message" );
         pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message( mod, "Message" );
 
         pybind11::enum_< dripline::message::encoding >( message, "encoding" )
@@ -88,6 +90,7 @@ namespace dripline_pybind
         /************
          msg_request
          ************/
+        all_items.push_back( "MsgRequest" );
         pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request > >( mod, "MsgRequest", message )
             // constructor(s)
             .def( pybind11::init< >() )
@@ -127,6 +130,7 @@ namespace dripline_pybind
         /************
          msg_reply
          ************/
+        all_items.push_back( "MsgReply" );
         pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply > > msg_reply( mod, "MsgReply", message );
         msg_reply
             .def( pybind11::init< >() )
@@ -142,11 +146,14 @@ namespace dripline_pybind
         /***********
          msg_alert
          ************/
+        all_items.push_back( "MsgAlert" );
         pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert > > msg_alert( mod, "MsgAlert", message );
         msg_alert
             .def( pybind11::init< >() )
             //.def_static( "create", &dripline::msg_alert::create, pybind11::arg("a_specifier") = "", pybind11::arg("a_encoding") = dripline::message::encoding::json )
             ;
+
+    return all_items;
 
     } /* export_message */
 

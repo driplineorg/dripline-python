@@ -8,8 +8,10 @@
 
 namespace dripline_pybind
 {
-    void export_service( pybind11::module& mod )
+    std::list< std::string>  export_service( pybind11::module& mod )
     {
+        std::list< std::string > all_items;
+        all_items.push_back( "Service" );
         pybind11::class_< dripline::service, std::shared_ptr< dripline::service > >( mod, "Service", "Used to send and receive simple messages" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
@@ -46,6 +48,7 @@ namespace dripline_pybind
                                         pybind11::scoped_estream_redirect >() )
             .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
             ;
+        return all_items;
     }
 } /* namespace dripline_pybind */
 
