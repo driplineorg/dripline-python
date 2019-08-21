@@ -108,6 +108,15 @@ namespace dripline_pybind
             .def_property( "message_op", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
 
             .def_static( "create", [](){ return dripline::msg_request::create( scarab::param_ptr_t(new scarab::param()), dripline::op_t::unknown, "", "", "", dripline::message::encoding::json ); } )
+            .def( "create2", &dripline::msg_request::create, "create a new request instance",
+                  //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param()),
+                  pybind11::arg_v( "a_payload", scarab::param_ptr_t(new scarab::param()) ),
+                  pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
+                  pybind11::arg( "a_routing_key" ) = "",
+                  pybind11::arg( "a_specifier" ) = "",
+                  pybind11::arg( "a_reply_to" ) = "",
+                  pybind11::arg( "a_encoding" ) = dripline::message::encoding::json
+                )
             //.def_static( "create", &dripline::msg_request::create, 
                          //pybind11::arg( "a_payload" ),
                          //pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
