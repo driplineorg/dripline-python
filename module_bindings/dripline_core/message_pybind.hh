@@ -98,8 +98,10 @@ namespace dripline_pybind
             // mv_referrable
             //TODO lockout key type is not something python understands... looks like we can use boost::uuids::to_string and/or stream operators
             //     see https://www.boost.org/doc/libs/1_71_0/libs/uuid/doc/uuid.html
-            .def_property( "lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key,
-                           [](dripline::msg_request& an_obj, const boost::uuids::uuid& a_lockout_key ){ an_obj.lockout_key() = a_lockout_key; } )
+            .def_property( "lockout_key",
+                           (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key,
+                           [](dripline::msg_request& an_obj, const boost::uuids::uuid& a_lockout_key ){ an_obj.lockout_key() = a_lockout_key; }
+                         )
             .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
             // mv_accessible
             .def_property_readonly( "lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
@@ -107,33 +109,37 @@ namespace dripline_pybind
             //.def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid)
             .def_property( "message_op", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
 
-            .def_static( "create", [](){ return dripline::msg_request::create( scarab::param_ptr_t(new scarab::param()), dripline::op_t::unknown, "", "", "", dripline::message::encoding::json ); } )
-            .def( "create2", &dripline::msg_request::create, "create a new request instance",
-                  //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param()),
-                  pybind11::arg_v( "a_payload", scarab::param_ptr_t(new scarab::param()) ),
-                  pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
-                  pybind11::arg( "a_routing_key" ) = "",
-                  pybind11::arg( "a_specifier" ) = "",
-                  pybind11::arg( "a_reply_to" ) = "",
-                  pybind11::arg( "a_encoding" ) = dripline::message::encoding::json
+            .def_static( "create",
+                         [](scarab::param& a_payload,
+                            dripline::op_t a_msg_op,
+                            std::string& a_routing_key,
+                            std::string& a_specifier,
+                            std::string& a_reply_to,
+                            dripline::message::encoding an_encoding)
+                           {return dripline::msg_request::create( a_payload.clone(), a_msg_op, a_routing_key, a_specifier, a_reply_to, an_encoding);},
+                         pybind11::arg( "payload" ) = scarab::param(),
+                         pybind11::arg( "msg_op" ) = dripline::op_t::unknown,
+                         pybind11::arg( "routing_key" ) = "",
+                         pybind11::arg( "specifier" ) = "",
+                         pybind11::arg( "reply_to" ) = "",
+                         pybind11::arg( "encoding" ) = dripline::message::encoding::json
+                       )
+//            .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
+//                      //pybind11::arg( "a_retcode" ) = 0,
+//                      //pybind11::arg( "a_ret_msg" ) = "",
+//                      //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
+//            //.def( "reply", (dripline::reply_ptr_t (dripline::msg_request::*)(const unsigned, const std::string&, scarab::param_ptr_t) const) &dripline::msg_request::reply )
+//            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
+            .def( "reply",
+                  [](dripline::request_ptr_t a_req,
+                     const unsigned a_retcode,
+                     const std::string& a_ret_msg,
+                     scarab::param& a_payload)
+                    {return a_req->reply( a_retcode, a_ret_msg, a_payload.clone() );},
+                  pybind11::arg( "retcode" ) = 0,
+                  pybind11::arg( "ret_msg" ) = "",
+                  pybind11::arg( "payload" ) = scarab::param()
                 )
-            //.def_static( "create", &dripline::msg_request::create, 
-                         //pybind11::arg( "a_payload" ),
-                         //pybind11::arg( "a_msg_op" ) = dripline::op_t::unknown,
-                         //pybind11::arg( "a_routing_key" ) = "",
-                         //pybind11::arg( "a_specifier" ) = "",
-                         //pybind11::arg( "a_reply_to" ) = "",
-                         //pybind11::arg( "a_encoding" ) = dripline::message::encoding::json
-                         //)
-            .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
-                      //pybind11::arg( "a_retcode" ) = 0,
-                      //pybind11::arg( "a_ret_msg" ) = "",
-                      //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
-            //.def( "reply", (dripline::reply_ptr_t (dripline::msg_request::*)(const unsigned, const std::string&, scarab::param_ptr_t) const) &dripline::msg_request::reply )
-            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
-            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg, scarab::param_node& a_payload)
-                  { return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param_node(a_payload)) ); } )
-
             ;
 
         /************
