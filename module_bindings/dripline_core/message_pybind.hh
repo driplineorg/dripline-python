@@ -3,8 +3,11 @@
 
 #include "message.hh"
 #include "message_trampoline.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/iostream.h"
+
+#include "uuid.hh"
 
 #include "logger.hh"
 LOGGER( dlog_mph, "message_pybind.hh" )
@@ -96,19 +99,20 @@ namespace dripline_pybind
             .def( pybind11::init< >() )
             // properties
             // mv_referrable
-            //TODO lockout key type is not something python understands... looks like we can use boost::uuids::to_string and/or stream operators
-            //     see https://www.boost.org/doc/libs/1_71_0/libs/uuid/doc/uuid.html
+            //TODO even better if we could interface with python's UUID library instead of passing strings
             .def_property( "lockout_key",
-                           (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key,
-                           [](dripline::msg_request& an_obj, const boost::uuids::uuid& a_lockout_key ){ an_obj.lockout_key() = a_lockout_key; }
+                           [](dripline::request_ptr_t a_req){ return boost::uuids::to_string(a_req->lockout_key()); },
+                           [](dripline::request_ptr_t a_req, const std::string& a_lockout_key ){
+                                bool t_lockout_key_valid = true;
+                                a_req->lockout_key() = dripline::uuid_from_string( a_lockout_key, t_lockout_key_valid );
+                                a_req->set_lockout_key_valid( t_lockout_key_valid );
+                             }
                          )
-            .def( "get_lockout_key", (boost::uuids::uuid& (dripline::msg_request::*)()) &dripline::msg_request::lockout_key )
             // mv_accessible
-            .def_property_readonly( "lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
-            .def( "get_lockout_key_valid", (void (dripline::msg_request::*)(bool)) &dripline::msg_request::get_lockout_key_valid )
-            //.def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid)
+            .def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid )
             .def_property( "message_op", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
 
+            // general methods
             .def_static( "create",
                          [](scarab::param& a_payload,
                             dripline::op_t a_msg_op,
@@ -124,12 +128,6 @@ namespace dripline_pybind
                          pybind11::arg( "reply_to" ) = "",
                          pybind11::arg( "encoding" ) = dripline::message::encoding::json
                        )
-//            .def( "reply", [](dripline::request_ptr_t a_req){ return a_req->reply( 0, "", scarab::param_ptr_t(new scarab::param())); } )
-//                      //pybind11::arg( "a_retcode" ) = 0,
-//                      //pybind11::arg( "a_ret_msg" ) = "",
-//                      //pybind11::arg( "a_payload" ) = scarab::param_ptr_t(new scarab::param())
-//            //.def( "reply", (dripline::reply_ptr_t (dripline::msg_request::*)(const unsigned, const std::string&, scarab::param_ptr_t) const) &dripline::msg_request::reply )
-//            .def( "reply", [](dripline::request_ptr_t a_req, const unsigned a_retcode, const std::string& a_ret_msg){ return a_req->reply( a_retcode, a_ret_msg, scarab::param_ptr_t(new scarab::param())); } )
             .def( "reply",
                   [](dripline::request_ptr_t a_req,
                      const unsigned a_retcode,
@@ -138,7 +136,7 @@ namespace dripline_pybind
                     {return a_req->reply( a_retcode, a_ret_msg, a_payload.clone() );},
                   pybind11::arg( "retcode" ) = 0,
                   pybind11::arg( "ret_msg" ) = "",
-                  pybind11::arg( "payload" ) = scarab::param()
+                  pybind11::arg_v( "payload", scarab::param(), "scarab::param()" )
                 )
             ;
 
