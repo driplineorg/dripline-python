@@ -22,6 +22,7 @@ namespace scarab_pybind
                     "Returns the size of the array" )
             .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
                     pybind11::return_value_policy::reference_internal)
+            .def( "__setitem__", [](scarab::param_array& an_obj, unsigned a_index, scarab::param& a_value){ an_obj.assign( a_index, a_value ); } )
 
             .def( "is_null", &scarab::param_array::is_null )
             .def( "is_array", &scarab::param_array::is_array )
