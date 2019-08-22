@@ -52,11 +52,18 @@ namespace scarab_pybind
             .def( "get_value", (std::string (scarab::param_array::*)(unsigned, const std::string& ) const) &scarab::param_array::get_value,
                     "Get parameter array value as a string" )
 
-            //TODO: push_back() and push_front()
+            .def( "push_back", (void (scarab::param_array::*)(const scarab::param&)) &scarab::param_array::push_back, "add a param object to the end of the array")
+            //.def( "push_back", (void (scarab::param_array::*)(scarab::param&)) &scarab::param_array::push_back, "add a param object to the end of the array")
+            .def( "push_front", (void (scarab::param_array::*)(const scarab::param&)) &scarab::param_array::push_front, "add a param object to the end of the array")
+            //.def( "push_front", (void (scarab::param_array::*)(scarab::param&)) &scarab::param_array::push_front, "add a param object to the end of the array")
 
-            //TODO: append(), merge(), erase(), remove(), clear()
+            .def( "append", &scarab::param_array::append )
+            .def( "merge", &scarab::param_array::merge )
+            .def( "erase", &scarab::param_array::erase )
+            .def( "remove", &scarab::param_array::remove )
+            .def( "clear", &scarab::param_array::clear )
 
-            //TODO: iterators
+            //TODO: iterators (see: https://github.com/pybind/pybind11/blob/master/tests/test_sequences_and_iterators.cpp)
 
             ;
     }
