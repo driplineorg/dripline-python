@@ -14,55 +14,96 @@ class Endpoint(_Endpoint):
         self.str_attribute = "Hi"
 
     def do_get_request( self, a_request_message ):
-        a_specifier =  a_request_message.parsed_specifier().to_string()
+        a_specifier =  a_request_message.parsed_specifier.to_string()
         if ( a_specifier ):
             try:
-                if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
-                    an_attribute = getattr( self, a_specifier )
-                    the_value = scarab.ParamValue( an_attribute )
-                    the_array = scarab.ParamArray()
-                    the_array.resize( 1 )
-                    the_array.assign( 0, the_value )
-                    the_node = scarab.ParamNode()
-                    the_node.add( "values", the_array )
-                    return a_request_message.reply( 0, "Success", the_node )
-                else:
-                    return a_request_message.reply( 200,  200, "Attribute {} does not exist in endpoint <{}>".format(a_specifier, self.name) )
+                an_attribute = getattr( self, a_specifier )
+                the_node = scarab.ParamNode()
+                the_node["values"] = scarab.ParamArray()
+                the_node["values"].push_back(scarab.ParamValue(an_attribute))
+                return a_request_message.reply(payload=the_node)
             except AttributeError:
+                #TODO we should resolve the returncodes and update this value
                 return a_request_message.reply( 201, "attribute error: {}".format(this_error.message) )
         else:
-            return self.on_get( a_request_message )
-
-    def on_get( self, a_request ):
-        return a_request.reply( 203, "Endpoint <{}> of type {} does not support Get".format(self.name, type(self)) )
+            try:
+                the_value = self.on_get()
+                payload = scarab.ParamNode()
+                payload["values"] = scarab.ParamValue(the_value)
+                return a_request_message.reply(payload=payload)
+            #TODO should work out exception details and make the following block more narrow
+            except Exception as e:
+                return a_request_message.reply( 100, "got an exception trying to on_get: {}".format(str(e)))
 
     def do_set_request( self, a_request_message ):
         a_specifier =  a_request_message.parsed_specifier().to_string()
+        new_value = a_request_message.payloas["values"][0]()
+        # TODO: can this block be done in pybind, not sure how to deal with the template
+        #       if not it would be nice if it were implemented in a python-extension of the scarab interface
+        if new_value.is_null():
+            new_value = None
+        elif new_value.is_bool():
+            new_value = new_value.as_bool()
+        elif new_value.is_int() or new_value.is_uint():
+            new_value = new_value.as_int()
+        elif new_value.is_double():
+            new_value = new_value.as_double()
+        elif new_value.is_string():
+            new_value = new_value.as_string()
+        else:
+            #TODO this should be something else
+            raise TypeError("set value type is not understood")
         if ( a_specifier ):
             try:
-                if ( getattr(self, a_specifier, "NotFound") != "NotFound"):
-                    print( "Current value of {} is: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
-                    #ipdb.set_trace()
-                    if( isinstance(getattr(self, a_specifier, "NotFound"), bool) ):
-                        print("bool test")
-                        a_payload_value = a_request_message.payload()["values"][0]().as_bool()
-                    elif( isinstance(getattr(self, a_specifier, "NotFound"), float) ):
-                        print("float test")
-                        a_payload_value = a_request_message.payload()["values"][0]().as_double()
-                    elif( isinstance(getattr(self, a_specifier, "NotFound"), int) ):
-                        print("int test")
-                        a_payload_value = a_request_message.payload()["values"][0]().as_int()
-                    #elif( isinstance(getattr(self, a_specifier, "NotFound"), str) ):
-                    #    print("str test")
-                    #    a_payload_value = a_request_message.payload()["values"][0]().as_string()
-
-                    print( "Request message payload: {}".format(a_request_message.payload()) )
-                    print( "Payload value: {}".format(a_payload_value) )
-                    setattr( self, a_specifier, a_payload_value)
-                    return a_request_message.reply( 0, "Changed {} to: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
-                else:
-                    return a_request_message.reply( 200, "Attribute {} does not exist in endpoint <{}>".format(a_specifier, self.name) )
+                setattr( self, a_specifier, a_payload_value)
+                #return a_request_message.reply( 0, "Changed {} to: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
             except AttributeError as this_error:
-                return a_request_message.reply( 201, "attribute error: {}".format(this_error.message) )
+                return a_request_message.reply(201, "attribute error: {}".format(this_error.message) )
         else:
-            return self.on_get( a_request_message )
+            try:
+                result = self.on_set(new_value)
+                return a_request_message.reply(payload=result)
+            except Exception as e:
+                return a_request_message.reply(100, "got an exception trying to on_get: {}".format(str(e)))
+
+    def do_cmd_request( self, a_request_message ):
+        #Note: any command executed in this way must return a Param object, otherwise the return will fail
+        method_name = a_request_message.parsed_specifier().to_string()
+        try:
+            method_ref = getattr(self, method_name)
+        except AttributeError as e:
+            return a_request_message.reply(100, "error getting command's corresponding method: {}".format(str(e)))
+        #TODO: this if/else block duplciates `get_value`, but it has no overload for returning a ParamNode (since it isn't a ParamValue)
+        #      should there be a "get" (or get_item?) which is similar but returns any Param at the index, still allowing a default?
+        if "values" in a_request_message:
+            the_args = a_request_message.payload["values"]
+        else:
+            the_args = []
+        #TODO: need to bind iterators for ParamNode so that we can populate unknown kwargs...
+        #      python's dict has a keys(), that would let me force the above, or I could implement that in python from an iterator
+        the_kwargs = {}
+        try:
+            result = method_ref(*the_args, **the_kwargs)
+            return a_request_message.reply(payload=result)
+        except Exception as e:
+                #TODO: should be using a logger object here, right?
+                print("failure while trying to execute: {}(*{}, **{})".format(method_name, str(the_args), str(the_kwargs)))
+                return a_request_message.reply(100, "got an exception trying to execute cmd: {}".format(str(e)))
+
+    def on_get( self ):
+        '''
+        placeholder method for getting the value of an endpoint.
+        Implementations may override to enable OP_GET operations.
+        The implementation must return a value which is able to be passed to the ParamValue constructor.
+        '''
+        #TODO should this be a dripline error?
+        raise NotImplementedError( "endpoint '{}' does not implement an on_get".format(self.name) )
+
+    def on_set( self ):
+        '''
+        placeholder method for setting the value of an endpoint.
+        Implementations may override to enable OP_SET operations.
+        Any returned object must already be a scarab::Param object
+        '''
+        #TODO should this be a dripline error?
+        raise NotImplementedError( "endpoint '{}' does not implement an on_set".format(self.name) )
