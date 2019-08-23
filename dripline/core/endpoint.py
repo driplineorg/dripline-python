@@ -56,7 +56,7 @@ class Endpoint(_Endpoint):
         if ( a_specifier ):
             try:
                 setattr( self, a_specifier, a_payload_value)
-                #return a_request_message.reply( 0, "Changed {} to: {}".format(a_specifier, getattr(self, a_specifier, "NotFound")) )
+                return a_request_message.reply()
             except AttributeError as this_error:
                 return a_request_message.reply(201, "attribute error: {}".format(this_error.message) )
         else:
@@ -68,6 +68,8 @@ class Endpoint(_Endpoint):
 
     def do_cmd_request( self, a_request_message ):
         #Note: any command executed in this way must return a Param object, otherwise the return will fail
+        #TODO: We need to implement a helper for converting a semi-arbitrary (compatible) python data structure to a Param
+        #      that way we can use this to call any method, methods can just return whatever is natural and the packaging be done here
         method_name = a_request_message.parsed_specifier().to_string()
         try:
             method_ref = getattr(self, method_name)
