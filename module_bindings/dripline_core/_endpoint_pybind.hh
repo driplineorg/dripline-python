@@ -8,6 +8,7 @@
 
 namespace dripline_pybind
 {
+
     class _endpoint : public dripline::endpoint
     {
         public:
@@ -16,8 +17,11 @@ namespace dripline_pybind
             using dripline::endpoint::do_cmd_request;
     };
 
-    void export_endpoint( pybind11::module& mod )
+    std::list< std::string > export_endpoint( pybind11::module& mod )
     {
+        std::list< std::string > all_items;
+
+        all_items.push_back( "_Endpoint" );
         pybind11::class_< dripline::endpoint, endpoint_trampoline, std::shared_ptr< dripline::endpoint > >( mod, "_Endpoint", "Endpoint binding" )
             .def( pybind11::init< const std::string& >(),
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
@@ -42,6 +46,7 @@ namespace dripline_pybind
             //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
             //          "Get name of an endpoint as a string" )
             ;
+            return all_items;
     }
 } /* namespace dripline_pybind */
 #endif /* DRIPLINE_PYBIND_ENDPOINT */

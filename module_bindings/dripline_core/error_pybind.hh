@@ -7,9 +7,12 @@
 namespace dripline_pybind
 {
 
-    void export_error( pybind11::module& mod )
+    std::list< std::string > export_error( pybind11::module& mod )
     {
+        std::list< std::string > all_items;
 
+        //TODO how do we actually want to deal with errors?
+        all_items.push_back( "dripline_error" );
         static pybind11::exception< dripline::dripline_error > ex( mod, "dripline_error" );
         pybind11::register_exception_translator( [](std::exception_ptr p)
         {
@@ -24,7 +27,7 @@ namespace dripline_pybind
             }
         }
         );
-
+        return all_items;
     }
 
 } /* namespace dripline_pybind */

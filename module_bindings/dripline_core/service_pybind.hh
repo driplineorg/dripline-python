@@ -8,8 +8,10 @@
 
 namespace dripline_pybind
 {
-    void export_service( pybind11::module& mod )
+    std::list< std::string>  export_service( pybind11::module& mod )
     {
+        std::list< std::string > all_items;
+        all_items.push_back( "Service" );
         pybind11::class_< dripline::service, std::shared_ptr< dripline::service > >( mod, "Service", "Used to send and receive simple messages" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
@@ -19,12 +21,12 @@ namespace dripline_pybind
                                   const bool
                                 >(),
                    pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
-                   pybind11::arg( "a_config" ) = scarab::param_node(),
-                   pybind11::arg( "a_queue_name" ) = "",
-                   pybind11::arg( "a_broker_address" ) = "",
-                   pybind11::arg( "a_port" ) = 0,
-                   pybind11::arg( "a_auth_file" ) = "",
-                   pybind11::arg( "a_make_connection" ) = true
+                   pybind11::arg( "config" ) = scarab::param_node(),
+                   pybind11::arg( "queue_name" ) = "",
+                   pybind11::arg( "broker_address" ) = "",
+                   pybind11::arg( "port" ) = 0,
+                   pybind11::arg( "auth_file" ) = "",
+                   pybind11::arg( "make_connection" ) = true
             )
 
             .def( "start", &dripline::service::start,
@@ -46,6 +48,7 @@ namespace dripline_pybind
                                         pybind11::scoped_estream_redirect >() )
             .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
             ;
+        return all_items;
     }
 } /* namespace dripline_pybind */
 

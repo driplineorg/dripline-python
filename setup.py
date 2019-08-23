@@ -4,7 +4,7 @@ import sys
 import platform
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
@@ -67,7 +67,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='dripline',
-    version='0.0.1',
+    version='4.0.0-beta',
     author='us',
     author_email='driplineorg@email.tld',
     description='a description would be good',
@@ -77,4 +77,5 @@ setup(
     ext_modules=[CMakeExtension('dripline_python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+    packages=["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")],#, "dripline.core", "dripline.extensions"],
 )

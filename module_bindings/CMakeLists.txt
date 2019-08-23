@@ -29,6 +29,6 @@ set( PB_DRIPLINE_CORE_HEADERFILES
 set( PB_DRIPLINE_CORE_SOURCEFILES
     dripline_core/dripline_core_namespace_pybind.cc
 )
-pybind11_add_module( dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
-target_link_libraries( dripline PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( dripline )
+pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
+target_link_libraries( _dripline PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+pbuilder_install_libraries( _dripline )

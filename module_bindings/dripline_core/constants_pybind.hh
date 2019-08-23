@@ -7,9 +7,11 @@
 namespace dripline_pybind
 {
 
-    void export_constants(pybind11::module& mod)
+    std::list< std::string > export_constants(pybind11::module& mod)
     {
+        std::list< std::string > all_items;
 
+        all_items.push_back("op_t");
         pybind11::enum_< dripline::op_t >( mod, "op_t", pybind11::arithmetic() )
                 // the values
                 .value( "set", dripline::op_t::set )
@@ -26,6 +28,7 @@ namespace dripline_pybind
                 .def_static( "to_op_t", (dripline::op_t (*)(std::string))&dripline::to_op_t, "Convert an string to op_t" )
                 ;
 
+        all_items.push_back("msg_t");
         pybind11::enum_<dripline::msg_t>( mod, "msg_t", pybind11::arithmetic() )
                 // the values
                 .value( "reply", dripline::msg_t::reply )
@@ -39,6 +42,7 @@ namespace dripline_pybind
                 .def_static( "to_msg_t", (dripline::msg_t (*)(std::string))&dripline::to_msg_t, "Convert a string to msg_t" )
                 ;
 
+        return all_items;
     } /* export_constants */
 } /* namespace dripline_pybind */
 
