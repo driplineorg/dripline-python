@@ -25,10 +25,9 @@ namespace scarab_pybind
 
             // python __ special functions
             .def( "__str__", &scarab::param_value::to_string )
+            .def( "__eq__", &scarab::param_value::operator== )
 
-            .def( "is_null", &scarab::param_value::is_null )
-            .def( "is_value", &scarab::param_value::is_value )
-
+            .def( "type", &scarab::param_value::type, "returns a string representation of the stored data type" )
             // type checking methods
             .def( "is_bool", (bool (scarab::param_value::*)() const) &scarab::param_value::is_bool,
                     "Return whether the param_value stores a boolean value" )

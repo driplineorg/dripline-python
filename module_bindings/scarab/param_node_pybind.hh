@@ -22,6 +22,8 @@ namespace scarab_pybind
                     pybind11::return_value_policy::reference_internal)
             .def( "__setitem__", [](scarab::param_node& an_obj, std::string& a_name, scarab::param& a_value){ an_obj.replace( a_name, a_value ); } )
             .def( "__contains__", &scarab::param_node::has )
+            .def( "__iter__", [](const scarab::param_node& an_obj){ return pybind11::make_iterator(an_obj.begin(), an_obj.end()); },
+                    pybind11::keep_alive<0, 1>() /* keep object alive while the iterator exists */ )
 
             .def( "count", &scarab::param_node::count )
 

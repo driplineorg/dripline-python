@@ -23,15 +23,11 @@ namespace scarab_pybind
             .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
                     pybind11::return_value_policy::reference_internal)
             .def( "__setitem__", [](scarab::param_array& an_obj, unsigned a_index, scarab::param& a_value){ an_obj.assign( a_index, a_value ); } )
-
-            .def( "is_null", &scarab::param_array::is_null )
-            .def( "is_array", &scarab::param_array::is_array )
+            .def( "__iter__", [](const scarab::param_array& an_obj){ return pybind11::make_iterator(an_obj.begin(), an_obj.end()); },
+                    pybind11::keep_alive<0, 1>() /* keep object alive while the iterator exists */)
 
             //TODO: has_subset()
 
-            //TODO: remove size(), which is not part of the pythonic API
-            .def( "size", &scarab::param_array::size,
-                    "Returns the size of the array" )
             .def( "empty", &scarab::param_array::empty,
                     "True if the length is zero" )
 
