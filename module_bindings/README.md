@@ -4,7 +4,7 @@ Our pattern is to use that style of import in `__init__.py` files to bring class
 In order to handle this in a consistent way, the following convention is established:
 1. The main source fill which calls `PYBIND11_MODULE` constructs an `std::list< std::string >`, which is added as the `__all__` attribute of the module.
 2. Every exporter function, generally one per header, which takes the above should return an `std::list< std::string >` of the names of the objects which have been added.
-3. The main source fill will collect these (using `std::list<>::splice`) to construct the module's `__all__`.
+3. The main source file will collect these (using `std::list<>::splice`) to construct the module's `__all__`.
 
 Note: This pattern mirrors the python source file pattern, where each file initializes an empty `__all__` list object, then appends object names to it as those objects are defined in the source.
 
