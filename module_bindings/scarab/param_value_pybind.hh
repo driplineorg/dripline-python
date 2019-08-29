@@ -68,7 +68,15 @@ namespace scarab_pybind
 
             //TODO: empty(), clear(), has_subset()
 
-
+            .def( "to_python", [](const scarab::param_value& an_obj){
+                        pybind11::object to_return;
+                        if (an_obj.is_bool()) to_return =  pybind11::cast(an_obj.as_bool());
+                        else if (an_obj.is_uint()) to_return = pybind11::cast(an_obj.as_uint());
+                        else if (an_obj.is_int()) to_return = pybind11::cast(an_obj.as_int());
+                        else if (an_obj.is_double()) to_return = pybind11::cast(an_obj.as_double());
+                        else if (an_obj.is_string()) to_return = pybind11::cast(an_obj.as_string());
+                        return to_return;
+                    } )
             ;
     }
 

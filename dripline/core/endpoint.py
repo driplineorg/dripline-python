@@ -14,7 +14,7 @@ class Endpoint(_Endpoint):
         self.str_attribute = "Hi"
 
     def do_get_request( self, a_request_message ):
-        a_specifier =  a_request_message.parsed_specifier.to_string()
+        a_specifier =  a_request_message.specifier.to_string()
         if ( a_specifier ):
             try:
                 an_attribute = getattr( self, a_specifier )
@@ -36,23 +36,10 @@ class Endpoint(_Endpoint):
                 return a_request_message.reply( 100, "got an exception trying to on_get: {}".format(str(e)))
 
     def do_set_request( self, a_request_message ):
-        a_specifier =  a_request_message.parsed_specifier().to_string()
-        new_value = a_request_message.payloas["values"][0]()
-        # TODO: can this block be done in pybind, not sure how to deal with the template
-        #       if not it would be nice if it were implemented in a python-extension of the scarab interface
-        if new_value.is_null():
-            new_value = None
-        elif new_value.is_bool():
-            new_value = new_value.as_bool()
-        elif new_value.is_int() or new_value.is_uint():
-            new_value = new_value.as_int()
-        elif new_value.is_double():
-            new_value = new_value.as_double()
-        elif new_value.is_string():
-            new_value = new_value.as_string()
-        else:
-            #TODO this should be something else
-            raise TypeError("set value type is not understood")
+        a_specifier =  a_request_message.specifier.to_string()
+        new_value = a_request_message.payload["values"][0]()
+        new_value = getattr(new_value, "as_"+new_value.type())
+        print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
             try:
                 setattr( self, a_specifier, a_payload_value)

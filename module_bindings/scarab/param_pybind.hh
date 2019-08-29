@@ -8,14 +8,20 @@
 #include "param.hh"
 
 #include "pybind11/pybind11.h"
+#include "pybind11/pytypes.h"
 
 namespace scarab_pybind
 {
+    pybind11::object to_python( const scarab::param& a_param )
+    {
+    }
 
     void export_param( pybind11::module& mod )
     {
         // param
         pybind11::class_< scarab::param >( mod, "Param" )
+            .def( pybind11::init< >() )
+            .def( pybind11::init< scarab::param_value >() )
 
             .def( "__str__", &scarab::param::to_string )
             .def( "__call__", (scarab::param_value& (scarab::param::*)()) &scarab::param::operator(),
@@ -37,6 +43,8 @@ namespace scarab_pybind
                     pybind11::return_value_policy::reference_internal )
             .def( "as_value", (scarab::param_value& (scarab::param::*)()) &scarab::param::as_value,
                     pybind11::return_value_policy::reference_internal )
+
+            .def( "to_python", [](const scarab::param& an_obj){ return pybind11::none(); } )
 
             //TODO: has_subset()
 

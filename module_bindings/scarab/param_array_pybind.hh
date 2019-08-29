@@ -60,7 +60,16 @@ namespace scarab_pybind
             .def( "remove", &scarab::param_array::remove )
             .def( "clear", &scarab::param_array::clear )
 
-            //TODO: iterators (see: https://github.com/pybind/pybind11/blob/master/tests/test_sequences_and_iterators.cpp)
+            /*
+            .def( "to_python", [](const scarab::param_array& an_obj){
+                        pybind11::list to_return;
+                        for (scarab::param_array_const_iterator an_item=an_obj.begin(); an_item != an_obj.end(); ++an_item)
+                        {
+                            to_return.append( pybind11::cast((*an_item)()).to_python() );
+                        }
+                        return to_return;
+                    } )
+            */
 
             ;
     }
