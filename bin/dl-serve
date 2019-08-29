@@ -32,20 +32,23 @@ def create_object(a_config):
     #     either plugins need to all populate a well defined set, or it should iterate over them
     else:
         raise NameError('no module "{}" in available namespaces'.format(module_name))
+    the_object = module( **a_config )
+
+    return the_object
 
 def run():
     the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
 
     the_endpoints = the_config.pop("endpoints", [])
 
-    if "module" not in the_config:
-        service = dripline.core.Service()
-        print( "No service module found, creating new service with default parameters" )
-
-    else:
-        module = the_config.pop( "module" )
-        # This service is meant to be used when the yaml file speficies more details about the service
-        service = dripline.core.Service()
+    the_service = create_object( the_config )
+    #if "module" not in the_config:
+    #    service = dripline.core.Service()
+    #    print( "No service module found, creating new service with default parameters" )
+    #else:
+    #    module = the_config.pop( "module" )
+    #    # This service is meant to be used when the yaml file speficies more details about the service
+    #    service = dripline.core.Service()
 
     endpoint_list = the_config.pop( "endpoints", [] )
     all_endpoints = add_endpoints( service, endpoint_list )

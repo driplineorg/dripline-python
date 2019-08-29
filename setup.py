@@ -65,6 +65,10 @@ class CMakeBuild(build_ext):
         print(['cmake', '--build', '.'] + build_args, 'cwd={}'.format(self.build_temp))
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+requirements = [
+    'PyYAML',
+]
+
 setup(
     name='dripline',
     version='4.0.0-beta',
@@ -77,5 +81,7 @@ setup(
     ext_modules=[CMakeExtension('dripline_python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+    install_requires=requirements,
     packages=["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")],#, "dripline.core", "dripline.extensions"],
+    scripts=["bin/dl-serve"]
 )
