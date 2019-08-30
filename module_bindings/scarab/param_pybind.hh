@@ -6,6 +6,7 @@
  */
 
 #include "param.hh"
+#include "error.hh"
 
 #include "pybind11/pybind11.h"
 #include "pybind11/pytypes.h"
@@ -50,6 +51,7 @@ namespace scarab_pybind
             }
             return to_return;
         }
+        throw scarab::error() << "Unknown param type cannot be converted to Python";
     }
 
     void export_param( pybind11::module& mod )
