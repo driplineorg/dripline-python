@@ -13,6 +13,57 @@
 
 namespace scarab_pybind
 {
+    scarab::param_ptr_t to_param( const pybind11::object& an_object )
+    {
+        using namespace pybind11;
+        if( isinstance< none >( an_object ) )
+        {
+            return scarab::param_ptr_t( new scarab::param() );
+        }
+        else if( isinstance< bool_ >( an_object ) )
+        {
+            return scarab::param_ptr_t( new scarab::param_value( static_cast< const bool_& >(an_object) ) );
+        }
+        else if( isinstance< int_ >( an_object ) )
+        {
+            return scarab::param_ptr_t( new scarab::param_value( (int64_t)static_cast< const int_& >(an_object) ) );
+        }
+        else if( isinstance< float_ >( an_object ) )
+        {
+            return scarab::param_ptr_t( new scarab::param_value( (double)static_cast< const float_& >(an_object) ) );
+        }
+        else if( isinstance< str >( an_object ) )
+        {
+            return scarab::param_ptr_t( new scarab::param_value( static_cast< const str& >(an_object) ) );
+        }
+        else if( isinstance< list >( an_object ) )
+        {
+            scarab::param_ptr_t the_return( new scarab::param_array() );
+            scarab::param_array& the_return_arr = the_return->as_array();
+            for( auto an_item = an_object.begin(); an_item != an_object.end(); ++an_item )
+            {
+                the_return_arr.push_back( to_param( an_item ) );
+            }
+            return the_return;
+        }
+        else if( isinstance< dict >( an_object ) )
+        {
+            scarab::param_ptr_t the_return( new scarab::param_node() );
+            scarab::param_node& the_return_arr = the_return->as_node();
+            const dict& a_dict = static_cast< const dict& >( an_object );
+            for( auto an_item = a_dict.begin(); an_item != a_dict.end(); ++an_item )
+            {
+                if( ! isinstance< str >(an_item->first) || ! isinstance< object >(an_item->second) )
+                {
+                    throw scarab::error() << "Cannot convert dict to param";
+                }
+                the_return_arr.add( static_cast< const str& >(an_item->first), to_param( static_cast< const object& >(an_item->second) ) );
+            }
+            return the_return;
+        }
+        throw scarab::error() << "Unknown python type cannot be converted to param";
+    }
+
     pybind11::object to_python( const scarab::param& a_param )
     {
         if (a_param.is_null())
