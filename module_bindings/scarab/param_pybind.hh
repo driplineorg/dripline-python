@@ -32,14 +32,26 @@ namespace scarab_pybind
         else if (a_param.is_array())
         {
             scarab::param_array this_array = a_param.as_array();
-            pybind11::list to_return
+            pybind11::list to_return;
             for (scarab::param_array_const_iterator an_item=this_array.begin(); an_item != this_array.end(); ++an_item)
             {
-                to_return.append( to_python( *an_item );
+                to_return.append( to_python( *an_item ) );
             }
+            return to_return;
         }
         else if (a_param.is_node())
         {
+            scarab::param_node this_node = a_param.as_node();
+            pybind11::dict to_return;
+            for (scarab::param_node_const_iterator an_item=this_node.begin(); an_item != this_node.end(); ++an_item)
+            {
+                //TODO how do I modify the contents of a pybind11::dict here... operators don't seem to work
+                //     in the way I expect
+                pybind11::object = to_python( *an_item );
+                to_return[ std::string(an_item.name()) ] = 0;
+                to_return[ std::string(an_item.name()) ] = to_python( *an_item );
+            }
+            return to_return;
         }
     }
 
