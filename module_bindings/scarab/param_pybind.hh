@@ -14,6 +14,33 @@ namespace scarab_pybind
 {
     pybind11::object to_python( const scarab::param& a_param )
     {
+        if (a_param.is_null())
+        {
+            return pybind11::none();
+        }
+        else if (a_param.is_value())
+        {
+            scarab::param_value this_value = a_param.as_value();
+            pybind11::object to_return;
+            if (this_value.is_bool()) to_return =  pybind11::cast(this_value.as_bool());
+            else if (this_value.is_uint()) to_return = pybind11::cast(this_value.as_uint());
+            else if (this_value.is_int()) to_return = pybind11::cast(this_value.as_int());
+            else if (this_value.is_double()) to_return = pybind11::cast(this_value.as_double());
+            else if (this_value.is_string()) to_return = pybind11::cast(this_value.as_string());
+            return to_return;
+        }
+        else if (a_param.is_array())
+        {
+            scarab::param_array this_array = a_param.as_array();
+            pybind11::list to_return
+            for (scarab::param_array_const_iterator an_item=this_array.begin(); an_item != this_array.end(); ++an_item)
+            {
+                to_return.append( to_python( *an_item );
+            }
+        }
+        else if (a_param.is_node())
+        {
+        }
     }
 
     void export_param( pybind11::module& mod )
@@ -44,7 +71,7 @@ namespace scarab_pybind
             .def( "as_value", (scarab::param_value& (scarab::param::*)()) &scarab::param::as_value,
                     pybind11::return_value_policy::reference_internal )
 
-            .def( "to_python", [](const scarab::param& an_obj){ return pybind11::none(); } )
+            .def( "to_python", &to_python )
 
             //TODO: has_subset()
 
