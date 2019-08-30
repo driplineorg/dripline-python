@@ -45,11 +45,8 @@ namespace scarab_pybind
             pybind11::dict to_return;
             for (scarab::param_node_const_iterator an_item=this_node.begin(); an_item != this_node.end(); ++an_item)
             {
-                //TODO how do I modify the contents of a pybind11::dict here... operators don't seem to work
-                //     in the way I expect
-                pybind11::object = to_python( *an_item );
-                to_return[ std::string(an_item.name()) ] = 0;
-                to_return[ std::string(an_item.name()) ] = to_python( *an_item );
+                //TODO how do I modify the contents of a pybind11::dict here... the following still fails
+                to_return[ an_item.name().c_str() ] = to_python( *an_item );
             }
             return to_return;
         }
