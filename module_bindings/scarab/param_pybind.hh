@@ -20,7 +20,7 @@ namespace scarab_pybind
         }
         else if (a_param.is_value())
         {
-            scarab::param_value this_value = a_param.as_value();
+            const scarab::param_value& this_value = a_param.as_value();
             pybind11::object to_return;
             if (this_value.is_bool()) to_return =  pybind11::cast(this_value.as_bool());
             else if (this_value.is_uint()) to_return = pybind11::cast(this_value.as_uint());
@@ -31,7 +31,7 @@ namespace scarab_pybind
         }
         else if (a_param.is_array())
         {
-            scarab::param_array this_array = a_param.as_array();
+            const scarab::param_array& this_array = a_param.as_array();
             pybind11::list to_return;
             for (scarab::param_array_const_iterator an_item=this_array.begin(); an_item != this_array.end(); ++an_item)
             {
@@ -41,7 +41,7 @@ namespace scarab_pybind
         }
         else if (a_param.is_node())
         {
-            scarab::param_node this_node = a_param.as_node();
+            const scarab::param_node& this_node = a_param.as_node();
             pybind11::dict to_return;
             for (scarab::param_node_const_iterator an_item=this_node.begin(); an_item != this_node.end(); ++an_item)
             {
