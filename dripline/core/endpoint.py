@@ -2,7 +2,6 @@ __all__ = []
 
 import scarab
 from _dripline.core import _Endpoint
-#import ipdb
 
 __all__.append('Endpoint')
 class Endpoint(_Endpoint):
@@ -28,9 +27,7 @@ class Endpoint(_Endpoint):
         else:
             try:
                 the_value = self.on_get()
-                payload = scarab.ParamNode()
-                payload["values"] = scarab.ParamValue(the_value)
-                return a_request_message.reply(payload=payload)
+                return a_request_message.reply(payload=scarab.to_param(payload))
             #TODO should work out exception details and make the following block more narrow
             except Exception as e:
                 return a_request_message.reply( 100, "got an exception trying to on_get: {}".format(str(e)))
@@ -49,31 +46,23 @@ class Endpoint(_Endpoint):
         else:
             try:
                 result = self.on_set(new_value)
-                return a_request_message.reply(payload=result)
+                return a_request_message.reply(payload=scarab.to_param(result))
             except Exception as e:
                 return a_request_message.reply(100, "got an exception trying to on_get: {}".format(str(e)))
 
     def do_cmd_request( self, a_request_message ):
-        #Note: any command executed in this way must return a Param object, otherwise the return will fail
-        #TODO: We need to implement a helper for converting a semi-arbitrary (compatible) python data structure to a Param
-        #      that way we can use this to call any method, methods can just return whatever is natural and the packaging be done here
+        # Note: any command executed in this way must return a python data structure which is
+        #       able to be converted to a Param object (to be returned in the reply message)
         method_name = a_request_message.parsed_specifier().to_string()
         try:
             method_ref = getattr(self, method_name)
         except AttributeError as e:
             return a_request_message.reply(100, "error getting command's corresponding method: {}".format(str(e)))
-        #TODO: this if/else block duplciates `get_value`, but it has no overload for returning a ParamNode (since it isn't a ParamValue)
-        #      should there be a "get" (or get_item?) which is similar but returns any Param at the index, still allowing a default?
-        if "values" in a_request_message:
-            the_args = a_request_message.payload["values"]
-        else:
-            the_args = []
-        #TODO: need to bind iterators for ParamNode so that we can populate unknown kwargs...
-        #      python's dict has a keys(), that would let me force the above, or I could implement that in python from an iterator
-        the_kwargs = {}
+        the_kwargs = a_request_message.payload.to_python()
+        the_args = argument_data.pop('values', [])
         try:
             result = method_ref(*the_args, **the_kwargs)
-            return a_request_message.reply(payload=result)
+            return a_request_message.reply(payload=scarab.to_param(result))
         except Exception as e:
                 #TODO: should be using a logger object here, right?
                 print("failure while trying to execute: {}(*{}, **{})".format(method_name, str(the_args), str(the_kwargs)))
