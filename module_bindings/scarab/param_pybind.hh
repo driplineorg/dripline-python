@@ -107,6 +107,8 @@ namespace scarab_pybind
 
     void export_param( pybind11::module& mod )
     {
+        mod.def( "to_param", &to_param, "Convert native python types to a param structure." );
+
         // param
         pybind11::class_< scarab::param >( mod, "Param" )
             .def( pybind11::init< >() )
