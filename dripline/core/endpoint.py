@@ -27,7 +27,7 @@ class Endpoint(_Endpoint):
         else:
             try:
                 the_value = self.on_get()
-                return a_request_message.reply(payload=scarab.to_param(payload))
+                return a_request_message.reply(payload=scarab.to_param(the_value))
             #TODO should work out exception details and make the following block more narrow
             except Exception as e:
                 return a_request_message.reply( 100, "got an exception trying to on_get: {}".format(str(e)))
@@ -35,7 +35,7 @@ class Endpoint(_Endpoint):
     def do_set_request( self, a_request_message ):
         a_specifier =  a_request_message.specifier.to_string()
         new_value = a_request_message.payload["values"][0]()
-        new_value = getattr(new_value, "as_"+new_value.type())
+        new_value = getattr(new_value, "as_"+new_value.type())()
         print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
             try:
@@ -53,13 +53,13 @@ class Endpoint(_Endpoint):
     def do_cmd_request( self, a_request_message ):
         # Note: any command executed in this way must return a python data structure which is
         #       able to be converted to a Param object (to be returned in the reply message)
-        method_name = a_request_message.parsed_specifier().to_string()
+        method_name = a_request_message.specifier.to_string()
         try:
             method_ref = getattr(self, method_name)
         except AttributeError as e:
             return a_request_message.reply(100, "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
-        the_args = argument_data.pop('values', [])
+        the_args = the_kwargs.pop('values', [])
         try:
             result = method_ref(*the_args, **the_kwargs)
             return a_request_message.reply(payload=scarab.to_param(result))
