@@ -1,21 +1,5 @@
-
-#set( LIB_DEPENDENCIES Dripline_DriplinePy DriplineExamples_DriplinePy )
-set( LIB_DEPENDENCIES Dripline_DriplinePy )
-
-# pybind11 bindings of scarab::param
-set( PB_PARAM_HEADERFILES
-    scarab/param_pybind.hh
-    scarab/param_value_pybind.hh
-    scarab/param_array_pybind.hh
-    scarab/param_node_pybind.hh
-    scarab/signal_handler_pybind.hh
-)
-set( PB_PARAM_SOURCEFILES
-    scarab/scarab_namespace_pybind.cc
-)
-pybind11_add_module( scarab ${PB_PARAM_SOURCEFILES} )
-target_link_libraries( scarab PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( scarab )
+# CMakeLists.txt for dripline-python/module_bindings
+# Authors: B.H. LaRoque, N.S. Oblath
 
 # pybind11 bindings of dripline-cpp into dripline.core
 set( PB_DRIPLINE_CORE_HEADERFILES
@@ -31,5 +15,6 @@ set( PB_DRIPLINE_CORE_SOURCEFILES
     dripline_core/dripline_core_namespace_pybind.cc
 )
 pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
-target_link_libraries( _dripline PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-pbuilder_install_libraries( _dripline )
+target_link_libraries( _dripline PRIVATE ${FULL_LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+install( TARGETS _dripline DESTINATION ${LIB_INSTALL_DIR} )
+
