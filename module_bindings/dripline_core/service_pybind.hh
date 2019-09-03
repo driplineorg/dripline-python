@@ -22,8 +22,8 @@ namespace dripline_pybind
                                 >(),
                    pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
                    pybind11::arg( "config" ) = scarab::param_node(),
-                   pybind11::arg( "queue_name" ) = "",
-                   pybind11::arg( "broker_address" ) = "",
+                   pybind11::arg( "name" ) = "",
+                   pybind11::arg( "broker" ) = "",
                    pybind11::arg( "port" ) = 0,
                    pybind11::arg( "auth_file" ) = "",
                    pybind11::arg( "make_connection" ) = true

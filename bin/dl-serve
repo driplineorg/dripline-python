@@ -1,48 +1,46 @@
 #!/usr/bin/env python
 
 import yaml
-import scarab
 import dripline
-from dripline.core import Endpoint
 
-def add_endpoints( this_service, this_endpoint_list ):
-    new_endpoints = []
-    for an_endpoint in this_endpoint_list:
-        module = an_endpoint.pop( "module" )
-        if module in globals():
-            new_endpoint = globals()[module](**an_endpoint)
-            new_endpoints.append(new_endpoint)
-            this_service.add_child( new_endpoint )
-    return new_endpoints
-
-with open( "../examples/kv_store_tutorial.yaml", "r" ) as stream:
-
-    store = yaml.safe_load( stream )
-
-    if "module" not in store:
-        service = dripline.core.Service()
-        print( "No service module found, creating new service with default parameters" )
-
+def create_object(a_config):
+    module_name = a_config.pop('module')
+    module_path = a_config.pop('module_path', False)
+    extra_namespace = object()
+    if module_path:
+        try:
+            extra_namespace = imp.load_source('extra_namespace', module_path)
+        except IOError as e:
+            print("unable to load source from: {}".format(module_path))
+            raise e
+    if hasattr(extra_namespace, module_name):
+        module = getattr(extra_namespace, module_name)
+    elif hasattr(dripline.core, module_name):
+        module = getattr(dripline.core, module_name)
+    #TODO this needs to be extended to include all of the relevant namespaces
+    #     either plugins need to all populate a well defined set, or it should iterate over them
     else:
-        module = store.pop( "module" )
-        # This service is meant to be used when the yaml file speficies more details about the service
-        service = dripline.core.Service()
+        raise NameError('no module "{}" in available namespaces'.format(module_name))
+    the_object = module( **a_config )
 
-    endpoint_list = store.pop( "endpoints", [] )
-    all_endpoints = add_endpoints( service, endpoint_list )
+    return the_object
 
-    #endpoint_dict = service.sync_children()
-    #request = dripline.core.MsgRequest().create()
-    #request.routing_key = "peaches"
-    #request.op_t = dripline.core.op_t.to_op_t( "get" )
-    #print( "Request encode_full_message:" )
-    #print( request.encode_full_message() )
+def run():
+    the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
 
-    #if request.routing_key in endpoint_dict:
-    #    message_reply_payload = endpoint_dict.get(request.routing_key).submit_request_message(request).encode_full_message()
-    #    print( "Reply encode_full_message:" )
-    #    print( message_reply_payload )
+    the_endpoints = the_config.pop("endpoints", [])
+
+    the_service = create_object( the_config )
+    all_endpoints = []
+    for an_endpoint_conf in the_endpoints:
+        an_endpoint = create_object(an_endpoint_conf)
+        the_service.add_child( an_endpoint )
+        all_endpoints.append(an_endpoint)
+
     print("Service starting")
-    service.start()
+    the_service.start()
     print("Service started")
-    service.listen()
+    the_service.listen()
+
+if __name__ == '__main__':
+    run()

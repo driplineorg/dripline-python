@@ -22,15 +22,12 @@ namespace scarab_pybind
                     "Returns the size of the array" )
             .def( "__getitem__", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
                     pybind11::return_value_policy::reference_internal)
-
-            .def( "is_null", &scarab::param_array::is_null )
-            .def( "is_array", &scarab::param_array::is_array )
+            .def( "__setitem__", [](scarab::param_array& an_obj, unsigned a_index, scarab::param& a_value){ an_obj.assign( a_index, a_value ); } )
+            .def( "__iter__", [](const scarab::param_array& an_obj){ return pybind11::make_iterator(an_obj.begin(), an_obj.end()); },
+                    pybind11::keep_alive<0, 1>() /* keep object alive while the iterator exists */)
 
             //TODO: has_subset()
 
-            //TODO: remove size(), which is not part of the pythonic API
-            .def( "size", &scarab::param_array::size,
-                    "Returns the size of the array" )
             .def( "empty", &scarab::param_array::empty,
                     "True if the length is zero" )
 
@@ -52,11 +49,27 @@ namespace scarab_pybind
             .def( "get_value", (std::string (scarab::param_array::*)(unsigned, const std::string& ) const) &scarab::param_array::get_value,
                     "Get parameter array value as a string" )
 
-            //TODO: push_back() and push_front()
+            .def( "push_back", (void (scarab::param_array::*)(const scarab::param&)) &scarab::param_array::push_back, "add a param object to the end of the array")
+            //.def( "push_back", (void (scarab::param_array::*)(scarab::param&)) &scarab::param_array::push_back, "add a param object to the end of the array")
+            .def( "push_front", (void (scarab::param_array::*)(const scarab::param&)) &scarab::param_array::push_front, "add a param object to the end of the array")
+            //.def( "push_front", (void (scarab::param_array::*)(scarab::param&)) &scarab::param_array::push_front, "add a param object to the end of the array")
 
-            //TODO: append(), merge(), erase(), remove(), clear()
+            .def( "append", &scarab::param_array::append )
+            .def( "merge", &scarab::param_array::merge )
+            .def( "erase", &scarab::param_array::erase )
+            .def( "remove", &scarab::param_array::remove )
+            .def( "clear", &scarab::param_array::clear )
 
-            //TODO: iterators
+            /*
+            .def( "to_python", [](const scarab::param_array& an_obj){
+                        pybind11::list to_return;
+                        for (scarab::param_array_const_iterator an_item=an_obj.begin(); an_item != an_obj.end(); ++an_item)
+                        {
+                            to_return.append( pybind11::cast((*an_item)()).to_python() );
+                        }
+                        return to_return;
+                    } )
+            */
 
             ;
     }
