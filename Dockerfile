@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
         wget &&\
     rm -rf /var/lib/apt/lists/*
 
-COPY pybind11 /usr/local/src/pybind11
 COPY dripline-cpp /usr/local/src/dripline-cpp
 COPY module_bindings /usr/local/src/module_bindings
+COPY dripline /usr/local/src/dripline
+COPY bin /usr/local/src/bin
 COPY .git /usr/local/src/.git
 COPY setup.py /usr/local/src/setup.py
 COPY CMakeLists.txt /usr/local/src/CMakeLists.txt
@@ -22,7 +23,6 @@ RUN echo "# cmake installed libraries" > /etc/ld.so.conf.d/dripline.conf &&\
     echo "/usr/local/lib/python3.5/site-packages" >> /etc/ld.so.conf.d/dripline.conf &&\
     ldconfig
 
-RUN cd /usr/local/src && \
-    pip -v install . && \
-    ldconfig && \
-    /bin/true
+RUN pip3 install --upgrade pip
+RUN pip3 install -v /usr/local/src
+RUN ldconfig
