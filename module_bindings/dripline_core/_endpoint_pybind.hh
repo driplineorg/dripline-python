@@ -1,10 +1,12 @@
 #ifndef DRIPLINE_PYBIND_ENDPOINT
 #define DRIPLINE_PYBIND_ENDPOINT
 
-#include "endpoint.hh"
 #include "pybind11/pybind11.h"
-#include "endpoint_trampoline.hh"
 #include "pybind11/iostream.h"
+
+#include "endpoint.hh"
+
+#include "_endpoint_trampoline.hh"
 
 namespace dripline_pybind
 {
@@ -22,7 +24,7 @@ namespace dripline_pybind
         std::list< std::string > all_items;
 
         all_items.push_back( "_Endpoint" );
-        pybind11::class_< dripline::endpoint, endpoint_trampoline, std::shared_ptr< dripline::endpoint > >( mod, "_Endpoint", "Endpoint binding" )
+        pybind11::class_< dripline::endpoint, _endpoint_trampoline, std::shared_ptr< dripline::endpoint > >( mod, "_Endpoint", "Endpoint binding" )
             .def( pybind11::init< const std::string& >(),
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect >() )

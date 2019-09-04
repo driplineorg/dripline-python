@@ -2,7 +2,7 @@
 
 #include "constants_pybind.hh"
 #include "_endpoint_pybind.hh"
-#include "endpoint_trampoline.hh"
+#include "_endpoint_trampoline.hh"
 #include "error_pybind.hh"
 #include "message_pybind.hh"
 //#include "run_simple_service_pybind.hh"
