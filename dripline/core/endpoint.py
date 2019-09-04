@@ -7,10 +7,6 @@ __all__.append('Endpoint')
 class Endpoint(_Endpoint):
     def __init__( self, name ):
         _Endpoint.__init__( self, name )
-        self.int_attribute = 3
-        self.float_attribute = 6.87
-        self.bool_attribute = False
-        self.str_attribute = "Hi"
 
     def do_get_request( self, a_request_message ):
         a_specifier =  a_request_message.specifier.to_string()
