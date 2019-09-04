@@ -3,6 +3,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/chrono.h" // privides std::chrono <-> datetime types
+#include "pybind11/functional.h"
 
 #include "scheduler.hh"
 
