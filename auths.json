@@ -1,0 +1,7 @@
+{
+    "amqp": {
+        "broker": "rabbit-broker",
+        "username": "dline",
+        "password": "dline"
+    }
+}
