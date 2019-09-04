@@ -9,6 +9,7 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/error_pybind.hh
     dripline_core/message_pybind.hh
     dripline_core/message_virtual_pybind.hh
+    dripline_core/scheduler_pybind.hh
     #dripline_core/run_simple_service_pybind.hh
 )
 set( PB_DRIPLINE_CORE_SOURCEFILES
