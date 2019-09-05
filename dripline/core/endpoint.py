@@ -5,8 +5,9 @@ from _dripline.core import _Endpoint
 
 __all__.append('Endpoint')
 class Endpoint(_Endpoint):
-    def __init__( self, name ):
+    def __init__( self, name, calibration=None ):
         _Endpoint.__init__( self, name )
+        self._calibration = calibration
 
     def do_get_request( self, a_request_message ):
         a_specifier =  a_request_message.specifier.to_string()

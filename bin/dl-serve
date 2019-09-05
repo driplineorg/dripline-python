@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import yaml
+
 import dripline
+import scarab
 
 def create_object(a_config):
     module_name = a_config.pop('module')
@@ -26,20 +28,21 @@ def create_object(a_config):
     return the_object
 
 def run():
+    sig_handler = scarab.SignalHandler()
     the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
 
     the_endpoints = the_config.pop("endpoints", [])
 
     the_service = create_object( the_config )
+    sig_handler.add_cancelable(the_service)
+
     all_endpoints = []
     for an_endpoint_conf in the_endpoints:
         an_endpoint = create_object(an_endpoint_conf)
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
 
-    print("Service starting")
     the_service.start()
-    print("Service started")
     the_service.listen()
 
 if __name__ == '__main__':

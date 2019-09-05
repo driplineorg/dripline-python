@@ -67,6 +67,7 @@ class CMakeBuild(build_ext):
 
 requirements = [
     'PyYAML',
+    'asteval',
 ]
 
 setup(

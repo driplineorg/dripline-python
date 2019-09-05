@@ -1,3 +1,4 @@
+from .calibrate import calibrate
 from .endpoint import Endpoint
 __all__ = []
 
@@ -8,6 +9,7 @@ class KeyValueStore(Endpoint):
         Endpoint.__init__(self, **kwargs)
         self._value = initial_value
 
+    @calibrate()
     def on_get(self):
         print("in K.V.S. on_get")
         return self._value

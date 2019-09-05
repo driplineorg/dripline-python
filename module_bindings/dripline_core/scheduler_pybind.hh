@@ -18,16 +18,14 @@ namespace dripline_pybind
     using executor_t = dripline::simple_executor;
     using executable_t = std::function< void() >;
     using clock_t = std::chrono::system_clock;
-    pybind11::class_< dripline::scheduler<executor_t, clock_t> >( mod, "Scheduler", "schedule future function calls" )
+    pybind11::class_< dripline::scheduler<executor_t, clock_t>, std::shared_ptr< dripline::scheduler<executor_t, clock_t> >, scarab::cancelable >( mod, "Scheduler", "schedule future function calls" )
         .def( pybind11::init<>() )
         //.def( "schedule", &dripline::scheduler<executor_t, clock_t>::schedule )
         .def( "schedule",
                 (int (dripline::scheduler<executor_t, clock_t>::*)(executable_t, clock_t::time_point)) &dripline::scheduler<executor_t, clock_t>::schedule,
-        /*
                 pybind11::arg( "executable" ),
-                pybind11::arg( "execution time [datetime.datetime]" ),
-        */
-                "schedule an action a specific future time"
+                pybind11::arg( "time" ),
+                "schedule execution of executable at specified future time"
             )
         .def( "unschedule", &dripline::scheduler<executor_t, clock_t>::unschedule, pybind11::arg( "id" ), "Cancel a scheduled function call by its id" )
         .def( "execute", &dripline::scheduler<executor_t, clock_t>::execute, "Start the timing thread which executes scheduled actions" )
