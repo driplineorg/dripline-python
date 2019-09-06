@@ -23,7 +23,11 @@ namespace dripline_pybind
                       std::shared_ptr< dripline::scheduler< executor_t, clock_t > >
                     >( mod, "Scheduler", "schedule future function calls" )
         .def( pybind11::init<>() )
-        //.def( "schedule", &dripline::scheduler<executor_t, clock_t>::schedule )
+
+        .def_property( "execution_buffer", &dripline::scheduler<executor_t, clock_t>::get_exe_buffer, &dripline::scheduler<executor_t, clock_t>::set_exe_buffer )
+        .def_property( "cycle_time", &dripline::scheduler<executor_t, clock_t>::get_cycle_time, &dripline::scheduler<executor_t, clock_t>::set_cycle_time )
+        //TODO: does it make sense to provide access to the events map? That will require wrapping the stuct they get stored into.
+
         .def( "schedule",
                 (int (dripline::scheduler<executor_t, clock_t>::*)(executable_t, clock_t::time_point)) &dripline::scheduler<executor_t, clock_t>::schedule,
                 pybind11::arg( "executable" ),
