@@ -34,6 +34,7 @@ def run():
     the_endpoints = the_config.pop("endpoints", [])
 
     the_service = create_object( the_config )
+    the_service.enable_scheduling = True
     sig_handler.add_cancelable(the_service)
 
     all_endpoints = []
@@ -41,6 +42,10 @@ def run():
         an_endpoint = create_object(an_endpoint_conf)
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
+
+    foo = lambda: print("in scheduled action")
+    import datetime
+    the_service.schedule(foo, datetime.datetime.now() + datetime.timedelta(seconds=10))
 
     the_service.start()
     the_service.listen()

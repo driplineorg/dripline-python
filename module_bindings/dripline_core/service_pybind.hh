@@ -33,6 +33,8 @@ namespace dripline_pybind
                    pybind11::arg( "make_connection" ) = true
             )
 
+            .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
+
             .def( "start", &dripline::service::start,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
