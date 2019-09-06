@@ -18,7 +18,10 @@ namespace dripline_pybind
     using executor_t = dripline::simple_executor;
     using executable_t = std::function< void() >;
     using clock_t = std::chrono::system_clock;
-    pybind11::class_< dripline::scheduler<executor_t, clock_t>, std::shared_ptr< dripline::scheduler<executor_t, clock_t> >, scarab::cancelable >( mod, "Scheduler", "schedule future function calls" )
+    pybind11::class_< dripline::scheduler< executor_t, clock_t >,
+                      scarab::cancelable,
+                      std::shared_ptr< dripline::scheduler< executor_t, clock_t > >
+                    >( mod, "Scheduler", "schedule future function calls" )
         .def( pybind11::init<>() )
         //.def( "schedule", &dripline::scheduler<executor_t, clock_t>::schedule )
         .def( "schedule",

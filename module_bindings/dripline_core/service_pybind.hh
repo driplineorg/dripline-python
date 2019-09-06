@@ -10,14 +10,13 @@ namespace dripline_pybind
 {
     std::list< std::string>  export_service( pybind11::module& mod )
     {
-        // listener_receiver is only bound for Service binding
-        // if we want more than this minimal binding it should go
-        // into its own header
-        pybind11::class_< dripline::listener_receiver, std::shared_ptr< dripline::listener_receiver> >(mod, "__ListenerReceiver" );
-
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
-        pybind11::class_< dripline::service, scarab::cancelable, dripline::listener_receiver, std::shared_ptr< dripline::service > >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
+        pybind11::class_< dripline::service,
+                          scarab::cancelable,
+                          dripline::scheduler<>,
+                          std::shared_ptr< dripline::service >
+                        >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
                                   const std::string&,
