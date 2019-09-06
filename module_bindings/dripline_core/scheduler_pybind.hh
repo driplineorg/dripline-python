@@ -30,6 +30,13 @@ namespace dripline_pybind
                 pybind11::arg( "time" ),
                 "schedule execution of executable at specified future time"
             )
+        .def( "schedule",
+                (int (dripline::scheduler<executor_t, clock_t>::*)(executable_t, clock_t::duration, clock_t::time_point)) &dripline::scheduler<executor_t, clock_t>::schedule,
+                pybind11::arg( "executable" ),
+                pybind11::arg( "interval" ),
+                pybind11::arg_v( "time", clock_t::now(), "now()" ),
+                "schedule recurring execution of [executable] every [interval], starting at specified future [time]"
+            )
         .def( "unschedule", &dripline::scheduler<executor_t, clock_t>::unschedule, pybind11::arg( "id" ), "Cancel a scheduled function call by its id" )
         .def( "execute", &dripline::scheduler<executor_t, clock_t>::execute, "Start the timing thread which executes scheduled actions" )
         ;
