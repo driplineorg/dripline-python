@@ -13,8 +13,8 @@ namespace dripline_pybind
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
         pybind11::class_< dripline::service,
-                          scarab::cancelable,
                           dripline::scheduler<>,
+                          scarab::cancelable,
                           std::shared_ptr< dripline::service >
                         >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
