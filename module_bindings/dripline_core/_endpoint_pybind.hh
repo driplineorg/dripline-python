@@ -28,6 +28,11 @@ namespace dripline_pybind
             .def( pybind11::init< const std::string& >(),
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect >() )
+
+            // mv_ properties
+            .def_property_readonly( "name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name )
+            .def_property_readonly( "service", ( dripline::service_ptr_t& (dripline::endpoint::*)()) &dripline::endpoint::service )
+
             .def( "submit_request_message", &dripline::endpoint::submit_request_message,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
