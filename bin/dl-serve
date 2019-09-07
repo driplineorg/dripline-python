@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import datetime
+
 import yaml
 
 import dripline
@@ -42,9 +44,10 @@ def run():
         an_endpoint = create_object(an_endpoint_conf)
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
+        if getattr(an_endpoint, 'log_interval', 0) > 0:
+            the_service.schedule(an_endpoint.log_a_value, datetime.timedelta(seconds=an_endpoint.log_interval), datetime.datetime.now())
 
     foo = lambda: print("in scheduled action")
-    import datetime
     the_service.schedule(foo, datetime.datetime.now() + datetime.timedelta(seconds=10))
 
     the_service.start()

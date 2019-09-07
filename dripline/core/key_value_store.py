@@ -1,12 +1,12 @@
 from .calibrate import calibrate
-from .endpoint import Endpoint
+from .entity import Entity
 __all__ = []
 
 __all__.append("KeyValueStore")
-class KeyValueStore(Endpoint):
+class KeyValueStore(Entity):
 
     def __init__(self, initial_value=None, **kwargs):
-        Endpoint.__init__(self, **kwargs)
+        Entity.__init__(self, **kwargs)
         self._value = initial_value
 
     @calibrate()
