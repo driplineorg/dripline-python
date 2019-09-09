@@ -82,7 +82,7 @@ class Endpoint(_Endpoint):
         #TODO should this be a dripline error?
         raise NotImplementedError("endpoint '{}' does not implement an on_get".format(self.name))
 
-    def on_set(self):
+    def on_set(self, _value):
         '''
         placeholder method for setting the value of an endpoint.
         Implementations may override to enable OP_SET operations.
