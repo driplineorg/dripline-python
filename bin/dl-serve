@@ -44,8 +44,8 @@ def run():
         an_endpoint = create_object(an_endpoint_conf)
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
-        if getattr(an_endpoint, 'log_interval', 0) > 0:
-            the_service.schedule(an_endpoint.log_a_value, datetime.timedelta(seconds=an_endpoint.log_interval), datetime.datetime.now())
+        if getattr(an_endpoint, 'log_interval', 0) > datetime.timedelta(seconds=0):
+            the_service.schedule(an_endpoint.log_a_value, an_endpoint.log_interval, datetime.datetime.now())
 
     foo = lambda: print("in scheduled action")
     the_service.schedule(foo, datetime.datetime.now() + datetime.timedelta(seconds=10))

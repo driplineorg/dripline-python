@@ -10,18 +10,26 @@ class Endpoint(_Endpoint):
         self._calibration = calibration
 
     def do_get_request(self, a_request_message):
+        print("in get_request")
         a_specifier =  a_request_message.specifier.to_string()
         if (a_specifier):
+            print("has specifier")
             try:
+                print("specifier is: {}".format(a_specifier))
+                print("self.log_interval: {}".format(self.log_interval))
+                print("getattr(self, log_interval): {}".format(getattr(self, 'log_interval')))
                 an_attribute = getattr(self, a_specifier)
+                print(an_attribute)
+                print("attribute '{}' value is [{}]".format(a_specifier, an_attribute))
                 the_node = scarab.ParamNode()
                 the_node["values"] = scarab.ParamArray()
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
-            except AttributeError:
+            except AttributeError as this_error:
                 #TODO we should resolve the returncodes and update this value
-                return a_request_message.reply(201, "attribute error: {}".format(this_error.message))
+                return a_request_message.reply(201, "attribute error: {}".format(this_error))
         else:
+            print('no specifier')
             try:
                 the_value = self.on_get()
                 return a_request_message.reply(payload=scarab.to_param(the_value))

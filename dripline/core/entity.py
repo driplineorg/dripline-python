@@ -27,11 +27,11 @@ class Entity(Endpoint):
     @log_interval.setter
     def log_interval(self, new_interval):
         if isinstance(new_interval, numbers.Number):
-            self.new_interval = datetime.timedelta(seconds=new_interval)
+            self._log_interval = datetime.timedelta(seconds=new_interval)
         elif isinstance(new_interval, dict):
-            self.new_interval = datetime.timedelta(**new_interval)
+            self._log_interval = datetime.timedelta(**new_interval)
         elif isinstance(new_interval, datetime.timedelta):
-            self.new_interval = new_interval
+            self._log_interval = new_interval
         else:
             raise ValueError("unable to interpret a new_interval of type <{}>".format(type(new_interval)))
 
