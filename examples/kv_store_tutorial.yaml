@@ -7,9 +7,9 @@ endpoints:
         module: KeyValueStore
         calibration: '2*{}'
         initial_value: 0.75
-        log_interval: 30
-        #get_on_set: True
-        #log_on_set: True
+        log_interval: 10
+        get_on_set: True
+        log_on_set: True
       - name: chips
         module: KeyValueStore
         #log_interval: 30

@@ -23,7 +23,8 @@ def _log_on_set_decoration(self, fun):
                 values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
-        self.log_a_value(alert=values)
+        print('set done, now log')
+        self.log_a_value(values)
         return result
     return wrapper
 
@@ -34,6 +35,7 @@ def _get_on_set_decoration(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         fun(*args, **kwargs)
+        print("set, now get_on_set")
         result = self.on_get()
         return result
     return wrapper
@@ -48,9 +50,9 @@ class Entity(Endpoint):
                   (particularly useful for devices which may round assignment values)
     log_on_set -> further extends get_on_set to send an alert message in addtion to returning the value in a reply
     log_interval -> leverages the scheduler class to log the on_get result at a regular cadence
-    check_on_set -> allows for more complex logic to confirm successful value updates
-                    (for example, the success condition may be measuring another endpoint)
     '''
+    #check_on_set -> allows for more complex logic to confirm successful value updates
+    #                (for example, the success condition may be measuring another endpoint)
     def __init__(self, get_on_set=False, log_routing_key_prefix='sensor_value', log_interval=0, log_on_set=False, **kwargs):
         '''
         get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
@@ -75,7 +77,6 @@ class Entity(Endpoint):
 
         self.log_interval = log_interval
         self._log_action_id = None
-
 
     @property
     def get_on_set(self):
@@ -122,11 +123,25 @@ class Entity(Endpoint):
             raise ValueError("unable to interpret a new_interval of type <{}>".format(type(new_interval)))
 
     def scheduled_log(self):
+        print("in a scheduled log event")
         result = self.on_get()
-        self.log_a_value(self, result)
+        self.log_a_value(result)
 
     def log_a_value(self, the_value):
         print("value to log is:\n{}".format(the_value))
 
     def start_logging(self):
-        self._log_action_id = self.service.schedule(self.log_a_value, self._log_interval)
+        if self._log_action_id is not None:
+            self.service.unschedule(self._log_action_id)
+        if self.log_interval:
+            print('should start logging every {}'.format(self.log_interval))
+            self._log_action_id = self.service.schedule(self.scheduled_log, self.log_interval, datetime.datetime.now() + self.service.execution_buffer*3)
+        else:
+            raise ValueError('unable to start logging when log_interval evaluates false')
+        print('log action id is {}'.format(self._log_action_id))
+
+    def stop_logging(self):
+        #TODO: should it be an error to stop_logging() when already not logging?
+        if self._log_action_id is not None:
+            self.service.unschedule(self._log_action_id)
+        self._log_action_id = None
