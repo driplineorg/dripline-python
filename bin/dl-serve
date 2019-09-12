@@ -45,9 +45,15 @@ def run():
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
         if getattr(an_endpoint, 'log_interval', 0) > datetime.timedelta(seconds=0):
-            the_service.schedule(an_endpoint.scheduled_log, an_endpoint.log_interval)
+            print("queue up start logging for '{}'".format(an_endpoint.name))
+            #action_id = the_service.schedule(an_endpoint.start_logging, datetime.datetime.now())
+            an_endpoint.start_logging()
+            #print("will start logging at {}".format(datetime.datetime.now() + the_service.execution_buffer*3))
+            #action_id = the_service.schedule(an_endpoint.scheduled_log, an_endpoint.log_interval, datetime.datetime.now() + the_service.execution_buffer*3)
 
+    print("about to start the service")
     the_service.start()
+    print("services started, now to listen")
     the_service.listen()
 
 if __name__ == '__main__':
