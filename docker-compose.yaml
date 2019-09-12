@@ -9,6 +9,7 @@ services:
       #- ./CMakeLists.txt:/usr/local/src/CMakeLists.txt
       #- ./setup.py:/usr/local/src/setup.py
       - .:/usr/local/src
+      - ./auths.json:/root/p8_auths.json
   rabbit-broker:
     image: rabbitmq:3-management
     environment:

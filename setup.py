@@ -61,9 +61,11 @@ class CMakeBuild(build_ext):
         print("should make a cmake call:")
         print(' '.join(['cmake', ext.sourcedir] + cmake_args), 'cwd={}'.format(self.build_temp), 'env={}'.format(env))
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         print("should make a build call:")
         print(['cmake', '--build', '.'] + build_args, 'cwd={}'.format(self.build_temp))
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        #subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        subprocess.check_call(['make', 'install'], cwd=self.build_temp)
 
 requirements = [
     'PyYAML',
