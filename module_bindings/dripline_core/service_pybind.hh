@@ -12,7 +12,11 @@ namespace dripline_pybind
     {
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
-        pybind11::class_< dripline::service, std::shared_ptr< dripline::service > >( mod, "Service", "Used to send and receive simple messages" )
+        pybind11::class_< dripline::service,
+                          dripline::scheduler<>,
+                          scarab::cancelable,
+                          std::shared_ptr< dripline::service >
+                        >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
                                   const std::string&,
@@ -28,6 +32,8 @@ namespace dripline_pybind
                    pybind11::arg( "auth_file" ) = "",
                    pybind11::arg( "make_connection" ) = true
             )
+
+            .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
 
             .def( "start", &dripline::service::start,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,

@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+import datetime
+
 import yaml
+
 import dripline
+import scarab
 
 def create_object(a_config):
     module_name = a_config.pop('module')
@@ -26,20 +30,30 @@ def create_object(a_config):
     return the_object
 
 def run():
+    sig_handler = scarab.SignalHandler()
     the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
 
     the_endpoints = the_config.pop("endpoints", [])
 
     the_service = create_object( the_config )
+    the_service.enable_scheduling = True
+    sig_handler.add_cancelable(the_service)
+
     all_endpoints = []
     for an_endpoint_conf in the_endpoints:
         an_endpoint = create_object(an_endpoint_conf)
         the_service.add_child( an_endpoint )
         all_endpoints.append(an_endpoint)
+        if getattr(an_endpoint, 'log_interval', 0) > datetime.timedelta(seconds=0):
+            print("queue up start logging for '{}'".format(an_endpoint.name))
+            #action_id = the_service.schedule(an_endpoint.start_logging, datetime.datetime.now())
+            an_endpoint.start_logging()
+            #print("will start logging at {}".format(datetime.datetime.now() + the_service.execution_buffer*3))
+            #action_id = the_service.schedule(an_endpoint.scheduled_log, an_endpoint.log_interval, datetime.datetime.now() + the_service.execution_buffer*3)
 
-    print("Service starting")
+    print("about to start the service")
     the_service.start()
-    print("Service started")
+    print("services started, now to listen")
     the_service.listen()
 
 if __name__ == '__main__':

@@ -5,34 +5,34 @@ auth_file: /root/p8_auths.json
 endpoints:
       - name: peaches
         module: KeyValueStore
-       #calibration: '2*{}'
-       #initial_value: 0.75
-       #log_interval: 30
-       #get_on_set: True
-       #log_on_set: True
+        calibration: '2*{}'
+        initial_value: 0.75
+        log_interval: 10
+        get_on_set: True
+        log_on_set: True
       - name: chips
-        module: Endpoint
-       #log_interval: 30
-       #get_on_set: True
-       #log_on_set: True
-       #calibration: 'times3({})'
-       #initial_value: 1.75
+        module: KeyValueStore
+        #log_interval: 30
+        #get_on_set: True
+        #log_on_set: True
+        calibration: 'times3({})'
+        initial_value: 1.75
       - name: waffles
-        module: Endpoint
-       #log_interval: 30
-       #log_on_set: True
-       #calibration: '1.*{}'
-       #initial_value: 4.00
+        module: KeyValueStore
+        #log_interval: 30
+        #log_on_set: True
+        calibration: '1.*{}'
+        initial_value: 4.00
       - name: peaches_status
-       #log_on_set: True
-        module: Endpoint
-       #initial_value: "CLOSE"
-       #calibration:
-       #    CLOSE: "on"
-       #    OPEN: "off"
-       #set_value_map:
-       #    1: OPEN
-       #    0: CLOSE
-       #    "on": OPEN
-       #    "off": CLOSE
-       #set_value_lowercase: True
+        #log_on_set: True
+        module: KeyValueStore
+        initial_value: "CLOSE"
+        calibration:
+            CLOSE: "on"
+            OPEN: "off"
+        #set_value_map:
+        #    1: OPEN
+        #    0: CLOSE
+        #    "on": OPEN
+        #    "off": CLOSE
+        #set_value_lowercase: True
