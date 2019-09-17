@@ -57,4 +57,8 @@ def run():
     the_service.listen()
 
 if __name__ == '__main__':
+    the_main = scarab.MainApp()
+    config = {'dripline': dripline.core.DriplineConfig().to_python()}
+    config['conf-file'] = None
+    the_main.default_config = scarab.to_param(config, True)
     run()
