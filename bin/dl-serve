@@ -29,7 +29,12 @@ def create_object(a_config):
 
     return the_object
 
-def run():
+def run(the_app):
+    this_config = the_app.master_config
+    print('python got a master config:\n{}'.format(this_config))
+    print('       a default config:\n{}'.format(the_app.default_config))
+    print('       a config file:\n{}'.format(the_app.config_filename))
+
     sig_handler = scarab.SignalHandler()
     the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
 
@@ -59,6 +64,8 @@ def run():
 if __name__ == '__main__':
     the_main = scarab.MainApp()
     config = {'dripline': dripline.core.DriplineConfig().to_python()}
-    config['conf-file'] = None
     the_main.default_config = scarab.to_param(config, True)
-    run()
+    # add flags
+    the_main.set_callback(lambda : run(the_main))
+    import sys
+    the_main.execute(sys.argv)
