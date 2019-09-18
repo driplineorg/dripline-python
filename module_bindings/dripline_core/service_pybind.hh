@@ -25,7 +25,7 @@ namespace dripline_pybind
                                   const bool
                                 >(),
                    pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
-                   pybind11::arg( "config" ) = scarab::param_node(),
+                   pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
                    pybind11::arg( "name" ) = "",
                    pybind11::arg( "broker" ) = "",
                    pybind11::arg( "port" ) = 0,
