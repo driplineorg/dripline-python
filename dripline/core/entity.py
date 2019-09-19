@@ -134,7 +134,6 @@ class Entity(Endpoint):
         print("value to log is:\n{}".format(the_value))
         the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key='{}.{}'.format(self.log_routing_key_prefix, self.name))
         alert_sent = self.service.send(the_alert)
-        print('send done')
 
     def start_logging(self):
         if self._log_action_id is not None:
