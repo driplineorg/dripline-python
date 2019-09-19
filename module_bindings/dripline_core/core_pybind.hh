@@ -39,12 +39,24 @@ namespace dripline_pybind
                    pybind11::arg( "make_connection" ) = true
             )
 
+            .def( "send",
+                  [](dripline::core& a_core, dripline::request_ptr_t a_request){auto foo = a_core.send(a_request);return 1;},
+                  "send a request message")
+            .def( "send",
+                  [](dripline::core& a_core, dripline::reply_ptr_t a_reply){auto foo = a_core.send(a_reply);return 1;},
+                  "send a reply message")
+            .def( "send",
+                  [](dripline::core& a_core, dripline::alert_ptr_t an_alert){auto foo = a_core.send(an_alert);return 1;},
+                  "send an alert message")
+
             //.def( "send", (dripline::sent_msg_pkg_ptr (_core::*)(dripline::request_ptr_t)) &_core::send, "send a request message" )
+            /*
             .def( "send",
                     //(dripline::sent_msg_pkg_ptr (dripline::core::*)(dripline::request_ptr_t) const)&dripline::core::send,
                     //TODO: how do I gest a request_ptr_t from a msg_request?
                     [](dripline::core& a_core, dripline::msg_request& a_request){return a_core.send( dripline::request_ptr_t(std::copy(a_request)) );},
                     "send a request message" )
+            */
             //.def( "send", (dripline::sent_msg_pkg_ptr (dripline::core::*)(dripline::reply_ptr_t)) &dripline::core::send, "send a reply message" )
             //.def( "send", (dripline::sent_msg_pkg_ptr (dripline::core::*)(dripline::alert_ptr_t)) &dripline::core::send, "send an alert message" )
 
