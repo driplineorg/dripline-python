@@ -10,6 +10,8 @@ services:
       #- ./setup.py:/usr/local/src/setup.py
       - .:/usr/local/src
       - ./auths.json:/root/auths.json
+    depends_on:
+      - rabbit-broker
   rabbit-broker:
     image: rabbitmq:3-management
     environment:

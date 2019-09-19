@@ -4,7 +4,10 @@ import types
 
 import numbers
 
+import scarab
+
 from .endpoint import Endpoint
+from dripline.core import MsgAlert
 __all__ = []
 
 def _log_on_set_decoration(self, fun):
@@ -129,6 +132,9 @@ class Entity(Endpoint):
 
     def log_a_value(self, the_value):
         print("value to log is:\n{}".format(the_value))
+        the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key='{}.{}'.format(self.log_routing_key_prefix, self.name))
+        alert_sent = self.service.send(the_alert)
+        print('sent')
 
     def start_logging(self):
         if self._log_action_id is not None:

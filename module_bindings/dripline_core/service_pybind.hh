@@ -1,6 +1,7 @@
 #ifndef DRIPLINE_PYBIND_SERVICE
 #define DRIPLINE_PYBIND_SERVICE
 
+#include "core.hh"
 #include "service.hh"
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
@@ -13,6 +14,7 @@ namespace dripline_pybind
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
         pybind11::class_< dripline::service,
+                          dripline::core,
                           dripline::scheduler<>,
                           scarab::cancelable,
                           std::shared_ptr< dripline::service >
