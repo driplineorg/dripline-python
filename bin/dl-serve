@@ -80,6 +80,7 @@ class Serve:
         the_service.start()
         print("services started, now to listen")
         the_service.listen()
+        the_service.stop()
 
 if __name__ == '__main__':
     the_main = scarab.MainApp()
