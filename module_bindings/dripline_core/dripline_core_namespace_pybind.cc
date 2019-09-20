@@ -1,6 +1,7 @@
 #include "pybind11/stl.h"
 
 #include "constants_pybind.hh"
+#include "core_pybind.hh"
 #include "dripline_config_pybind.hh"
 #include "_endpoint_pybind.hh"
 #include "_endpoint_trampoline.hh"
@@ -18,6 +19,7 @@ PYBIND11_MODULE( _dripline, dripline_mod )
     pybind11::module dripline_core_mod = dripline_mod.def_submodule( "core", "Core dripline standard implementation classes" );
     // Call exporters for the dripline.core namespace
     all_members.splice( all_members.end(), dripline_pybind::export_constants( dripline_core_mod ) );
+    all_members.splice( all_members.end(), dripline_pybind::export_core( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_dripline_config( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_endpoint( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_error( dripline_core_mod ) );
