@@ -2,7 +2,7 @@ __all__ = []
 
 import scarab
 
-from dripline.core import op_t, Core, DriplineConfig
+from dripline.core import op_t, Core, DriplineConfig, MsgRequest
 
 __all__.append("Interface")
 class Interface(Core):
@@ -25,8 +25,8 @@ class Interface(Core):
         internal helper method to standardize sending request messages
         '''
         a_specifier = specifier if specifier is not None else ""
-        a_request = MsgRequest.create(payload=scarab.to_param(payload), msgop=msgop, routing_key=target, specifier=a_specifier)
-        return self.send(a_reqeust)
+        a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
+        return self.send(a_request)
 
     def get(self, endpoint, specifier=None, timeout=None):
         '''
