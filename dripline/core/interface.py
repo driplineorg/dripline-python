@@ -47,7 +47,7 @@ class Interface(Core):
         specifier (string|None): specifier to add to the message
         '''
         payload = {'values':[value]}
-        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier, payload=payload )
+        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
         result = self._receiver.wait_for_reply(reply_pkg, timeout)
         return result
 
@@ -60,6 +60,6 @@ class Interface(Core):
         '''
         payload = {'values': ordered_args}
         payload.update(keyed_args)
-        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=method, payload=payload )
+        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=method, payload=payload )
         result = self._receiver.wait_for_reply(reply_pkg, timeout)
         return result
