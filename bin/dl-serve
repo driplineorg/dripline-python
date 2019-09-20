@@ -1,60 +1,97 @@
 #!/usr/bin/env python
 
 import datetime
+import traceback
 
 import yaml
 
 import dripline
 import scarab
 
-def create_object(a_config):
-    module_name = a_config.pop('module')
-    module_path = a_config.pop('module_path', False)
-    extra_namespace = object()
-    if module_path:
+class Serve:
+    def __init__(self):
+        self.return_code = 0
+
+    def create_object(self, a_config):
+        print("creating object from:\n{}\n...".format(a_config))
+        module_name = a_config.pop('module')
+        module_path = a_config.pop('module_path', False)
+        extra_namespace = object()
+        if module_path:
+            try:
+                extra_namespace = imp.load_source('extra_namespace', module_path)
+            except IOError as e:
+                print("unable to load source from: {}".format(module_path))
+                raise e
+        if hasattr(extra_namespace, module_name):
+            module = getattr(extra_namespace, module_name)
+        elif hasattr(dripline.core, module_name):
+            module = getattr(dripline.core, module_name)
+        #TODO this needs to be extended to include all of the relevant namespaces
+        #     either plugins need to all populate a well defined set, or it should iterate over them
+        else:
+            raise NameError('no module "{}" in available namespaces'.format(module_name))
+        the_object = module( **a_config )
+
+        return the_object
+
+    def run(self, the_app):
         try:
-            extra_namespace = imp.load_source('extra_namespace', module_path)
-        except IOError as e:
-            print("unable to load source from: {}".format(module_path))
-            raise e
-    if hasattr(extra_namespace, module_name):
-        module = getattr(extra_namespace, module_name)
-    elif hasattr(dripline.core, module_name):
-        module = getattr(dripline.core, module_name)
-    #TODO this needs to be extended to include all of the relevant namespaces
-    #     either plugins need to all populate a well defined set, or it should iterate over them
-    else:
-        raise NameError('no module "{}" in available namespaces'.format(module_name))
-    the_object = module( **a_config )
+            self._run(the_app)
+        except:
+            print("got an error... need to implement handling")
+            print("traceback was:\n{}".format(traceback.format_exc()))
+            self.return_code = 100
 
-    return the_object
+    def _run(self, the_app):
+        this_config = the_app.master_config
+        print('python got a master config:\n{}'.format(this_config))
 
-def run():
-    sig_handler = scarab.SignalHandler()
-    the_config = yaml.safe_load(open("../examples/kv_store_tutorial.yaml", "r"))
+        sig_handler = scarab.SignalHandler()
 
-    the_endpoints = the_config.pop("endpoints", [])
+        #file_path = this_config.get_value('runtime-file', None)
+        #if file_path is None:
+        #    #TODO: shold be a better error, also can I make this a required flag?
+        #    raise ValueError("runtime file is required")
+        #run_config = yaml.safe_load(open(file_path, 'r'))
+        #print('found file & loaded')
 
-    the_service = create_object( the_config )
-    the_service.enable_scheduling = True
-    sig_handler.add_cancelable(the_service)
+        run_config = this_config.to_python().get('runtime-config')
+        the_endpoints = run_config.pop("endpoints", [])
 
-    all_endpoints = []
-    for an_endpoint_conf in the_endpoints:
-        an_endpoint = create_object(an_endpoint_conf)
-        the_service.add_child( an_endpoint )
-        all_endpoints.append(an_endpoint)
-        if getattr(an_endpoint, 'log_interval', 0) > datetime.timedelta(seconds=0):
-            print("queue up start logging for '{}'".format(an_endpoint.name))
-            #action_id = the_service.schedule(an_endpoint.start_logging, datetime.datetime.now())
-            an_endpoint.start_logging()
-            #print("will start logging at {}".format(datetime.datetime.now() + the_service.execution_buffer*3))
-            #action_id = the_service.schedule(an_endpoint.scheduled_log, an_endpoint.log_interval, datetime.datetime.now() + the_service.execution_buffer*3)
+        service_config = run_config.copy()
+        service_config.update({'config': this_config})
 
-    print("about to start the service")
-    the_service.start()
-    print("services started, now to listen")
-    the_service.listen()
+        the_service = self.create_object( run_config )
+        the_service.enable_scheduling = True
+        sig_handler.add_cancelable(the_service)
+        print('service built')
+
+        all_endpoints = []
+        for an_endpoint_conf in the_endpoints:
+            an_endpoint = self.create_object(an_endpoint_conf)
+            the_service.add_child( an_endpoint )
+            all_endpoints.append(an_endpoint)
+            if getattr(an_endpoint, 'log_interval', 0) > datetime.timedelta(seconds=0):
+                print("queue up start logging for '{}'".format(an_endpoint.name))
+                an_endpoint.start_logging()
+
+        print("about to start the service")
+        the_service.start()
+        print("services started, now to listen")
+        the_service.listen()
+        the_service.stop()
 
 if __name__ == '__main__':
-    run()
+    the_main = scarab.MainApp()
+    dripline_config = {'dripline': dripline.core.DriplineConfig().to_python()}
+    the_main.default_config = scarab.to_param(dripline_config, True)
+    dripline.core.add_dripline_options(the_main)
+
+    the_server = Serve()
+    # add flags
+    the_main.set_callback(lambda : the_server.run(the_main))
+    import sys
+    the_main.execute(sys.argv)
+
+    sys.exit(the_server.return_code)
