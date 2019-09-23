@@ -12,7 +12,7 @@
 #include "version_store.hh"
 
 
-ADD_VERSION( driplinepython, dripline_pybind::dl_python_version );
+static dripline::version_store_adder< dripline_pybind::dl_python_version > s_version_adder_dripline_python( "dripline-python" );
 
 
 namespace dripline_pybind
