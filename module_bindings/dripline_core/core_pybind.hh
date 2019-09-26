@@ -39,11 +39,11 @@ namespace dripline_pybind
                 )
 
             .def( "send",
-                  [](dripline::core& a_core, dripline::request_ptr_t a_request){auto foo = a_core.send(a_request);return 1;},
+                  [](dripline::core& a_core, dripline::request_ptr_t a_request){return a_core.send(a_request);},
                   "send a request message"
                 )
             .def( "send",
-                  [](dripline::core& a_core, dripline::reply_ptr_t a_reply){auto foo = a_core.send(a_reply);return 1;},
+                  [](dripline::core& a_core, dripline::reply_ptr_t a_reply){return a_core.send(a_reply);},
                   "send a reply message"
                 )
             .def( "send",
