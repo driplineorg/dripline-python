@@ -18,6 +18,7 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/scheduler_pybind.hh
     #dripline_core/run_simple_service_pybind.hh
     dripline_core/receiver_pybind.hh
+    dripline_core/version_store_pybind.hh
 )
 set( PB_DRIPLINE_CORE_SOURCEFILES
     dripline_core/dripline_core_namespace_pybind.cc
