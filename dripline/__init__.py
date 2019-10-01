@@ -1,5 +1,3 @@
-a = 3
-
 from . import core
 from . import extensions
 

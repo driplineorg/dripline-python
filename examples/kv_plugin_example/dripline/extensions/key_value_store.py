@@ -1,5 +1,5 @@
-from .calibrate import calibrate
-from .entity import Entity
+from dripline.core.calibrate import calibrate
+from dripline.core.entity import Entity
 __all__ = []
 
 __all__.append("KeyValueStore")
