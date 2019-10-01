@@ -24,5 +24,7 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 
 #RUN cd /usr/local/src && \
 RUN pip --disable-pip-version-check install -v /usr/local/src
-#    ldconfig
+RUN ldconfig
 #    /bin/true
+
+RUN pip install ipython
