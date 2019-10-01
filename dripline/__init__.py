@@ -16,5 +16,5 @@ def __update_plugins():
         setattr( dripline.extensions, name.split('dripline.extensions.')[1], this_module)
         if hasattr(this_module, 'version'):
             print("it has a version")
-            scarab.add_version(name, this_module.version)
+            dripline.core.add_version(name, this_module.version)
 __update_plugins()
