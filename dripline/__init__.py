@@ -2,6 +2,16 @@ from . import core
 from . import implementations
 from . import extensions
 
+def __get_version():
+    import scarab
+    #TODO: this all needs to be populated from setup.py and gita
+    version = scarab.VersionSemantic(0,0,1)
+    version.package = 'driplineorg/dripline-python'
+    version.commit = 'cba321'
+    core.add_version('dripline-python', version)
+    return version
+version = __get_version()
+
 def __update_plugins():
     import importlib
     import pkgutil
