@@ -5,17 +5,6 @@
 
 #include <string>
 
-namespace dripline
-{
-    struct return_code
-    {
-        virtual ~return_code() {};
-        virtual unsigned rc_value() const = 0;
-        virtual std::string rc_name() const = 0;
-    };
-
-}
-
 namespace dripline_pybind
 {
 
