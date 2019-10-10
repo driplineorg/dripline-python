@@ -56,6 +56,7 @@ requirements = list()
 if not on_rtd:
     requirements.append('pika<=0.11.2')
     requirements.append('asteval')
+    requirements.append('six')
 else:
     requirements += extras_require['doc']
 
