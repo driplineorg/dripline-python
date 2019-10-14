@@ -1,5 +1,8 @@
 __all__ = []
 
+import pkg_resources
+import ipdb;ipdb.set_trace()
+
 import scarab
 version = scarab.VersionSemantic(0,1,0)
 version.package = 'driplineorg/dripline-python.kve'
