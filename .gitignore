@@ -8,6 +8,7 @@ dripline.egg-info/*
 build/*
 doc/_build/*
 .eggs/*
+examples/kv_plugin_example/kv_plugin.egg-info/*
 *.egg
 *.so*
 dripline.sublime-workspace
