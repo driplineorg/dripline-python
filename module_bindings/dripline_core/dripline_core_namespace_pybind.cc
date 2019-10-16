@@ -12,6 +12,7 @@
 //#include "run_simple_service_pybind.hh"
 #include "specifier_pybind.hh"
 #include "service_pybind.hh"
+#include "version_store_pybind.hh"
 
 PYBIND11_MODULE( _dripline, dripline_mod )
 {
@@ -30,6 +31,7 @@ PYBIND11_MODULE( _dripline, dripline_mod )
     all_members.splice( all_members.end(), dripline_pybind::export_specifier( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_receiver( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_service( dripline_core_mod ) );
+    all_members.splice( all_members.end(), dripline_pybind::export_version_store( dripline_core_mod ) );
     // add __all__
     dripline_core_mod.attr( "__all__" ) = all_members;
 }

@@ -10,4 +10,5 @@ set_option( Scarab_BUILD_PYTHON TRUE )
 
 pbuilder_add_submodule( Dripline dripline-cpp )
 
+include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )
 add_subdirectory( module_bindings )
