@@ -81,6 +81,8 @@ setup(
     use_scm_version={
         "root": ".",
         "write_to": "./dripline/version.py",
+        'version_scheme': lambda x: "v{}".format(x.tag),
+        'local_scheme': lambda x: '',
     },
     #version='4.0.0-beta',
     author='us',

@@ -4,8 +4,11 @@ from . import extensions
 
 def __get_version():
     import scarab
+    import pkg_resources
     #TODO: this all needs to be populated from setup.py and gita
-    version = scarab.VersionSemantic(0,0,1)
+    version = scarab.VersionSemantic()
+    print('version should be: {}'.format(pkg_resources.get_distribution('dripline').version))
+    version.parse(pkg_resources.get_distribution('dripline').version)
     version.package = 'driplineorg/dripline-python'
     version.commit = 'na'
     core.add_version('dripline-python', version)
