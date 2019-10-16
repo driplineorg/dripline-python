@@ -7,7 +7,7 @@ def __get_version():
     #TODO: this all needs to be populated from setup.py and gita
     version = scarab.VersionSemantic(0,0,1)
     version.package = 'driplineorg/dripline-python'
-    version.commit = 'cba321'
+    version.commit = 'na'
     core.add_version('dripline-python', version)
     return version
 version = __get_version()

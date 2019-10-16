@@ -11,6 +11,7 @@ doc/_build/*
 examples/kv_plugin_example/kv_plugin.egg-info/*
 *.egg
 *.so*
+version.py
 dripline.sublime-workspace
 
 # Compiled Object files
