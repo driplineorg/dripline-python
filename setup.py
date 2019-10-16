@@ -70,11 +70,21 @@ class CMakeBuild(build_ext):
 requirements = [
     'PyYAML',
     'asteval',
+    'setuptools_scm',
 ]
+
+packages = ["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")]
+print('packages are: {}'.format(packages))
 
 setup(
     name='dripline',
-    version='4.0.0-beta',
+    use_scm_version={
+        "root": ".",
+        "write_to": "./dripline/version.py",
+        'version_scheme': lambda x: "v{}".format(x.tag),
+        'local_scheme': lambda x: '',
+    },
+    #version='4.0.0-beta',
     author='us',
     author_email='driplineorg@email.tld',
     description='a description would be good',
@@ -85,6 +95,6 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     install_requires=requirements,
-    packages=["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")],#, "dripline.core", "dripline.extensions"],
+    packages=packages,
     scripts=["bin/dl-serve"]
 )

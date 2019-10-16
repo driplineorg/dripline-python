@@ -22,7 +22,9 @@ COPY CMakeLists.txt /usr/local/src/CMakeLists.txt
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-#RUN cd /usr/local/src && \
-RUN pip --disable-pip-version-check install -v /usr/local/src
-#    ldconfig
-#    /bin/true
+RUN pip install ipython
+
+RUN cd /usr/local/src &&\
+    python setup.py install
+RUN ldconfig
+
