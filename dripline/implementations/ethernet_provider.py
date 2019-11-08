@@ -1,0 +1,215 @@
+import socket
+import threading
+import six
+
+import scarab
+from dripline.core import Service
+# Dripline Exceptions currently unavailable
+
+# logging currently unavailable
+# import logging 
+# logger = logging.getLogger(__name__)
+
+__all__ = []
+
+
+__all__.append('EthernetProvider')
+
+class EthernetProvider(Service):
+    def __init__(self,
+                 socket_timeout=1.0,
+                 socket_info=('localhost',1234),
+                 cmd_at_reconnect=['*OPC?'],
+                 reconnect_test='1',
+                 command_terminator='',
+                 response_terminator=None,
+                 bare_response_terminator=None,
+                 reply_echo_cmd=False,
+                 **kwargs
+                 ):
+
+        Service.__init__(self, scarab.to_param(kwargs))
+
+        if isinstance(socket_info, str):
+            # logger.debug
+            print("Formatting socket_info: {}".format(repr(socket_info)))
+            import re
+            re_str = "\([\"'](\S+)[\"'], ?(\d+)\)"
+            (ip,port) = re.findall(re_str,socket_info)[0]
+            socket_info = (ip,int(port))
+        if response_terminator is None or response_terminator == '':
+            # exceptions.DriplineValueError
+            raise ValueError("Invalid response terminator: <{}>! Expect string".format(repr(response_terminator)))
+        if not isinstance(cmd_at_reconnect, list) or len(cmd_at_reconnect)==0:
+            if cmd_at_reconnect is not None:
+                # exceptions.DriplineValueError
+                raise ValueError("Invalid cmd_at_reconnect: <{}>! Expect non-zero length list".format(repr(cmd_at_reconnect)))
+
+        self.alock = threading.Lock()
+        self.socket = socket.socket()
+        self.socket_timeout = float(socket_timeout)
+        self.socket_info = socket_info
+        self.cmd_at_reconnect = cmd_at_reconnect
+        self.reconnect_test = reconnect_test
+        self.command_terminator = command_terminator
+        self.response_terminator = response_terminator
+        self.bare_response_terminator = bare_response_terminator
+        self.reply_echo_cmd = reply_echo_cmd
+        self._reconnect()
+
+
+    def _reconnect(self):
+        '''
+        Method establishing socket to ethernet instrument.
+        Called by __init__ or send (on failed communication).
+        '''
+        self.socket.close()
+        self.socket = socket.socket()
+        try:
+            self.socket = socket.create_connection(self.socket_info, self.socket_timeout)
+        except (socket.error, socket.timeout) as err:
+            # logger.warning
+            print("connection {} refused: {}".format(self.socket_info, err))
+            # exception.DriplineHardwareConnectionError
+            raise Exception("Unable to establish ethernet socket {}".format(self.socket_info))
+        self.socket.settimeout(self.socket_timeout)
+        # logger.info
+        print("Ethernet socket {} established".format(self.socket_info))
+
+        # Lantronix xDirect adapters have no query options
+        if self.cmd_at_reconnect is None:
+            return
+        commands = self.cmd_at_reconnect[:]
+        # Agilent/Keysight instruments give an unprompted *IDN? response on
+        #   connection. This must be cleared before communicating with a blank
+        #   listen or all future queries will be offset.
+        while commands[0] is None:
+            # logger.debug
+            print("Emptying reconnect buffer")
+            commands.pop(0)
+            self._listen(blank_command=True)
+        response = self._send_commands(commands)
+        # Final cmd_at_reconnect should return '1' to test connection.
+        if response[-1] != self.reconnect_test:
+            self.socket.close()
+            # logger.warning
+            print("Failed connection test.  Response was {}".format(response))
+            # exceptions.DriplineHardwareConnectionError
+            raise Exception("Failed connection test.")
+
+
+    def send(self, commands, **kwargs):
+        '''
+        Standard provider method to communicate with instrument.
+        NEVER RENAME THIS METHOD!
+
+        commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!
+                             : if impossible, set as None to skip
+        '''
+        if isinstance(commands, six.string_types):
+            commands = [commands]
+        self.alock.acquire()
+
+        try:
+            data = self._send_commands(commands)
+        except socket.error as err:
+            # logger.warning
+            print("socket.error <{}> received, attempting reconnect".format(err))
+            self._reconnect()
+            data = self._send_commands(commands)
+            # logger.critical
+            print("Ethernet connection reestablished")
+        # exceptions.DriplineHardwareResponselessError
+        except Exception as err:
+            # logger.critical
+            print(str(err))
+            try:
+                self._reconnect()
+                data = self._send_commands(commands)
+                # logger.critical
+                print("Query successful after ethernet connection recovered")
+            # exceptions.DriplineHardwareConnectionError
+            except socket.error: # simply trying to make it possible to catch the error below
+                # logger.critical
+                print("Ethernet reconnect failed, dead socket")
+                # exceptions.DriplineHardwareConnectionError
+                raise socket.error("Broken ethernet socket")
+            # exceptions.DriplineHardwareResponselessError
+            except Exception as err:
+                # logger.critical
+                print("Query failed after successful ethernet socket reconnect")
+                # exceptions.DriplineHardwareResponselessError
+                raise Exception(err)
+        finally:
+            self.alock.release()
+        to_return = ';'.join(data)
+        # logger.debug
+        print("should return:\n{}".format(to_return))
+        return to_return
+
+
+    def _send_commands(self, commands):
+        '''
+        Take a list of commands, send to instrument and receive responses, do any necessary formatting.
+
+        commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!
+                             : if impossible, set as None to skip
+        '''
+        all_data=[]
+
+        for command in commands:
+            command += self.command_terminator
+            # logger.debug
+            print("sending: {}".format(repr(command)))
+            self.socket.send(command.encode())
+            if command == self.command_terminator:
+                blank_command = True
+            else:
+                blank_command = False
+
+            data = self._listen(blank_command)
+
+            if self.reply_echo_cmd:
+                if data.startswith(command):
+                    data = data[len(command):]
+                elif not blank_command:
+                    # exceptions.DriplineHardwareConnectionError
+                    raise Exception("Bad ethernet query return: {}".format(data))
+            # logger.info
+            print("sync: {} -> {}".format(repr(command),repr(data)))
+            all_data.append(data)
+        return all_data
+
+
+    def _listen(self, blank_command=False):
+        '''
+        Query socket for response.
+
+        blank_comands (bool): flag which is True when command is exactly the command terminator
+        '''
+        data = ''
+        try:
+            while True:
+                data += self.socket.recv(1024).decode(errors='replace')
+                if data.endswith(self.response_terminator):
+                    terminator = self.response_terminator
+                    break
+                # Special exception for lockin data dump
+                elif self.bare_response_terminator and data.endswith(self.bare_response_terminator):
+                    terminator = self.bare_response_terminator
+                    break
+                # Special exception for disconnect of prologix box to avoid infinite loop
+                if data == '':
+                    # exceptions.DriplineHardwareResponselessError
+                    raise Exception("Empty socket.recv packet")
+        except socket.timeout:
+            # logger.warning
+            print("socket.timeout condition met; received:\n{}".format(repr(data)))
+            if blank_command == False:
+                # exceptions.DriplineHardwareResponselessError
+                raise Exception("Unexpected socket.timeout")
+            terminator = ''
+        # logger.debug
+        print(repr(data))
+        data = data[0:data.rfind(terminator)]
+        return data
