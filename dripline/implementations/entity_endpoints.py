@@ -73,7 +73,7 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
 
 
 __all__.append('SimpleSCPISetEntity')
-@fancy_doc
+
 class SimpleSCPISetEntity(SimpleSCPIEntity):
     '''
     Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted, and on_set return query is *OPC? instead of base_str?
@@ -92,7 +92,7 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
 
 __all__.append('FormatEntity')
-@fancy_doc
+
 class FormatEntity(Entity):
     '''
     Utility Entity allowing arbitrary set and query syntax and formatting for more complicated usage cases
