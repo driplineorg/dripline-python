@@ -12,6 +12,9 @@ doc/_build/*
 *.so*
 dripline.sublime-workspace
 
+# generated source files
+dripline/version.py
+
 # Compiled Object files
 *.slo
 *.lo
