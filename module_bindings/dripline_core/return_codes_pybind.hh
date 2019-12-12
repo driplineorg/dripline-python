@@ -1,5 +1,8 @@
+#ifndef DRIPLINE_PYBIND_RETURN_CODES
+#define DRIPLINE_PYBIND_RETURN_CODES
 
 #include "return_codes.hh"
+#include "return_code_trampoline.hh"
 
 #include "pybind11/pybind11.h"
 
@@ -7,9 +10,17 @@
 
 namespace dripline_pybind
 {
+    // Macro for binding dripline-cpp return codes; note, it uses local variables defined and scoped in this header
+#define ADD_DRIPLINE_RET_CODE( cpp_name, py_name ) \
+    all_items.push_back( "DL_" #py_name ); \
+    pybind11::class_< dripline::dl_##cpp_name, dripline::return_code >( mod, "DL_" #py_name, "" ) \
+        .def( pybind11::init<>() ) \
+        .def_property_readonly( "value", &dripline::dl_##cpp_name::rc_value ) \
+        ;
 
-    std::list< std::string > export_version( pybind11::module& mod )
+    std::list< std::string > export_return_codes( pybind11::module& mod )
     {
+        /*
         class return_code_registrar : public scarab::base_registrar< dripline::return_code >
         {
             public:
@@ -26,21 +37,61 @@ namespace dripline_pybind
                     return dripline::dl_unhandled_exception::s_value;
                 }
         };
+        */
 
+        /*
+        struct _return_code : public dripline::return_code
+        {
+            public:
+                using dripline::return_code
+        }
+        */
 
         std::list< std::string > all_items;
 
         all_items.push_back( "ReturnCode" );
-        pybind11::class_< return_code >( mod, "ReturnCode", "base class for return codes" )
+        pybind11::class_< dripline::return_code, return_code_trampoline >( mod, "ReturnCode", "base class for return codes" )
             .def( pybind11::init<>() )
-            .def( "value", &return_code::value, "return code value" )
-            .def( "name", &return_code::name, "return code name" )
+            .def_property_readonly( "value", &dripline::return_code::rc_value, "return code value" )
+            //.def( "value", &dripline::return_code::value, "return code value" )
+            //.def( "name", &dripline::return_code::name, "return code name" )
             ;
-            
 
+        ADD_DRIPLINE_RET_CODE( success, Success )
+        ADD_DRIPLINE_RET_CODE( warning_no_action_taken, WarningNoActionTaken )
+
+        ADD_DRIPLINE_RET_CODE( amqp_error, AmqpError )
+        ADD_DRIPLINE_RET_CODE( amqp_error_broker_connection, AmqpErrorBrokerConnection )
+        ADD_DRIPLINE_RET_CODE( amqp_error_routingkey_notfound, AmqpErrorRoutingkeyNotfound )
+
+        ADD_DRIPLINE_RET_CODE( device_error, DeviceError )
+        ADD_DRIPLINE_RET_CODE( device_error_connection, DeviceErrorConnection )
+        ADD_DRIPLINE_RET_CODE( device_error_no_resp, DeviceErrorNoResp )
+
+        ADD_DRIPLINE_RET_CODE( message_error, MessageError )
+        ADD_DRIPLINE_RET_CODE( message_error_no_encoding, MessageErrorNoEncoding )
+        ADD_DRIPLINE_RET_CODE( message_error_decoding_fail, MessageErrorDecodingFail )
+        ADD_DRIPLINE_RET_CODE( message_error_bad_payload, MessageErrorBadPayload )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_value, MessageErrorInvalidValue )
+        ADD_DRIPLINE_RET_CODE( message_error_timeout, MessageErrorTimeout )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_method, MessageErrorInvalidMethod )
+        ADD_DRIPLINE_RET_CODE( message_error_access_denied, MessageErrorAccessDenied )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_key, MessageErrorInvalidKey )
+        ADD_DRIPLINE_RET_CODE( message_error_dripline_deprecated, MessageErrorDriplineDeprecated )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_specifier, MessageErrorInvalidSpecifier )
+
+        ADD_DRIPLINE_RET_CODE( client_error, ClientError )
+        ADD_DRIPLINE_RET_CODE( client_error_invalid_request, ClientErrorInvalidRequest )
+        ADD_DRIPLINE_RET_CODE( client_error_handling_reply, ClientErrorHandlingReply )
+        ADD_DRIPLINE_RET_CODE( client_error_unable_to_send, ClientErrorUnableToSend )
+        ADD_DRIPLINE_RET_CODE( client_error_timeout, ClientErrorTimeout )
+
+        ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
+
+        /*
         all_items.push_back( "register_return_code" );
-        mod.def( "register_return_code", [](return_code_registrar& a_registrar){ 
-                    scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->register_class( a_registrar.value(), &a_registrar ); 
+        mod.def( "register_return_code", [](return_code_registrar& a_registrar){
+                    scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->register_class( a_registrar.value(), &a_registrar );
             },
             pybind11::call_guard< pybind11::gil_scoped_release >(),
             "Registers a new Dripline return code" );
@@ -57,7 +108,10 @@ namespace dripline_pybind
         //      it should store an instance of the class object of the return code
         //      it should implement create() and value()
 
+        */
         return all_items;
     }
 
 }
+
+#endif /* DRIPLINE_PYBIND_RETURN_CODES */
