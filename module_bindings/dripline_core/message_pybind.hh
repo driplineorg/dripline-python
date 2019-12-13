@@ -123,7 +123,7 @@ namespace dripline_pybind
                          )
             // mv_accessible
             .def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid )
-            .def_property( "message_op", &dripline::msg_request::get_message_op, &dripline::msg_request::set_message_op )
+            .def_property( "message_operation", &dripline::msg_request::get_message_operation, &dripline::msg_request::set_message_operation )
 
             // general methods
             .def_static( "create",
@@ -143,12 +143,12 @@ namespace dripline_pybind
                        )
             .def( "reply",
                   [](dripline::request_ptr_t a_req,
-                     const unsigned a_retcode,
-                     const std::string& a_ret_msg,
+                     const unsigned a_return_code,
+                     const std::string& a_return_message,
                      scarab::param& a_payload)
-                    {return a_req->reply( a_retcode, a_ret_msg, a_payload.clone() );},
-                  pybind11::arg( "retcode" ) = 0,
-                  pybind11::arg( "ret_msg" ) = "",
+                    {return a_req->reply( a_return_code, a_return_message, a_payload.clone() );},
+                  pybind11::arg( "return_code" ) = 0,
+                  pybind11::arg( "return_message" ) = "",
                   pybind11::arg_v( "payload", scarab::param(), "scarab::param()" )
                 )
             ;
@@ -163,8 +163,8 @@ namespace dripline_pybind
 
             // properties
             // mv_referrable
-            .def_property( "return_msg", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_msg,
-                           []( dripline::msg_reply& an_obj, const std::string& a_msg ){ an_obj.return_msg() = a_msg; } )
+            .def_property( "return_message", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_message,
+                           []( dripline::msg_reply& an_obj, const std::string& a_msg ){ an_obj.return_message() = a_msg; } )
             // mv_accessible
             .def_property( "return_code", &dripline::msg_reply::get_return_code, &dripline::msg_reply::set_return_code )
 
@@ -179,8 +179,8 @@ namespace dripline_pybind
                             std::string& a_specifier,
                             dripline::message::encoding an_encoding)
                            {return dripline::msg_reply::create( a_retcode_value, a_ret_msg, a_payload.clone(), a_routing_key, a_specifier, an_encoding);},
-                         pybind11::arg( "retcode" ) = 0,
-                         pybind11::arg( "ret_msg" ) = "",
+                         pybind11::arg( "return_code" ) = 0,
+                         pybind11::arg( "return_message" ) = "",
                          pybind11::arg( "payload" ) = scarab::param(),
                          pybind11::arg( "routing_key" ) = "",
                          pybind11::arg( "specifier" ) = "",
@@ -192,8 +192,8 @@ namespace dripline_pybind
                             scarab::param& a_payload,
                             const dripline::msg_request& a_msg_request)
                            {return dripline::msg_reply::create( a_retcode_value, a_ret_msg, a_payload.clone(), a_msg_request);},
-                         pybind11::arg( "retcode" ) = 0,
-                         pybind11::arg( "ret_msg" ) = "",
+                         pybind11::arg( "return_code" ) = 0,
+                         pybind11::arg( "return_message" ) = "",
                          pybind11::arg( "payload" ) = scarab::param(),
                          pybind11::arg( "msg_request" ) = dripline::message::encoding::json
                        )

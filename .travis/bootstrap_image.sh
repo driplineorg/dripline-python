@@ -90,7 +90,7 @@ esac
 dot_travis_path=`dirname $0`
 dot_travis_path=`readlink -e $dot_travis_path`
 
-set -x
+set -ex
 
 # bootstrap a custom base image with emulation
 cp $original_qemu_path ${dot_travis_path}/this_qemu
@@ -112,4 +112,4 @@ docker build \
     .
 docker push ${output_image}-${architecture_img_suffix}
 
-set +x
+set +ex
