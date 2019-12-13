@@ -16,6 +16,8 @@ namespace dripline_pybind
     pybind11::class_< dripline::dl_##cpp_name, dripline::return_code >( mod, "DL_" #py_name, "" ) \
         .def( pybind11::init<>() ) \
         .def_property_readonly( "value", &dripline::dl_##cpp_name::rc_value ) \
+        .def_property_readonly( "name", &dripline::dl_##cpp_name::rc_name ) \
+        .def_property_readonly( "description", &dripline::dl_##cpp_name::rc_description ) \
         ;
 
     std::list< std::string > export_return_codes( pybind11::module& mod )
@@ -39,22 +41,14 @@ namespace dripline_pybind
         };
         */
 
-        /*
-        struct _return_code : public dripline::return_code
-        {
-            public:
-                using dripline::return_code
-        }
-        */
-
         std::list< std::string > all_items;
 
         all_items.push_back( "ReturnCode" );
         pybind11::class_< dripline::return_code, return_code_trampoline >( mod, "ReturnCode", "base class for return codes" )
             .def( pybind11::init<>() )
             .def_property_readonly( "value", &dripline::return_code::rc_value, "return code value" )
-            //.def( "value", &dripline::return_code::value, "return code value" )
-            //.def( "name", &dripline::return_code::name, "return code name" )
+            .def_property_readonly( "name", &dripline::return_code::rc_name, "return code name" )
+            .def_property_readonly( "description", &dripline::return_code::rc_description, "return code description" )
             ;
 
         ADD_DRIPLINE_RET_CODE( success, Success )
@@ -89,27 +83,6 @@ namespace dripline_pybind
 
         ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
 
-        /*
-        all_items.push_back( "register_return_code" );
-        mod.def( "register_return_code", [](return_code_registrar& a_registrar){
-                    scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->register_class( a_registrar.value(), &a_registrar );
-            },
-            pybind11::call_guard< pybind11::gil_scoped_release >(),
-            "Registers a new Dripline return code" );
-
-        //TODO: this probably needs a trampoline class to get the virtual functions to forward correctly
-        all_items.push_back( "_ReturnCodeRegistrar" );
-        pybind11::class_< return_code_registrar >( mod, "_ReturnCodeRegistrar", "base class for registering Python-based return codes" )
-            .def( pybind11::init<>() )
-            .def( "create", &return_code_registrar::create, "creates a new return code object" )
-            .def( "value", &return_code_registrar::value, "returns the value of the return code" )
-            ;
-
-        //TODO: there should be a pure-python class ReturnCodeRegistrar that inherits from _ReturnCodeRegistrar
-        //      it should store an instance of the class object of the return code
-        //      it should implement create() and value()
-
-        */
         return all_items;
     }
 
