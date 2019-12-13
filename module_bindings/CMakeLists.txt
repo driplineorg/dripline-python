@@ -16,6 +16,7 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/receiver_pybind.hh
     dripline_core/return_code_trampoline.hh
     dripline_core/return_codes.hh
+    dripline_core/version_store_pybind.hh
 )
 set( PB_DRIPLINE_CORE_SOURCEFILES
     dripline_core/dripline_core_namespace_pybind.cc

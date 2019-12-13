@@ -1,7 +1,7 @@
 #ifndef DRIPLINE_PYBIND_ERROR
 #define DRIPLINE_PYBIND_ERROR
 
-#include "dripline_error.hh"
+#include "dripline_exceptions.hh"
 #include "pybind11/pybind11.h"
 
 namespace dripline_pybind
