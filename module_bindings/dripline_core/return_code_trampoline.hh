@@ -17,6 +17,16 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( unsigned, dripline::return_code, rc_value );
             }
 
+            std::string rc_name() const override
+            {
+                PYBIND11_OVERLOAD_PURE( std::string, dripline::return_code, rc_name );
+            }
+
+            std::string rc_description() const override
+            {
+                PYBIND11_OVERLOAD_PURE( std::string, dripline::return_code, rc_description );
+            }
+
     };
 
 } /* namespace dripline_pybind */

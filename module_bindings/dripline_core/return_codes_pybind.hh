@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #ifndef DRIPLINE_PYBIND_RETURN_CODES
 #define DRIPLINE_PYBIND_RETURN_CODES
 
@@ -59,6 +58,7 @@ namespace dripline_pybind
             ;
 
         ADD_DRIPLINE_RET_CODE( success, Success )
+
         ADD_DRIPLINE_RET_CODE( warning_no_action_taken, WarningNoActionTaken )
 
         ADD_DRIPLINE_RET_CODE( amqp_error, AmqpError )

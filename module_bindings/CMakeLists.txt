@@ -18,7 +18,6 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/version_store_pybind.hh
 )
 set( PB_DRIPLINE_CORE_SOURCEFILES
-    dripline_core/_return_code_trampoline.cc
     dripline_core/dripline_core_namespace_pybind.cc
 )
 pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
