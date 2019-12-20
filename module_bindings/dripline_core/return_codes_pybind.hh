@@ -5,6 +5,7 @@
 #include "return_code_trampoline.hh"
 
 #include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
 #include <string>
 
@@ -65,7 +66,6 @@ namespace dripline_pybind
 
         ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
 
-        /************************************************************
 
         class return_code_registrar : public scarab::base_registrar< dripline::return_code >
         {
@@ -83,13 +83,52 @@ namespace dripline_pybind
                     return dripline::dl_unhandled_exception::s_value;
                 }
         };
+        class return_code_registrar_trampoline : public return_code_registrar
+        {
+          public:
+              using return_code_registrar::return_code_registrar;
+
+              dripline::return_code* create() const override
+              {
+                pybind11::gil_scoped_acquire t_acquire;
+                PYBIND11_OVERLOAD( dripline::return_code*, return_code_registrar, create );
+              }
+              unsigned value() const override
+              {
+                pybind11::gil_scoped_acquire t_acquire;
+                PYBIND11_OVERLOAD( unsigned, return_code_registrar, value );
+              }
+        };
 
         all_items.push_back( "register_return_code" );
-        mod.def( "register_return_code", [](return_code_registrar& a_registrar){
-                    scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->register_class( a_registrar.value(), &a_registrar );
+        mod.def( "register_return_code", [](return_code_registrar& a_registrar)
+            {
+                scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->register_class( a_registrar.value(), &a_registrar );
             },
             pybind11::call_guard< pybind11::gil_scoped_release >(),
-            "Registers a new Dripline return code" );
+            "Registers a new Dripline return code"
+            );
+        all_items.push_back( "get_return_codes" );
+        mod.def( "get_return_codes",
+                 [](){
+                    std::list< unsigned > retcodes;
+                    auto the_registrar = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
+                    auto anIt = the_registrar->begin();
+                    while (anIt != the_registrar->end() )
+                    {
+                        retcodes.push_back( anIt->first );
+                        anIt++;
+                    }
+                    return retcodes;
+                    //return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
+                      //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->begin(),
+                      //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->end()
+                    );
+                 }//,
+                // pybind11::keep_alive<0, 1>()
+                 );
+
+
         //TODO: this probably needs a trampoline class to get the virtual functions to forward correctly
         all_items.push_back( "_ReturnCodeRegistrar" );
         pybind11::class_< return_code_registrar >( mod, "_ReturnCodeRegistrar", "base class for registering Python-based return codes" )
@@ -97,6 +136,7 @@ namespace dripline_pybind
             .def( "create", &return_code_registrar::create, "creates a new return code object" )
             .def( "value", &return_code_registrar::value, "returns the value of the return code" )
             ;
+        /************************************************************
         //TODO: there should be a pure-python class ReturnCodeRegistrar that inherits from _ReturnCodeRegistrar
         //      it should store an instance of the class object of the return code
         //      it should implement create() and value()
