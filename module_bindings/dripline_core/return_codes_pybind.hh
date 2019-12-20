@@ -11,6 +11,7 @@
 
 namespace dripline_pybind
 {
+    LOGGER( dl_pybind_retcode, "return_codes_pybind" );
     // Macro for binding dripline-cpp return codes; note, it uses local variables defined and scoped in this header
 #define ADD_DRIPLINE_RET_CODE( cpp_name, py_name ) \
     all_items.push_back( "DL_" #py_name ); \
@@ -113,6 +114,7 @@ namespace dripline_pybind
                  [](){
                     std::list< unsigned > retcodes;
                     auto the_factory = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
+                    LDEBUG( dl_pybind_retcode, "factor is at " << the_factory );
                     auto anIt = the_factory->begin();
                     while (anIt != the_factory->end() )
                     {
