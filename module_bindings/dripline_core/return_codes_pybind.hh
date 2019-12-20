@@ -112,13 +112,14 @@ namespace dripline_pybind
         mod.def( "get_return_codes",
                  [](){
                     std::list< unsigned > retcodes;
-                    auto the_registrar = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
-                    auto anIt = the_registrar->begin();
-                    while (anIt != the_registrar->end() )
+                    auto the_factory = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
+                    auto anIt = the_factory->begin();
+                    while (anIt != the_factory->end() )
                     {
                         retcodes.push_back( anIt->first );
                         anIt++;
                     }
+                    retcodes.push_back(0);
                     return retcodes;
                     /*
                     return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
