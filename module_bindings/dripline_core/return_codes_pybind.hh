@@ -120,10 +120,12 @@ namespace dripline_pybind
                         anIt++;
                     }
                     return retcodes;
-                    //return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
+                    /*
+                    return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
                       //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->begin(),
                       //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->end()
                     );
+                    */
                  }//,
                 // pybind11::keep_alive<0, 1>()
                  );
