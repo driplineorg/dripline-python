@@ -35,38 +35,6 @@ namespace dripline_pybind
             .def_property_readonly( "description", &dripline::return_code::rc_description, "return code description" )
             ;
 
-        ADD_DRIPLINE_RET_CODE( success, Success )
-
-        ADD_DRIPLINE_RET_CODE( warning_no_action_taken, WarningNoActionTaken )
-
-        ADD_DRIPLINE_RET_CODE( amqp_error, AmqpError )
-        ADD_DRIPLINE_RET_CODE( amqp_error_broker_connection, AmqpErrorBrokerConnection )
-        ADD_DRIPLINE_RET_CODE( amqp_error_routingkey_notfound, AmqpErrorRoutingkeyNotfound )
-
-        ADD_DRIPLINE_RET_CODE( device_error, DeviceError )
-        ADD_DRIPLINE_RET_CODE( device_error_connection, DeviceErrorConnection )
-        ADD_DRIPLINE_RET_CODE( device_error_no_resp, DeviceErrorNoResp )
-
-        ADD_DRIPLINE_RET_CODE( message_error, MessageError )
-        ADD_DRIPLINE_RET_CODE( message_error_no_encoding, MessageErrorNoEncoding )
-        ADD_DRIPLINE_RET_CODE( message_error_decoding_fail, MessageErrorDecodingFail )
-        ADD_DRIPLINE_RET_CODE( message_error_bad_payload, MessageErrorBadPayload )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_value, MessageErrorInvalidValue )
-        ADD_DRIPLINE_RET_CODE( message_error_timeout, MessageErrorTimeout )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_method, MessageErrorInvalidMethod )
-        ADD_DRIPLINE_RET_CODE( message_error_access_denied, MessageErrorAccessDenied )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_key, MessageErrorInvalidKey )
-        ADD_DRIPLINE_RET_CODE( message_error_dripline_deprecated, MessageErrorDriplineDeprecated )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_specifier, MessageErrorInvalidSpecifier )
-
-        ADD_DRIPLINE_RET_CODE( client_error, ClientError )
-        ADD_DRIPLINE_RET_CODE( client_error_invalid_request, ClientErrorInvalidRequest )
-        ADD_DRIPLINE_RET_CODE( client_error_handling_reply, ClientErrorHandlingReply )
-        ADD_DRIPLINE_RET_CODE( client_error_unable_to_send, ClientErrorUnableToSend )
-        ADD_DRIPLINE_RET_CODE( client_error_timeout, ClientErrorTimeout )
-
-        ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
-
 
         class return_code_registrar : public scarab::base_registrar< dripline::return_code >
         {
@@ -145,8 +113,40 @@ namespace dripline_pybind
         //TODO: there should be a pure-python class ReturnCodeRegistrar that inherits from _ReturnCodeRegistrar
         //      it should store an instance of the class object of the return code
         //      it should implement create() and value()
-
         ***************************************************************/
+
+        // now bind all of the existing dripline return codes so we can use them
+        ADD_DRIPLINE_RET_CODE( success, Success )
+
+        ADD_DRIPLINE_RET_CODE( warning_no_action_taken, WarningNoActionTaken )
+
+        ADD_DRIPLINE_RET_CODE( amqp_error, AmqpError )
+        ADD_DRIPLINE_RET_CODE( amqp_error_broker_connection, AmqpErrorBrokerConnection )
+        ADD_DRIPLINE_RET_CODE( amqp_error_routingkey_notfound, AmqpErrorRoutingkeyNotfound )
+
+        ADD_DRIPLINE_RET_CODE( device_error, DeviceError )
+        ADD_DRIPLINE_RET_CODE( device_error_connection, DeviceErrorConnection )
+        ADD_DRIPLINE_RET_CODE( device_error_no_resp, DeviceErrorNoResp )
+
+        ADD_DRIPLINE_RET_CODE( message_error, MessageError )
+        ADD_DRIPLINE_RET_CODE( message_error_no_encoding, MessageErrorNoEncoding )
+        ADD_DRIPLINE_RET_CODE( message_error_decoding_fail, MessageErrorDecodingFail )
+        ADD_DRIPLINE_RET_CODE( message_error_bad_payload, MessageErrorBadPayload )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_value, MessageErrorInvalidValue )
+        ADD_DRIPLINE_RET_CODE( message_error_timeout, MessageErrorTimeout )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_method, MessageErrorInvalidMethod )
+        ADD_DRIPLINE_RET_CODE( message_error_access_denied, MessageErrorAccessDenied )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_key, MessageErrorInvalidKey )
+        ADD_DRIPLINE_RET_CODE( message_error_dripline_deprecated, MessageErrorDriplineDeprecated )
+        ADD_DRIPLINE_RET_CODE( message_error_invalid_specifier, MessageErrorInvalidSpecifier )
+
+        ADD_DRIPLINE_RET_CODE( client_error, ClientError )
+        ADD_DRIPLINE_RET_CODE( client_error_invalid_request, ClientErrorInvalidRequest )
+        ADD_DRIPLINE_RET_CODE( client_error_handling_reply, ClientErrorHandlingReply )
+        ADD_DRIPLINE_RET_CODE( client_error_unable_to_send, ClientErrorUnableToSend )
+        ADD_DRIPLINE_RET_CODE( client_error_timeout, ClientErrorTimeout )
+
+        ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
 
         return all_items;
     }
