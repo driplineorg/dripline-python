@@ -4,6 +4,8 @@
 #include "return_codes.hh"
 #include "return_code_trampoline.hh"
 
+#include "return_code_functions.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
@@ -79,9 +81,12 @@ namespace dripline_pybind
             );
         all_items.push_back( "get_return_codes" );
         mod.def( "get_return_codes",
+                 &get_return_codes
+                /*
                  [](){
                     std::list< unsigned > retcodes;
-                    auto the_factory = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
+                    //auto the_factory = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
+                    scarab::indexed_factory< unsigned, dripline::return_code >* the_factory = scarab::indexed_factory< unsigned, dripline::return_code >::get_instance();
                     LDEBUG( dl_pybind_retcode, "factor is at " << the_factory );
                     auto anIt = the_factory->begin();
                     while (anIt != the_factory->end() )
@@ -91,14 +96,13 @@ namespace dripline_pybind
                     }
                     retcodes.push_back(0);
                     return retcodes;
-                    /*
-                    return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
-                      //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->begin(),
-                      //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->end()
-                    );
-                    */
+                    //return pybind11::make_iterator( the_registrar->begin(), the_registrar->end()
+                    //  //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->begin(),
+                    //  //scarab::indexed_factory< unsigned, dripline::return_code >::get_instance()->end()
+                    //);
                  }//,
                 // pybind11::keep_alive<0, 1>()
+                */
                  );
 
 
