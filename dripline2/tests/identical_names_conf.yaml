@@ -1,5 +1,0 @@
-broker: foo.bar.baz
-nodename: abc
-providers:
-- name: a_provider
-- name: a_provider
