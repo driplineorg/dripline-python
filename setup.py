@@ -60,7 +60,7 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
         # We need to remove the cache file because pip makes new /tmp source directories each time
         print('remove cache')
-        subprocess.check_call(['rm', 'CMakeCache.txt'], cwd=self.build_temp, env=env)
+        subprocess.check_call(['rm', '-f', 'CMakeCache.txt'], cwd=self.build_temp, env=env)
         print("should make a cmake call:")
         print(' '.join(['cmake', ext.sourcedir] + cmake_args), 'cwd={}'.format(self.build_temp), 'env={}'.format(env))
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
