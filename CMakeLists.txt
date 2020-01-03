@@ -6,7 +6,8 @@ include( PackageBuilder )
 
 pbuilder_prepare_project()
 
-set_option( Scarab_BUILD_PYTHON TRUE )
+#set_option( Scarab_BUILD_PYTHON TRUE )
+set_option( Dripline_BUILD_PYTHON TRUE )
 
 pbuilder_add_submodule( Dripline dripline-cpp )
 
