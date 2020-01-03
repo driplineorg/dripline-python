@@ -30,8 +30,13 @@ namespace dripline_pybind
 //                   pybind11::arg_v( "payload", std::move(scarab::param_ptr_t(new scarab::param())), "Payload for the reply" )
 //                )
             .def( pybind11::init< dripline::throw_reply >() )
+            .def_property( "return_message",
+                            (std::string& (dripline::throw_reply::*)())&dripline::throw_reply::return_message,
+                            [](dripline::throw_reply& a_throw, std::string& a_message){ a_throw.return_message() = a_message; },
+                            pybind11::return_value_policy::reference_internal 
+                         )
             .def_property( "return_code",
-                           (scarab::param& (dripline::throw_reply::*)())&dripline::throw_reply::ret_code,
+                           (dripline::return_code& (dripline::throw_reply::*)())&dripline::throw_reply::ret_code,
                            [](dripline::throw_reply& a_throw, dripline::return_code& a_code){ a_throw.set_return_code(a_code); },
                            pybind11::return_value_policy::reference_internal
                          )
