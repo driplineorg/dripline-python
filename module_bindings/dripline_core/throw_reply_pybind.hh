@@ -9,9 +9,88 @@
 
 namespace dripline_pybind
 {
+    struct base
+    {
+        base() {}
+        virtual ~base() {}
+
+        virtual std::string label() const
+        {
+            return std::string( "base" );
+        }
+
+        virtual void throw_exception() const
+        {
+            throw std::runtime_error( "Thrown from base" );
+            return;
+        }
+
+        void execute() const
+        {
+            try
+            {
+                std::cout << "Class used: " << this->label() << std::endl;
+                this->throw_exception();
+            }
+            catch( const pybind11::error_already_set& e )
+            {
+                std::cerr << "pybind11::error_already_set:\n" << e.what() << "-----" << std::endl;
+            }
+            catch( const std::runtime_error& e )
+            {
+                std::cerr << "std::runtime_error:\n" << e.what() << "-----" << std::endl;
+            }
+            catch( const std::exception& e )
+            {
+                std::cerr << "std::exception:\n" << e.what() << "-----" << std::endl;
+            }
+        }
+
+    };
+
+    struct base_trampoline : base
+    {
+        using base::base;
+        std::string label() const override
+        {
+            pybind11::gil_scoped_acquire t_acquire;
+            PYBIND11_OVERLOAD( std::string, base, label );
+        }
+        void throw_exception() const override
+        {
+            pybind11::gil_scoped_acquire t_acquire;
+            PYBIND11_OVERLOAD( void, base, throw_exception );
+        }
+    };
+
+    struct _base : base
+    {
+        using base::label;
+        using base::throw_exception;
+    };
+
+    void test_throw()
+    {
+        base the_base;
+        the_base.execute();
+        return;
+    }
+
     std::list< std::string>  export_throw_reply( pybind11::module& mod )
     {
         std::list< std::string > all_items;
+
+        all_items.push_back( "_Base" );
+        pybind11::class_< base, base_trampoline >( mod, "_Base", "Base test class" )
+            .def( pybind11::init<>() )
+            .def( "label", &_base::label )
+            .def( "throw_exception", &_base::throw_exception )
+            .def( "execute", &base::execute )
+            ;
+
+        all_items.push_back( "test_throw" );
+        mod.def( "test_throw", &test_throw );
+
 
         all_items.push_back( "_ThrowReply" );
         pybind11::class_< dripline::throw_reply >( mod, "_ThrowReply", "Holds information for creating a reply as a thrown exception")
