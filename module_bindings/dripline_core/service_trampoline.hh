@@ -9,10 +9,10 @@ namespace dripline_pybind
     {
         public:
             using dripline::service::service;
-        public:
+
             using dripline::service::bind_keys;
             using dripline::core::bind_key;
-            using dripline::service::on_alert_message;
+            using dripline::endpoint::on_alert_message;
     };
 
     //class _service_trampoline : public dripline::service
@@ -42,7 +42,7 @@ namespace dripline_pybind
             void on_alert_message( const dripline::alert_ptr_t a_alert ) override
             {
                 pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( void, dripline::endpoint, on_alert_message, a_alert );
+                PYBIND11_OVERLOAD( void, _service, on_alert_message, a_alert );
             }
 
             // Overrides for virtual do_[request-type]_request
