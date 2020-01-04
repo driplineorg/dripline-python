@@ -126,13 +126,26 @@ namespace dripline_pybind
                          )
             ;
 
-        all_items.push_back( "set_reply_cache" );
-        mod.def( "set_reply_cache",
-                 (void (*)(const dripline::throw_reply&)) &dripline::set_reply_cache,
+        all_items.push_back( "set_reply_cache1" );
+        mod.def( "set_reply_cache1",
+                 (void (*)(const dripline::throw_reply&)) &dripline::set_reply_cache1,
                  pybind11::arg( "throw_reply" ),
                  "set the reply_cache with the desired throw_reply"
              );
 
+        all_items.push_back( "set_reply_cache" );
+        mod.def( "set_reply_cache",
+                 [](const dripline::return_code& a_code, const std::string& a_message, const scarab::param& a_payload) {
+                    dripline::set_reply_cache( a_code, a_message, a_payload.clone());
+                 },
+                 pybind11::arg( "return_code" ),
+                 pybind11::arg( "return_message" ),
+                 pybind11::arg( "payload" ),
+                 "set the reply cache with the desired information" 
+            );
+
+        all_items.push_back( "throw_reply_keyword" );
+        mod.attr( "throw_reply_keyword" ) = STRINGIFY(PYTHON_THROW_REPLY_KEYWORD);
 
         return all_items;
     }
