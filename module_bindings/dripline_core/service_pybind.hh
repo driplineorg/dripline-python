@@ -44,12 +44,13 @@ namespace dripline_pybind
 
             // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
-            //.def_property( "alerts_exchange", )
-            //.def_property( "requests_exchange", )
+            .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
+            .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
 
             .def( "bind_keys", &_service::bind_keys )
             .def( "bind_key",
-                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, an_obj.name(), a_key);},
+                  // Note, need to take a service pointer so that we can accept derived types... I think
+                  [](_service* an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj->channel(), an_exchange, an_obj->name(), a_key);},
                   pybind11::arg( "exchange" ),
                   pybind11::arg( "key" )
             )
@@ -72,7 +73,7 @@ namespace dripline_pybind
                                         pybind11::scoped_estream_redirect >() )
             .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
 
-            //.def
+            .def( "on_alert_message", &_service::on_alert_message )
             ;
         return all_items;
     }

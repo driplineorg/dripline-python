@@ -12,7 +12,9 @@ namespace dripline_pybind
         public:
             using dripline::service::bind_keys;
             using dripline::core::bind_key;
+            using dripline::service::on_alert_message;
     };
+
     //class _service_trampoline : public dripline::service
     class _service_trampoline : public _service
     {
