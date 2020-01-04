@@ -47,7 +47,7 @@ namespace dripline_pybind
 
             .def( "bind_keys", &_service::bind_keys )
             .def( "bind_key",
-                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_queue, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, a_queue, a_key)},
+                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_queue, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, a_queue, a_key);},
                   pybind11::arg( "exchange" ),
                   pybind11::arg( "queue" ),
                   pybind11::arg( "key" )
