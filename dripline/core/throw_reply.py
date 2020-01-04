@@ -1,15 +1,19 @@
 __all__ = []
 
 import scarab
-from _dripline.core import _ThrowReply, DL_Success, set_reply_cache
+from _dripline.core import _ThrowReply, DL_Success, set_reply_cache, throw_reply_keyword
 
 from _dripline.core import _Base
 
 __all__.append('ThrowReply')
-class ThrowReply(_ThrowReply, Exception):
-    def __init__(self, return_code=DL_Success(), payload=scarab.Param()):
-        _ThrowReply.__init__(self, return_code, payload)
-        set_reply_cache(self)
+class ThrowReply(Exception):
+    def __init__(self, return_code=DL_Success(), message=DL_Success().description, payload=scarab.Param()):
+        Exception.__init__(self, throw_reply_keyword)
+        set_reply_cache(return_code, message, payload)
+        #self.internal = _ThrowReply(return_code, payload)
+        #self.internal.return_message(message)
+        #set_reply_cache(self)
+
 
 
 __all__.append('Derived')
