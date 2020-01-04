@@ -44,12 +44,13 @@ namespace dripline_pybind
 
             // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
+            //.def_property( "alerts_exchange", )
+            //.def_property( "requests_exchange", )
 
             .def( "bind_keys", &_service::bind_keys )
             .def( "bind_key",
-                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_queue, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, a_queue, a_key);},
+                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, an_obj.name(), a_key);},
                   pybind11::arg( "exchange" ),
-                  pybind11::arg( "queue" ),
                   pybind11::arg( "key" )
             )
             .def( "start", &dripline::service::start,

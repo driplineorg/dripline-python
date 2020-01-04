@@ -13,9 +13,8 @@ class AlertConsumer(Service):
         print("in python's bind keys")
         to_return = Service.bind_keys(self);
         for a_key in self._alert_keys:
-            # core::bind_key( channel, exchange, queue, key ) - all are strings
-            #self.bind_key()
-            pass
+            print(" binding alert key {}".format(a_key))
+            self.bind_key("alerts", a_key)
         return to_return
 
     def on_alert_message(self, an_alert):
