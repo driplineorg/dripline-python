@@ -3,9 +3,12 @@
 
 #include "core.hh"
 #include "service.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
+
+#include "service_trampoline.hh"
 
 namespace dripline_pybind
 {
@@ -13,11 +16,15 @@ namespace dripline_pybind
     {
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
-        pybind11::class_< dripline::service,
+        pybind11::class_< _service,
+                          //dripline::service,
+                          _service_trampoline,
                           dripline::core,
+                          dripline::endpoint,
                           dripline::scheduler<>,
                           scarab::cancelable,
-                          std::shared_ptr< dripline::service >
+                          std::shared_ptr< _service >
+                          //std::shared_ptr< dripline::service >
                         >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
@@ -35,8 +42,16 @@ namespace dripline_pybind
                    pybind11::arg( "make_connection" ) = true
             )
 
+            // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
 
+            .def( "bind_keys", &_service::bind_keys )
+            .def( "bind_key",
+                  [](dripline::service& an_obj, std::string&  an_exchange, std::string& a_queue, std::string& a_key){return _service::bind_key(an_obj.channel(), an_exchange, a_queue, a_key)},
+                  pybind11::arg( "exchange" ),
+                  pybind11::arg( "queue" ),
+                  pybind11::arg( "key" )
+            )
             .def( "start", &dripline::service::start,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
