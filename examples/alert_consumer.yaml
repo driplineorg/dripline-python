@@ -2,6 +2,7 @@ runtime-config:
   name: alert_consumer_example
   module: AlertConsumer
   auth_file: /root/auths.json
+  alert_key_parser_re: 'sensor_value\.(?P<from>\w+)'
 #  endpoints:
 #        - name: peaches
 #          module: KeyValueStore
