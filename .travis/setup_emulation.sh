@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -ex
 echo "docker status:"
 systemctl status docker
 echo "initial docker daemon config should be: `sudo cat /etc/docker/daemon.json || true`"
@@ -16,3 +17,4 @@ echo 'checking for docker experimental...'
 docker version -f '{{.Server.Experimental}}'
 
 sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
+set +ex
