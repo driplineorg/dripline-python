@@ -13,7 +13,6 @@ message( STATUS "##### python include dir: ${PYTHON_INCLUDE_DIRS}" )
 message( STATUS "##### python prefix: ${PYTHON_PREFIX}" )
 
 pbuilder_add_submodule( Dripline dripline-cpp )
-add_definitions( -DPYTHON_THROW_REPLY_KEYWORD=${Dripline_PYTHON_THROW_REPLY_KEYWORD} )
 
 include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )
 add_subdirectory( module_bindings )
