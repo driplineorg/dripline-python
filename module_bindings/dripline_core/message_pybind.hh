@@ -63,7 +63,7 @@ namespace dripline_pybind
             .def_property( "sender_info", &dripline::message::get_sender_info, &dripline::message::set_sender_info )
             .def_property( "payload",
                            (scarab::param& (dripline::message::*)())&dripline::message::payload,
-                           [](dripline::request_ptr_t a_req, scarab::param& a_payload){ a_req->set_payload(a_payload.clone()); },
+                           [](dripline::message& an_obj, scarab::param& a_payload){ an_obj.set_payload(a_payload.clone()); },
                            pybind11::return_value_policy::reference_internal
                          )
 
