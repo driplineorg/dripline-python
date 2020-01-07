@@ -2,8 +2,8 @@ language: cpp
 
 dist: xenial
 
-services:
-  - docker
+#services:
+#  - docker
 
 addons:
   apt:
