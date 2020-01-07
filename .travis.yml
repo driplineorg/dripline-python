@@ -10,6 +10,7 @@ addons:
     packages:
       - docker-ce
       - qemu-user-static
+      - jq
 
 env:
   - DOCKER_CLI_EXPERIMENTAL=enabled
