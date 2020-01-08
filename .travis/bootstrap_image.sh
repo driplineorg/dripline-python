@@ -74,15 +74,18 @@ if [[ -z $image_user || -z $image_repo || -z $image_tag || -z $target_arch || -z
 fi
 
 original_qemu_path=""
+platform_arg=""
 case $target_arch in
     amd64)
         original_qemu_path="/usr/bin/qemu-x86_64-static"
         architecture_img_suffix="amd64"
+        platform_arg=" --platform amd64 "
         echo "-- set qemu vars for amd64"
         ;;
     arm7)
         original_qemu_path="/usr/bin/qemu-arm-static"
         architecture_img_suffix="arm"
+        platform_arg=" --platform arm "
         echo "-- set qemu vars for arm7"
         ;;
 esac
@@ -99,6 +102,7 @@ docker build \
     --build-arg image_user=$image_user \
     --build-arg image_repo=$image_repo \
     --build-arg image_tag=$image_tag \
+    $platform_arg \
     -t local/emulation_base:latest \
     -f $dot_travis_path/Dockerfile \
     $dot_travis_path
@@ -108,6 +112,7 @@ docker build \
     --build-arg img_user=local \
     --build-arg img_repo=emulation_base \
     --build-arg img_tag=latest \
+    $platform_arg \
     -t ${output_image}-${architecture_img_suffix} \
     .
 docker push ${output_image}-${architecture_img_suffix}
