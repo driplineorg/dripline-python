@@ -1,6 +1,6 @@
 language: cpp
 
-dist: bionic #xenial
+dist: bionic
 
 services:
   - docker
@@ -8,7 +8,6 @@ services:
 addons:
   apt:
     packages:
-      #- docker-ce
       - qemu-user-static
       - jq
 
