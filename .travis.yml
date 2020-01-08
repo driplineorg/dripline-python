@@ -20,6 +20,7 @@ branches:
     - master
     - develop
     - develop_dl3
+    - feature/fix-travis-builds
     - /^v\d+\.\d+\.\d+(-S*)?$/
 
 jobs:
