@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
+docker_daemon_conf_file=/etc/docker/daemon.json
+
 set -ex
 echo "docker status:"
 systemctl status docker
-echo "initial docker daemon config should be: `sudo cat /etc/docker/daemon.json || true`"
+echo "initial docker daemon config should be: `sudo cat $docker_daemon_conf_file || true`"
 
 #echo '{"experimental": true}' | sudo tee -a /etc/docker/daemon.json > /dev/null
-sudo cat /etc/docker/daemon.json | jq '. + {"experimental": true}' | sudo tee /etc/docker/daemon.json > /dev/null
-echo "docker daemon config should be: `sudo cat /etc/docker/daemon.json || true`"
+sudo cat $docker_daemon_conf_file | jq '. + {"experimental": true}' | sudo tee $docker_daemon_conf_file > /dev/null
+echo "docker daemon config should be: `sudo cat $docker_daemon_conf_file || true`"
 
 sudo service docker restart
 sudo systemctl restart docker
