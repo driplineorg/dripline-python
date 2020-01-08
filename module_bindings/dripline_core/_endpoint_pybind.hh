@@ -11,14 +11,6 @@
 namespace dripline_pybind
 {
 
-    class _endpoint : public dripline::endpoint
-    {
-        public:
-            using dripline::endpoint::do_get_request;
-            using dripline::endpoint::do_set_request;
-            using dripline::endpoint::do_cmd_request;
-    };
-
     std::list< std::string > export_endpoint( pybind11::module& mod )
     {
         std::list< std::string > all_items;
@@ -33,25 +25,36 @@ namespace dripline_pybind
             .def_property_readonly( "name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name )
             .def_property_readonly( "service", ( dripline::service_ptr_t& (dripline::endpoint::*)()) &dripline::endpoint::service )
 
+
+            // deal with messages
             .def( "submit_request_message", &dripline::endpoint::submit_request_message,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
                                         pybind11::gil_scoped_release >() )
-            .def( "do_get_request", &_endpoint::do_get_request,
+            .def( "on_request_message", &dripline::endpoint::on_request_message,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
                                         pybind11::gil_scoped_release >() )
-            .def( "do_set_request", &_endpoint::do_set_request,
+            .def( "on_reply_message", &dripline::endpoint::on_reply_message,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
                                         pybind11::scoped_estream_redirect,
                                         pybind11::gil_scoped_release >() )
-            .def( "do_cmd_request", &_endpoint::do_cmd_request,
+            .def( "on_alert_message", &dripline::endpoint::on_alert_message,
                   pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                          pybind11::scoped_estream_redirect >() )
-            .def_property( "name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
-                           [](dripline::endpoint& an_obj, const std::string& a_name ){ an_obj.name() = a_name; } )
-            //.def( "get_name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name,
-            //          "Get name of an endpoint as a string" )
+                                        pybind11::scoped_estream_redirect,
+                                        pybind11::gil_scoped_release >() )
+            .def( "do_get_request", &dripline::endpoint::do_get_request,
+                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                        pybind11::scoped_estream_redirect,
+                                        pybind11::gil_scoped_release >() )
+            .def( "do_set_request", &dripline::endpoint::do_set_request,
+                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                        pybind11::scoped_estream_redirect,
+                                        pybind11::gil_scoped_release >() )
+            .def( "do_cmd_request", &dripline::endpoint::do_cmd_request,
+                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
+                                        pybind11::scoped_estream_redirect,
+                                        pybind11::gil_scoped_release >() )
             ;
             return all_items;
     }

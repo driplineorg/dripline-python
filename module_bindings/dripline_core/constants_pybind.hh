@@ -16,8 +16,6 @@ namespace dripline_pybind
                 // the values
                 .value( "set", dripline::op_t::set )
                 .value( "get", dripline::op_t::get )
-                .value( "config", dripline::op_t::config ) // deprecated as of v2.0.0 (dripline_cpp)
-                .value( "send", dripline::op_t::send )
                 .value( "run", dripline::op_t::run )
                 .value( "cmd", dripline::op_t::cmd )
                 .value( "unknown", dripline::op_t::unknown )

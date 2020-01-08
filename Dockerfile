@@ -29,5 +29,7 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 RUN pip install ipython
 
 RUN pip install /usr/local/src
+#RUN cd /usr/local/src &&\
+#    python setup.py install
 RUN ldconfig
 

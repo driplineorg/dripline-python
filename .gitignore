@@ -14,6 +14,9 @@ examples/kv_plugin_example/kv_plugin.egg-info/*
 version.py
 dripline.sublime-workspace
 
+# generated source files
+dripline/version.py
+
 # Compiled Object files
 *.slo
 *.lo

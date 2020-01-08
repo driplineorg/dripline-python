@@ -6,7 +6,11 @@ include( PackageBuilder )
 
 pbuilder_prepare_project()
 
-set_option( Scarab_BUILD_PYTHON TRUE )
+set_option( Dripline_BUILD_PYTHON TRUE )
+
+message( STATUS "##### python site packages: ${PYTHON_SITE_PACKAGES}" )
+message( STATUS "##### python include dir: ${PYTHON_INCLUDE_DIRS}" )
+message( STATUS "##### python prefix: ${PYTHON_PREFIX}" )
 
 pbuilder_add_submodule( Dripline dripline-cpp )
 

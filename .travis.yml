@@ -1,6 +1,6 @@
 language: cpp
 
-dist: xenial
+dist: bionic
 
 services:
   - docker
@@ -8,8 +8,8 @@ services:
 addons:
   apt:
     packages:
-      - docker-ce
       - qemu-user-static
+      - jq
 
 env:
   - DOCKER_CLI_EXPERIMENTAL=enabled
@@ -19,6 +19,7 @@ branches:
     - master
     - develop
     - develop_dl3
+    - feature/fix-travis-builds
     - /^v\d+\.\d+\.\d+(-S*)?$/
 
 jobs:

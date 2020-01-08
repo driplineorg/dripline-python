@@ -1,6 +1,5 @@
 runtime-config:
   name: my_store
-  #broker: localhost
   module: Service
   auth_file: /root/auths.json
   endpoints:
@@ -13,9 +12,6 @@ runtime-config:
           log_on_set: True
         - name: chips
           module: KeyValueStore
-          #log_interval: 30
-          #get_on_set: True
-          #log_on_set: True
           calibration: 'times3({})'
           initial_value: 1.75
         - name: waffles
@@ -31,9 +27,3 @@ runtime-config:
           calibration:
               CLOSE: "on"
               OPEN: "off"
-          #set_value_map:
-          #    1: OPEN
-          #    0: CLOSE
-          #    "on": OPEN
-          #    "off": CLOSE
-          #set_value_lowercase: True
