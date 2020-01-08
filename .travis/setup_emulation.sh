@@ -15,6 +15,7 @@ sudo ls -l $docker_daemon_conf_file
 
 echo 'restarting docker'
 sudo service docker restart
+systemctl status docker
 sudo systemctl restart docker
 systemctl status docker
 
