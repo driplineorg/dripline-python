@@ -2,13 +2,13 @@ language: cpp
 
 dist: xenial
 
-#services:
-#  - docker
+services:
+  - docker
 
 addons:
   apt:
     packages:
-      - docker-ce
+      #- docker-ce
       - qemu-user-static
       - jq
 

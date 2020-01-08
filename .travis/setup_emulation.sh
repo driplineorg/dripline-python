@@ -6,6 +6,7 @@ set -ex
 echo "docker status:"
 systemctl status docker
 echo "initial docker daemon config should be: `sudo cat $docker_daemon_conf_file || true`"
+ls -l $docker_daemon_conf_file
 
 #echo '{"experimental": true}' | sudo tee -a /etc/docker/daemon.json > /dev/null
 sudo cat $docker_daemon_conf_file | jq '. + {"experimental": true}' | sudo tee $docker_daemon_conf_file > /dev/null
