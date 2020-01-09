@@ -8,15 +8,19 @@ from dripline.core import Service
 # Dripline Exceptions currently unavailable
 
 # logging currently unavailable
-# import logging 
+# import logging
 # logger = logging.getLogger(__name__)
 
 __all__ = []
 
 
-__all__.append('EthernetProvider')
-
-class EthernetProvider(Service):
+__all__.append('EthernetSCPIProvider')
+class EthernetSCPIProvider(Service):
+    '''
+    A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.
+    In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.
+    In particular, devices must support sending a response to every command received (either natively, or via SCPI's command composition) and responses are expected to include a termination marking complete transmission.
+    '''
     def __init__(self,
                  socket_timeout=1.0,
                  socket_info=('localhost', 1234),

@@ -26,7 +26,9 @@ __all__ = []
 __all__.append('SimpleSCPIEntity')
 class SimpleSCPIEntity(Entity):
     '''
-    Convenience Entity for interacting with SCPI endpoints that support basic set and query syntax.
+    Convenience Entity for interacting with SCPI endpoints that support basic assignment and query syntax.
+    (That is, assignments of the form "base_string <new_value>" and queries of the form "base_string?")
+    Commands requiring a more complex structure, such as specifying channels or other arguments, should use FormatEntity or a custom Entity.
     '''
 
     def __init__(self,
@@ -72,7 +74,8 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
 __all__.append('SimpleSCPISetEntity')
 class SimpleSCPISetEntity(SimpleSCPIEntity):
     '''
-    Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted, and on_set return query is *OPC? instead of base_str?
+    Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted.
+    Uses *OPC? to ensure a response is generated when making an assignment.
     '''
 
     def __init__(self, **kwargs):
