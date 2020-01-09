@@ -12,7 +12,6 @@ Generic Entity catalog (in order of ease-of-use):
 - FormatEntity: utility Entity with expanded functionality
 '''
 
-import six
 import asteval # used for FormatEntity, ADS1115CalcEntity
 import re # used for FormatEntity
 
@@ -164,7 +163,7 @@ class FormatEntity(Entity):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
             raise Exception('<{}> has no set string available'.format(self.name))
-        if isinstance(value, six.string_types) and self._set_value_lowercase:
+        if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:
             mapped_value = value

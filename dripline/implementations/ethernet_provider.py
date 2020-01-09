@@ -1,8 +1,9 @@
+import re
 import socket
 import threading
-import six
 
 import scarab
+
 from dripline.core import Service
 # Dripline Exceptions currently unavailable
 
@@ -18,22 +19,33 @@ __all__.append('EthernetProvider')
 class EthernetProvider(Service):
     def __init__(self,
                  socket_timeout=1.0,
-                 socket_info=('localhost',1234),
+                 socket_info=('localhost', 1234),
                  cmd_at_reconnect=['*OPC?'],
                  reconnect_test='1',
                  command_terminator='',
                  response_terminator=None,
-                 bare_response_terminator=None,
+                 bare_response_terminator=None, #TODO do we still need this? would a refactor be possible to put it elsewhere?
                  reply_echo_cmd=False,
                  **kwargs
                  ):
+        '''
+        socket_timeout (int) : number of seconds to wait for a reply from the device before timeout
+        socket_info (tuple or string) : either socket.socket.connect argument tuple, or string that parses into one
+        cmd_at_reconnect ([str,...]) : a list of commands to send to the device every time the socket connection is estabilished
+                                       note that these will be sent on *every* connection, which may be disruptive to ongoing activity
+        reconnect_test (str) : expected return from the last command in the cmd_at_reconnect list, must match exactly or the reconnect
+                               is deemed a failure
+        command_terminator (str) : string to be post-pended to commands, indicating to the device that the transmission is complete (often \r, \n, or \r\n)
+        response_terminator (str) : string added to the end of a reply from the device, indicates the end of the reply
+        bare_response_terminator (str) : extra response terminator for devices with inconsistent behavior
+        reply_echo_cmd (bool) : indicates that the device includes the the received command in its reply
+        '''
 
         Service.__init__(self, scarab.to_param(kwargs))
 
         if isinstance(socket_info, str):
             # logger.debug
-            print("Formatting socket_info: {}".format(repr(socket_info)))
-            import re
+            print("Formatting socket_info: {}".format(socket_info))
             re_str = "\([\"'](\S+)[\"'], ?(\d+)\)"
             (ip,port) = re.findall(re_str,socket_info)[0]
             socket_info = (ip,int(port))
@@ -72,7 +84,6 @@ class EthernetProvider(Service):
             print("connection {} refused: {}".format(self.socket_info, err))
             # exception.DriplineHardwareConnectionError
             raise Exception("Unable to establish ethernet socket {}".format(self.socket_info))
-        self.socket.settimeout(self.socket_timeout)
         # logger.info
         print("Ethernet socket {} established".format(self.socket_info))
 
@@ -106,7 +117,7 @@ class EthernetProvider(Service):
         commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!
                              : if impossible, set as None to skip
         '''
-        if isinstance(commands, six.string_types):
+        if isinstance(commands, str):
             commands = [commands]
         self.alock.acquire()
 
@@ -160,7 +171,7 @@ class EthernetProvider(Service):
         for command in commands:
             command += self.command_terminator
             # logger.debug
-            print("sending: {}".format(repr(command)))
+            print("sending: {}".format(command.encode()))
             self.socket.send(command.encode())
             if command == self.command_terminator:
                 blank_command = True
