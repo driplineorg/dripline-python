@@ -8,7 +8,7 @@ When implementing a Entity, please remember:
 
 Generic Entity catalog (in order of ease-of-use):
 - SimpleSCPIEntity: quick and simple minimal Entity
--* SimpleSCPIGetEntity/SimpleSCPISetEntity: limited instance of above with disabled Get/Set
+- SimpleSCPIGetEntity/SimpleSCPISetEntity: limited instance of above with disabled Get/Set
 - FormatEntity: utility Entity with expanded functionality
 '''
 
@@ -24,7 +24,6 @@ from dripline.core import Entity, calibrate
 __all__ = []
 
 __all__.append('SimpleSCPIEntity')
-
 class SimpleSCPIEntity(Entity):
     '''
     Convenience Entity for interacting with SCPI endpoints that support basic set and query syntax.
@@ -57,7 +56,6 @@ class SimpleSCPIEntity(Entity):
 
 
 __all__.append('SimpleSCPIGetEntity')
-
 class SimpleSCPIGetEntity(SimpleSCPIEntity):
     '''
     Identical to SimpleSCPIEntity, but with an explicit exception if on_set is attempted
@@ -72,7 +70,6 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
 
 
 __all__.append('SimpleSCPISetEntity')
-
 class SimpleSCPISetEntity(SimpleSCPIEntity):
     '''
     Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted, and on_set return query is *OPC? instead of base_str?
@@ -91,7 +88,6 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
 
 __all__.append('FormatEntity')
-
 class FormatEntity(Entity):
     '''
     Utility Entity allowing arbitrary set and query syntax and formatting for more complicated usage cases
