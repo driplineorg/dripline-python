@@ -40,8 +40,7 @@ class EthernetProvider(Service):
         bare_response_terminator (str) : extra response terminator for devices with inconsistent behavior
         reply_echo_cmd (bool) : indicates that the device includes the the received command in its reply
         '''
-
-        Service.__init__(self, scarab.to_param(kwargs))
+        Service.__init__(self, **kwargs)
 
         if isinstance(socket_info, str):
             # logger.debug
@@ -67,8 +66,8 @@ class EthernetProvider(Service):
         self.response_terminator = response_terminator
         self.bare_response_terminator = bare_response_terminator
         self.reply_echo_cmd = reply_echo_cmd
-        self._reconnect()
 
+        self._reconnect()
 
     def _reconnect(self):
         '''
