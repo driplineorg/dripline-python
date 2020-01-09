@@ -108,7 +108,7 @@ class EthernetProvider(Service):
             raise Exception("Failed connection test.")
 
 
-    def send2(self, commands, **kwargs):
+    def send_to_device(self, commands, **kwargs):
         '''
         Standard provider method to communicate with instrument.
         NEVER RENAME THIS METHOD!

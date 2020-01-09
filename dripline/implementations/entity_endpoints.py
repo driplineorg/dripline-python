@@ -45,14 +45,14 @@ class SimpleSCPIEntity(Entity):
     @calibrate()
     def on_get(self):
         to_send = [self.cmd_base + '?']
-        result = self.service.send2(to_send)
+        result = self.service.send_to_device(to_send)
         # logger.debug
         print('raw result is: {}'.format(result))
         return result
 
     def on_set(self, value):
         to_send = ['{0} {1};{0}?'.format(self.cmd_base,value)]
-        return self.service.send2(to_send)
+        return self.service.send_to_device(to_send)
 
 
 __all__.append('SimpleSCPIGetEntity')
@@ -84,7 +84,7 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
     def on_set(self, value):
         to_send = ['{} {};*OPC?'.format(self.cmd_base,value)]
-        return self.service.send2(to_send)
+        return self.service.send_to_device(to_send)
 
 
 __all__.append('FormatEntity')
@@ -131,7 +131,7 @@ class FormatEntity(Entity):
         if self._get_str is None:
             # exceptions.DriplineMethodNotSupportedError
             raise Exception('<{}> has no get string available'.format(self.name))
-        result = self.service.send2([self._get_str])
+        result = self.service.send_to_device([self._get_str])
         # logger.debug
         print('result is: {}'.format(result))
         if self._extract_raw_regex is not None:
@@ -169,4 +169,4 @@ class FormatEntity(Entity):
             mapped_value = self.evaluator(self._set_value_map.format(value))
         #logger.debug
         print('value is {}; mapped value is: {}'.format(value, mapped_value))
-        return self.service.send2([self._set_str.format(mapped_value)])
+        return self.service.send_to_device([self._set_str.format(mapped_value)])
