@@ -14,8 +14,8 @@ from dripline.core import Service
 __all__ = []
 
 
-__all__.append('EthernetSCPIProvider')
-class EthernetSCPIProvider(Service):
+__all__.append('EthernetSCPIService')
+class EthernetSCPIService(Service):
     '''
     A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.
     In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.
@@ -114,7 +114,7 @@ class EthernetSCPIProvider(Service):
 
     def send_to_device(self, commands, **kwargs):
         '''
-        Standard provider method to communicate with instrument.
+        Standard device access method to communicate with instrument.
         NEVER RENAME THIS METHOD!
 
         commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!

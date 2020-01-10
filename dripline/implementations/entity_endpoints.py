@@ -148,14 +148,6 @@ class FormatEntity(Entity):
             # logger.debug
             print("matches are: {}".format(matches.groupdict()))
             result = matches.groupdict()['value_raw']
-        if self._get_reply_float:
-            # logger.debug
-            print('desired format is: float')
-            formatted_result = map(float, re.findall("[-+]?\d+\.\d+",format(result)))
-            # formatted_result = map(float, re.findall("[-+]?(?: \d* \. \d+ )(?: [Ee] [+-]? \d+ )",format(result)))
-            #logger.debug
-            print('formatted result is {}'.format(formatted_result[0]))
-            return formatted_result[0]
         return result
 
     def on_set(self, value):
