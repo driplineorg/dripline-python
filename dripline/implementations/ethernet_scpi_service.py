@@ -28,7 +28,6 @@ class EthernetSCPIService(Service):
                  reconnect_test='1',
                  command_terminator='',
                  response_terminator=None,
-                 bare_response_terminator=None, #TODO do we still need this? would a refactor be possible to put it elsewhere?
                  reply_echo_cmd=False,
                  **kwargs
                  ):
@@ -41,7 +40,6 @@ class EthernetSCPIService(Service):
                                is deemed a failure
         command_terminator (str) : string to be post-pended to commands, indicating to the device that the transmission is complete (often \r, \n, or \r\n)
         response_terminator (str) : string added to the end of a reply from the device, indicates the end of the reply
-        bare_response_terminator (str) : extra response terminator for devices with inconsistent behavior
         reply_echo_cmd (bool) : indicates that the device includes the the received command in its reply
         '''
         Service.__init__(self, **kwargs)
@@ -68,7 +66,6 @@ class EthernetSCPIService(Service):
         self.reconnect_test = reconnect_test
         self.command_terminator = command_terminator
         self.response_terminator = response_terminator
-        self.bare_response_terminator = bare_response_terminator
         self.reply_echo_cmd = reply_echo_cmd
 
         self._reconnect()
@@ -207,10 +204,6 @@ class EthernetSCPIService(Service):
                 data += self.socket.recv(1024).decode(errors='replace')
                 if data.endswith(self.response_terminator):
                     terminator = self.response_terminator
-                    break
-                # Special exception for lockin data dump
-                elif self.bare_response_terminator and data.endswith(self.bare_response_terminator):
-                    terminator = self.bare_response_terminator
                     break
                 # Special exception for disconnect of prologix box to avoid infinite loop
                 if data == '':
