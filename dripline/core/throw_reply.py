@@ -1,7 +1,7 @@
 __all__ = []
 
 import scarab
-from _dripline.core import _ThrowReply, DL_Success, set_reply_cache
+from _dripline.core import DL_Success, set_reply_cache
 
 __all__.append('ThrowReply')
 class ThrowReply(Exception):
