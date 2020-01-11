@@ -28,7 +28,7 @@ namespace dripline_pybind
             .def_property( "return_message",
                             (std::string& (dripline::throw_reply::*)())&dripline::throw_reply::return_message,
                             [](dripline::throw_reply& a_throw, std::string& a_message){ a_throw.return_message() = a_message; },
-                            pybind11::return_value_policy::reference_internal 
+                            pybind11::return_value_policy::reference_internal
                          )
             .def_property( "return_code",
                            (dripline::return_code& (dripline::throw_reply::*)())&dripline::throw_reply::ret_code,
@@ -50,7 +50,7 @@ namespace dripline_pybind
                  pybind11::arg( "return_code" ),
                  pybind11::arg( "return_message" ),
                  pybind11::arg( "payload" ),
-                 "set the reply cache with the desired information" 
+                 "set the reply cache with the desired information"
             );
 
         return all_items;
