@@ -11,5 +11,8 @@ More detailed notes are on the [getting started page](https://dripline-python.re
 # Repo navigation
 The repo is organized with the following subdirectories
 - `doc`: contains the reStructuredText files used to build sphinx documentation (along with supporting files)
-- `dripline`: is the top of the python package source tree
-- `examples`: [deprecated] contains legacy example configuration files which belong to the dragonfly repo and should be purged.
+- `module_bindings`: contains C++ code to bind dripline-cpp (a git submodule) and to build the `_dripline` python package
+- `dripline`: is the top of the pure-python package source tree
+- `bin`: directory of python-implemented CLI utlities
+- `examples`: contains example configuration files compatible with the dl-serve command.
+              some will require details be filled in before they work
