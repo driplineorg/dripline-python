@@ -15,8 +15,7 @@ Generic Entity catalog (in order of ease-of-use):
 import asteval # used for FormatEntity
 import re # used for FormatEntity
 
-from dripline.core import Entity, calibrate
-# Dripline Exceptions currently unavailable
+from dripline.core import Entity, calibrate, ThrowReply
 
 # logging currently unavailable
 # import logging 
@@ -38,7 +37,6 @@ class SimpleSCPIEntity(Entity):
         base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;base_str?"
         '''
         if base_str is None:
-            # exceptions.DriplineValueError
             raise ValueError('<base_str> is required to __init__ SimpleSCPIEntity instance')
         else:
             self.cmd_base = base_str
@@ -67,8 +65,8 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
         SimpleSCPIEntity.__init__(self, **kwargs)
 
     def on_set(self, value):
-        # exceptions.DriplineMethodNotSupportedError
-        raise Exception('setting not available for {}'.format(self.name))
+        #TODO exceptions.DriplineMethodNotSupportedError
+        raise ThrowReply('device_error', "endpoint '{}' does not support set".format(self.anme))
 
 
 __all__.append('SimpleSCPISetEntity')
@@ -83,7 +81,7 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
     def on_get(self):
         # exceptions.DriplineMethodNotSupportedError
-        raise Exception('getting not available for {}'.format(self.name))
+        raise ThrowReply('device_error', "endpoint '{}' does not support get".format(self.anme))
 
     def on_set(self, value):
         to_send = ['{} {};*OPC?'.format(self.cmd_base,value)]
@@ -122,18 +120,16 @@ class FormatEntity(Entity):
         self._extract_raw_regex = extract_raw_regex
         self.evaluator = asteval.Interpreter()
         if set_value_map is not None and not isinstance(set_value_map, (dict,str)):
-            # exceptions.DriplineValueError
             raise ValueError("Invalid set_value_map config for {}; type is {} not dict".format(self.name, type(set_value_map)))
         self._set_value_lowercase = set_value_lowercase
         if isinstance(set_value_map, dict) and not set_value_lowercase:
-            # exceptions.DriplineValueError
             raise ValueError("Invalid config option for {} with set_value_map and set_value_lowercase=False".format(self.name))
 
     @calibrate()
     def on_get(self):
         if self._get_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise Exception('<{}> has no get string available'.format(self.name))
+            raise ThrowReply('device_error', "endpoint '{}' does not support get".format(self.anme))
         result = self.service.send_to_device([self._get_str])
         # logger.debug
         print('result is: {}'.format(result))
@@ -144,7 +140,7 @@ class FormatEntity(Entity):
                 # logger.error
                 print('matching returned none')
                 # exceptions.DriplineValueError
-                raise ValueError('returned result [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
+                raise ThrowReply('device_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             # logger.debug
             print("matches are: {}".format(matches.groupdict()))
             result = matches.groupdict()['value_raw']
@@ -153,7 +149,7 @@ class FormatEntity(Entity):
     def on_set(self, value):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise Exception('<{}> has no set string available'.format(self.name))
+            raise ThrowReply('device_error', "endpoint '{}' does not support set".format(self.anme))
         if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:
