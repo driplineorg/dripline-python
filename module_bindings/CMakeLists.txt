@@ -12,12 +12,12 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/message_pybind.hh
     dripline_core/message_virtual_pybind.hh
     dripline_core/receiver_pybind.hh
+    dripline_core/reply_cache_pybind.hh
     dripline_core/return_codes.hh
     dripline_core/return_code_trampoline.hh
     dripline_core/service_pybind.hh
     dripline_core/service_trampoline.hh
     dripline_core/scheduler_pybind.hh
-    dripline_core/throw_reply_pybind.hh
     dripline_core/version_store_pybind.hh
 )
 set( PB_DRIPLINE_CORE_SOURCEFILES
