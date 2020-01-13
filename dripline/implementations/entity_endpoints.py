@@ -12,7 +12,7 @@ Generic Entity catalog (in order of ease-of-use):
 - FormatEntity: utility Entity with expanded functionality
 '''
 
-import asteval # used for FormatEntity, ADS1115CalcEntity
+import asteval # used for FormatEntity
 import re # used for FormatEntity
 
 from dripline.core import Entity, calibrate
