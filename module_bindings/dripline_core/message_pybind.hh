@@ -149,7 +149,7 @@ namespace dripline_pybind
                     {return a_req->reply( a_return_code, a_return_message, a_payload.clone() );},
                   pybind11::arg( "return_code" ) = 0,
                   pybind11::arg( "return_message" ) = "",
-                  pybind11::arg_v( "payload", scarab::param(), "scarab::param()" )
+                  pybind11::arg_v( "payload", scarab::param(), "scarab::param()" ),
                   "construct and send a reply message in response to this request"
                 )
             ;
@@ -198,7 +198,7 @@ namespace dripline_pybind
                          pybind11::arg( "return_code" ) = 0,
                          pybind11::arg( "return_message" ) = "",
                          pybind11::arg( "payload" ) = scarab::param(),
-                         pybind11::arg( "msg_request" ) = dripline::message::encoding::json
+                         pybind11::arg( "msg_request" ) = dripline::message::encoding::json,
                          "create and populate a new MsgReply instance"
                        )
             ;
