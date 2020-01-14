@@ -51,11 +51,9 @@ class EthernetSCPIService(Service):
             (ip,port) = re.findall(re_str,socket_info)[0]
             socket_info = (ip,int(port))
         if response_terminator is None or response_terminator == '':
-            # exceptions.DriplineValueError
             raise ValueError("Invalid response terminator: <{}>! Expect string".format(repr(response_terminator)))
         if not isinstance(cmd_at_reconnect, list) or len(cmd_at_reconnect)==0:
             if cmd_at_reconnect is not None:
-                # exceptions.DriplineValueError
                 raise ValueError("Invalid cmd_at_reconnect: <{}>! Expect non-zero length list".format(repr(cmd_at_reconnect)))
 
         self.alock = threading.Lock()
@@ -184,8 +182,7 @@ class EthernetSCPIService(Service):
                 if data.startswith(command):
                     data = data[len(command):]
                 elif not blank_command:
-                    # exceptions.DriplineHardwareConnectionError
-                    raise Exception("Bad ethernet query return: {}".format(data))
+                    raise ThrowReply('device_error_connection', "Bad ethernet query return: {}".format(data))
             # logger.info
             print("sync: {} -> {}".format(repr(command),repr(data)))
             all_data.append(data)
@@ -207,14 +204,13 @@ class EthernetSCPIService(Service):
                     break
                 # Special exception for disconnect of prologix box to avoid infinite loop
                 if data == '':
-                    # exceptions.DriplineHardwareResponselessError
-                    raise Exception("Empty socket.recv packet")
+                    raise ThrowReply('device_error_no_response', "Empty socket.recv packet")
         except socket.timeout:
             # logger.warning
             print("socket.timeout condition met; received:\n{}".format(repr(data)))
             if blank_command == False:
                 # exceptions.DriplineHardwareResponselessError
-                raise Exception("Unexpected socket.timeout")
+                raise ThrowReply('device_error_no_response', "Unexpected socket.timeout")
             terminator = ''
         # logger.debug
         print(repr(data))

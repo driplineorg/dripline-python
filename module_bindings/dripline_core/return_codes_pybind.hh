@@ -4,8 +4,6 @@
 #include "return_codes.hh"
 #include "return_code_trampoline.hh"
 
-#include "return_code_functions.hh"
-
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
@@ -47,6 +45,8 @@ namespace dripline_pybind
 
         all_items.push_back( "get_return_code_values" );
         mod.def( "get_return_code_values", &dripline::get_return_code_values );
+        all_items.push_back( "get_return_codes_map" );
+        mod.def( "get_return_codes_map", &dripline::get_return_codes_map );
 
         // now bind all of the existing dripline return codes so we can use them
         ADD_DRIPLINE_RET_CODE( success, Success )
