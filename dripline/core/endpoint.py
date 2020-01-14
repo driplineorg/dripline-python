@@ -36,12 +36,8 @@ class Endpoint(_Endpoint):
                 return a_request_message.reply(201, "attribute error: {}".format(this_error))
         else:
             print('no specifier')
-            try:
-                the_value = self.on_get()
-                return a_request_message.reply(payload=scarab.to_param(the_value))
-            #TODO should work out exception details and make the following block more narrow
-            except Exception as e:
-                return a_request_message.reply( 100, "got an exception trying to on_get: {}".format(str(e)))
+            the_value = self.on_get()
+            return a_request_message.reply(payload=scarab.to_param(the_value))
 
     def do_set_request(self, a_request_message):
         a_specifier =  a_request_message.specifier.to_string()
@@ -71,13 +67,8 @@ class Endpoint(_Endpoint):
             return a_request_message.reply(100, "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
-        try:
-            result = method_ref(*the_args, **the_kwargs)
-            return a_request_message.reply(payload=scarab.to_param(result))
-        except Exception as e:
-                #TODO: should be using a logger object here, right?
-                print("failure while trying to execute: {}(*{}, **{})".format(method_name, str(the_args), str(the_kwargs)))
-                return a_request_message.reply(100, "got an exception trying to execute cmd: {}".format(str(e)))
+        result = method_ref(*the_args, **the_kwargs)
+        return a_request_message.reply(payload=scarab.to_param(result))
 
     def on_get(self):
         '''
