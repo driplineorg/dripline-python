@@ -16,11 +16,16 @@ env:
 
 branches:
   only:
+    # dripline v2 main branches
     - master
     - develop
-    - develop_dl3
-    - feature/fix-travis-builds
+    # dripline v3 main branches
+    - dl3/develop
+    - dl3/master
+    # all version tags
     - /^v\d+\.\d+\.\d+(-S*)?$/
+    # all branches ending in '/build' (case insensitive)
+    - /.*\/(?i:build)$/
 
 jobs:
   include:
