@@ -1,3 +1,8 @@
+# General guides
+- The python module is defined in a single source file, it runs exporter functions defined in header files which correspond one-to-one with source files in dripline-python; they have names ending in `_pybind.hh`.
+- When needed, trampoline classes and extra functions in support of bindings should be defined in their own source and header files as needed.
+- It is preferrable to try to achieve pythonic interfaces for bound classes; this means naming arguments and providing default values where possible and including doc strings.
+
 # Items list convention
 In python, if a module has an attribute named `__all__`, then that lists (as strings) the names of the objects to be imported when doing `from <module> import *`.
 Our pattern is to use that style of import in `__init__.py` files to bring classes and other implementations into the namespace of a package, and so this is required for bound C++ as well.

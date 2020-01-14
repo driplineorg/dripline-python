@@ -5,6 +5,7 @@
 
 namespace dripline_pybind
 {
+    // we need an extra class so that we can make private/protected methods public for binding
     class _service : public dripline::service
     {
         public:

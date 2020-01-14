@@ -8,6 +8,8 @@
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
 
+
+#include "binding_helpers.hh"
 #include "service_trampoline.hh"
 
 namespace dripline_pybind
@@ -17,14 +19,12 @@ namespace dripline_pybind
         std::list< std::string > all_items;
         all_items.push_back( "Service" );
         pybind11::class_< _service,
-                          //dripline::service,
                           _service_trampoline,
                           dripline::core,
                           dripline::endpoint,
                           dripline::scheduler<>,
                           scarab::cancelable,
                           std::shared_ptr< _service >
-                          //std::shared_ptr< dripline::service >
                         >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
@@ -33,7 +33,7 @@ namespace dripline_pybind
                                   const std::string&,
                                   const bool
                                 >(),
-                   pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
+                   DL_BIND_CALL_GUARD_STREAMS,
                    pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
                    pybind11::arg( "name" ) = "",
                    pybind11::arg( "broker" ) = "",
@@ -47,31 +47,20 @@ namespace dripline_pybind
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
 
-            .def( "bind_keys", &_service::bind_keys )
+            .def( "bind_keys", &_service::bind_keys, "overridable method to create all desired key bindings, overrides should still call this version")
             .def( "bind_key",
                   // Note, need to take a service pointer so that we can accept derived types... I think
                   [](_service* an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj->channel(), an_exchange, an_obj->name(), a_key);},
                   pybind11::arg( "exchange" ),
-                  pybind11::arg( "key" )
+                  pybind11::arg( "key" ),
+                  "bind the service's message queue to a particular exchange and key"
             )
-            .def( "start", &dripline::service::start,
-                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect,
-                                        pybind11::gil_scoped_release >() )
-            .def( "listen", &dripline::service::listen,
-                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect,
-                                        pybind11::gil_scoped_release >() )
-            .def( "stop", &dripline::service::stop,
-                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "add_child", &dripline::service::add_child,
-                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "add_async_child", &dripline::service::add_async_child,
-                  pybind11::call_guard< pybind11::scoped_ostream_redirect,
-                                        pybind11::scoped_estream_redirect >() )
-            .def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
+            .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+            .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+            .def( "stop", &dripline::service::stop, DL_BIND_CALL_GUARD_STREAMS )
+            .def( "add_child", &dripline::service::add_child, DL_BIND_CALL_GUARD_STREAMS )
+            .def( "add_async_child", &dripline::service::add_async_child, DL_BIND_CALL_GUARD_STREAMS )
+            //.def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
 
             .def( "on_alert_message", &_service::on_alert_message )
             ;

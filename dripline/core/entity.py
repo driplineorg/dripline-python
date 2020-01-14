@@ -56,7 +56,7 @@ class Entity(Endpoint):
     '''
     #check_on_set -> allows for more complex logic to confirm successful value updates
     #                (for example, the success condition may be measuring another endpoint)
-    def __init__(self, get_on_set=False, log_routing_key_prefix='sensor_value', log_interval=0, log_on_set=False, **kwargs):
+    def __init__(self, get_on_set=False, log_routing_key_prefix='sensor_value', log_interval=0, log_on_set=False, calibration=None, **kwargs):
         '''
         get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
         log_routing_key_prefix: first term in routing key used in alert messages which log values
@@ -65,10 +65,15 @@ class Entity(Endpoint):
                       to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
         log_on_set: if true, always call log_a_value() immediately after on_set
                     **Note:** requires get_on_set be true, overrides must be equivalent
+        calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
+                                       @calibrate decorator, used to populate raw and calibrated values
+                                       fields of a result payload. If a dictionary, the raw result is used
+                                       to index the dict with the calibrated value being the dict's value.
         '''
         Endpoint.__init__(self, **kwargs)
 
         self.log_routing_key_prefix=log_routing_key_prefix
+        self._calibration = calibration
 
         # keep a reference to the on_set (possibly decorated in a subclass), needed for changing *_on_set configurations
         self.__initial_on_set = self.on_set
