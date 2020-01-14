@@ -38,7 +38,4 @@ Based on that we prefer the following:
     - The description of the class belongs in the class's doc string
     - The doc string for the ``__init__`` method should just include description of the kwargs for that class
 
-Class Inheritance
-=================
-
 
