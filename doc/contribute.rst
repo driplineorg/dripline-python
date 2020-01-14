@@ -17,7 +17,7 @@ Merging
 Merging follows the instruction from the branching section above in most cases, but there are a few additional notes:
 
   - With the default travis-ci config, if the name of your branch ends in ``\build``, then when you push it will trigger travis-ci tasks
-  - Anyone may offer contributions by forkig and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the ``develop`` or ``master`` branches.
+  - Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the ``develop`` or ``master`` branches.
 
 Coding Style
 ============
