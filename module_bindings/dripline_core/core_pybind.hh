@@ -1,6 +1,8 @@
 #ifndef DRIPLINE_PYBIND_CORE_HH_
 #define DRIPLINE_PYBIND_CORE_HH_
 
+#include "binding_helpers.hh"
+
 #include "core.hh"
 #include "dripline_fwd.hh"
 
@@ -30,7 +32,7 @@ namespace dripline_pybind
                                   const std::string&,
                                   const bool
                                 >(),
-                   pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >(),
+                   DL_BIND_CALL_GUARD_STREAMS,
                    pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
                    pybind11::arg( "broker" ) = "",
                    pybind11::arg( "port" ) = 0,
@@ -40,14 +42,17 @@ namespace dripline_pybind
 
             .def( "send",
                   [](dripline::core& a_core, dripline::request_ptr_t a_request){return a_core.send(a_request);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send a request message"
                 )
             .def( "send",
                   [](dripline::core& a_core, dripline::reply_ptr_t a_reply){return a_core.send(a_reply);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send a reply message"
                 )
             .def( "send",
                   [](dripline::core& a_core, dripline::alert_ptr_t an_alert){return a_core.send(an_alert);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send an alert message"
                 )
 
