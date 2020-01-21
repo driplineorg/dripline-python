@@ -7,6 +7,8 @@
 
 #include "scheduler.hh"
 
+#include "binding_helpers.hh"
+
 namespace dripline_pybind
 {
     std::list< std::string > export_scheduler( pybind11::module& mod )
@@ -30,21 +32,25 @@ namespace dripline_pybind
 
         .def( "schedule",
               (int (dripline::scheduler<executor_t, clock_t>::*)(executable_t, clock_t::time_point)) &dripline::scheduler<executor_t, clock_t>::schedule,
+              DL_BIND_CALL_GUARD_STREAMS,
               pybind11::arg( "executable" ),
               pybind11::arg( "time" ),
               "schedule execution of executable at specified future time")
         .def( "schedule",
               (int (dripline::scheduler<executor_t, clock_t>::*)(executable_t, clock_t::duration, clock_t::time_point)) &dripline::scheduler<executor_t, clock_t>::schedule,
+              DL_BIND_CALL_GUARD_STREAMS,
               pybind11::arg( "executable" ),
               pybind11::arg( "interval" ),
               pybind11::arg_v( "time", clock_t::now(), "now()" ),
               "schedule recurring execution of [executable] every [interval], starting at specified future [time]")
         .def( "unschedule",
               &dripline::scheduler<executor_t, clock_t>::unschedule,
+              DL_BIND_CALL_GUARD_STREAMS,
               pybind11::arg( "id" ),
               "Cancel a scheduled function call by its id" )
         .def( "execute",
               &dripline::scheduler<executor_t, clock_t>::execute,
+              DL_BIND_CALL_GUARD_STREAMS_AND_GIL, 
               "Start the timing thread which executes scheduled actions" )
         ;
 
