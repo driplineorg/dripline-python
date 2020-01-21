@@ -1,7 +1,10 @@
 #ifndef DRIPLINE_PYBIND_SIMPLE_SERVICE
 #define DRIPLINE_PYBIND_SIMPLE_SERVICE
 
+#include "binding_helpers.hh"
+
 #include "simple_service.hh"
+
 #include "pybind11/pybind11.h"
 
 namespace dripline_pybind
@@ -12,7 +15,7 @@ namespace dripline_pybind
         all_items.push_back( "simple_service" );
         pybind11::class_< dripline::simple_service, std::shared_ptr< dripline::simple_service > >( mod, "simple_service", "Minimal example of a dripline service" )
             .def( pybind11::init< const scarab::param_node& >() )
-            .def( "execute", &dripline::simple_service::execute )
+            .def( "execute", &dripline::simple_service::execute, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             ;
         return all_items;
     }

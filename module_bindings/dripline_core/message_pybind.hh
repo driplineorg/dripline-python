@@ -139,7 +139,8 @@ namespace dripline_pybind
                          pybind11::arg( "specifier" ) = "",
                          pybind11::arg( "reply_to" ) = "",
                          pybind11::arg( "encoding" ) = dripline::message::encoding::json,
-                         "create and populate a new MsgRequest instance"
+                         "create and populate a new MsgRequest instance",
+                         DL_BIND_CALL_GUARD_STREAMS
                        )
             .def( "reply",
                   [](dripline::request_ptr_t a_req,
@@ -150,7 +151,8 @@ namespace dripline_pybind
                   pybind11::arg( "return_code" ) = 0,
                   pybind11::arg( "return_message" ) = "",
                   pybind11::arg_v( "payload", scarab::param(), "scarab::param()" ),
-                  "construct and send a reply message in response to this request"
+                  "construct and send a reply message in response to this request",
+                  DL_BIND_CALL_GUARD_STREAMS
                 )
             ;
 
@@ -187,7 +189,8 @@ namespace dripline_pybind
                          pybind11::arg( "routing_key" ) = "",
                          pybind11::arg( "specifier" ) = "",
                          pybind11::arg( "encoding" ) = dripline::message::encoding::json,
-                         "create and populate a new MsgReply instance"
+                         "create and populate a new MsgReply instance",
+                         DL_BIND_CALL_GUARD_STREAMS
                        )
             .def_static( "create",
                          [](unsigned a_retcode_value,
@@ -199,7 +202,8 @@ namespace dripline_pybind
                          pybind11::arg( "return_message" ) = "",
                          pybind11::arg( "payload" ) = scarab::param(),
                          pybind11::arg( "msg_request" ) = dripline::message::encoding::json,
-                         "create and populate a new MsgReply instance"
+                         "create and populate a new MsgReply instance",
+                         DL_BIND_CALL_GUARD_STREAMS
                        )
             ;
 
@@ -223,7 +227,8 @@ namespace dripline_pybind
                          pybind11::arg( "routing_key" ) = "",
                          pybind11::arg( "specifier" ) = "",
                          pybind11::arg( "encoding" ) = dripline::message::encoding::json,
-                         "create and populate a new MsgAlert instance"
+                         "create and populate a new MsgAlert instance",
+                         DL_BIND_CALL_GUARD_STREAMS
                        )
             ;
 
