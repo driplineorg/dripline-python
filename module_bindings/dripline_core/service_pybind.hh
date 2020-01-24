@@ -49,7 +49,7 @@ namespace dripline_pybind
                                       const unsigned int a_port,
                                       const std::string& a_auth_file,
                                       const bool a_make_connection )
-                                  { return new  _service( (scarab_pybind::to_param(a_config))->as_node(),
+                                  { return new  _service( (scarab_pybind::to_param(a_config, true))->as_node(),
                                                           a_name,
                                                           a_broker,
                                                           a_port,
