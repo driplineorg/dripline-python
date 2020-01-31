@@ -9,23 +9,15 @@ OP_T_UKW = 0xffffffff
 MSG_T_REPLY = 2
 MSG_T_REQUEST = 3
 MSG_T_ALERT = 4
-MSG_UNKNOWN = 0xffffffff
-
-def test_op_t_values():
-    item = dripline.core.op_t
-    assert(item.set.value == OP_T_SET)
-    assert(item.get.value == OP_T_GET)
-    assert(item.run.value == OP_T_RUN)
-    assert(item.cmd.value == OP_T_CMD)
-    assert(item.unknown.value == OP_T_UKW)
+MSG_T_UNKNOWN = 0xffffffff
     
-def test_op_t_to_unit():
+def test_op_t_to_uint():
     item = dripline.core.op_t
-    assert(item.to_unit(item.set) == OP_T_SET)
-    assert(item.to_unit(item.get) == OP_T_GET)
-    assert(item.to_unit(item.run) == OP_T_RUN)
-    assert(item.to_unit(item.cmd) == OP_T_CMD)
-    assert(item.to_unit(item.unknown) == OP_T_UKW)
+    assert(item.to_uint(item.set) == OP_T_SET)
+    assert(item.to_uint(item.get) == OP_T_GET)
+    assert(item.to_uint(item.run) == OP_T_RUN)
+    assert(item.to_uint(item.cmd) == OP_T_CMD)
+    assert(item.to_uint(item.unknown) == OP_T_UKW)
 
 def test_op_t_to_string():
     item = dripline.core.op_t
@@ -48,12 +40,6 @@ def test_op_t_uint_to_op_t():
     assert(item.to_op_t(OP_T_RUN) == item.run)
     assert(item.to_op_t(OP_T_CMD) == item.cmd)
     assert(item.to_op_t(OP_T_UKW) == item.unknown)
-    flag = False
-    try:
-        item.to_op_t(1000)
-    except Exception:
-        flag = True
-    assert(flag)
 
 def test_op_t_string_to_op_t():
     item = dripline.core.op_t
@@ -68,20 +54,13 @@ def test_op_t_string_to_op_t():
     except Exception:
         flag = True
     assert(flag)
-
-def test_msg_t_values():
-    item = dripline.core.msg_t
-    assert(item.reply.value == MSG_T_REPLY)
-    assert(item.request.value == MSG_T_REQUEST)
-    assert(item.alert.value == MSG_T_ALERT)
-    assert(item.unknown.value == MSG_T_UNKNOWN)
     
-def test_msg_t_to_unit():
+def test_msg_t_to_uint():
     item = dripline.core.msg_t
-    assert(item.to_unit(item.reply) == MSG_T_REPLY)
-    assert(item.to_unit(item.request) == MSG_T_REQUEST)
-    assert(item.to_unit(item.alert) == MSG_T_ALERT)
-    assert(item.to_unit(item.unknown) == MSG_T_UNKNOWN)
+    assert(item.to_uint(item.reply) == MSG_T_REPLY)
+    assert(item.to_uint(item.request) == MSG_T_REQUEST)
+    assert(item.to_uint(item.alert) == MSG_T_ALERT)
+    assert(item.to_uint(item.unknown) == MSG_T_UNKNOWN)
 
 def test_msg_t_to_string():
     item = dripline.core.msg_t
@@ -102,12 +81,6 @@ def test_msg_t_uint_to_msg_t():
     assert(item.to_msg_t(MSG_T_REQUEST) == item.request)
     assert(item.to_msg_t(MSG_T_ALERT) == item.alert)
     assert(item.to_msg_t(MSG_T_UNKNOWN) == item.unknown)
-    flag = False
-    try:
-        item.to_msg_t(1000)
-    except Exception:
-        flag = True
-    assert(flag)
 
 def test_msg_t_string_to_msg_t():
     item = dripline.core.msg_t
