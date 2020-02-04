@@ -74,6 +74,9 @@ requirements = [
     'PyYAML',
     'asteval',
     'setuptools_scm',
+    #these two for postgreSQL, move to plugin?
+    'sqlalchemy',
+    'psycopg2',
 ]
 
 packages = ["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")]
