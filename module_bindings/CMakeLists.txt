@@ -26,4 +26,5 @@ set( PB_DRIPLINE_CORE_SOURCEFILES
 )
 pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
 target_link_libraries( _dripline PRIVATE ${FULL_LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+set_property( GLOBAL APPEND PROPERTY Scarab_LIBRARIES _dripline)
 #install( TARGETS _dripline DESTINATION ${LIB_INSTALL_DIR} )
