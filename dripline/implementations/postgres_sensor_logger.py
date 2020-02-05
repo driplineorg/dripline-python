@@ -8,6 +8,8 @@ from __future__ import absolute_import
 import logging
 import re
 
+import scarab
+
 # internal imports
 from dripline.core import AlertConsumer
 from .postgres_interface import PostgreSQLInterface
@@ -36,11 +38,12 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
         PostgreSQLInterface.add_child(self, endpoint)
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
-        this_data_table = self.sync_endpoints[self.insertion_table_endpoint_name]
+        this_data_table = self.sync_children[self.insertion_table_endpoint_name]
         # combine data sources
         insert_data = {'timestamp': a_message_timestamp}
         insert_data.update(a_routing_key_data)
-        insert_data.update(a_payload)
+        insert_data.update(a_payload.to_python())
+        logger.info("insert data are:\n{}".format(insert_data))
         # do the insert
         this_data_table.do_insert(**insert_data)
-        logger.info('value logged for <{}>'.format(sensor_name))
+        logger.info("finished processing data")

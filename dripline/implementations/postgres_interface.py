@@ -169,8 +169,6 @@ class SQLTable(Endpoint):
     def do_insert(self, *args, **kwargs):
         '''
         '''
-        if not isinstance(self.provider, PostgreSQLInterface):
-            raise DriplineInternalError('InsertDBEndpoint must have a RunDBInterface as provider')
         # make sure that all provided insert values are expected
         for col in kwargs.keys():
             if not col in self._column_map.keys():
