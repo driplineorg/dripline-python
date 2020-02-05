@@ -44,7 +44,8 @@ class PostgreSQLInterface(Service):
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        Service.__init__(self, **kwargs)
+        service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
+        Service.__init__(self, **service_kwargs)
         if auths_file is not None:
             logger.warning("you have passed an auths file directly to 'PostgreSQLInterface.__init-_', this capability is considered temporary")
             self._auths_file = auths_file
