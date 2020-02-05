@@ -173,7 +173,7 @@ class SQLTable(Endpoint):
         # make sure that all provided insert values are expected
         for col in kwargs.keys():
             if not col in self._column_map.keys():
-                logger.warning('got an unexpected insert column <{}>'.format(col))
+                logger.debug('got an unexpected insert column <{}>'.format(col))
                 kwargs.pop(col)
         # make sure that all required columns are present
         for col in self._required_insert_names:
