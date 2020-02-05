@@ -47,9 +47,12 @@ namespace dripline_pybind
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
+            .def_property_readonly( "sync_children", (std::map<std::string, dripline::endpoint_ptr_t>& (dripline::service::*)()) &dripline::service::sync_children )
+            //TODO: need to deal with lr_ptr_t to bind this
+            //.def_property_readonly( "async_children", &dripline::service::async_children )
 
-            .def( "bind_keys", 
-                  &_service::bind_keys, 
+            .def( "bind_keys",
+                  &_service::bind_keys,
                   "overridable method to create all desired key bindings, overrides should still call this version",
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL
                 )
