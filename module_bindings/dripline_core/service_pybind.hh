@@ -7,10 +7,11 @@
 #include "core.hh"
 #include "service.hh"
 
+#include "param_binding_helpers.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
-
 
 
 namespace dripline_pybind
@@ -36,6 +37,26 @@ namespace dripline_pybind
                                 >(),
                    DL_BIND_CALL_GUARD_STREAMS,
                    pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
+                   pybind11::arg( "name" ) = "",
+                   pybind11::arg( "broker" ) = "",
+                   pybind11::arg( "port" ) = 0,
+                   pybind11::arg( "auth_file" ) = "",
+                   pybind11::arg( "make_connection" ) = true
+            )
+            .def( pybind11::init( []( const pybind11::dict a_config,
+                                      const std::string& a_name,
+                                      const std::string& a_broker,
+                                      const unsigned int a_port,
+                                      const std::string& a_auth_file,
+                                      const bool a_make_connection )
+                                  { return new  _service( (scarab_pybind::to_param(a_config, true))->as_node(),
+                                                          a_name,
+                                                          a_broker,
+                                                          a_port,
+                                                          a_auth_file,
+                                                          a_make_connection); } ),
+                   DL_BIND_CALL_GUARD_STREAMS,
+                   pybind11::arg( "config"),
                    pybind11::arg( "name" ) = "",
                    pybind11::arg( "broker" ) = "",
                    pybind11::arg( "port" ) = 0,
