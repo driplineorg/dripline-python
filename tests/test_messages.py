@@ -139,20 +139,6 @@ def test_alert_create_nondefault():
     assert(an_alert.encoding.name == "json")
     assert(len(an_alert.correlation_id) == 36)
 
-def test_message_encode_message_body():
-    a_payload = scarab.ParamNode()
-    for i in range(10):
-        a_payload.add("p"+str(i), scarab.ParamValue(i))
-    messages = []
-    messages.append(dripline.core.MsgRequest.create(payload = a_payload))
-    messages.append(dripline.core.MsgReply.create(payload = a_payload))
-    messages.append(dripline.core.MsgAlert.create(payload = a_payload))
-    contents = [[],[],[]]
-    for i in range(3):
-        messages[i].encode_message_body(contents[i], 10, scarab.ParamNode())
-        assert(len(contents[i]) > 0)
-        assert(type(contents[i][0]) == str)
-
 def test_message_encode_full_message():
     a_payload = scarab.ParamValue(99)
     messages = []
@@ -172,7 +158,7 @@ def test_message_derived_modify_message_param():
     a_dir = a_node.to_python()
     assert(len(a_dir) == 2)
     assert(len(a_dir['lockout_key']) == 36)
-    assert(a_dir['message_operationeration'] == 0xffffffff)
+    assert(a_dir['message_operation'] == 0xffffffff)
     a_reply = dripline.core.MsgReply.create()
     a_reply.derived_modify_message_param(a_node)
     a_dir = a_node.to_python()
