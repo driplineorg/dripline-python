@@ -26,11 +26,6 @@ namespace dripline_pybind
                 PYBIND11_OVERLOAD_PURE( bool, dripline::message, is_alert, );
             }
 
-            void derived_modify_amqp_message( dripline::amqp_message_ptr t_amqp_msg, AmqpClient::Table& a_properties ) const override
-            {
-                PYBIND11_OVERLOAD_PURE( void, dripline::message, derived_modify_amqp_message, t_amqp_msg, a_properties );
-            }
-
             void derived_modify_message_param( scarab::param_node& a_node ) const override
             {
                 PYBIND11_OVERLOAD_PURE( void, dripline::message, derived_modify_message_body, a_node );
