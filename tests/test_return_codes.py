@@ -1,9 +1,9 @@
-import dripline.core
+import scarab, _dripline.core
 
 def test_builtin_ret_code():
     default = None
-    builtin_ret_codes = dripline.core.get_return_code_values()
-    builtin_ret_codes_map = dripline.core.get_return_codes_map()
+    builtin_ret_codes = _dripline.core.get_return_code_values()
+    builtin_ret_codes_map = _dripline.core.get_return_codes_map()
     for ret_code in builtin_ret_codes:
         ret_code_obj = builtin_ret_codes_map.get(ret_code, default)
         assert(ret_code_obj != default)
@@ -21,9 +21,9 @@ def test_add_unique_ret_codes():
         value = base_value + i
         name = base_name + str(i)
         description = base_description + str(i)
-        dripline.core.add_return_code(value, name, description)
-    new_ret_codes = dripline.core.get_return_code_values()
-    new_ret_codes_map = dripline.core.get_return_codes_map()
+        _dripline.core.add_return_code(value, name, description)
+    new_ret_codes = _dripline.core.get_return_code_values()
+    new_ret_codes_map = _dripline.core.get_return_codes_map()
     for i in range(num):
         ret_code_obj = new_ret_codes_map.get(base_value + i, default)
         assert(ret_code_obj != default)
@@ -37,10 +37,10 @@ def test_add_duplicated_ret_codes():
     description1 = "description1"
     name2 = "name2"
     description2 = "description2"    
-    dripline.core.add_return_code(value1, name1, description1)
+    _dripline.core.add_return_code(value1, name1, description1)
     flag = False
     try:
-        dripline.core.add_return_code(value1, name2, description2)
+        _dripline.core.add_return_code(value1, name2, description2)
     except RuntimeError:
         flag = True
     assert(flag)
