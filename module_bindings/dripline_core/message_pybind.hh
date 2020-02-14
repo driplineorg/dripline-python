@@ -77,21 +77,6 @@ namespace dripline_pybind
             // methods to convert between dripline message, amqp types, etc.
             /*.def_static( "process_envelope", &dripline::message::process_envelope,
                 "From AMQP to message object" ) */
-            .def( "create_amqp_messages",
-                  &dripline::message::create_amqp_messages,
-                  "From message object to AMQP",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "encode_message_body",
-                  &dripline::message::encode_message_body,
-                  "From message object to string",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "derived_modify_amqp_message",
-                  &_message::derived_modify_amqp_message,
-                  "derived_modify_amqp_message function",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
             .def( "derived_modify_message_param",
                   &_message::derived_modify_message_param,
                   "derived_modify_amqp_message function",
