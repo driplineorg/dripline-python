@@ -21,12 +21,14 @@ COPY bin /usr/local/src/bin
 COPY .git /usr/local/src/.git
 COPY setup.py /usr/local/src/setup.py
 COPY CMakeLists.txt /usr/local/src/CMakeLists.txt
+COPY tests /usr/local/src/tests
 
 ## would prefer not to do this, just run ldconfig after the build to get things
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
 RUN pip install ipython
+RUN pip install pytest
 
 RUN pip install /usr/local/src
 #RUN cd /usr/local/src &&\
