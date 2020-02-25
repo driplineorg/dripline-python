@@ -7,10 +7,11 @@
 #include "core.hh"
 #include "service.hh"
 
+#include "param_binding_helpers.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
-
 
 
 namespace dripline_pybind
@@ -42,14 +43,37 @@ namespace dripline_pybind
                    pybind11::arg( "auth_file" ) = "",
                    pybind11::arg( "make_connection" ) = true
             )
+            .def( pybind11::init( []( const pybind11::dict a_config,
+                                      const std::string& a_name,
+                                      const std::string& a_broker,
+                                      const unsigned int a_port,
+                                      const std::string& a_auth_file,
+                                      const bool a_make_connection )
+                                  { return new  _service( (scarab_pybind::to_param(a_config, true))->as_node(),
+                                                          a_name,
+                                                          a_broker,
+                                                          a_port,
+                                                          a_auth_file,
+                                                          a_make_connection); } ),
+                   DL_BIND_CALL_GUARD_STREAMS,
+                   pybind11::arg( "config"),
+                   pybind11::arg( "name" ) = "",
+                   pybind11::arg( "broker" ) = "",
+                   pybind11::arg( "port" ) = 0,
+                   pybind11::arg( "auth_file" ) = "",
+                   pybind11::arg( "make_connection" ) = true
+            )
 
             // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
+            .def_property_readonly( "sync_children", (std::map<std::string, dripline::endpoint_ptr_t>& (dripline::service::*)()) &dripline::service::sync_children )
+            //TODO: need to deal with lr_ptr_t to bind this
+            //.def_property_readonly( "async_children", &dripline::service::async_children )
 
-            .def( "bind_keys", 
-                  &_service::bind_keys, 
+            .def( "bind_keys",
+                  &_service::bind_keys,
                   "overridable method to create all desired key bindings, overrides should still call this version",
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL
                 )
