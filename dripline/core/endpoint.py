@@ -22,8 +22,6 @@ class Endpoint(_Endpoint):
             print("has specifier")
             try:
                 print("specifier is: {}".format(a_specifier))
-                print("self.log_interval: {}".format(self.log_interval))
-                print("getattr(self, log_interval): {}".format(getattr(self, 'log_interval')))
                 an_attribute = getattr(self, a_specifier)
                 print(an_attribute)
                 print("attribute '{}' value is [{}]".format(a_specifier, an_attribute))
