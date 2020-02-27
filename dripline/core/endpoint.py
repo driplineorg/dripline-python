@@ -44,7 +44,7 @@ class Endpoint(_Endpoint):
         print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
             try:
-                setattr(self, a_specifier, a_payload_value)
+                setattr(self, a_specifier, new_value)
                 return a_request_message.reply()
             except AttributeError as this_error:
                 return a_request_message.reply(201, "attribute error: {}".format(this_error.message))
