@@ -47,7 +47,7 @@ class Endpoint(_Endpoint):
                 setattr(self, a_specifier, new_value)
                 return a_request_message.reply()
             except AttributeError as this_error:
-                return a_request_message.reply(201, "attribute error: {}".format(this_error.message))
+                return a_request_message.reply(201, "attribute error: {}".format(this_error))
         else:
             try:
                 result = self.on_set(new_value)
