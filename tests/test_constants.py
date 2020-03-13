@@ -10,7 +10,7 @@ MSG_T_REPLY = 2
 MSG_T_REQUEST = 3
 MSG_T_ALERT = 4
 MSG_T_UNKNOWN = 0xffffffff
-    
+
 def test_op_t_to_uint():
     item = _dripline.core.op_t
     assert(item.to_uint(item.set) == OP_T_SET)
@@ -29,7 +29,7 @@ def test_op_t_to_string():
     flag = False
     try:
         item.to_string(_dripline.core.msg_t.request)
-    except Exception:
+    except TypeError:
         flag = True
     assert(flag)
 
@@ -51,10 +51,11 @@ def test_op_t_string_to_op_t():
     flag = False
     try:
         item.to_op_t("hello")
+    ##TODO: what exception should this be
     except Exception:
         flag = True
     assert(flag)
-    
+
 def test_msg_t_to_uint():
     item = _dripline.core.msg_t
     assert(item.to_uint(item.reply) == MSG_T_REPLY)
@@ -71,7 +72,7 @@ def test_msg_t_to_string():
     flag = False
     try:
         item.to_string(_dripline.core.op_t.set)
-    except Exception:
+    except TypeError:
         flag = True
     assert(flag)
 
@@ -91,6 +92,7 @@ def test_msg_t_string_to_msg_t():
     flag = False
     try:
         item.to_msg_t("hello")
+    ##TODO: what exception should this be
     except Exception:
         flag = True
     assert(flag)
