@@ -38,4 +38,15 @@ Based on that we prefer the following:
     - The description of the class belongs in the class's doc string
     - The doc string for the ``__init__`` method should just include description of the kwargs for that class
 
+Testing
+============
 
+Since we reuse some cpp code here using Pybind, we have provided some unit tests to make sure such classes and methods work properly. These tests are contained in the ``/tests`` folder and can be run using PyTest. An overview can be found `there <http://doc.pytest.org/en/5.3.5/goodpractices.html/>`_.
+
+How to run the tests:
+  - After installing the package, either navigate to the folder and run all tests within it using ``python -m pytest``, or specify the path to the test to be run using ``python -m pytest tests/to/be/run/test_something.py``.
+  - To disable the caching, use ``PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider``.
+
+How to add a new test:
+  - Name your file with ``test_`` prefix, followed by the name of the class to be tested.
+  - Within the file, write ``test`` prefixed methods to be run. Ideally, one such method is supposed to test only one case. To keep unit tests simple and independent of each other, test classes are not suggested.

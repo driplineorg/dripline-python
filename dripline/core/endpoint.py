@@ -22,8 +22,6 @@ class Endpoint(_Endpoint):
             print("has specifier")
             try:
                 print("specifier is: {}".format(a_specifier))
-                print("self.log_interval: {}".format(self.log_interval))
-                print("getattr(self, log_interval): {}".format(getattr(self, 'log_interval')))
                 an_attribute = getattr(self, a_specifier)
                 print(an_attribute)
                 print("attribute '{}' value is [{}]".format(a_specifier, an_attribute))
@@ -46,10 +44,10 @@ class Endpoint(_Endpoint):
         print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
             try:
-                setattr(self, a_specifier, a_payload_value)
+                setattr(self, a_specifier, new_value)
                 return a_request_message.reply()
             except AttributeError as this_error:
-                return a_request_message.reply(201, "attribute error: {}".format(this_error.message))
+                return a_request_message.reply(201, "attribute error: {}".format(this_error))
         else:
             try:
                 result = self.on_set(new_value)
