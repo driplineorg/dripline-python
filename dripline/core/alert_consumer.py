@@ -38,6 +38,7 @@ class AlertConsumer(Service):
     def on_alert_message(self, an_alert):
         print("in python's on alert")
         routing_data = self.parse_routing_key(an_alert.routing_key)
+        print("routing key data are:\n{}".format(routing_data))
         self.process_payload(an_alert.payload, routing_data, an_alert.timestamp)
 
     def parse_routing_key(self, a_routing_key):

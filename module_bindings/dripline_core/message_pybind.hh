@@ -16,12 +16,6 @@ LOGGER( dlog_mph, "message_pybind.hh" )
 
 namespace dripline_pybind
 {
-    class _message : public dripline::message
-    {
-        public:
-            using dripline::message::derived_modify_amqp_message;
-            using dripline::message::derived_modify_message_param;
-    };
 
     std::list< std::string >  export_message( pybind11::module& mod )
     {
@@ -74,29 +68,6 @@ namespace dripline_pybind
             .def( "is_reply", &dripline::message::is_reply, "Returns true if the message is a reply, false otherwise" )
             .def( "is_alert", &dripline::message::is_alert, "Returns true if the message is an alert, false otherwise" )
 
-            // methods to convert between dripline message, amqp types, etc.
-            /*.def_static( "process_envelope", &dripline::message::process_envelope,
-                "From AMQP to message object" ) */
-            .def( "create_amqp_messages",
-                  &dripline::message::create_amqp_messages,
-                  "From message object to AMQP",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "encode_message_body",
-                  &dripline::message::encode_message_body,
-                  "From message object to string",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "derived_modify_amqp_message",
-                  &_message::derived_modify_amqp_message,
-                  "derived_modify_amqp_message function",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "derived_modify_message_param",
-                  &_message::derived_modify_message_param,
-                  "derived_modify_amqp_message function",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
 
             .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
             ;
