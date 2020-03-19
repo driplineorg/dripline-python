@@ -102,19 +102,22 @@ def test_do_set_request_invalid_specifier():
     assert(a_reply.correlation_id == a_get_request.correlation_id)
 
 def test_do_set_request_valid_specifier():
-    name1 = "an_endpoint"
-    name2 = "a_better_endpoint"
-    an_endpoint = dripline.core.Endpoint(name1)
+    value1 = "an_endpoint"
+    value2 = "a_better_endpoint"
+    ## the endpoint base class doesn't have any settable members, create one:
+    class EndpointWithMember(dripline.core.Endpoint):
+        a_value = value1
+    an_endpoint = dripline.core.Endpoint("an_endpoint")
     the_node = scarab.ParamNode()
     the_node["values"] = scarab.ParamArray()
-    the_node["values"].push_back(scarab.ParamValue(name2))
-    a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey", "name", "a_receiver")
+    the_node["values"].push_back(scarab.ParamValue(value2))
+    a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey", "a_value", "a_receiver")
     a_reply = an_endpoint.do_set_request(a_set_request)
     assert(isinstance(a_reply, dripline.core.MsgReply))
     assert(a_reply.return_code == 0)
     assert(a_reply.correlation_id == a_set_request.correlation_id)
     print(an_endpoint.name)
-    assert(an_endpoint.name == name2)
+    assert(an_endpoint.a_value == value2)
 
 def test_do_cmd_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
