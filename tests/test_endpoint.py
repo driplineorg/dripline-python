@@ -4,7 +4,6 @@ def test_endpoint_creation():
     a_name = "an_endpoint"
     an_endpoint = dripline.core.Endpoint(a_name)
     assert(an_endpoint.name == a_name)
-    assert(isinstance(an_endpoint.service, dripline.core.Service))
 
 def test_submit_request_message():
     a_name = "an_endpoint"
@@ -15,7 +14,7 @@ def test_submit_request_message():
     assert(a_reply.return_code == 0)
     assert(a_reply.correlation_id == a_request.correlation_id)
     a_reply.payload.to_python()['values'] == [a_name]
-  
+
 def test_on_request_message():
     a_name = "an_endpoint"
     an_endpoint = dripline.core.Endpoint(a_name)
@@ -76,14 +75,17 @@ def test_do_get_request_valid_specifier():
     assert(a_reply.return_code == 0)
     assert(a_reply.correlation_id == a_get_request.correlation_id)
     a_reply.payload.to_python()['values'] == [a_name]
-    
+
 def test_do_set_request_no_specifier():
+    print("start test")
     an_endpoint = dripline.core.Endpoint("hello")
     the_node = scarab.ParamNode()
     the_node["values"] = scarab.ParamArray()
     the_node["values"].push_back(scarab.ParamValue("a_better_endpoint"))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey")
+    print('objects created') ##TODO
     a_reply = an_endpoint.do_set_request(a_set_request)
+    print('called do_set_request') ##TODO
     assert(isinstance(a_reply, dripline.core.MsgReply))
     assert(a_reply.return_code == 100)
     assert(a_reply.correlation_id == a_set_request.correlation_id)
