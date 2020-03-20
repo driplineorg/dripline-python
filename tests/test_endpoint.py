@@ -31,9 +31,8 @@ def test_on_reply_message():
     flag = False
     try:
         an_endpoint.on_reply_message(a_reply)
-    ##TODO narrow this exception type
-    except Exception:
-        flag =True
+    except dripline.core.DriplineError:
+        flag = True
     assert(flag)
 
 def test_on_alert_message():
@@ -42,8 +41,7 @@ def test_on_alert_message():
     flag = False
     try:
         an_endpoint.on_alert_message(an_alert)
-    ##TODO narrow this exception type
-    except Exception:
+    except dripline.core.DriplineError:
         flag =True
     assert(flag)
 
@@ -53,8 +51,7 @@ def test_do_get_request_no_specifier():
     flag = False
     try:
         a_reply = an_endpoint.do_get_request(a_get_request)
-    ##TODO narrow this exception type
-    except Exception:
+    except dripline.core.ThrowReply:
         flag = True
     assert(flag)
 

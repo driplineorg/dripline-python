@@ -2,6 +2,7 @@ __all__ = []
 
 import scarab
 from _dripline.core import _Endpoint
+from .throw_reply import ThrowReply
 
 __all__.append('Endpoint')
 class Endpoint(_Endpoint):
@@ -30,8 +31,7 @@ class Endpoint(_Endpoint):
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
             except AttributeError as this_error:
-                #TODO we should resolve the returncodes and update this value
-                return a_request_message.reply(201, "attribute error: {}".format(this_error))
+                raise ThrowReply('message_error_invalid_specifier', "endpoint {} has no attribute {}, unable to get".format(self.name, a_specifier))
         else:
             print('no specifier')
             the_value = self.on_get()
@@ -43,17 +43,13 @@ class Endpoint(_Endpoint):
         new_value = getattr(new_value, "as_"+new_value.type())()
         print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
-            try:
-                setattr(self, a_specifier, new_value)
-                return a_request_message.reply()
-            except AttributeError as this_error:
-                return a_request_message.reply(201, "attribute error: {}".format(this_error))
+            if not hasattr(self, a_specifier):
+                raise ThrowReply('message_error_invalid_specifier', "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
+            setattr(self, a_specifier, new_value)
+            return a_request_message.reply()
         else:
-            try:
-                result = self.on_set(new_value)
-                return a_request_message.reply(payload=scarab.to_param(result))
-            except Exception as e:
-                return a_request_message.reply(100, "got an exception trying to on_get: {}".format(str(e)))
+            result = self.on_set(new_value)
+            return a_request_message.reply(payload=scarab.to_param(result))
 
     def do_cmd_request(self, a_request_message):
         # Note: any command executed in this way must return a python data structure which is
@@ -62,7 +58,7 @@ class Endpoint(_Endpoint):
         try:
             method_ref = getattr(self, method_name)
         except AttributeError as e:
-            return a_request_message.reply(100, "error getting command's corresponding method: {}".format(str(e)))
+            raise ThrowReply('message_error', "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
         result = method_ref(*the_args, **the_kwargs)
@@ -74,8 +70,7 @@ class Endpoint(_Endpoint):
         Implementations may override to enable OP_GET operations.
         The implementation must return a value which is able to be passed to the ParamValue constructor.
         '''
-        #TODO should this be a dripline error?
-        raise NotImplementedError("endpoint '{}' does not implement an on_get".format(self.name))
+        raise ThrowReply('message_error_invalid_method', "{} does not implement on_get".format(self.__class__))
 
     def on_set(self, _value):
         '''
@@ -83,5 +78,4 @@ class Endpoint(_Endpoint):
         Implementations may override to enable OP_SET operations.
         Any returned object must already be a scarab::Param object
         '''
-        #TODO should this be a dripline error?
-        raise NotImplementedError("endpoint '{}' does not implement an on_set".format(self.name))
+        raise ThrowReply('message_error_invalid_method', "{} does not implement on_set".format(self.__class__))

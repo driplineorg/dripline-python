@@ -1,4 +1,5 @@
 import scarab, _dripline.core
+from dripline.core import ThrowReply, DriplineError
 
 OP_T_SET = 0
 OP_T_GET = 1
@@ -51,8 +52,7 @@ def test_op_t_string_to_op_t():
     flag = False
     try:
         item.to_op_t("hello")
-    ##TODO: what exception should this be
-    except Exception:
+    except DriplineError:
         flag = True
     assert(flag)
 
@@ -92,7 +92,6 @@ def test_msg_t_string_to_msg_t():
     flag = False
     try:
         item.to_msg_t("hello")
-    ##TODO: what exception should this be
-    except Exception:
+    except DriplineError:
         flag = True
     assert(flag)
