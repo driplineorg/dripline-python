@@ -43,7 +43,7 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
         insert_data = {'timestamp': a_message_timestamp}
         insert_data.update(a_routing_key_data)
         insert_data.update(a_payload.to_python())
-        logger.info("insert data are:\n{}".format(insert_data))
+        logger.info(f"insert data are:\n{insert_data}")
         # do the insert
         this_data_table.do_insert(**insert_data)
         logger.info("finished processing data")
