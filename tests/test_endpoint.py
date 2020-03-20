@@ -61,10 +61,12 @@ def test_do_get_request_no_specifier():
 def test_do_get_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
     a_get_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "namee", "a_receiver")
-    a_reply = an_endpoint.do_get_request(a_get_request)
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 201)
-    assert(a_reply.correlation_id == a_get_request.correlation_id)
+    correct_error = False
+    try:
+        a_reply = an_endpoint.do_get_request(a_get_request)
+    except dripline.core.ThrowReply as e:
+        correct_error = True
+    assert(correct_error)
 
 def test_do_get_request_valid_specifier():
     a_name = "an_endpoint"
@@ -83,12 +85,12 @@ def test_do_set_request_no_specifier():
     the_node["values"] = scarab.ParamArray()
     the_node["values"].push_back(scarab.ParamValue("a_better_endpoint"))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey")
-    print('objects created') ##TODO
-    a_reply = an_endpoint.do_set_request(a_set_request)
-    print('called do_set_request') ##TODO
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 100)
-    assert(a_reply.correlation_id == a_set_request.correlation_id)
+    correct_error = False
+    try:
+        a_reply = an_endpoint.do_set_request(a_set_request)
+    except dripline.core.ThrowReply as e:
+        correct_error = True
+    assert(correct_error)
 
 def test_do_set_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
@@ -96,10 +98,13 @@ def test_do_set_request_invalid_specifier():
     the_node["values"] = scarab.ParamArray()
     the_node["values"].push_back(scarab.ParamValue("a_better_endpoint"))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey", "namee", "a_receiver")
-    a_reply = an_endpoint.do_set_request(a_set_request)
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 201)
-    assert(a_reply.correlation_id == a_get_request.correlation_id)
+    correct_error = False
+    try:
+        a_reply = an_endpoint.do_set_request(a_set_request)
+    except dripline.core.ThrowReply as e:
+        correct_error = True
+        print('content of error:\n{}'.format(dir(e)))
+    assert(correct_error)
 
 def test_do_set_request_valid_specifier():
     value1 = "an_endpoint"
@@ -107,7 +112,7 @@ def test_do_set_request_valid_specifier():
     ## the endpoint base class doesn't have any settable members, create one:
     class EndpointWithMember(dripline.core.Endpoint):
         a_value = value1
-    an_endpoint = dripline.core.Endpoint("an_endpoint")
+    an_endpoint = EndpointWithMember("an_endpoint")
     the_node = scarab.ParamNode()
     the_node["values"] = scarab.ParamArray()
     the_node["values"].push_back(scarab.ParamValue(value2))
@@ -122,10 +127,14 @@ def test_do_set_request_valid_specifier():
 def test_do_cmd_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
     a_cmd_request = dripline.core.MsgRequest.create(scarab.Param(), dripline.core.op_t.cmd, "hey", "on_gett", "a_receiver")
-    a_reply = an_endpoint.do_cmd_request(a_cmd_request)
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 100)
-    assert(a_reply.correlation_id == a_cmd_request.correlation_id)
+    correct_error = False
+    try:
+        a_reply = an_endpoint.do_cmd_request(a_cmd_request)
+    except dripline.core.ThrowReply as e:
+        correct_error = True
+    except Exception as e:
+        print("got a [{}]".format(type(e)))
+    assert(correct_error)
 
 def test_do_cmd_request_valid_specifier():
     class AnotherEndpoint(dripline.core.Endpoint):
