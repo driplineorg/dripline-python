@@ -31,20 +31,20 @@ class AlertConsumer(Service):
         print("in python's bind keys")
         to_return = Service.bind_keys(self);
         for a_key in self._alert_keys:
-            print(" binding alert key {}".format(a_key))
+            print(f" binding alert key {a_key}")
             to_return = to_return and self.bind_key("alerts", a_key)
         return to_return
 
     def on_alert_message(self, an_alert):
         print("in python's on alert")
         routing_data = self.parse_routing_key(an_alert.routing_key)
-        print("routing key data are:\n{}".format(routing_data))
+        print(f"routing key data are:\n{routing_data}")
         self.process_payload(an_alert.payload, routing_data, an_alert.timestamp)
 
     def parse_routing_key(self, a_routing_key):
         return_data = {}
-        print("routing key: '{}'".format(a_routing_key))
-        print("regex: '{}'".format(self._alert_key_parser_re))
+        print(f"routing key: '{a_routing_key}'")
+        print(f"regex: '{self._alert_key_parser_re}'")
         re_result = re.match(self._alert_key_parser_re, a_routing_key)
         if re_result:
             return_data.update(re_result.groupdict())
@@ -53,4 +53,4 @@ class AlertConsumer(Service):
         return return_data
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
-        print('got routing key data: {}\nwith payload: {}'.format(a_routing_key_data, a_payload))
+        print(f'got routing key data: {a_routing_key_data}\nwith payload: {a_payload}')

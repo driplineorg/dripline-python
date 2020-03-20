@@ -21,17 +21,17 @@ class Endpoint(_Endpoint):
         if (a_specifier):
             print("has specifier")
             try:
-                print("specifier is: {}".format(a_specifier))
+                print(f"specifier is: {a_specifier}")
                 an_attribute = getattr(self, a_specifier)
                 print(an_attribute)
-                print("attribute '{}' value is [{}]".format(a_specifier, an_attribute))
+                print(f"attribute '{a_specifier}' value is [{an_attribute}]")
                 the_node = scarab.ParamNode()
                 the_node["values"] = scarab.ParamArray()
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
             except AttributeError as this_error:
                 #TODO we should resolve the returncodes and update this value
-                return a_request_message.reply(201, "attribute error: {}".format(this_error))
+                return a_request_message.reply(201, "attribute error: {}".format())
         else:
             print('no specifier')
             the_value = self.on_get()
@@ -41,7 +41,7 @@ class Endpoint(_Endpoint):
         a_specifier =  a_request_message.specifier.to_string()
         new_value = a_request_message.payload["values"][0]()
         new_value = getattr(new_value, "as_"+new_value.type())()
-        print('new_value is [{}]'.format(new_value))
+        print(f'new_value is [{new_value}]')
         if ( a_specifier ):
             try:
                 setattr(self, a_specifier, new_value)
