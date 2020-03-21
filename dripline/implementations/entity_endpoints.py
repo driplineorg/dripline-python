@@ -66,7 +66,7 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
 
     def on_set(self, value):
         #TODO exceptions.DriplineMethodNotSupportedError
-        raise ThrowReply('device_error', "endpoint '{}' does not support set".format(self.anme))
+        raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support set".format(self.anme))
 
 
 __all__.append('SimpleSCPISetEntity')
@@ -81,7 +81,7 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
     def on_get(self):
         # exceptions.DriplineMethodNotSupportedError
-        raise ThrowReply('device_error', "endpoint '{}' does not support get".format(self.anme))
+        raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support get".format(self.anme))
 
     def on_set(self, value):
         to_send = ['{} {};*OPC?'.format(self.cmd_base,value)]
@@ -129,7 +129,7 @@ class FormatEntity(Entity):
     def on_get(self):
         if self._get_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('device_error', "endpoint '{}' does not support get".format(self.anme))
+            raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support get".format(self.anme))
         result = self.service.send_to_device([self._get_str])
         # logger.debug
         print('result is: {}'.format(result))
@@ -140,7 +140,7 @@ class FormatEntity(Entity):
                 # logger.error
                 print('matching returned none')
                 # exceptions.DriplineValueError
-                raise ThrowReply('device_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
+                raise ThrowReply('resource_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             # logger.debug
             print("matches are: {}".format(matches.groupdict()))
             result = matches.groupdict()['value_raw']
@@ -149,7 +149,7 @@ class FormatEntity(Entity):
     def on_set(self, value):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('device_error', "endpoint '{}' does not support set".format(self.anme))
+            raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support set".format(self.anme))
         if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:

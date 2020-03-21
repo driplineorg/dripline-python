@@ -49,36 +49,47 @@ namespace dripline_pybind
         mod.def( "get_return_codes_map", &dripline::get_return_codes_map );
 
         // now bind all of the existing dripline return codes so we can use them
+        //**********************************************************************
+        /* Success and Warnings */
         ADD_DRIPLINE_RET_CODE( success, Success )
 
         ADD_DRIPLINE_RET_CODE( warning_no_action_taken, WarningNoActionTaken )
+        ADD_DRIPLINE_RET_CODE( warning_deprecated_feature, WarningDeprecatedFeature )
+        ADD_DRIPLINE_RET_CODE( warning_dry_run, WarningDryRun )
+        ADD_DRIPLINE_RET_CODE( warning_offline, WarningOffline )
+        ADD_DRIPLINE_RET_CODE( warning_sub_service, WarningSubService )
 
+        /* 100s AMQP errors */
         ADD_DRIPLINE_RET_CODE( amqp_error, AmqpError )
         ADD_DRIPLINE_RET_CODE( amqp_error_broker_connection, AmqpErrorBrokerConnection )
         ADD_DRIPLINE_RET_CODE( amqp_error_routingkey_notfound, AmqpErrorRoutingkeyNotfound )
 
-        ADD_DRIPLINE_RET_CODE( device_error, DeviceError )
-        ADD_DRIPLINE_RET_CODE( device_error_connection, DeviceErrorConnection )
-        ADD_DRIPLINE_RET_CODE( device_error_no_resp, DeviceErrorNoResp )
+        /* 200s Resource errors */
+        ADD_DRIPLINE_RET_CODE( resource_error, ResourceError )
+        ADD_DRIPLINE_RET_CODE( resource_error_connection, ResourceErrorConnection )
+        ADD_DRIPLINE_RET_CODE( resource_error_no_response, ResourceErrorNoResponse )
+        ADD_DRIPLINE_RET_CODE( resource_error_sub_service, ResourceErrorSubService )
 
-        ADD_DRIPLINE_RET_CODE( message_error, MessageError )
-        ADD_DRIPLINE_RET_CODE( message_error_no_encoding, MessageErrorNoEncoding )
-        ADD_DRIPLINE_RET_CODE( message_error_decoding_fail, MessageErrorDecodingFail )
-        ADD_DRIPLINE_RET_CODE( message_error_bad_payload, MessageErrorBadPayload )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_value, MessageErrorInvalidValue )
-        ADD_DRIPLINE_RET_CODE( message_error_timeout, MessageErrorTimeout )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_method, MessageErrorInvalidMethod )
-        ADD_DRIPLINE_RET_CODE( message_error_access_denied, MessageErrorAccessDenied )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_key, MessageErrorInvalidKey )
-        ADD_DRIPLINE_RET_CODE( message_error_dripline_deprecated, MessageErrorDriplineDeprecated )
-        ADD_DRIPLINE_RET_CODE( message_error_invalid_specifier, MessageErrorInvalidSpecifier )
+        /* 300s Service errors */
+        ADD_DRIPLINE_RET_CODE( service_error, ServiceError )
+        ADD_DRIPLINE_RET_CODE( service_error_no_encoding, ServiceErrorNoEncoding )
+        ADD_DRIPLINE_RET_CODE( service_error_decoding_fail, ServiceErrorDecodingFail )
+        ADD_DRIPLINE_RET_CODE( service_error_bad_payload, ServiceErrorBadPayload )
+        ADD_DRIPLINE_RET_CODE( service_error_invalid_value, ServiceErrorInvalidValue )
+        ADD_DRIPLINE_RET_CODE( service_error_timeout, ServiceErrorTimeout )
+        ADD_DRIPLINE_RET_CODE( service_error_invalid_method, ServiceErrorInvalidMethod )
+        ADD_DRIPLINE_RET_CODE( service_error_access_denied, ServiceErrorAccessDenied )
+        ADD_DRIPLINE_RET_CODE( service_error_invalid_key, ServiceErrorInvalidKey ) //lockout key
+        ADD_DRIPLINE_RET_CODE( service_error_invalid_specifier, ServiceErrorInvalidSpecifier )
 
+        /* 400s Client errors */
         ADD_DRIPLINE_RET_CODE( client_error, ClientError )
         ADD_DRIPLINE_RET_CODE( client_error_invalid_request, ClientErrorInvalidRequest )
         ADD_DRIPLINE_RET_CODE( client_error_handling_reply, ClientErrorHandlingReply )
         ADD_DRIPLINE_RET_CODE( client_error_unable_to_send, ClientErrorUnableToSend )
         ADD_DRIPLINE_RET_CODE( client_error_timeout, ClientErrorTimeout )
 
+        /* 999 unhandled error */
         ADD_DRIPLINE_RET_CODE( unhandled_exception, UnhandledException )
 
         return all_items;
