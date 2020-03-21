@@ -182,7 +182,7 @@ class EthernetSCPIService(Service):
                 if data.startswith(command):
                     data = data[len(command):]
                 elif not blank_command:
-                    raise ThrowReply('device_error_connection', "Bad ethernet query return: {}".format(data))
+                    raise ThrowReply('resource_error', "Bad ethernet query return: {}".format(data))
             # logger.info
             print("sync: {} -> {}".format(repr(command),repr(data)))
             all_data.append(data)
@@ -204,13 +204,13 @@ class EthernetSCPIService(Service):
                     break
                 # Special exception for disconnect of prologix box to avoid infinite loop
                 if data == '':
-                    raise ThrowReply('device_error_no_response', "Empty socket.recv packet")
+                    raise ThrowReply('resource_error_no_response', "Empty socket.recv packet")
         except socket.timeout:
             # logger.warning
             print("socket.timeout condition met; received:\n{}".format(repr(data)))
             if blank_command == False:
                 # exceptions.DriplineHardwareResponselessError
-                raise ThrowReply('device_error_no_response', "Unexpected socket.timeout")
+                raise ThrowReply('resource_error_no_response', "Unexpected socket.timeout")
             terminator = ''
         # logger.debug
         print(repr(data))
