@@ -31,7 +31,7 @@ class Endpoint(_Endpoint):
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
             except AttributeError as this_error:
-                raise ThrowReply('message_error_invalid_specifier', "endpoint {} has no attribute {}, unable to get".format(self.name, a_specifier))
+                raise ThrowReply('service_error_invalid_specifier', "endpoint {} has no attribute {}, unable to get".format(self.name, a_specifier))
         else:
             print('no specifier')
             the_value = self.on_get()
@@ -44,7 +44,7 @@ class Endpoint(_Endpoint):
         print('new_value is [{}]'.format(new_value))
         if ( a_specifier ):
             if not hasattr(self, a_specifier):
-                raise ThrowReply('message_error_invalid_specifier', "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
+                raise ThrowReply('service_error_invalid_specifier', "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
             setattr(self, a_specifier, new_value)
             return a_request_message.reply()
         else:
@@ -58,7 +58,7 @@ class Endpoint(_Endpoint):
         try:
             method_ref = getattr(self, method_name)
         except AttributeError as e:
-            raise ThrowReply('message_error', "error getting command's corresponding method: {}".format(str(e)))
+            raise ThrowReply('service_error_invalid_method', "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
         result = method_ref(*the_args, **the_kwargs)
@@ -70,7 +70,7 @@ class Endpoint(_Endpoint):
         Implementations may override to enable OP_GET operations.
         The implementation must return a value which is able to be passed to the ParamValue constructor.
         '''
-        raise ThrowReply('message_error_invalid_method', "{} does not implement on_get".format(self.__class__))
+        raise ThrowReply('service_error_invalid_method', "{} does not implement on_get".format(self.__class__))
 
     def on_set(self, _value):
         '''
@@ -78,4 +78,4 @@ class Endpoint(_Endpoint):
         Implementations may override to enable OP_SET operations.
         Any returned object must already be a scarab::Param object
         '''
-        raise ThrowReply('message_error_invalid_method', "{} does not implement on_set".format(self.__class__))
+        raise ThrowReply('service_error_invalid_method', "{} does not implement on_set".format(self.__class__))

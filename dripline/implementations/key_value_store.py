@@ -23,4 +23,4 @@ class KeyValueStore(Entity):
 
     def throw_something(self):
         print("in throw_something")
-        raise ThrowReply('device_error', "in throw_something method, rasing device_error")
+        raise ThrowReply('resource_error', "in throw_something method, rasing resource_error")
