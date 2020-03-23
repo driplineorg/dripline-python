@@ -1,0 +1,14 @@
+ARG img_user=driplineorg
+ARG img_repo=dripline-python
+ARG img_tag=master
+
+from ${img_user}/${img_repo}:${img_tag}
+
+COPY . /root/build
+
+WORKDIR /root/build
+RUN pip install \
+    sphinx \
+    setuptools_scm \
+    alabaster
+RUN python3 setup.py build_sphinx

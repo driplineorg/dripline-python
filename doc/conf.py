@@ -22,15 +22,15 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
-import better_apidoc
-better_apidoc.main([
-    'better_apidoc',
-    '-t', '_templates', # path to jinja templates
-    '--force', # overwrite existing files
-    '--separate', # split modules into their own files
-    '-o', 'better_apidoc_out', #output location
-    '../dripline', #path to modules to doc
-    ])
+#import better_apidoc
+#better_apidoc.main([
+#    'better_apidoc',
+#    '-t', '_templates', # path to jinja templates
+#    '--force', # overwrite existing files
+#    '--separate', # split modules into their own files
+#    '-o', 'better_apidoc_out', #output location
+#    '../dripline', #path to modules to doc
+#    ])
 
 # -- General configuration ------------------------------------------------
 
@@ -83,7 +83,8 @@ try:
     release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
     print("dripline Gogol members:\n{}".format(dir(dripline.core.Gogol)))
 except Exception as e:
-    print("error message is:\n{}".format(e.message))
+    print("import exception")
+    #print("error message is:\n{}".format(e.message))
     version = "unknown"
     release = "unknown"
 print('version/release are: {}/{}'.format(version,release))
