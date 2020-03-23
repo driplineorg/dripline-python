@@ -35,7 +35,7 @@ jobs:
     - stage: build docs
       #if: branch IN (master, develop) OR branch =~ /^v\d+\.\d+\.\d+(-S*)?$/
       script:
-        - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=develop | tr / _) .
+        - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=develop .
         #- docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
         - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
         - git checkout gh-pages
