@@ -29,6 +29,21 @@ branches:
 
 jobs:
   include:
+    ## stage for building and publishing docs to github pages
+    ##TODO: This should move to after the build/publish of images
+    ##TODO: this should use the built/published image
+    - stage: build docs
+      #if: branch IN (master, develop) OR branch =~ /^v\d+\.\d+\.\d+(-S*)?$/
+      script:
+        - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=develop | tr / _) .
+        #- docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
+        - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
+        - git checkout gh-pages
+        - git clean -d -f -x
+        - ls
+        - rsync -av --delete /tmp/build.html ./$(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]]; then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG"; else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi)
+        - tree -L 3
+
     ## amd64
     - stage: build images
       name: amd64
@@ -49,13 +64,5 @@ jobs:
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - .travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
-    ## Build stage for building and publishing docs to github pages
-    - stage: build docs
-      script:
-        - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
-        - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
-        - git checkout gh-pages
-        - git clean -d -f -x
-        - ls
-        - rsync -av --delete /tmp/build.html ./$(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]]; then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG"; else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi)
-        - tree -L 3
+
+
