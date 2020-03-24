@@ -40,7 +40,6 @@ jobs:
         - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=develop .
         #- docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
         - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
-        - git pull
         - git checkout gh-pages
         - git clean -d -f -x
         - ls
