@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Introduction and Background Reading &#8212; dripline unknown documentation</title>
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Welcome to dripline-python’s documentation!" href="index.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>dripline unknown documentation</span></a></h1>
+        <h2 class="heading"><span>Introduction and Background Reading</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to dripline-python’s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="getting_started.html">Getting Started</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <div class="section" id="introduction-and-background-reading">
+<h1>Introduction and Background Reading<a class="headerlink" href="#introduction-and-background-reading" title="Permalink to this headline">¶</a></h1>
+<p>Before delving into the details of dripline, there is some important context to discuss.
+These are generally beyond the scope of even this page, but I’ll try and point you in the right direction before assuming you know what’s going on.</p>
+<div class="section" id="advanced-message-queuing-protocol-amqp">
+<h2>Advanced Message Queuing Protocol (AMQP)<a class="headerlink" href="#advanced-message-queuing-protocol-amqp" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.amqp.org">AMQP</a> is a specification for a centralized message routing system, and it is important to note that it refers to the <em>specification</em> and not a particular <em>implementation</em>.
+All current use and development of dripline is currently being done with the <a class="reference external" href="http://www.rabbitmq.com">RabbitMQ</a> implementation of AMQP.
+We use a vanilla installation of version 2.8.4 of rabbit from the Debian Linux 7.7 (note that we plan to upgrade to Debian 8 “jessie” eminently).</p>
+<p>By using a centralized message routing service, it becomes easy for services to be run on as many different systems as we like.
+We can also add and remove services from the system without having to disrupt others, etc.</p>
+</div>
+<div class="section" id="message-wire-protocol">
+<span id="wire-protocol"></span><h2>Message Wire Protocol<a class="headerlink" href="#message-wire-protocol" title="Permalink to this headline">¶</a></h2>
+<p>If AMQP defines a protocol for message routing, the Project 8 wire protocol defines a protocol for the content of those messages.
+By having a standard that all messages follow, it is possible for any appropriately implemented application, regardless of host system, programming language, etc., to interact with any other successfully.
+That is, as long as your C++ application on Windows and my python application on Linux are both speaking the same version of the Project 8 Wire Protocol over the same AMQP broker, they will get along just fine.</p>
+<p>The official definition of the dripline protocol can be found on the <a class="reference external" href="https://github.com/project8/dripline">the dripline repository</a> available also <a class="reference external" href="https://dripline.readthedocs.io/en/latest/">rendered</a>.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to dripline-python’s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="getting_started.html">Getting Started</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014, The Project 8 Collaboration.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

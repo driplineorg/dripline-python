@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Getting Started &#8212; dripline unknown documentation</title>
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contribute" href="contribute.html" />
+    <link rel="prev" title="Introduction and Background Reading" href="introduction.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>dripline unknown documentation</span></a></h1>
+        <h2 class="heading"><span>Getting Started</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="introduction.html">Introduction and Background Reading</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="contribute.html">Contribute</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="system-requirements">
+<h2>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<p>The development of dripline is being done primarily on OS X (with packages installed via homebrew and python packages through pip) and debian linux (with any system-packages from apt and python pacakges through pip).</p>
+<p>We have made no attempt to determine the exact minimal system requirements, but develop primarily in python 2.7 with “current” versions of dependencies from PyPI.
+No effort is made to maintain compatibility with python &lt; 2.7; the code should be compatible with python 3.x and we hope to transition to primarily (and possibly exclusively) python 3 usage in the future.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>There are two recommended approaches to installation and use of dripline-python.
+Using docker containers can take more setup but eliminates the need for any installation steps and is useful for integrated development.
+The docker approach is preferred for Project 8 collaborators, especially when working within the context of the rest of our controls software ecosystem.
+Virtual environments allow for mostly local installation and development; they are common in the python community.</p>
+<div class="section" id="docker-containers">
+<h3>Docker containers<a class="headerlink" href="#docker-containers" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to get started with docker is simply to use the container image from the <a class="reference external" href="https://hub.docker.com/r/project8/dripline-python/">dockerhub repository</a>.
+You may also use the <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> located in the dripline-python GitHub repository’s root directory to build the image yourself (the full repository is the required build context).</p>
+</div>
+<div class="section" id="virtual-environments">
+<h3>Virtual Environments<a class="headerlink" href="#virtual-environments" title="Permalink to this headline">¶</a></h3>
+<p>The recommended usage is with a <a class="reference external" href="http://virtualenv.readthedocs.org/en/latest">virtual environment</a> and the <a class="reference external" href="http://ipython.org">ipython</a> interpreter.
+Assuming you have virtualenv installed (On debian, you can install it from your package manager; on Mac you should install pip from homebrew, then use pip to instal virtualenv) it is relatively simple to get everything going.
+For the complete experience, you would run the following three commands (the last line installs all recommended extras, you can include any combination or none of them).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ virtualenv path/to/virt_environments/dripline <span class="o">[</span>--system-site-packages<span class="o">]</span>
+$ <span class="nb">source</span> path/to/virt_environments/dripline/bin/activate
+$ pip install -e . <span class="o">[</span>doc,database,other<span class="o">]</span>
+</pre></div>
+</div>
+<p>This will install the local dripline source into your same virtual environment. If you are going to develop on the source replace the last line with the following two:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install pika msgpack-python PyYAML <span class="o">[</span>whichever optionals you want<span class="o">]</span>
+$ python setup.py develop
+</pre></div>
+</div>
+<p>That will install the dependencies, and create symbolic links for the dripline python files.
+This way as you make changes to the source you don’t have to rerun the <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> step.
+More details can be found in the documentation for python’s <a class="reference external" href="http://pythonhosted.org//setuptools/">setup tools</a>.</p>
+</div>
+</div>
+<div class="section" id="python-libraries">
+<h2>Python Libraries<a class="headerlink" href="#python-libraries" title="Permalink to this headline">¶</a></h2>
+<p>There are quite a few dependencies for dripline, some required and many optional (though needed for certain features).
+Unless otherwise noted, you are encouraged to install any/all of these from PyPI using pip.</p>
+<div class="section" id="required">
+<h3>Required<a class="headerlink" href="#required" title="Permalink to this headline">¶</a></h3>
+<p>The following dependencies are required for core functionality and thus non-optional.</p>
+<p><a class="reference external" href="http://pika.readthedocs.org">Pika</a> is an amqp library.</p>
+<p><a class="reference external" href="http://pyyaml.org">PyYAML</a> is used to read yaml formatted configuration files.
+It could in principle (and perhaps should) be moved to “optional” status (since it is possible to run several aspects without a config file, and json based config files would be easy to use.
+Nevertheless, PyYAML is pervasive and we’ve had no motivation to refactor to make it cleanly optional.</p>
+<p><a class="reference external" href="https://newville.github.io/asteval/">asteval</a> is used to process python statements presented as strings (sometimes provided as strings in start-up configurations or as part of calibration definitions).</p>
+<div class="section" id="building-docs-doc">
+<h4>Building Docs [doc]<a class="headerlink" href="#building-docs-doc" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="http://sphinx-doc.org/">Sphinx</a> is required to compile this documentation.</p>
+<p><a class="reference external" href="https://github.com/snide/sphinx_rtd_theme">Sphinx-rdc-theme</a> is used by Sphinx for a nicer look.</p>
+</div>
+<div class="section" id="color-output">
+<h4>Color Output<a class="headerlink" href="#color-output" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="http://pypi.python.org/pypi/colorlog">Colorlog</a> is completely aesthetic.
+The logging module is used throughout dripline and this allows for colorized format of log messages.</p>
+</div>
+<div class="section" id="helpful-python-packages">
+<h4>Helpful Python Packages<a class="headerlink" href="#helpful-python-packages" title="Permalink to this headline">¶</a></h4>
+<p>The following packages are not actually dependencies for any aspect of dripline.
+They are, however, highly recommended (especially for anyone relatively new to python).</p>
+<p><a class="reference external" href="http://ipython.org">ipython</a> and <a class="reference external" href="http://www.pypi.python.org/pypi/ipdb">ipdb</a> are both highly recomended for all non-production workflows.
+The expanded tab completion, command and output history, and doc access make it a powerful python interpretor for developing or manually interacting with dripline components.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="introduction.html">Introduction and Background Reading</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="contribute.html">Contribute</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014, The Project 8 Collaboration.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

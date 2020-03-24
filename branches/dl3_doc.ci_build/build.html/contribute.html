@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Contribute &#8212; dripline unknown documentation</title>
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>dripline unknown documentation</span></a></h1>
+        <h2 class="heading"><span>Contribute</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="getting_started.html">Getting Started</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="glossary.html">Glossary</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <div class="section" id="contribute">
+<h1>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="branching">
+<h2>Branching<a class="headerlink" href="#branching" title="Permalink to this headline">¶</a></h2>
+<p>Branches are cheap, lets do more of those.
+For more details, <a class="reference external" href="nvie.com/posts/a-successful-git-branching-model">this branching model</a> has served us very well to date.
+In particular, please note that master is for tagged/release versions while develop is the latest working version.
+We name branches off of develop as <code class="docutils literal notranslate"><span class="pre">feature/&lt;description&gt;</span></code> and bug fixes off of master as <code class="docutils literal notranslate"><span class="pre">hotfix/&lt;description&gt;</span></code> so that they are sorted and easier to navigate.
+You’re welcome and encouraged to push your feature branch to github, we’re not going to judge you for things that are incomplete and appreciate not loosing work if you move on or lose your laptop (at a minimum, we suggest pushing at the end of your work day).</p>
+</div>
+<div class="section" id="merging">
+<h2>Merging<a class="headerlink" href="#merging" title="Permalink to this headline">¶</a></h2>
+<p>Merging follows the instruction from the branching section above in most cases, but there are a few additional notes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>With the default travis-ci config, if the name of your branch ends in <code class="docutils literal notranslate"><span class="pre">\build</span></code>, then when you push it will trigger travis-ci tasks</p></li>
+<li><p>Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the <code class="docutils literal notranslate"><span class="pre">develop</span></code> or <code class="docutils literal notranslate"><span class="pre">master</span></code> branches.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="coding-style">
+<h2>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<p>The internet is full of arguments over coding style which we’re not really interested in getting into; in this repo we’re going just go ahead and start with the following assumptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Regardless of what that style is, consistent styling makes code easier to read</p></li>
+<li><p>If we follow what is used in the python community then that is more intuitive to new people</p></li>
+<li><p>We’re not robots and common sense can win out</p></li>
+<li><p>doc strings can be special, depending on how they are expected to be rendered (for example in the API docs section of this page)</p></li>
+</ul>
+</div></blockquote>
+<p>Based on that we prefer the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Generally we try to follow <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP-8</a></p></li>
+<li><p>The 80 column limit makes things harder to read more often than easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed</p></li>
+<li><p>When creating new classes which inherit from local classes, decorate them with <code class="docutils literal notranslate"><span class="pre">&#64;fancy_doc</span></code> so that the class’s docstring gets updated</p>
+<ul>
+<li><p>The description of the class belongs in the class’s doc string</p></li>
+<li><p>The doc string for the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method should just include description of the kwargs for that class</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Since we reuse some cpp code here using Pybind, we have provided some unit tests to make sure such classes and methods work properly. These tests are contained in the <code class="docutils literal notranslate"><span class="pre">/tests</span></code> folder and can be run using PyTest. An overview can be found <a class="reference external" href="http://doc.pytest.org/en/5.3.5/goodpractices.html/">there</a>.</p>
+<dl class="simple">
+<dt>How to run the tests:</dt><dd><ul class="simple">
+<li><p>After installing the package, either navigate to the folder and run all tests within it using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span></code>, or specify the path to the test to be run using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/to/be/run/test_something.py</span></code>.</p></li>
+<li><p>To disable the caching, use <code class="docutils literal notranslate"><span class="pre">PYTHONDONTWRITEBYTECODE=1</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">-p</span> <span class="pre">no:cacheprovider</span></code>.</p></li>
+</ul>
+</dd>
+<dt>How to add a new test:</dt><dd><ul class="simple">
+<li><p>Name your file with <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix, followed by the name of the class to be tested.</p></li>
+<li><p>Within the file, write <code class="docutils literal notranslate"><span class="pre">test</span></code> prefixed methods to be run. Ideally, one such method is supposed to test only one case. To keep unit tests simple and independent of each other, test classes are not suggested.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="getting_started.html">Getting Started</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="glossary.html">Glossary</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014, The Project 8 Collaboration.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
