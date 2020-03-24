@@ -30,29 +30,6 @@ before_install:
 
 jobs:
   include:
-  ## Builds documentation
-  - stage: build docs
-    git:
-      depth: false
-    script:
-    - echo $(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]];
-      then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG";
-      else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi) | tee /tmp/output_location
-    - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=develop .
-    - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
-    - git checkout gh-pages
-    - rm -rf dripline-cpp
-    - git clean -d -f -x
-    - ls
-    - rsync -av --delete /tmp/build.html/ ./$(cat /tmp/output_location)
-    - tree -L 3
-    - git add $(cat /tmp/output_location)
-    - git status
-    - git commit -m "build docs for ${TRAVIS_BRANCH}"
-    - git remote -v
-    - git remote set-url origin "git@github.com:${TRAVIS_REPO_SLUG}"
-    - git remote -v
-    - git push
   ## build arch-specific images
   - stage: build images
     name: amd64
@@ -70,9 +47,35 @@ jobs:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - ".travis/bootstrap_image.sh -u arm32v7 -r python -t 3.5 -a arm7 -i driplineorg/dripline-python:`echo
       ${TRAVIS_BRANCH} | tr / _`"
+
   ## build general-use manifest
   - stage: assemble manifest
     script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - ".travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo
       ${TRAVIS_BRANCH} | tr / _`"
+
+  ## Builds documentation
+  - stage: build docs
+    git:
+      depth: false
+    script:
+    - echo $(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]];
+      then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG";
+      else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi) | tee /tmp/output_location
+    - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
+    - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
+    - git checkout gh-pages
+    - rm -rf dripline-cpp
+    - git clean -d -f -x
+    - ls
+    - rsync -av --delete /tmp/build.html/ ./$(cat /tmp/output_location)
+    - tree -L 3
+    - git add $(cat /tmp/output_location)
+    - git status
+    - git commit -m "build docs for ${TRAVIS_BRANCH}"
+    - git remote -v
+    - git remote set-url origin "git@github.com:${TRAVIS_REPO_SLUG}"
+    - git remote -v
+    - git push
+
