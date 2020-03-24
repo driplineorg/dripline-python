@@ -44,7 +44,7 @@ jobs:
     - rm -rf dripline-cpp
     - git clean -d -f -x
     - ls
-    - rsync -av --delete /tmp/build.html ./$(cat /tmp/output_location)
+    - rsync -av --delete /tmp/build.html/ ./$(cat /tmp/output_location)
     - tree -L 3
     - git add $(cat /tmp/output_location)
     - git status
