@@ -128,7 +128,7 @@ class Entity(Endpoint):
         elif isinstance(new_interval, datetime.timedelta):
             self._log_interval = new_interval
         else:
-            raise ValueError("unable to interpret a new_interval of type <{}>".format(type(new_interval)))
+            raise ValueError(f"unable to interpret a new_interval of type <{type(new_interval)}>")
 
     def scheduled_log(self):
         print("in a scheduled log event")
@@ -136,19 +136,19 @@ class Entity(Endpoint):
         self.log_a_value(result)
 
     def log_a_value(self, the_value):
-        print("value to log is:\n{}".format(the_value))
-        the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key='{}.{}'.format(self.log_routing_key_prefix, self.name))
+        print(f"value to log is:\n{the_value}")
+        the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key=f'{self.log_routing_key_prefix}.{self.name}')
         alert_sent = self.service.send(the_alert)
 
     def start_logging(self):
         if self._log_action_id is not None:
             self.service.unschedule(self._log_action_id)
         if self.log_interval:
-            print('should start logging every {}'.format(self.log_interval))
+            print(f'should start logging every {self.log_interval}')
             self._log_action_id = self.service.schedule(self.scheduled_log, self.log_interval, datetime.datetime.now() + self.service.execution_buffer*3)
         else:
             raise ValueError('unable to start logging when log_interval evaluates false')
-        print('log action id is {}'.format(self._log_action_id))
+        print(f'log action id is {self._log_action_id}')
 
     def stop_logging(self):
         #TODO: should it be an error to stop_logging() when already not logging?

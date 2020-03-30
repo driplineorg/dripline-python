@@ -47,11 +47,11 @@ class SimpleSCPIEntity(Entity):
         to_send = [self.cmd_base + '?']
         result = self.service.send_to_device(to_send)
         # logger.debug
-        print('raw result is: {}'.format(result))
+        print(f'raw result is: {result}')
         return result
 
     def on_set(self, value):
-        to_send = ['{0} {1};{0}?'.format(self.cmd_base,value)]
+        to_send = [f'{self.cmd_base} {value};{self.cmd_base}?']
         return self.service.send_to_device(to_send)
 
 
@@ -65,8 +65,7 @@ class SimpleSCPIGetEntity(SimpleSCPIEntity):
         SimpleSCPIEntity.__init__(self, **kwargs)
 
     def on_set(self, value):
-        #TODO exceptions.DriplineMethodNotSupportedError
-        raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support set".format(self.anme))
+        raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support set")
 
 
 __all__.append('SimpleSCPISetEntity')
@@ -81,10 +80,10 @@ class SimpleSCPISetEntity(SimpleSCPIEntity):
 
     def on_get(self):
         # exceptions.DriplineMethodNotSupportedError
-        raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support get".format(self.anme))
+        raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support get")
 
     def on_set(self, value):
-        to_send = ['{} {};*OPC?'.format(self.cmd_base,value)]
+        to_send = [f'{self.cmd_base} {value};*OPC?']
         return self.service.send_to_device(to_send)
 
 
@@ -120,19 +119,19 @@ class FormatEntity(Entity):
         self._extract_raw_regex = extract_raw_regex
         self.evaluator = asteval.Interpreter()
         if set_value_map is not None and not isinstance(set_value_map, (dict,str)):
-            raise ValueError("Invalid set_value_map config for {}; type is {} not dict".format(self.name, type(set_value_map)))
+            raise ValueError(f"Invalid set_value_map config for {self.name}; type is {type(set_value_map)} not dict")
         self._set_value_lowercase = set_value_lowercase
         if isinstance(set_value_map, dict) and not set_value_lowercase:
-            raise ValueError("Invalid config option for {} with set_value_map and set_value_lowercase=False".format(self.name))
+            raise ValueError(f"Invalid config option for {self.name} with set_value_map and set_value_lowercase=False")
 
     @calibrate()
     def on_get(self):
         if self._get_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support get".format(self.anme))
+            raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support get")
         result = self.service.send_to_device([self._get_str])
         # logger.debug
-        print('result is: {}'.format(result))
+        print(f'result is: {result}')
         if self._extract_raw_regex is not None:
             first_result = result
             matches = re.search(self._extract_raw_regex, first_result)
@@ -142,14 +141,14 @@ class FormatEntity(Entity):
                 # exceptions.DriplineValueError
                 raise ThrowReply('resource_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             # logger.debug
-            print("matches are: {}".format(matches.groupdict()))
+            print(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
         return result
 
     def on_set(self, value):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('service_error_invalid_method', "endpoint '{}' does not support set".format(self.anme))
+            raise ThrowReply('device_error', f"endpoint '{self.name}' does not support set")
         if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:
@@ -159,5 +158,5 @@ class FormatEntity(Entity):
         elif isinstance(self._set_value_map, str):
             mapped_value = self.evaluator(self._set_value_map.format(value))
         #logger.debug
-        print('value is {}; mapped value is: {}'.format(value, mapped_value))
+        print(f'value is {value}; mapped value is: {mapped_value}')
         return self.service.send_to_device([self._set_str.format(mapped_value)])
