@@ -38,6 +38,7 @@ The internet is full of arguments over coding style which we're not really inter
 Based on that we prefer/stress the following:
 
   - Generally we try to follow `PEP-8 <https://www.python.org/dev/peps/pep-0008/>`_
+  - We're using sphinx with ``sphinx-apidoc`` and have the `sphinx.ext.napolean extension<https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html>`_. Google style docstrings are preferred, but proper parsing is most important.
   - The 80 column limit makes things harder to read as often as easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed
   - For multi-line python data structures which support it, place a comma after the final element and the closing symbol on its own line, that way any element may be easily commented out.
   - Use unix-style line endings and soft tabs in all files (other than the documentation Makefile)
