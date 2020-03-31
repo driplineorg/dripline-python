@@ -12,20 +12,14 @@ devices, resources, and behaviors; and ``extensions``, for enabling plugins via 
 There is also a commandline tool, ``dl-serve``, which enables ``YAML``-based configurations to define
 the components in a running service.
 
+Contents:
 .. toctree::
-   :caption: Contents
    :maxdepth: 2
 
    introduction
    getting_started
    contribute
 
-.. todolist::
-
-.. toctree::
-   :hidden:
-
-   glossary
 
 Indices and tables
 ==================
