@@ -6,7 +6,7 @@ Getting Started
 System Requirements
 *******************
 The development of dripline is being done primarily on OS X (with packages installed via homebrew and python packages through pip) and debian linux (with any system-packages from apt and python pacakges through pip).
-Much work is also done in :ref:`docker-containers` described below.
+Much work is also done in :ref:`docker_containers` described below.
 
 We have not attempted to fully track compatible versions of all dependencies, or minimal versions.
 We do, however, know the following:
@@ -23,6 +23,7 @@ Dripline-python is developed specifically for container-based workflows, includi
 In principle, there is nothing to prevent installing and running directly on your host system, but you will need to be careful about the potential for conflicting dependency versions (that should probably be done in a virtualenvironment, but that's up to you).
 If you're new to containers, consider starting with the `getting started docs from Docker Inc. <https://www.docker.com/get-started>`_; most contributors develop using the OS-native "desktop application" available there.
 
+.. _docker_containers:
 
 Docker containers
 -----------------
