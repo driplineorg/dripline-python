@@ -1,6 +1,6 @@
 ARG img_user=amd64
 ARG img_repo=python
-ARG img_tag=3.5
+ARG img_tag=3.7
 
 from ${img_user}/${img_repo}:${img_tag}
 

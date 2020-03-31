@@ -9,12 +9,30 @@ import yaml
 import dripline
 import scarab
 
+import logging
+logger = logging.getLogger('dripline')
+logger.setLevel(logging.DEBUG)
+
 class Serve:
     def __init__(self):
         self.return_code = 0
+        self.handler = logging.StreamHandler()
+        self.handler.setLevel(logging.WARNING)
+        logger.addHandler(self.handler)
+        time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        base_format = '%(asctime)s{}[%(levelname)-8s] %(name)s(%(lineno)d) -> {}%(message)s'
+        self._logging_format = None
+        try:
+            import colorlog
+            modified_format = base_format.format('%(log_color)s', '%(purple)s')
+            self._logging_format = colorlog.ColoredFormatter(modified_format, datefmt=time_format[:-4])
+        except ImportError:
+            modified_format = base_format.format(' ', '')
+            self._logging_format = logging.Formatter(modified_format, time_format[:-4])
+        self.handler.setFormatter(self._logging_format)
 
     def create_object(self, a_config):
-        print("creating object from:\n{}\n...".format(a_config))
+        logger.debug("creating object from:\n{}\n...".format(a_config))
         module_name = a_config.pop('module')
         module_path = a_config.pop('module_path', False)
         extra_namespace = object()
@@ -22,7 +40,7 @@ class Serve:
             try:
                 extra_namespace = imp.load_source('extra_namespace', module_path)
             except IOError as e:
-                print("unable to load source from: {}".format(module_path))
+                logger.error("unable to load source from: {}".format(module_path))
                 raise e
         module = None
         #first priority, if it is in the module_path provided (if any)
@@ -54,17 +72,22 @@ class Serve:
         try:
             self._run(the_app)
         except:
-            print("got an error... need to implement handling")
-            print("traceback was:\n{}".format(traceback.format_exc()))
+            logger.error("got an error...")
+            logger.error("traceback was:\n{}".format(traceback.format_exc()))
             self.return_code = 100
 
     def _run(self, the_app):
-        this_config = the_app.master_config
-        print('python got a master config:\n{}'.format(this_config))
+        this_config = the_app.master_config.to_python()
+
+        verbosity = the_app.global_verbosity
+        #print(f"verbosity is {verbosity}")
+        self.handler.setLevel(verbosity)
+
+        logger.info('python got a master config:\n{}'.format(this_config))
 
         sig_handler = scarab.SignalHandler()
 
-        run_config = this_config.to_python().get('runtime-config')
+        run_config = this_config.get('runtime-config')
         the_endpoints = run_config.pop("endpoints", [])
 
         service_config = run_config.copy()
@@ -73,7 +96,7 @@ class Serve:
         the_service = self.create_object( run_config )
         the_service.enable_scheduling = True
         sig_handler.add_cancelable(the_service)
-        print('service built')
+        logger.info('service built')
 
         all_endpoints = []
         for an_endpoint_conf in the_endpoints:
@@ -81,12 +104,12 @@ class Serve:
             the_service.add_child( an_endpoint )
             all_endpoints.append(an_endpoint)
             if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
-                print("queue up start logging for '{}'".format(an_endpoint.name))
+                logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
                 an_endpoint.start_logging()
 
-        print("about to start the service")
+        logger.info("about to start the service")
         the_service.start()
-        print("services started, now to listen")
+        logger.info("services started, now to listen")
         the_service.listen()
         the_service.stop()
 

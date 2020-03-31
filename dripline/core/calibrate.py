@@ -40,7 +40,7 @@ def calibrate(cal_functions=None):
                     eval_str = self._calibration.format(val_dict['value_raw'].strip())
                 else:
                     eval_str = self._calibration.format(val_dict['value_raw'])
-                logger.debug("formatted cal is:\n{}".format(eval_str))
+                logger.debug(f"formatted cal is:\n{eval_str}")
                 try:
                     cal = evaluator(eval_str)
                 except OverflowError:
@@ -55,7 +55,7 @@ def calibrate(cal_functions=None):
                 if val_dict['value_raw'] in self._calibration:
                     val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
                 else:
-                    raise exceptions.DriplineValueError('raw value <{}> not in cal dict'.format(repr(val_dict['value_raw'])), result=val_dict)
+                    raise exceptions.DriplineValueError(f"raw value <{repr(val_dict['value_raw'])}> not in cal dict", result=val_dict)
             else:
                 logger.warning('the _calibration property is of unknown type')
             return val_dict

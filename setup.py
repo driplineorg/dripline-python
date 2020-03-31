@@ -77,6 +77,7 @@ requirements = [
     #these two for postgreSQL, move to plugin?
     'sqlalchemy',
     'psycopg2',
+    'colorlog', #we could make this optional if we wnat to minimize dependencies
 ]
 
 packages = ["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")]

@@ -4,12 +4,10 @@ import threading
 
 import scarab
 
-from dripline.core import Service
-# Dripline Exceptions currently unavailable
+from dripline.core import Service, ThrowReply
 
-# logging currently unavailable
-# import logging
-# logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger(__name__)
 
 __all__ = []
 
@@ -45,16 +43,15 @@ class EthernetSCPIService(Service):
         Service.__init__(self, **kwargs)
 
         if isinstance(socket_info, str):
-            # logger.debug
-            print("Formatting socket_info: {}".format(socket_info))
+            logger.debug(f"Formatting socket_info: {socket_info}")
             re_str = "\([\"'](\S+)[\"'], ?(\d+)\)"
             (ip,port) = re.findall(re_str,socket_info)[0]
             socket_info = (ip,int(port))
         if response_terminator is None or response_terminator == '':
-            raise ValueError("Invalid response terminator: <{}>! Expect string".format(repr(response_terminator)))
+            raise ThrowReply('service_error_invalid_value', f"Invalid response terminator: <{repr(response_terminator)}>! Expect string")
         if not isinstance(cmd_at_reconnect, list) or len(cmd_at_reconnect)==0:
             if cmd_at_reconnect is not None:
-                raise ValueError("Invalid cmd_at_reconnect: <{}>! Expect non-zero length list".format(repr(cmd_at_reconnect)))
+                raise ThrowReply('service_error_invalid_value', f"Invalid cmd_at_reconnect: <{repr(cmd_at_reconnect)}>! Expect non-zero length list")
 
         self.alock = threading.Lock()
         self.socket = socket.socket()
@@ -78,12 +75,9 @@ class EthernetSCPIService(Service):
         try:
             self.socket = socket.create_connection(self.socket_info, self.socket_timeout)
         except (socket.error, socket.timeout) as err:
-            # logger.warning
-            print("connection {} refused: {}".format(self.socket_info, err))
-            # exception.DriplineHardwareConnectionError
-            raise Exception("Unable to establish ethernet socket {}".format(self.socket_info))
-        # logger.info
-        print("Ethernet socket {} established".format(self.socket_info))
+            logger.warning(f"connection {self.socket_info} refused: {err}")
+            raise ThrowReply('resource_error_connection', f"Unable to establish ethernet socket {self.socket_info}")
+        logger.info(f"Ethernet socket {self.socket_info} established")
 
         # Lantronix xDirect adapters have no query options
         if self.cmd_at_reconnect is None:
@@ -93,18 +87,16 @@ class EthernetSCPIService(Service):
         #   connection. This must be cleared before communicating with a blank
         #   listen or all future queries will be offset.
         while commands[0] is None:
-            # logger.debug
-            print("Emptying reconnect buffer")
+            logger.debug("Emptying reconnect buffer")
             commands.pop(0)
             self._listen(blank_command=True)
         response = self._send_commands(commands)
         # Final cmd_at_reconnect should return '1' to test connection.
         if response[-1] != self.reconnect_test:
             self.socket.close()
-            # logger.warning
-            print("Failed connection test.  Response was {}".format(response))
+            logger.warning(f"Failed connection test.  Response was {response}")
             # exceptions.DriplineHardwareConnectionError
-            raise Exception("Failed connection test.")
+            raise ThrowReply('resource_error_connection', "Failed connection test.")
 
 
     def send_to_device(self, commands, **kwargs):
@@ -122,38 +114,27 @@ class EthernetSCPIService(Service):
         try:
             data = self._send_commands(commands)
         except socket.error as err:
-            # logger.warning
-            print("socket.error <{}> received, attempting reconnect".format(err))
+            logger.warning(f"socket.error <{err}> received, attempting reconnect")
             self._reconnect()
             data = self._send_commands(commands)
-            # logger.critical
-            print("Ethernet connection reestablished")
+            logger.critical("Ethernet connection reestablished")
         # exceptions.DriplineHardwareResponselessError
         except Exception as err:
-            # logger.critical
-            print(str(err))
+            logger.critical(str(err))
             try:
                 self._reconnect()
                 data = self._send_commands(commands)
-                # logger.critical
-                print("Query successful after ethernet connection recovered")
-            # exceptions.DriplineHardwareConnectionError
+                logger.critical("Query successful after ethernet connection recovered")
             except socket.error: # simply trying to make it possible to catch the error below
-                # logger.critical
-                print("Ethernet reconnect failed, dead socket")
-                # exceptions.DriplineHardwareConnectionError
-                raise socket.error("Broken ethernet socket")
-            # exceptions.DriplineHardwareResponselessError
-            except Exception as err:
-                # logger.critical
-                print("Query failed after successful ethernet socket reconnect")
-                # exceptions.DriplineHardwareResponselessError
-                raise Exception(err)
+                logger.critical("Ethernet reconnect failed, dead socket")
+                raise ThrowReply('resource_error_connection', "Broken ethernet socket")
+            except Exception as err: ##TODO handle all exceptions, that seems questionable
+                logger.critical("Query failed after successful ethernet socket reconnect")
+                raise ThrowReply('resource_error_no_response', err)
         finally:
             self.alock.release()
         to_return = ';'.join(data)
-        # logger.debug
-        print("should return:\n{}".format(to_return))
+        logger.debug(f"should return:\n{to_return}")
         return to_return
 
 
@@ -168,8 +149,7 @@ class EthernetSCPIService(Service):
 
         for command in commands:
             command += self.command_terminator
-            # logger.debug
-            print("sending: {}".format(command.encode()))
+            logger.debug(f"sending: {command.encode()}")
             self.socket.send(command.encode())
             if command == self.command_terminator:
                 blank_command = True
@@ -182,9 +162,8 @@ class EthernetSCPIService(Service):
                 if data.startswith(command):
                     data = data[len(command):]
                 elif not blank_command:
-                    raise ThrowReply('resource_error', "Bad ethernet query return: {}".format(data))
-            # logger.info
-            print("sync: {} -> {}".format(repr(command),repr(data)))
+                    raise ThrowReply('device_error_connection', f'Bad ethernet query return: {data}')
+            logger.info(f"sync: {repr(command)} -> {repr(data)}")
             all_data.append(data)
         return all_data
 
@@ -206,13 +185,10 @@ class EthernetSCPIService(Service):
                 if data == '':
                     raise ThrowReply('resource_error_no_response', "Empty socket.recv packet")
         except socket.timeout:
-            # logger.warning
-            print("socket.timeout condition met; received:\n{}".format(repr(data)))
+            logger.warning(f"socket.timeout condition met; received:\n{repr(data)}")
             if blank_command == False:
-                # exceptions.DriplineHardwareResponselessError
                 raise ThrowReply('resource_error_no_response', "Unexpected socket.timeout")
             terminator = ''
-        # logger.debug
-        print(repr(data))
+        logger.debug(repr(data))
         data = data[0:data.rfind(terminator)]
         return data

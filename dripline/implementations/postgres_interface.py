@@ -60,18 +60,14 @@ class PostgreSQLInterface(Service):
         logger.debug('Connecting to the db')
         #TODO: this is a massive hack; as soon as scarab supports environment variable substitutions, this should be refactored
         credentials = json.loads(open(os.path.expandvars(os.path.expanduser(self._auths_file))).read())['postgresql']
-        engine_str = 'postgresql://{}:{}@{}/{}'.format(credentials['username'],
-                                                       credentials['password'],
-                                                       database_server,
-                                                       database_name
-                                                      )
+        engine_str = f'postgresql://{credentials["username"]}:{credentials["password"]}@{database_server}/{database_name}'
         self.engine = sqlalchemy.create_engine(engine_str)
         self.meta = sqlalchemy.MetaData(self.engine)
 
     def add_child(self, endpoint):
         Service.add_child(self, endpoint)
         if isinstance(endpoint, SQLTable):
-            logger.debug('Adding sqlalchemy.Table object for "{}" to Endpoint'.format(endpoint.table_name))
+            logger.debug(f'Adding sqlalchemy.Table object for "{endpoint.table_name}" to Endpoint')
             endpoint.table = sqlalchemy.Table(endpoint.table_name, self.meta, autoload=True, schema=endpoint.schema)
 
 
@@ -116,11 +112,11 @@ class SQLTable(Endpoint):
                 self._column_map[a_col] = a_col
             elif isinstance(a_col, dict):
                 if not 'column' in a_col or not 'payload_key' in a_col:
-                    raise KeyError("column insert map <{}> does not contain the required keys, ['column', 'payload_key']".format(a_col))
+                    raise KeyError(f"column insert map <{a_col}> does not contain the required keys, ['column', 'payload_key']")
                 to_return.append(a_col)
                 self._column_map[a_col['payload_key']] = a_col['column']
             else:
-                raise TypeError("column info <{}> is not of an expected type".format(a_col))
+                raise TypeError(f"column info <{a_col}> is not of an expected type")
         return to_return
 
     def do_select(self, return_cols=[], where_eq_dict={}, where_lt_dict={}, where_gt_dict={}):
@@ -172,12 +168,12 @@ class SQLTable(Endpoint):
         # make sure that all provided insert values are expected
         for col in kwargs.keys():
             if not col in self._column_map.keys():
-                logger.debug('got an unexpected insert column <{}>'.format(col))
+                logger.debug(f'got an unexpected insert column <{col}>')
                 kwargs.pop(col)
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col['payload_key'] in kwargs.keys():
-                raise DriplineDatabaseError('a value for <{}> is required!\ngot: {}'.format(col, kwargs))
+                raise DriplineDatabaseError(f'a value for <{col}> is required!\ngot: {kwargs}')
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update({self._column_map[key]:value for key,value in kwargs.items()})
