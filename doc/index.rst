@@ -14,7 +14,6 @@ the components in a running service.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
 
    getting_started
    dl_serve

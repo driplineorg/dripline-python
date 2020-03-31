@@ -141,6 +141,7 @@ html_theme_options = {
   'sidebar_collapse': True,
   'github_user': 'driplineorg',
   'github_repo': 'dripline-python',
+  'badge_branch': 'dl3/develop',
   'github_button': True,
 }
 
