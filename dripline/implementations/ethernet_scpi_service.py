@@ -48,10 +48,10 @@ class EthernetSCPIService(Service):
             (ip,port) = re.findall(re_str,socket_info)[0]
             socket_info = (ip,int(port))
         if response_terminator is None or response_terminator == '':
-            raise ValueError(f"Invalid response terminator: <{repr(response_terminator)}>! Expect string")
+            raise ThrowReply('service_error_invalid_value', f"Invalid response terminator: <{repr(response_terminator)}>! Expect string")
         if not isinstance(cmd_at_reconnect, list) or len(cmd_at_reconnect)==0:
             if cmd_at_reconnect is not None:
-                raise ValueError(f"Invalid cmd_at_reconnect: <{repr(cmd_at_reconnect)}>! Expect non-zero length list")
+                raise ThrowReply('service_error_invalid_value', f"Invalid cmd_at_reconnect: <{repr(cmd_at_reconnect)}>! Expect non-zero length list")
 
         self.alock = threading.Lock()
         self.socket = socket.socket()
@@ -96,7 +96,7 @@ class EthernetSCPIService(Service):
             self.socket.close()
             logger.warning(f"Failed connection test.  Response was {response}")
             # exceptions.DriplineHardwareConnectionError
-            raise Exception("Failed connection test.")
+            raise ThrowReply('resource_error_connection', "Failed connection test.")
 
 
     def send_to_device(self, commands, **kwargs):
@@ -125,16 +125,12 @@ class EthernetSCPIService(Service):
                 self._reconnect()
                 data = self._send_commands(commands)
                 logger.critical("Query successful after ethernet connection recovered")
-            # exceptions.DriplineHardwareConnectionError
             except socket.error: # simply trying to make it possible to catch the error below
                 logger.critical("Ethernet reconnect failed, dead socket")
-                # exceptions.DriplineHardwareConnectionError
-                raise socket.error("Broken ethernet socket")
-            # exceptions.DriplineHardwareResponselessError
-            except Exception as err:
+                raise ThrowReply('resource_error_connection', "Broken ethernet socket")
+            except Exception as err: ##TODO handle all exceptions, that seems questionable
                 logger.critical("Query failed after successful ethernet socket reconnect")
-                # exceptions.DriplineHardwareResponselessError
-                raise Exception(err)
+                raise ThrowReply('resource_error_no_response', err)
         finally:
             self.alock.release()
         to_return = ';'.join(data)
@@ -191,7 +187,6 @@ class EthernetSCPIService(Service):
         except socket.timeout:
             logger.warning(f"socket.timeout condition met; received:\n{repr(data)}")
             if blank_command == False:
-                # exceptions.DriplineHardwareResponselessError
                 raise ThrowReply('resource_error_no_response', "Unexpected socket.timeout")
             terminator = ''
         logger.debug(repr(data))
