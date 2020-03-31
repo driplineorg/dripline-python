@@ -2,6 +2,9 @@ __all__ = []
 
 from _dripline.core import get_return_codes_map
 
+import logging
+logger = logging.getLogger(__name__)
+
 __all__.append("get_return_codes_dict")
 def get_return_codes_dict():
     '''

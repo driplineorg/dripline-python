@@ -17,9 +17,9 @@ import re # used for FormatEntity
 
 from dripline.core import Entity, calibrate, ThrowReply
 
-# logging currently unavailable
-# import logging 
-# logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger(__name__)
+
 __all__ = []
 
 __all__.append('SimpleSCPIEntity')
@@ -46,8 +46,7 @@ class SimpleSCPIEntity(Entity):
     def on_get(self):
         to_send = [self.cmd_base + '?']
         result = self.service.send_to_device(to_send)
-        # logger.debug
-        print(f'raw result is: {result}')
+        logger.debug(f'raw result is: {result}')
         return result
 
     def on_set(self, value):
@@ -130,18 +129,15 @@ class FormatEntity(Entity):
             # exceptions.DriplineMethodNotSupportedError
             raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support get")
         result = self.service.send_to_device([self._get_str])
-        # logger.debug
-        print(f'result is: {result}')
+        logger.debug(f'result is: {result}')
         if self._extract_raw_regex is not None:
             first_result = result
             matches = re.search(self._extract_raw_regex, first_result)
             if matches is None:
-                # logger.error
-                print('matching returned none')
+                logger.error('matching returned none')
                 # exceptions.DriplineValueError
                 raise ThrowReply('resource_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
-            # logger.debug
-            print(f"matches are: {matches.groupdict()}")
+            logger.debug(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
         return result
 
@@ -157,6 +153,5 @@ class FormatEntity(Entity):
             mapped_value = self._set_value_map[value]
         elif isinstance(self._set_value_map, str):
             mapped_value = self.evaluator(self._set_value_map.format(value))
-        #logger.debug
-        print(f'value is {value}; mapped value is: {mapped_value}')
+        logger.debug(f'value is {value}; mapped value is: {mapped_value}')
         return self.service.send_to_device([self._set_str.format(mapped_value)])

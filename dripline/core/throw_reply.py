@@ -4,6 +4,9 @@ import scarab
 from _dripline.core import DL_Success, set_reply_cache
 from .return_codes import get_return_codes_dict
 
+import logging
+logger = logging.getLogger(__name__)
+
 __all__.append('ThrowReply')
 class ThrowReply(Exception):
     '''

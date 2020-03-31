@@ -4,6 +4,9 @@ import scarab
 from _dripline.core import _Endpoint
 from .throw_reply import ThrowReply
 
+import logging
+logger = logging.getLogger(__name__)
+
 __all__.append('Endpoint')
 class Endpoint(_Endpoint):
     '''
@@ -17,15 +20,14 @@ class Endpoint(_Endpoint):
         _Endpoint.__init__(self, name)
 
     def do_get_request(self, a_request_message):
-        print("in get_request")
+        logger.info("in get_request")
         a_specifier =  a_request_message.specifier.to_string()
         if (a_specifier):
-            print("has specifier")
+            logger.debug("has specifier")
             try:
-                print(f"specifier is: {a_specifier}")
+                logger.debug(f"specifier is: {a_specifier}")
                 an_attribute = getattr(self, a_specifier)
-                print(an_attribute)
-                print(f"attribute '{a_specifier}' value is [{an_attribute}]")
+                logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
                 the_node = scarab.ParamNode()
                 the_node["values"] = scarab.ParamArray()
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
@@ -33,7 +35,7 @@ class Endpoint(_Endpoint):
             except AttributeError as this_error:
                 raise ThrowReply('service_error_invalid_specifier', f"endpoint {self.name} has no attribute {a_specifier}, unable to get")
         else:
-            print('no specifier')
+            logger.debug('no specifier')
             the_value = self.on_get()
             return a_request_message.reply(payload=scarab.to_param(the_value))
 
@@ -41,7 +43,7 @@ class Endpoint(_Endpoint):
         a_specifier =  a_request_message.specifier.to_string()
         new_value = a_request_message.payload["values"][0]()
         new_value = getattr(new_value, "as_"+new_value.type())()
-        print(f'new_value is [{new_value}]')
+        logger.debug(f'new_value is [{new_value}]')
         if ( a_specifier ):
             if not hasattr(self, a_specifier):
                 raise ThrowReply('service_error_invalid_specifier', "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
