@@ -1,3 +1,4 @@
+##########
 Contribute
 ##########
 
@@ -9,7 +10,11 @@ Branches are cheap, lets do more of those.
 For more details, `this branching model <nvie.com/posts/a-successful-git-branching-model>`_ has served us very well to date.
 In particular, please note that master is for tagged/release versions while develop is the latest working version.
 We name branches off of develop as ``feature/<description>`` and bug fixes off of master as ``hotfix/<description>`` so that they are sorted and easier to navigate.
-You're welcome and encouraged to push your feature branch to github, we're not going to judge you for things that are incomplete and appreciate not loosing work if you move on or lose your laptop (at a minimum, we suggest pushing at the end of your work day).
+In the hopefullly infrequent event of a major version change to the dripline standard, we will follow a parallel structure of branches for the new version prefixed with ``dl<N>`` (where ``<N>`` is replaced with the major version number of dripline).
+
+Anyone is welcome to fork the repo and pass back changes via pull request.
+Frequent contributors may request membership in the github organization, which will allow pushing feature and hotfix branches directly to the driplineorg repo.
+
 
 Merging
 =======
@@ -18,6 +23,7 @@ Merging follows the instruction from the branching section above in most cases, 
 
   - With the default travis-ci config, if the name of your branch ends in ``\build``, then when you push it will trigger travis-ci tasks
   - Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the ``develop`` or ``master`` branches.
+
 
 Coding Style
 ============
@@ -29,14 +35,13 @@ The internet is full of arguments over coding style which we're not really inter
   - We're not robots and common sense can win out
   - doc strings can be special, depending on how they are expected to be rendered (for example in the API docs section of this page)
 
-Based on that we prefer the following:
+Based on that we prefer/stress the following:
 
   - Generally we try to follow `PEP-8 <https://www.python.org/dev/peps/pep-0008/>`_
-  - The 80 column limit makes things harder to read more often than easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed
-  - When creating new classes which inherit from local classes, decorate them with ``@fancy_doc`` so that the class's docstring gets updated
+  - The 80 column limit makes things harder to read as often as easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed
+  - For multi-line python data structures which support it, place a comma after the final element and the closing symbol on its own line, that way any element may be easily commented out.
+  - Use unix-style line endings and soft tabs in all files (other than the documentation Makefile)
 
-    - The description of the class belongs in the class's doc string
-    - The doc string for the ``__init__`` method should just include description of the kwargs for that class
 
 Testing
 ============
