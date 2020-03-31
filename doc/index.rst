@@ -17,6 +17,7 @@ the components in a running service.
 
    getting_started
    dl_serve
+   API Documentation <apidoc/modules>
    contribute
 
 

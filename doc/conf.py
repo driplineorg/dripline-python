@@ -15,12 +15,19 @@
 
 import sys
 import os
+import subprocess
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+api_doc_cmd = ['sphinx-apidoc',
+               '-o', 'apidoc',
+               '-f',
+               '../dripline'
+              ]
+subprocess.check_call(api_doc_cmd)
+sys.path.insert(0, os.path.abspath('.'))
 
 #import better_apidoc
 #better_apidoc.main([
@@ -45,6 +52,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     #'sphinxcontrib.programoutput',
+    #'sphinxcontrib.apidoc',
     'sphinx.ext.napoleon',
     #'sphinxarg.ext',
 ]

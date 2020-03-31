@@ -3,7 +3,7 @@ A Entity is an enhanced implementation of a Dripline Endpoint with simple loggin
 The Entitys defined here are more broad-ranging than a single service, obviating the need to define new Entitys for each new service or provider.
 
 When implementing a Entity, please remember:
-- All communication must be configured to return a response.  If no useful get is possible, consider a *OPC?
+- All communication must be configured to return a response.  If no useful get is possible, consider a \*OPC?
 - set_and_check is a generally desirable functionality
 
 Generic Entity catalog (in order of ease-of-use):
@@ -34,7 +34,8 @@ class SimpleSCPIEntity(Entity):
                  base_str=None,
                  **kwargs):
         '''
-        base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;base_str?"
+        Args:
+            base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;base_str?"
         '''
         if base_str is None:
             raise ValueError('<base_str> is required to __init__ SimpleSCPIEntity instance')
@@ -71,7 +72,7 @@ __all__.append('SimpleSCPISetEntity')
 class SimpleSCPISetEntity(SimpleSCPIEntity):
     '''
     Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted.
-    Uses *OPC? to ensure a response is generated when making an assignment.
+    Uses \*OPC? to ensure a response is generated when making an assignment.
     '''
 
     def __init__(self, **kwargs):
@@ -102,13 +103,14 @@ class FormatEntity(Entity):
                  extract_raw_regex=None,
                  **kwargs):
         '''
-        get_str (str): sent verbatim in the event of on_get; if None, getting of endpoint is disabled
-        get_reply_float (bool): apply special formatting to get return
-        set_str (str): sent as set_str.format(value) in the event of on_set; if None, setting of endpoint is disabled
-        set_value_lowercase (bool): default option to map all string set value to .lower()
-            **WARNING: never set to False if using a set_value_map dict
-        set_value_map (str||dict): inverse of calibration to map raw set value to value sent; either a dictionary or an asteval-interpretable string
-        extract_raw_regex (str): regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name "value_raw" (ie r'(?P<value_raw>)' ) 
+        Args:
+            get_str (str): sent verbatim in the event of on_get; if None, getting of endpoint is disabled
+            get_reply_float (bool): apply special formatting to get return
+            set_str (str): sent as set_str.format(value) in the event of on_set; if None, setting of endpoint is disabled
+            set_value_lowercase (bool): default option to map all string set value to .lower()
+                **WARNING**: never set to False if using a set_value_map dict
+            set_value_map (str||dict): inverse of calibration to map raw set value to value sent; either a dictionary or an asteval-interpretable string
+            extract_raw_regex (str): regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name "value_raw" (ie r'(?P<value_raw>)' ) 
         '''
         Entity.__init__(self, **kwargs)
         self._get_reply_float = get_reply_float
