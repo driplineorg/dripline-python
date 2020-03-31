@@ -50,15 +50,17 @@ Configuration File
 ==================
 
 The configuration is used to define what components are part of the service.
-These elements all exist within the top-level ``runtime-config`` node within the configuration file,
-which is described here.
+These elements all exist within the top-level ``runtime-config`` node within the configuration file, which is described here.
 If not already familiar, you're encouraged to review the `dripline-cpp core library documentation <https://driplineorg.github.io/dripline-cpp/branches/dl3_develop/library.html>`_ for descriptions of roles of the base classes and their relationships.
+
 .. TODO again, update this link to a more generic branch, when available.
 
 The ``runtime-config`` node is built up out of nodes which each describe a class instance.
 The details for defining instance nodes is below
 The top level of the runtime configuration must be exactly one instance which is either a ``Service`` or a class derrived from it.
 It follows the description below for any instance node, but has an extra reserved keyword (``endpoints``), which contains an array of instance nodes which will be added as children of the ``Service`` instance, these can be instance of any ``Endpoint``-derrived class.
+
+For a more complete example of writing a configuration file and using it, see the `first mesh tutorial in the driplineorg controls guide<https://driplineorg.github.io/controls-guide/develop/guides/first-mesh.html>`_
 
 Instance node description
 -------------------------
