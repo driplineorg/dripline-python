@@ -21,6 +21,7 @@ Installation
 
 Dripline-python is developed specifically for container-based workflows, including development and deployment, and that is the only approach we encourage or support.
 In principle, there is nothing to prevent installing and running directly on your host system, but you will need to be careful about the potential for conflicting dependency versions (that should probably be done in a virtualenvironment, but that's up to you).
+If you're new to containers, consider starting with the `getting started docs from Docker Inc. <https://www.docker.com/get-started>`_; most contributors develop using the OS-native "desktop application" available there.
 
 
 Docker containers
