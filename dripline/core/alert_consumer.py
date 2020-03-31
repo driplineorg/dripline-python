@@ -13,8 +13,8 @@ class AlertConsumer(Service):
     A base class for implementing custom alert message consumers.
 
     One is expected to extend this class in one of two ways:
-    1) More advanced: override the existing on_alert_message method with whatever behavior is desired
-    2) Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.
+    1. More advanced: override the existing on_alert_message method with whatever behavior is desired
+    2. Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.
     '''
     def __init__(self, alert_keys=["#"], alert_key_parser_re='', **kwargs):
         '''
