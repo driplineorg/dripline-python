@@ -66,8 +66,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'dripline'
-copyright = '2020, The Project 8 Collaboration'
+project = 'Dripline-Python'
+copyright = '2020, The Dripline-Python Authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -81,9 +81,8 @@ try:
     version = dripline.__version__#pkg_resources.require("dripline")[0].version
 # The full version, including alpha/beta/rc tags.
     release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
-    print("dripline Gogol members:\n{}".format(dir(dripline.core.Gogol)))
 except Exception as e:
-    print("import exception")
+    print("failure importing dripline")
     #print("error message is:\n{}".format(e.message))
     version = "unknown"
     release = "unknown"
@@ -232,11 +231,18 @@ latex_elements = {
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
+# (source start file,
+#  target name,
+#  title,
+#  author,
+#  documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'dripline.tex', 'dripline Documentation',
-   'The Project 8 Collaboration', 'manual'),
+  ('index',
+   'dripline-python.tex',
+   'Dripline-Python Documentation',
+   'The Dripline-Python Authors',
+   'manual',
+  ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -263,10 +269,17 @@ latex_documents = [
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
+# (source start file,
+#  name,
+#  description,
+#  authors,
+#  manual section).
 man_pages = [
-    ('index', 'dripline', 'dripline Documentation',
-     ['The Project 8 Collaboration'], 1)
+    ('index',
+     'dripline-python',
+     'Dripline-Python Documentation',
+     ['The Dripline-Python Authors'],
+     1)
 ]
 
 # If true, show URL addresses after external links.
@@ -276,11 +289,20 @@ man_pages = [
 # -- Options for Texinfo output -------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
+# (source start file,
+#  target name,
+#  title,
+#  author,
+#  dir menu entry,
+#  description,
+#  category)
 texinfo_documents = [
-  ('index', 'dripline', 'dripline Documentation',
-   'The Project 8 Collaboration', 'dripline', 'One line description of project.',
+  ('index',
+   'dripline-python',
+   'Dripline-Python Documentation',
+   'The Dripline-Python Authors',
+   'dripline-python',
+   'Documentation for Dripline-Python',
    'Miscellaneous'),
 ]
 
