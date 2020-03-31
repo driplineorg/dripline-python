@@ -18,6 +18,7 @@ class Serve:
         self.return_code = 0
         self.handler = logging.StreamHandler()
         self.handler.setLevel(logging.WARNING)
+        logger.addHandler(self.handler)
         time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
         base_format = '%(asctime)s{}[%(levelname)-8s] %(name)s(%(lineno)d) -> {}%(message)s'
         self._logging_format = None
@@ -78,8 +79,10 @@ class Serve:
     def _run(self, the_app):
         this_config = the_app.master_config.to_python()
 
-        verbosity = this_config.pop('verbosity', logging.WARNING)
+        verbosity = the_app.global_verbosity
+        #print(f"verbosity is {verbosity}")
         self.handler.setLevel(verbosity)
+
         logger.info('python got a master config:\n{}'.format(this_config))
 
         sig_handler = scarab.SignalHandler()
