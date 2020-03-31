@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to dripline-python's documentation!
-====================================
+===========================================
 
 Contents:
 
@@ -15,13 +15,12 @@ Contents:
     getting_started
     contribute
 
-.. todolist:: 
+.. todolist::
 
 .. toctree::
     :hidden:
 
     glossary
-    better_apidoc_out/modules
 
 Indices and tables
 ==================

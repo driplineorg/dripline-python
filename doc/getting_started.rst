@@ -76,7 +76,8 @@ Building Docs [doc]
 
 .. `Sphinx-contrib-programoutput <http://pythonhosted.org/sphinxcontrib-programoutput/>`_ Is used to automatically include the --help for the various utility programs.
 
-`better-apidoc <https://pypi.python.org/pypi/better-apidoc>`_ is used to automatically generate rst files with api documentation.
+.. removing better-apidoc use, we should confirm we want/need to use this, or look into normal apidoc
+   `better-apidoc <https://pypi.python.org/pypi/better-apidoc>`_ is used to automatically generate rst files with api documentation.
 
 Color Output
 ~~~~~~~~~~~~
