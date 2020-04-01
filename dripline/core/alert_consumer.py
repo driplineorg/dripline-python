@@ -13,14 +13,14 @@ class AlertConsumer(Service):
     A base class for implementing custom alert message consumers.
 
     One is expected to extend this class in one of two ways:
-    1) More advanced: override the existing on_alert_message method with whatever behavior is desired
-    2) Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload.
-       The first may be used or overriden, the second must always be implemented.
+    1. More advanced: override the existing on_alert_message method with whatever behavior is desired
+    2. Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.
     '''
     def __init__(self, alert_keys=["#"], alert_key_parser_re='', **kwargs):
         '''
-        alert_keys: an iterable of strings which will be used as binding keys on the alerts exchange
-        alert_key_parser_re: a regular expression (see python's re library) which is used in the default implementation
+        Args:
+            alert_keys: an iterable of strings which will be used as binding keys on the alerts exchange
+            alert_key_parser_re: a regular expression (see python's re library) which is used in the default implementation
                              of parse_routing_key to extract useful data from the incoming routing key.  Note: a failed
                              match will return an empty dict, you are responsible for checkin and deciding if this is an
                              error. We use re.match and return the groupdict.

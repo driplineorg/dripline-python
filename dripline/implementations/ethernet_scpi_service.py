@@ -30,15 +30,21 @@ class EthernetSCPIService(Service):
                  **kwargs
                  ):
         '''
-        socket_timeout (int) : number of seconds to wait for a reply from the device before timeout
-        socket_info (tuple or string) : either socket.socket.connect argument tuple, or string that parses into one
-        cmd_at_reconnect ([str,...]) : a list of commands to send to the device every time the socket connection is estabilished
-                                       note that these will be sent on *every* connection, which may be disruptive to ongoing activity
-        reconnect_test (str) : expected return from the last command in the cmd_at_reconnect list, must match exactly or the reconnect
-                               is deemed a failure
-        command_terminator (str) : string to be post-pended to commands, indicating to the device that the transmission is complete (often \r, \n, or \r\n)
-        response_terminator (str) : string added to the end of a reply from the device, indicates the end of the reply
-        reply_echo_cmd (bool) : indicates that the device includes the the received command in its reply
+        Args:
+            socket_timeout (int): number of seconds to wait for a reply from the device before timeout.
+            socket_info (tuple or string): either socket.socket.connect argument tuple, or string that
+                parses into one.
+            cmd_at_reconnect ([str,...]): a list of commands to send to the device every time the socket
+                connection is estabilished note that these will be sent on *every* connection, which may be
+                disruptive to ongoing activity.
+            reconnect_test (str): expected return from the last command in the cmd_at_reconnect list, must
+                match exactly or the reconnect is deemed a failure
+            command_terminator (str): string to be post-pended to commands, indicating to the device that
+                the transmission is complete (often \\r, \\n, or \\r\\n - where escaping depends on string types)
+            response_terminator (str): string added to the end of a reply from the device, indicates the
+                end of the reply
+            reply_echo_cmd (bool): indicates that the device includes the the received command in its reply
+
         '''
         Service.__init__(self, **kwargs)
 

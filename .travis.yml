@@ -19,7 +19,7 @@ branches:
   - dl3/develop
   - dl3/master
   - "/^v\\d+\\.\\d+\\.\\d+(-S*)?$/"
-  - "/.*\\/(?i:build)$/"
+  - "/.*\\.(?i:build)$/"
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_f6748e572ec7_key -iv $encrypted_f6748e572ec7_iv

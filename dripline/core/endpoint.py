@@ -15,7 +15,8 @@ class Endpoint(_Endpoint):
     '''
     def __init__(self, name):
         '''
-        name (str) : the name of the endpoint, specifies the binding key for request messages to which this object should reply
+        Args:
+            name (str) : the name of the endpoint, specifies the binding key for request messages to which this object should reply
         '''
         _Endpoint.__init__(self, name)
 

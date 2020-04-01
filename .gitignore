@@ -1,6 +1,8 @@
 .deploy_key
 .deploy_key.pub
 
+doc/apidoc/*
+
 *~
 *#
 *.swp

@@ -38,9 +38,10 @@ class PostgreSQLInterface(Service):
 
     def __init__(self, database_name, database_server, auths_file=None, **kwargs):
         '''
-        database_name (str): name of the 'database' to connect to within the database server
-        database_server (str): network resolvable hostname of database server
-        auths_file (str): expandable path to an authentications file **Note, this option is considered temporary and like to be removed in a future version
+        Args:
+            database_name (str): name of the 'database' to connect to within the database server
+            database_server (str): network resolvable hostname of database server
+            auths_file (str): expandable path to an authentications file **Note**, this option is considered temporary and like to be removed in a future version
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')

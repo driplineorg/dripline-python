@@ -10,8 +10,14 @@ logger=logging.getLogger(__name__)
 
 __all__.append("KeyValueStore")
 class KeyValueStore(Entity):
+    '''
+    '''
 
     def __init__(self, initial_value=None, **kwargs):
+        '''
+        Args:
+            initial_value (any) : the starting value for the endpoint
+        '''
         Entity.__init__(self, **kwargs)
         self._value = initial_value
 
