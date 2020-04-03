@@ -4,6 +4,9 @@ import scarab
 
 from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest
 
+import logging
+logger = logging.getLogger(__name__)
+
 __all__.append("Interface")
 class Interface(Core):
     '''

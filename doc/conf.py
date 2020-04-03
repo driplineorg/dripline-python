@@ -15,22 +15,32 @@
 
 import sys
 import os
+import subprocess
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+api_doc_cmd = ['sphinx-apidoc',
+               '-o', 'apidoc', ## set output path
+               '-e', ## put modules each on their own page
+               '-f', ## overwrite existing files
+               '../dripline', ## path to source
+               ## exclude these:
+               '../dripline/extensions',
+              ]
+subprocess.check_call(api_doc_cmd)
+sys.path.insert(0, os.path.abspath('.'))
 
-import better_apidoc
-better_apidoc.main([
-    'better_apidoc',
-    '-t', '_templates', # path to jinja templates
-    '--force', # overwrite existing files
-    '--separate', # split modules into their own files
-    '-o', 'better_apidoc_out', #output location
-    '../dripline', #path to modules to doc
-    ])
+#import better_apidoc
+#better_apidoc.main([
+#    'better_apidoc',
+#    '-t', '_templates', # path to jinja templates
+#    '--force', # overwrite existing files
+#    '--separate', # split modules into their own files
+#    '-o', 'better_apidoc_out', #output location
+#    '../dripline', #path to modules to doc
+#    ])
 
 # -- General configuration ------------------------------------------------
 
@@ -45,6 +55,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     #'sphinxcontrib.programoutput',
+    #'sphinxcontrib.apidoc',
     'sphinx.ext.napoleon',
     #'sphinxarg.ext',
 ]
@@ -66,8 +77,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'dripline'
-copyright = '2014, The Project 8 Collaboration'
+project = 'Dripline-Python'
+copyright = '2020, The Dripline-Python Authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -81,9 +92,9 @@ try:
     version = dripline.__version__#pkg_resources.require("dripline")[0].version
 # The full version, including alpha/beta/rc tags.
     release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
-    print("dripline Gogol members:\n{}".format(dir(dripline.core.Gogol)))
 except Exception as e:
-    print("error message is:\n{}".format(e.message))
+    print("failure importing dripline")
+    #print("error message is:\n{}".format(e.message))
     version = "unknown"
     release = "unknown"
 print('version/release are: {}/{}'.format(version,release))
@@ -131,17 +142,19 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-try:
-    import sphinx_rtd_theme
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    html_theme = 'sphinx_rtd_theme'
-except ImportError:
-    html_theme = 'haiku'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+  'fixed_sidebar': True,
+  'sidebar_collapse': True,
+  'github_user': 'driplineorg',
+  'github_repo': 'dripline-python',
+  'badge_branch': 'dl3/develop',
+  'github_button': True,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -155,12 +168,12 @@ except ImportError:
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = DL3Logo.png
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'favicon.ico'
+html_favicon = 'DL3Logo.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -231,11 +244,18 @@ latex_elements = {
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
+# (source start file,
+#  target name,
+#  title,
+#  author,
+#  documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'dripline.tex', 'dripline Documentation',
-   'The Project 8 Collaboration', 'manual'),
+  ('index',
+   'dripline-python.tex',
+   'Dripline-Python Documentation',
+   'The Dripline-Python Authors',
+   'manual',
+  ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -262,10 +282,17 @@ latex_documents = [
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
+# (source start file,
+#  name,
+#  description,
+#  authors,
+#  manual section).
 man_pages = [
-    ('index', 'dripline', 'dripline Documentation',
-     ['The Project 8 Collaboration'], 1)
+    ('index',
+     'dripline-python',
+     'Dripline-Python Documentation',
+     ['The Dripline-Python Authors'],
+     1)
 ]
 
 # If true, show URL addresses after external links.
@@ -275,11 +302,20 @@ man_pages = [
 # -- Options for Texinfo output -------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
+# (source start file,
+#  target name,
+#  title,
+#  author,
+#  dir menu entry,
+#  description,
+#  category)
 texinfo_documents = [
-  ('index', 'dripline', 'dripline Documentation',
-   'The Project 8 Collaboration', 'dripline', 'One line description of project.',
+  ('index',
+   'dripline-python',
+   'Dripline-Python Documentation',
+   'The Dripline-Python Authors',
+   'dripline-python',
+   'Documentation for Dripline-Python',
    'Miscellaneous'),
 ]
 

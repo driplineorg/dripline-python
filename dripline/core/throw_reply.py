@@ -4,6 +4,9 @@ import scarab
 from _dripline.core import DL_Success, set_reply_cache
 from .return_codes import get_return_codes_dict
 
+import logging
+logger = logging.getLogger(__name__)
+
 __all__.append('ThrowReply')
 class ThrowReply(Exception):
     '''
@@ -14,10 +17,11 @@ class ThrowReply(Exception):
     '''
     def __init__(self, return_code=DL_Success(), message=DL_Success().description, payload=scarab.Param()):
         '''
-        return_code (_dripline.core.ReturnCode || string) : instance of subclass of ReturnCode, or the string name of a return code;
-                it must be an instance which is already registered and is used to determine various header fields of the resulting dripline message.
-        message (string) : provides more specific information about the particular exception (beyond the fixed ReturnCode's description
-        payload (scarab.Param) : any data to include in the payload of the reply message (in a Warning, should match the normal success data)
+        Args:
+            return_code (_dripline.core.ReturnCode || string) : instance of subclass of ReturnCode, or the string name of a return code;
+                    it must be an instance which is already registered and is used to determine various header fields of the resulting dripline message.
+            message (string) : provides more specific information about the particular exception (beyond the fixed ReturnCode's description
+            payload (scarab.Param) : any data to include in the payload of the reply message (in a Warning, should match the normal success data)
         '''
         Exception.__init__(self, message)
         if isinstance(return_code, str):

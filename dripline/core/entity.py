@@ -10,6 +10,9 @@ from .endpoint import Endpoint
 from dripline.core import MsgAlert
 __all__ = []
 
+import logging
+logger = logging.getLogger(__name__)
+
 def _log_on_set_decoration(self, fun):
     '''
     requires get_on_set be true; log the result of the on_get via an alert message
@@ -26,7 +29,7 @@ def _log_on_set_decoration(self, fun):
                 values.update({'value_raw': result})
         else:
             values.update({'value_raw': args[0]})
-        print('set done, now log')
+        logger.debug('set done, now log')
         self.log_a_value(values)
         return result
     return wrapper
@@ -38,7 +41,7 @@ def _get_on_set_decoration(self, fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         fun(*args, **kwargs)
-        print("set, now get_on_set")
+        logger.debug("set, now get_on_set")
         result = self.on_get()
         return result
     return wrapper
@@ -49,8 +52,7 @@ class Entity(Endpoint):
     Subclass of Endpoint which adds logic related to logging and confirming values.
 
     In particular, there is support for:
-    get_on_set -> setting the endpoint's value returns a get() result rather than an empty success
-                  (particularly useful for devices which may round assignment values)
+    get_on_set -> setting the endpoint's value returns a get() result rather than an empty success (particularly useful for devices which may round assignment values)
     log_on_set -> further extends get_on_set to send an alert message in addtion to returning the value in a reply
     log_interval -> leverages the scheduler class to log the on_get result at a regular cadence
     '''
@@ -58,17 +60,18 @@ class Entity(Endpoint):
     #                (for example, the success condition may be measuring another endpoint)
     def __init__(self, get_on_set=False, log_routing_key_prefix='sensor_value', log_interval=0, log_on_set=False, calibration=None, **kwargs):
         '''
-        get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
-        log_routing_key_prefix: first term in routing key used in alert messages which log values
-        log_interval: how often to log the Entity's value. If 0 then scheduled logging is disabled;
-                      if a number, interpreted as number of seconds; if a dict, unpacked as arguments
-                      to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
-        log_on_set: if true, always call log_a_value() immediately after on_set
-                    **Note:** requires get_on_set be true, overrides must be equivalent
-        calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
-                                       @calibrate decorator, used to populate raw and calibrated values
-                                       fields of a result payload. If a dictionary, the raw result is used
-                                       to index the dict with the calibrated value being the dict's value.
+        Args:
+            get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
+            log_routing_key_prefix: first term in routing key used in alert messages which log values
+            log_interval: how often to log the Entity's value. If 0 then scheduled logging is disabled;
+                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments
+                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
+            log_on_set: if true, always call log_a_value() immediately after on_set
+                        **Note:** requires get_on_set be true, overrides must be equivalent
+            calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
+                                           @calibrate decorator, used to populate raw and calibrated values
+                                           fields of a result payload. If a dictionary, the raw result is used
+                                           to index the dict with the calibrated value being the dict's value.
         '''
         Endpoint.__init__(self, **kwargs)
 
@@ -128,27 +131,27 @@ class Entity(Endpoint):
         elif isinstance(new_interval, datetime.timedelta):
             self._log_interval = new_interval
         else:
-            raise ValueError("unable to interpret a new_interval of type <{}>".format(type(new_interval)))
+            raise ValueError(f"unable to interpret a new_interval of type <{type(new_interval)}>")
 
     def scheduled_log(self):
-        print("in a scheduled log event")
+        logger.debug("in a scheduled log event")
         result = self.on_get()
         self.log_a_value(result)
 
     def log_a_value(self, the_value):
-        print("value to log is:\n{}".format(the_value))
-        the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key='{}.{}'.format(self.log_routing_key_prefix, self.name))
+        logger.debug(f"value to log is:\n{the_value}")
+        the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key=f'{self.log_routing_key_prefix}.{self.name}')
         alert_sent = self.service.send(the_alert)
 
     def start_logging(self):
         if self._log_action_id is not None:
             self.service.unschedule(self._log_action_id)
         if self.log_interval:
-            print('should start logging every {}'.format(self.log_interval))
+            logger.info(f'should start logging every {self.log_interval}')
             self._log_action_id = self.service.schedule(self.scheduled_log, self.log_interval, datetime.datetime.now() + self.service.execution_buffer*3)
         else:
             raise ValueError('unable to start logging when log_interval evaluates false')
-        print('log action id is {}'.format(self._log_action_id))
+        logger.debug(f'log action id is {self._log_action_id}')
 
     def stop_logging(self):
         #TODO: should it be an error to stop_logging() when already not logging?

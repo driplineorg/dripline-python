@@ -16,7 +16,6 @@ def test_op_t_to_uint():
     item = _dripline.core.op_t
     assert(item.to_uint(item.set) == OP_T_SET)
     assert(item.to_uint(item.get) == OP_T_GET)
-    assert(item.to_uint(item.run) == OP_T_RUN)
     assert(item.to_uint(item.cmd) == OP_T_CMD)
     assert(item.to_uint(item.unknown) == OP_T_UKW)
 
@@ -24,7 +23,6 @@ def test_op_t_to_string():
     item = _dripline.core.op_t
     assert(item.to_string(item.set) == "set")
     assert(item.to_string(item.get) == "get")
-    assert(item.to_string(item.run) == "run")
     assert(item.to_string(item.cmd) == "cmd")
     assert(item.to_string(item.unknown) == "unknown")
     flag = False
@@ -38,7 +36,6 @@ def test_op_t_uint_to_op_t():
     item = _dripline.core.op_t
     assert(item.to_op_t(OP_T_SET) == item.set)
     assert(item.to_op_t(OP_T_GET) == item.get)
-    assert(item.to_op_t(OP_T_RUN) == item.run)
     assert(item.to_op_t(OP_T_CMD) == item.cmd)
     assert(item.to_op_t(OP_T_UKW) == item.unknown)
 
@@ -46,7 +43,6 @@ def test_op_t_string_to_op_t():
     item = _dripline.core.op_t
     assert(item.to_op_t("set") == item.set)
     assert(item.to_op_t("get") == item.get)
-    assert(item.to_op_t("run") == item.run)
     assert(item.to_op_t("cmd") == item.cmd)
     assert(item.to_op_t("unknown") == item.unknown)
     flag = False

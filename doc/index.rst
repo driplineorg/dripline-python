@@ -1,32 +1,29 @@
-.. dripline documentation master file, created by
-   sphinx-quickstart on Mon Aug 25 15:26:40 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. dripline-python documentation master file
 
-Welcome to dripline-python's documentation!
-====================================
+===========================================
+Welcome to Dripline-python's documentation!
+===========================================
 
-Contents:
-
-.. toctree::
-    :maxdepth: 2
-
-    introduction
-    getting_started
-    contribute
-
-.. todolist:: 
+Dripline-python builds on `dripline-cpp <http://driplineorg.github.io/dripline-cpp>`_ to provide useful
+implementations for assembly of a dripline mesh. The package is split into three components (each a
+namespace): ``core``, for extending ``dripline-cpp`` with a pythonic interface and adding the most basic
+and generic features; ``implementations``, for ready to use classes that enable generic support for various
+devices, resources, and behaviors; and ``extensions``, for enabling plugins via namespace packages.
+There is also a commandline tool, ``dl-serve``, which enables ``YAML``-based configurations to define
+the components in a running service.
 
 .. toctree::
-    :hidden:
+   :maxdepth: 2
 
-    glossary
-    better_apidoc_out/modules
+   getting_started
+   dl_serve
+   API Documentation <apidoc/modules>
+   contribute
+
 
 Indices and tables
 ==================
 
-* :ref:`parlance`
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

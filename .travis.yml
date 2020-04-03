@@ -1,51 +1,81 @@
 language: cpp
-
 dist: bionic
-
 services:
-  - docker
-
+- docker
 addons:
   apt:
     packages:
-      - qemu-user-static
-      - jq
+    - qemu-user-static
+    - jq
+    - tree
 
 env:
-  - DOCKER_CLI_EXPERIMENTAL=enabled
+- DOCKER_CLI_EXPERIMENTAL=enabled
 
 branches:
   only:
-    # dripline v2 main branches
-    - master
-    - develop
-    # dripline v3 main branches
-    - dl3/develop
-    - dl3/master
-    # all version tags
-    - /^v\d+\.\d+\.\d+(-S*)?$/
-    # all branches ending in '/build' (case insensitive)
-    - /.*\/(?i:build)$/
+  - master
+  - develop
+  - dl3/develop
+  - dl3/master
+  - "/^v\\d+\\.\\d+\\.\\d+(-S*)?$/"
+  - "/.*\\.(?i:build)$/"
+
+before_install:
+- openssl aes-256-cbc -K $encrypted_f6748e572ec7_key -iv $encrypted_f6748e572ec7_iv
+  -in .deploy_key.enc -out .deploy_key -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ./.deploy_key
+- ssh-add ./.deploy_key
 
 jobs:
   include:
-    ## amd64
-    - stage: build images
-      name: amd64
-      before_install: .travis/setup_emulation.sh
-      script:
-        - set -e
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/bootstrap_image.sh -u amd64 -r python -t 3.5 -a amd64 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
-    ## arm
-    - stage: build images
-      name: arm32v7
-      before_install: .travis/setup_emulation.sh
-      script:
-        - set -e
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/bootstrap_image.sh -u arm32v7 -r python -t 3.5 -a arm7 -i driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
-    - stage: assemble manifest
-      script:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - .travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo ${TRAVIS_BRANCH} | tr / _`
+  ## build arch-specific images
+  - stage: build images
+    name: amd64
+    before_install: ".travis/setup_emulation.sh"
+    script:
+    - set -e
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - ".travis/bootstrap_image.sh -u amd64 -r python -t 3.5 -a amd64 -i driplineorg/dripline-python:`echo
+      ${TRAVIS_BRANCH} | tr / _`"
+  - stage: build images
+    name: arm32v7
+    before_install: ".travis/setup_emulation.sh"
+    script:
+    - set -e
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - ".travis/bootstrap_image.sh -u arm32v7 -r python -t 3.5 -a arm7 -i driplineorg/dripline-python:`echo
+      ${TRAVIS_BRANCH} | tr / _`"
+
+  ## build general-use manifest
+  - stage: assemble manifest
+    script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - ".travis/build_manifest.sh -a arm -a amd64 -n driplineorg/dripline-python:`echo
+      ${TRAVIS_BRANCH} | tr / _`"
+
+  ## Builds documentation
+  - stage: build docs
+    git:
+      depth: false
+    script:
+    - echo $(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]];
+      then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG";
+      else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi) | tee /tmp/output_location
+    - docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .
+    - docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
+    - git checkout gh-pages
+    - rm -rf dripline-cpp
+    - git clean -d -f -x
+    - ls
+    - rsync -av --delete /tmp/build.html/ ./$(cat /tmp/output_location)
+    - tree -L 3
+    - git add $(cat /tmp/output_location)
+    - git status
+    - git commit -m "build docs for ${TRAVIS_BRANCH}"
+    - git remote -v
+    - git remote set-url origin "git@github.com:${TRAVIS_REPO_SLUG}"
+    - git remote -v
+    - git push
+

@@ -16,7 +16,6 @@ namespace dripline_pybind
                 // the values
                 .value( "set", dripline::op_t::set )
                 .value( "get", dripline::op_t::get )
-                .value( "run", dripline::op_t::run )
                 .value( "cmd", dripline::op_t::cmd )
                 .value( "unknown", dripline::op_t::unknown )
                 // helpers for type conversion
