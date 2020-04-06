@@ -10,8 +10,7 @@ addons:
     - tree
 
 env:
-- DOCKER_CLI_EXPERIMENTAL=enabled
-- BASE_IMAGE_TAG="3.7"
+- DOCKER_CLI_EXPERIMENTAL=enabled BASE_IMAGE_TAG="3.7"
 
 branches:
   only:
