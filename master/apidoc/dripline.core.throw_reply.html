@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dripline.core.throw_reply module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.implementations package" href="dripline.implementations.html" />
+    <link rel="prev" title="dripline.core.return_codes module" href="dripline.core.return_codes.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.core.html">dripline.core package</a><ul>
+      <li>Previous: <a href="dripline.core.return_codes.html" title="previous chapter">dripline.core.return_codes module</a></li>
+      <li>Next: <a href="dripline.implementations.html" title="next chapter">dripline.implementations package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dripline.core.throw_reply">
+<span id="dripline-core-throw-reply-module"></span><h1>dripline.core.throw_reply module<a class="headerlink" href="#module-dripline.core.throw_reply" title="Permalink to this headline">¶</a></h1>
+<dl class="py exception">
+<dt id="dripline.core.throw_reply.ThrowReply">
+<em class="property">exception </em><code class="sig-prename descclassname">dripline.core.throw_reply.</code><code class="sig-name descname">ThrowReply</code><span class="sig-paren">(</span><em class="sig-param">return_code=&lt;_dripline.core.DL_Success object&gt;</em>, <em class="sig-param">message='Success'</em>, <em class="sig-param">payload=&lt;scarab.Param object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/throw_reply.html#ThrowReply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.throw_reply.ThrowReply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception class for use throughout the codebase for exceptions which do not fatally interrupt a running dripline service.
+These exceptions are caught in the top of the message handling call stack and result in an reply message being sent indicating an error.
+The preferred way to send a reply indicating an error (or warning) is to raise an instance of ThrowReply.
+In cases where a dependency library throws a custom exception, or any piece of code throws a standard python exception, if the expected behavior is an error reply and continued service operation, that exception must be handled and ThrowReply raised instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>return_code</strong> (<em>_dripline.core.ReturnCode || string</em>) – instance of subclass of ReturnCode, or the string name of a return code;
+it must be an instance which is already registered and is used to determine various header fields of the resulting dripline message.</p></li>
+<li><p><strong>message</strong> (<em>string</em>) – provides more specific information about the particular exception (beyond the fixed ReturnCode’s description</p></li>
+<li><p><strong>payload</strong> (<em>scarab.Param</em>) – any data to include in the payload of the reply message (in a Warning, should match the normal success data)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.core.throw_reply.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

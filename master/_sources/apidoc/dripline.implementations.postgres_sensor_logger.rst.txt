@@ -1,0 +1,7 @@
+dripline.implementations.postgres\_sensor\_logger module
+========================================================
+
+.. automodule:: dripline.implementations.postgres_sensor_logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
