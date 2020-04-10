@@ -1,0 +1,28 @@
+# Default values for a dripline-python chart
+
+# You will almost certainly need to override this command to specify the broker if nothing else.
+command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "localhost"]'
+
+replicaCount: 1
+
+rabbitmqSecretName: ""
+
+configFileData: ~
+
+image:
+  repository: driplineorg/dripline-python
+  ## the default tag comes from the Chart.yaml file, but it can be replaced here for testing or holding back a version
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: ~
+  #- name: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: []
