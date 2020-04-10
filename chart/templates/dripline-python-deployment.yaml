@@ -35,7 +35,7 @@ spec:
             - name: config-volume
               mountPath: /etc/config
             - name: auth-volume
-              mountPath: /etc/rabbitmq-secret
+              mountPath: /etc/authentications-secret
               readOnly: true
             {{- with .Values.extraVolumeMounts }}
 {{ toYaml . | indent 12 }}
@@ -51,7 +51,7 @@ spec:
             name: {{ include "driplinePython.fullname" . | trunc 56 }}-config
         - name: auth-volume
           secret:
-            secretName: {{ .Values.rabbitmqSecretName }}
+            secretName: {{ .Values.authenticationsSecretName }}
         {{- with .Values.extraVolumes }}
 {{ toYaml . | indent 8 }}
         {{- end }}

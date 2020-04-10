@@ -5,7 +5,7 @@ command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "localh
 
 replicaCount: 1
 
-rabbitmqSecretName: ""
+authenticationsSecretName: "dl-authentications-secret"
 
 configFileData: ~
 

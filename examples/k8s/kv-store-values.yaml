@@ -1,5 +1,7 @@
 replicaCount: 1
 
+command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "rabbitmq-app.default.svc.local"]'
+
 configFileData: 
   runtime-config:
     name: my_store
