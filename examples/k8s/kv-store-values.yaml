@@ -1,6 +1,6 @@
 replicaCount: 1
 
-command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "rabbitmq-app.default.svc.local"]'
+command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "rabbitmq-app.default.svc.cluster.local"]'
 
 configFileData: 
   runtime-config:
