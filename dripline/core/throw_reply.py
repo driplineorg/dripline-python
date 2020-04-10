@@ -1,7 +1,7 @@
 __all__ = []
 
 import scarab
-from _dripline.core import DL_Success, set_reply_cache
+from _dripline.core import DL_Success, DL_ServiceError, set_reply_cache
 from .return_codes import get_return_codes_dict
 
 import logging
@@ -25,5 +25,5 @@ class ThrowReply(Exception):
         '''
         Exception.__init__(self, message)
         if isinstance(return_code, str):
-            return_code = get_return_codes_dict()[return_code]
+            return_code = get_return_codes_dict().get(return_code, DL_ServiceError())
         set_reply_cache(return_code, message, payload)
