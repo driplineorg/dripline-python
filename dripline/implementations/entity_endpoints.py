@@ -146,7 +146,7 @@ class FormatEntity(Entity):
     def on_set(self, value):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('device_error', f"endpoint '{self.name}' does not support set")
+            raise ThrowReply('service_error', f"endpoint '{self.name}' does not support set")
         if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:
