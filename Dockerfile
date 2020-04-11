@@ -1,20 +1,23 @@
-ARG img_user=amd64
-ARG img_repo=python
-ARG img_tag=3.7
+#ARG img_user=amd64
+#ARG img_repo=python
+#ARG img_tag=3.7
 
-from ${img_user}/${img_repo}:${img_tag}
+#from ${img_user}/${img_repo}:${img_tag}
 
-RUN apt-get update && apt-get install -y \
-        cmake \
-        # for dripline-cpp
-        build-essential \
-        gdb \
-        libboost-all-dev \
-        librabbitmq-dev \
-        wget &&\
-    rm -rf /var/lib/apt/lists/*
+from 9a4135956856
 
-COPY dripline-cpp /usr/local/src/dripline-cpp
+#RUN apt-get update && apt-get install -y \
+#        cmake \
+#        # for dripline-cpp
+#        build-essential \
+#        gdb \
+#        libboost-all-dev \
+#        librabbitmq-dev \
+#        wget &&\
+#    rm -rf /var/lib/apt/lists/*
+
+COPY pybind11 /usr/local/src/pybind11
+#COPY dripline-cpp /usr/local/src/dripline-cpp
 COPY module_bindings /usr/local/src/module_bindings
 COPY dripline /usr/local/src/dripline
 COPY bin /usr/local/src/bin
@@ -27,10 +30,11 @@ COPY tests /usr/local/src/tests
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
+RUN pip install /usr/local/src
+
 RUN pip install ipython
 RUN pip install pytest
 
-RUN pip install /usr/local/src
 #RUN cd /usr/local/src &&\
 #    python setup.py install
 RUN ldconfig
