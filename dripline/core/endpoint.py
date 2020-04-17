@@ -42,6 +42,8 @@ class Endpoint(_Endpoint):
 
     def do_set_request(self, a_request_message):
         a_specifier =  a_request_message.specifier.to_string()
+        if not "values" in a_request_message.payload:
+            raise ThrowReply('service_error_bad_payload', 'setting called without values, but values are required for set')
         new_value = a_request_message.payload["values"][0]()
         new_value = getattr(new_value, "as_"+new_value.type())()
         logger.debug(f'new_value is [{new_value}]')
