@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "driplinePython.fullname" . | trunc 52 }}-deployment
+  labels:
+    helm.sh/chart: {{ include "driplinePython.chart" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+        app.kubernetes.io/name: {{ include "driplinePython.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "driplinePython.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ .Values.configFileData | toYaml | sha256sum }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-app-container
+          {{- if .Values.image.tag }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ .Values.command }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: auth-volume
+              mountPath: /etc/rabbitmq-secret
+              readOnly: true
+            {{- with .Values.extraVolumeMounts }}
+{{ toYaml . | indent 12 }}
+            {{- end }}
+          {{- if .Values.securityContext }}
+          securityContext:
+            {{ .Values.securityContext | toYaml }}
+          {{- end }}
+      terminationGracePeriodSeconds: 1
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "driplinePython.fullname" . | trunc 56 }}-config
+        - name: auth-volume
+          secret:
+            secretName: {{ .Values.rabbitmqSecretName }}
+        {{- with .Values.extraVolumes }}
+{{ toYaml . | indent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
