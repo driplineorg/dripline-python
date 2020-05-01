@@ -3,7 +3,7 @@ import re
 from _dripline.core import Service
 
 import logging
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 __all__ = []
 
