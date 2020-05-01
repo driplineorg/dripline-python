@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>dripline.core.endpoint &#8212; Dripline-Python unknown documentation</title>
@@ -133,6 +133,8 @@
 
 <div class="viewcode-block" id="Endpoint.do_set_request"><a class="viewcode-back" href="../../../apidoc/dripline.core.endpoint.html#dripline.core.endpoint.Endpoint.do_set_request">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a_request_message</span><span class="p">):</span>
         <span class="n">a_specifier</span> <span class="o">=</span>  <span class="n">a_request_message</span><span class="o">.</span><span class="n">specifier</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;values&quot;</span> <span class="ow">in</span> <span class="n">a_request_message</span><span class="o">.</span><span class="n">payload</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;service_error_bad_payload&#39;</span><span class="p">,</span> <span class="s1">&#39;setting called without values, but values are required for set&#39;</span><span class="p">)</span>
         <span class="n">new_value</span> <span class="o">=</span> <span class="n">a_request_message</span><span class="o">.</span><span class="n">payload</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]()</span>
         <span class="n">new_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="s2">&quot;as_&quot;</span><span class="o">+</span><span class="n">new_value</span><span class="o">.</span><span class="n">type</span><span class="p">())()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;new_value is [</span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
@@ -185,7 +187,7 @@
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
