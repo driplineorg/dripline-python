@@ -4,7 +4,7 @@
 
 #from ${img_user}/${img_repo}:${img_tag}
 
-from 9a4135956856
+from driplineorg/dripline-cpp:cmake-config
 
 #RUN apt-get update && apt-get install -y \
 #        cmake \

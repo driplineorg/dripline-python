@@ -12,14 +12,14 @@ add_subdirectory( pybind11 )
 include_directories( pybind11/include )    
 
 # need yaml-cpp, which exports itself
-find_package( yaml-cpp CONFIG )
-set( SimpleAmqpClient_DIR "/usr/local/lib/cmake/DriplineCpp" )
-set( Scarab_DIR "/usr/local/lib/cmake/DriplineCpp" )
-find_package( SimpleAmqpClient CONFIG )
-find_package( Scarab CONFIG )
+find_package( yaml-cpp CONFIG REQUIRED )
+#set( SimpleAmqpClient_DIR "/usr/local/lib/cmake/DriplineCpp" )
+#set( Scarab_DIR "/usr/local/lib/cmake/DriplineCpp" )
+find_package( SimpleAmqpClient CONFIG REQUIRED )
+find_package( Scarab CONFIG REQUIRED )
 # then import DriplineCpp
 #find_package(DriplineCpp 2.0.0 )
-find_package( DriplineCpp 2.3.0 CONFIG)
+find_package( DriplineCpp 2.3.0 CONFIG REQUIRED )
 
 message( STATUS "dlcpp found: ${DriplineCpp_FOUND}" )
 message( STATUS "dlcpp libraries: ${DriplineCpp_LIBRARIES}" )
