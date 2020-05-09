@@ -5,9 +5,11 @@ command: '["dl-serve", "-c", "/etc/config/config_file.yaml", "-v", "-b", "localh
 
 replicaCount: 1
 
-rabbitmqSecretName: ""
+## rabbitmqSecretName now uses the required template function
+#rabbitmqSecretName: ""
 
-configFileData: ~
+## configFileData now uses the required template function
+#configFileData: ~
 
 image:
   repository: driplineorg/dripline-python

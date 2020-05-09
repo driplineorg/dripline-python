@@ -51,7 +51,7 @@ spec:
             name: {{ include "driplinePython.fullname" . | trunc 56 }}-config
         - name: auth-volume
           secret:
-            secretName: {{ .Values.rabbitmqSecretName }}
+            secretName: {{ required "An existing secret is required in .Values.rabbitmqSecretName" .Values.rabbitmqSecretName }}
         {{- with .Values.extraVolumes }}
 {{ toYaml . | indent 8 }}
         {{- end }}

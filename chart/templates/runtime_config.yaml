@@ -4,4 +4,4 @@ metadata:
     name: {{ include "driplinePython.fullname" . | trunc 56 }}-config
 data:
     config_file.yaml: |
-{{ toYaml .Values.configFileData | indent 6 }}
+{{ required "a valid .Values.configFileData dictionary is required" .Values.configFileData | toYaml | indent 6 }}
