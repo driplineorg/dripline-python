@@ -18,6 +18,8 @@ spec:
       annotations:
         checksum/config: {{ .Values.configFileData | toYaml | sha256sum }}
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 8 }}
