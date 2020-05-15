@@ -4,7 +4,7 @@
 
 #from ${img_user}/${img_repo}:${img_tag}
 
-from driplineorg/dripline-cpp:cmake-config
+from driplineorg/dripline-cpp:scarab3
 
 #RUN apt-get update && apt-get install -y \
 #        cmake \
@@ -16,26 +16,26 @@ from driplineorg/dripline-cpp:cmake-config
 #        wget &&\
 #    rm -rf /var/lib/apt/lists/*
 
-COPY pybind11 /usr/local/src/pybind11
+#COPY pybind11 /usr/local/src_py/pybind11
 #COPY dripline-cpp /usr/local/src/dripline-cpp
-COPY module_bindings /usr/local/src/module_bindings
-COPY dripline /usr/local/src/dripline
-COPY bin /usr/local/src/bin
-COPY .git /usr/local/src/.git
-COPY setup.py /usr/local/src/setup.py
-COPY CMakeLists.txt /usr/local/src/CMakeLists.txt
-COPY tests /usr/local/src/tests
+COPY module_bindings /usr/local/src_py/module_bindings
+COPY dripline /usr/local/src_py/dripline
+COPY bin /usr/local/src_py/bin
+COPY .git /usr/local/src_py/.git
+COPY setup.py /usr/local/src_py/setup.py
+COPY CMakeLists.txt /usr/local/src_py/CMakeLists.txt
+COPY tests /usr/local/src_py/tests
 
 ## would prefer not to do this, just run ldconfig after the build to get things
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-RUN pip install /usr/local/src
+RUN pip install /usr/local/src_py
 
 RUN pip install ipython
 RUN pip install pytest
 
-#RUN cd /usr/local/src &&\
+#RUN cd /usr/local/src_py &&\
 #    python setup.py install
 RUN ldconfig
 
