@@ -26,4 +26,4 @@ set( PB_DRIPLINE_CORE_SOURCEFILES
 )
 pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
 target_link_libraries( _dripline PRIVATE Dripline::Dripline )
-#install( TARGETS _dripline DESTINATION ${LIB_INSTALL_DIR} )
+install( TARGETS _dripline DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
