@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.4.2 )
+project( DriplinePy VERSION 4.4.3 )
 
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/dripline-cpp/scarab/cmake )
 include( PackageBuilder )
