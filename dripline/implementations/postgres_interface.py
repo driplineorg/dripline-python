@@ -156,7 +156,7 @@ class SQLTable(Endpoint):
             else:
                 return_values = []
         except sqlalchemy.exc.IntegrityError as err:
-            raise DriplineDatabaseError(err)
+            raise ThrowReply('resource_error', f"database integreity error: '{repr(err)}'")
         except Exception as err:
             logger.critical('received an unexpected SQL error while trying to insert:\n{}'.format(str(ins) % insert_kv_dict))
             logger.info('traceback is:\n{}'.format(traceback.format_exc()))
@@ -174,7 +174,7 @@ class SQLTable(Endpoint):
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col['payload_key'] in kwargs.keys():
-                raise DriplineDatabaseError(f'a value for <{col}> is required!\ngot: {kwargs}')
+                raise ThrowReply('service_error_invalid_value', f'a value for <{col}> is required!\ngot: {kwargs}')
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update({self._column_map[key]:value for key,value in kwargs.items()})
