@@ -167,7 +167,7 @@ class SQLTable(Endpoint):
         '''
         '''
         # make sure that all provided insert values are expected
-        for col in kwargs.keys():
+        for col in list(kwargs.keys()):
             if not col in self._column_map.keys():
                 logger.debug(f'got an unexpected insert column <{col}>')
                 kwargs.pop(col)
