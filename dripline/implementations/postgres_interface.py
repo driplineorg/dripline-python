@@ -24,7 +24,7 @@ from itertools import groupby
 import collections
 
 # local imports
-from dripline.core import Service, Endpoint
+from dripline.core import Service, Endpoint, ThrowReply
 
 import logging
 logger = logging.getLogger(__name__)
