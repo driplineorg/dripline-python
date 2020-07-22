@@ -142,7 +142,7 @@ class SQLTable(Endpoint):
             this_select = this_select.where(getattr(self.table.c,c)<v)
         for c,v in where_gt_dict.items():
             this_select = this_select.where(getattr(self.table.c,c)>v)
-        result = self.provider.engine.execute(this_select)
+        result = self.service.engine.execute(this_select)
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
