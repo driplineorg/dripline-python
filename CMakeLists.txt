@@ -3,7 +3,7 @@ project( DriplinePy VERSION 3.10.1 )
 
 find_package( pybind11 REQUIRED )
 
-find_package( Dripline 2.3.0 CONFIG REQUIRED )
+find_package( Dripline 2.4.0 CONFIG REQUIRED )
 
 include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )
 
