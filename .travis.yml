@@ -10,14 +10,12 @@ addons:
     - tree
 
 env:
-- DOCKER_CLI_EXPERIMENTAL=enabled BASE_IMAGE_TAG="3.7"
+- DOCKER_CLI_EXPERIMENTAL=enabled BASE_IMAGE_TAG="v2.4.0"
 
 branches:
   only:
   - master
   - develop
-  - dl3/develop
-  - dl3/master
   - "/^v\\d+\\.\\d+\\.\\d+(-S*)?$/"
   - "/.*\\.(?i:build)$/"
 
@@ -37,7 +35,7 @@ jobs:
     script:
     - set -e
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - ".travis/bootstrap_image.sh -u amd64 -r python -t ${BASE_IMAGE_TAG} -a amd64 -i driplineorg/dripline-python:`echo
+    - ".travis/bootstrap_image.sh -u amd64 -r dripline-cpp -t ${BASE_IMAGE_TAG} -a amd64 -i driplineorg/dripline-python:`echo
       ${TRAVIS_BRANCH} | tr / _`"
   - stage: build images
     name: arm32v7
@@ -45,7 +43,7 @@ jobs:
     script:
     - set -e
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - ".travis/bootstrap_image.sh -u arm32v7 -r python -t ${BASE_IMAGE_TAG} -a arm7 -i driplineorg/dripline-python:`echo
+    - ".travis/bootstrap_image.sh -u arm32v7 -r dripline-cpp -t ${BASE_IMAGE_TAG} -a arm7 -i driplineorg/dripline-python:`echo
       ${TRAVIS_BRANCH} | tr / _`"
 
   ## build general-use manifest
