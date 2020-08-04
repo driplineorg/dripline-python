@@ -1,23 +1,12 @@
-#ARG img_user=amd64
-#ARG img_repo=python
-#ARG img_tag=3.7
+ARG img_user=amd64
+ARG img_repo=dripline-cpp
+ARG img_tag=3.7
 
 #from ${img_user}/${img_repo}:${img_tag}
+from driplineorg/${img_repo}:${img_tag}-${img_user}
 
 from driplineorg/dripline-cpp:scarab3
 
-#RUN apt-get update && apt-get install -y \
-#        cmake \
-#        # for dripline-cpp
-#        build-essential \
-#        gdb \
-#        libboost-all-dev \
-#        librabbitmq-dev \
-#        wget &&\
-#    rm -rf /var/lib/apt/lists/*
-
-#COPY pybind11 /usr/local/src_py/pybind11
-#COPY dripline-cpp /usr/local/src/dripline-cpp
 COPY module_bindings /usr/local/src_py/module_bindings
 COPY dripline /usr/local/src_py/dripline
 COPY bin /usr/local/src_py/bin
