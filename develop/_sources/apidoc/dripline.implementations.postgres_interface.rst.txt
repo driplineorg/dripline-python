@@ -1,0 +1,7 @@
+dripline.implementations.postgres\_interface module
+===================================================
+
+.. automodule:: dripline.implementations.postgres_interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
