@@ -1,0 +1,7 @@
+dripline.core.calibrate module
+==============================
+
+.. automodule:: dripline.core.calibrate
+   :members:
+   :undoc-members:
+   :show-inheritance:
