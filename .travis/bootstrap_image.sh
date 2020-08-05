@@ -102,6 +102,7 @@ docker build \
     --build-arg image_user=$image_user \
     --build-arg image_repo=$image_repo \
     --build-arg image_tag=$image_tag \
+    --build-arg image_arch=$architecture_img_suffix \
     $platform_arg \
     -t local/emulation_base:latest \
     -f $dot_travis_path/Dockerfile \

@@ -1,11 +1,10 @@
-ARG img_user=amd64
+ARG img_user=driplineorg
 ARG img_repo=dripline-cpp
-ARG img_tag=3.7
+ARG img_tag=v2.4.0
+#ARG img_arch=arm
 
-#from ${img_user}/${img_repo}:${img_tag}
-from driplineorg/${img_repo}:${img_tag}-${img_user}
-
-from driplineorg/dripline-cpp:scarab3
+from ${img_user}/${img_repo}:${img_tag}
+#from ${img_user}/${img_repo}:${img_tag}-${img_arch}
 
 COPY module_bindings /usr/local/src_py/module_bindings
 COPY dripline /usr/local/src_py/dripline
