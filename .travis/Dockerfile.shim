@@ -3,7 +3,7 @@ ARG image_repo=dripline-cpp
 ARG image_tag=v2.4.0
 ARG image_arch=amd64
 
-FROM ${image_user}/${image_repo}:${image_tag}-${img_arch}
+FROM ${image_user}/${image_repo}:${image_tag}-${image_arch}
 
 # copy the local qemu interpreter layer
 # NOTE: this file is *not* provided in the repo, it needs to be installed via your package manager and copied here
