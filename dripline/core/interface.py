@@ -2,7 +2,7 @@ __all__ = []
 
 import scarab
 
-from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest
+from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
 
 import logging
 logger = logging.getLogger(__name__)
@@ -30,7 +30,10 @@ class Interface(Core):
         '''
         a_specifier = specifier if specifier is not None else ""
         a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
-        return self.send(a_request)
+        receive_reply = self.send(a_request)
+        if not receive_reply.successful_send:
+            raise DriplineError('unable to send request')
+        return receive_reply
 
     def get(self, endpoint, specifier=None, timeout=0):
         '''

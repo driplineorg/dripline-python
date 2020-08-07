@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import datetime
+import importlib.util
 import inspect
 import traceback
 
@@ -38,7 +39,9 @@ class Serve:
         extra_namespace = object()
         if module_path:
             try:
-                extra_namespace = imp.load_source('extra_namespace', module_path)
+                spec = importlib.util.spec_from_file_location('extra_namespace', module_path)
+                extra_namespace = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(extra_namespace)
             except IOError as e:
                 logger.error("unable to load source from: {}".format(module_path))
                 raise e

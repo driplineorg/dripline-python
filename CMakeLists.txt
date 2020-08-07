@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.13) # v3.13 required for dripline-cpp
-project( DriplinePy VERSION 3.10.1 )
+cmake_minimum_required(VERSION 3.1)
+project( DriplinePy VERSION 4.4.6 )
 
 find_package( pybind11 REQUIRED )
 
