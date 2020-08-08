@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.4.6 )
+project( DriplinePy VERSION 4.5.0 )
 
 find_package( pybind11 REQUIRED )
 
