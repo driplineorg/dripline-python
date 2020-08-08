@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dripline.implementations.key_value_store module &#8212; Dripline-Python unknown documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -113,7 +114,10 @@
 <dl class="py method">
 <dt id="dripline.implementations.key_value_store.KeyValueStore.on_get">
 <code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>placeholder method for getting the value of an endpoint.
+Implementations may override to enable OP_GET operations.
+The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dripline.implementations.key_value_store.KeyValueStore.on_set">
@@ -143,7 +147,7 @@ Any returned object must already be a scarab::Param object</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

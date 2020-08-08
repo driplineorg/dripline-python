@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dripline.implementations.entity_endpoints module &#8212; Dripline-Python unknown documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -111,6 +112,43 @@ The Entitys defined here are more broad-ranging than a single service, obviating
 - SimpleSCPIGetEntity/SimpleSCPISetEntity: limited instance of above with disabled Get/Set
 - FormatEntity: utility Entity with expanded functionality</p>
 <dl class="py class">
+<dt id="dripline.implementations.entity_endpoints.FormatEntity">
+<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">FormatEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">get_reply_float</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">set_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">set_value_lowercase</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">set_value_map</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extract_raw_regex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
+<p>Utility Entity allowing arbitrary set and query syntax and formatting for more complicated usage cases
+No assumption about SCPI communication syntax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>get_str</strong> (<em>str</em>) – sent verbatim in the event of on_get; if None, getting of endpoint is disabled</p></li>
+<li><p><strong>get_reply_float</strong> (<em>bool</em>) – apply special formatting to get return</p></li>
+<li><p><strong>set_str</strong> (<em>str</em>) – sent as set_str.format(value) in the event of on_set; if None, setting of endpoint is disabled</p></li>
+<li><p><strong>set_value_lowercase</strong> (<em>bool</em>) – default option to map all string set value to .lower()
+<strong>WARNING</strong>: never set to False if using a set_value_map dict</p></li>
+<li><p><strong>set_value_map</strong> (<em>str||dict</em>) – inverse of calibration to map raw set value to value sent; either a dictionary or an asteval-interpretable string</p></li>
+<li><p><strong>extract_raw_regex</strong> (<em>str</em>) – regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name “value_raw” (ie r’(?P&lt;value_raw&gt;)’ )</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="dripline.implementations.entity_endpoints.FormatEntity.on_get">
+<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for getting the value of an endpoint.
+Implementations may override to enable OP_GET operations.
+The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.implementations.entity_endpoints.FormatEntity.on_set">
+<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for setting the value of an endpoint.
+Implementations may override to enable OP_SET operations.
+Any returned object must already be a scarab::Param object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity">
 <em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">SimpleSCPIEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
@@ -125,7 +163,10 @@ Commands requiring a more complex structure, such as specifying channels or othe
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_get">
 <code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>placeholder method for getting the value of an endpoint.
+Implementations may override to enable OP_GET operations.
+The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_set">
@@ -180,40 +221,6 @@ Any returned object must already be a scarab::Param object</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="dripline.implementations.entity_endpoints.FormatEntity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">FormatEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">get_reply_float</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">set_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">set_value_lowercase</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">set_value_map</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extract_raw_regex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
-<p>Utility Entity allowing arbitrary set and query syntax and formatting for more complicated usage cases
-No assumption about SCPI communication syntax.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>get_str</strong> (<em>str</em>) – sent verbatim in the event of on_get; if None, getting of endpoint is disabled</p></li>
-<li><p><strong>get_reply_float</strong> (<em>bool</em>) – apply special formatting to get return</p></li>
-<li><p><strong>set_str</strong> (<em>str</em>) – sent as set_str.format(value) in the event of on_set; if None, setting of endpoint is disabled</p></li>
-<li><p><strong>set_value_lowercase</strong> (<em>bool</em>) – default option to map all string set value to .lower()
-<strong>WARNING</strong>: never set to False if using a set_value_map dict</p></li>
-<li><p><strong>set_value_map</strong> (<em>str||dict</em>) – inverse of calibration to map raw set value to value sent; either a dictionary or an asteval-interpretable string</p></li>
-<li><p><strong>extract_raw_regex</strong> (<em>str</em>) – regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name “value_raw” (ie r’(?P&lt;value_raw&gt;)’ )</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="dripline.implementations.entity_endpoints.FormatEntity.on_get">
-<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="dripline.implementations.entity_endpoints.FormatEntity.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>placeholder method for setting the value of an endpoint.
-Implementations may override to enable OP_SET operations.
-Any returned object must already be a scarab::Param object</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 
@@ -227,7 +234,7 @@ Any returned object must already be a scarab::Param object</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
