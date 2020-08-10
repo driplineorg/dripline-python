@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.core.endpoint module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.core.entity module" href="dripline.core.entity.html" />
+    <link rel="prev" title="dripline.core.calibrate module" href="dripline.core.calibrate.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.core.html">dripline.core package</a><ul>
+      <li>Previous: <a href="dripline.core.calibrate.html" title="previous chapter">dripline.core.calibrate module</a></li>
+      <li>Next: <a href="dripline.core.entity.html" title="next chapter">dripline.core.entity module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dripline.core.endpoint">
+<span id="dripline-core-endpoint-module"></span><h1>dripline.core.endpoint module<a class="headerlink" href="#module-dripline.core.endpoint" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dripline.core.endpoint.Endpoint">
+<em class="property">class </em><code class="sig-prename descclassname">dripline.core.endpoint.</code><code class="sig-name descname">Endpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core._Endpoint</span></code></p>
+<p>Base class for all objects which can be sent dripline requests.
+Every object described in a runtime configuration passed to <cite>dl-serve</cite> should derive from this class (either directly or indirectly).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – the name of the endpoint, specifies the binding key for request messages to which this object should reply</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="dripline.core.endpoint.Endpoint.do_cmd_request">
+<code class="sig-name descname">do_cmd_request</code><span class="sig-paren">(</span><em class="sig-param">self: _dripline.core._Endpoint</em>, <em class="sig-param">arg0: dripline::msg_request</em><span class="sig-paren">)</span> &#x2192; dripline::msg_reply<a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint.do_cmd_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint.do_cmd_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>overridable method for implementing cmd handling behavior</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.endpoint.Endpoint.do_get_request">
+<code class="sig-name descname">do_get_request</code><span class="sig-paren">(</span><em class="sig-param">self: _dripline.core._Endpoint</em>, <em class="sig-param">arg0: dripline::msg_request</em><span class="sig-paren">)</span> &#x2192; dripline::msg_reply<a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint.do_get_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint.do_get_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>overridable method for implementing get handling behavior</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.endpoint.Endpoint.do_set_request">
+<code class="sig-name descname">do_set_request</code><span class="sig-paren">(</span><em class="sig-param">self: _dripline.core._Endpoint</em>, <em class="sig-param">arg0: dripline::msg_request</em><span class="sig-paren">)</span> &#x2192; dripline::msg_reply<a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint.do_set_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint.do_set_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>overridable method for implementing set handling behavior</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.endpoint.Endpoint.on_get">
+<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint.on_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint.on_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for getting the value of an endpoint.
+Implementations may override to enable OP_GET operations.
+The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.endpoint.Endpoint.on_set">
+<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/endpoint.html#Endpoint.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.endpoint.Endpoint.on_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for setting the value of an endpoint.
+Implementations may override to enable OP_SET operations.
+Any returned object must already be a scarab::Param object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.core.endpoint.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

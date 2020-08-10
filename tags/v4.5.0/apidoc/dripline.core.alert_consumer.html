@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.core.alert_consumer module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.core.calibrate module" href="dripline.core.calibrate.html" />
+    <link rel="prev" title="dripline.core package" href="dripline.core.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.core.html">dripline.core package</a><ul>
+      <li>Previous: <a href="dripline.core.html" title="previous chapter">dripline.core package</a></li>
+      <li>Next: <a href="dripline.core.calibrate.html" title="next chapter">dripline.core.calibrate module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dripline.core.alert_consumer">
+<span id="dripline-core-alert-consumer-module"></span><h1>dripline.core.alert_consumer module<a class="headerlink" href="#module-dripline.core.alert_consumer" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dripline.core.alert_consumer.AlertConsumer">
+<em class="property">class </em><code class="sig-prename descclassname">dripline.core.alert_consumer.</code><code class="sig-name descname">AlertConsumer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alert_keys</span><span class="o">=</span><span class="default_value">['#']</span></em>, <em class="sig-param"><span class="n">alert_key_parser_re</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/alert_consumer.html#AlertConsumer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.alert_consumer.AlertConsumer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Service</span></code></p>
+<p>A base class for implementing custom alert message consumers.</p>
+<p>One is expected to extend this class in one of two ways:
+1. More advanced: override the existing on_alert_message method with whatever behavior is desired
+2. Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alert_keys</strong> – an iterable of strings which will be used as binding keys on the alerts exchange</p></li>
+<li><p><strong>alert_key_parser_re</strong> – a regular expression (see python’s re library) which is used in the default implementation
+of parse_routing_key to extract useful data from the incoming routing key.  Note: a failed
+match will return an empty dict, you are responsible for checkin and deciding if this is an
+error. We use re.match and return the groupdict.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="dripline.core.alert_consumer.AlertConsumer.bind_keys">
+<code class="sig-name descname">bind_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">_dripline.core.Service</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/dripline/core/alert_consumer.html#AlertConsumer.bind_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.alert_consumer.AlertConsumer.bind_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>overridable method to create all desired key bindings, overrides should still call this version</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.alert_consumer.AlertConsumer.on_alert_message">
+<code class="sig-name descname">on_alert_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n">_dripline.core.Service</span></em>, <em class="sig-param"><span class="n">arg0</span><span class="p">:</span> <span class="n">_dripline.core.MsgAlert</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/dripline/core/alert_consumer.html#AlertConsumer.on_alert_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.alert_consumer.AlertConsumer.on_alert_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.alert_consumer.AlertConsumer.parse_routing_key">
+<code class="sig-name descname">parse_routing_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a_routing_key</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/alert_consumer.html#AlertConsumer.parse_routing_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.alert_consumer.AlertConsumer.parse_routing_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.alert_consumer.AlertConsumer.process_payload">
+<code class="sig-name descname">process_payload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a_payload</span></em>, <em class="sig-param"><span class="n">a_routing_key_data</span></em>, <em class="sig-param"><span class="n">a_message_timestamp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/alert_consumer.html#AlertConsumer.process_payload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.alert_consumer.AlertConsumer.process_payload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.core.alert_consumer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
