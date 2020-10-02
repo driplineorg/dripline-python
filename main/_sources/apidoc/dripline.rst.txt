@@ -1,0 +1,27 @@
+dripline package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   dripline.core
+   dripline.implementations
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   dripline.version
+
+Module contents
+---------------
+
+.. automodule:: dripline
+   :members:
+   :undoc-members:
+   :show-inheritance:

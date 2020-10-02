@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.core.entity &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/modules.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for dripline.core.entity</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<span class="kn">import</span> <span class="nn">numbers</span>
+
+<span class="kn">import</span> <span class="nn">scarab</span>
+
+<span class="kn">from</span> <span class="nn">.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span>
+<span class="kn">from</span> <span class="nn">dripline.core</span> <span class="kn">import</span> <span class="n">MsgAlert</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_log_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    requires get_on_set be true; log the result of the on_get via an alert message</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="p">[</span><span class="sa">u</span><span class="s1">&#39;&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;value_raw&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;value_raw&#39;</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;set done, now log&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_a_value</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="k">def</span> <span class="nf">_get_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    make a call to on_get immediately after on_set returns, returning the result</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;set, now get_on_set&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_get</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Entity&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Entity"><a class="viewcode-back" href="../../../apidoc/dripline.core.entity.html#dripline.core.entity.Entity">[docs]</a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">Endpoint</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Subclass of Endpoint which adds logic related to logging and confirming values.</span>
+
+<span class="sd">    In particular, there is support for:</span>
+<span class="sd">    get_on_set -&gt; setting the endpoint&#39;s value returns a get() result rather than an empty success (particularly useful for devices which may round assignment values)</span>
+<span class="sd">    log_on_set -&gt; further extends get_on_set to send an alert message in addtion to returning the value in a reply</span>
+<span class="sd">    log_interval -&gt; leverages the scheduler class to log the on_get result at a regular cadence</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1">#check_on_set -&gt; allows for more complex logic to confirm successful value updates</span>
+    <span class="c1">#                (for example, the success condition may be measuring another endpoint)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_on_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_routing_key_prefix</span><span class="o">=</span><span class="s1">&#39;sensor_value&#39;</span><span class="p">,</span> <span class="n">log_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">log_on_set</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned</span>
+<span class="sd">            log_routing_key_prefix: first term in routing key used in alert messages which log values</span>
+<span class="sd">            log_interval: how often to log the Entity&#39;s value. If 0 then scheduled logging is disabled;</span>
+<span class="sd">                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments</span>
+<span class="sd">                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value</span>
+<span class="sd">            log_on_set: if true, always call log_a_value() immediately after on_set</span>
+<span class="sd">                        **Note:** requires get_on_set be true, overrides must be equivalent</span>
+<span class="sd">            calibration (string || dict) : if string, updated with raw on_get() result via str.format() in</span>
+<span class="sd">                                           @calibrate decorator, used to populate raw and calibrated values</span>
+<span class="sd">                                           fields of a result payload. If a dictionary, the raw result is used</span>
+<span class="sd">                                           to index the dict with the calibrated value being the dict&#39;s value.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Endpoint</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_routing_key_prefix</span><span class="o">=</span><span class="n">log_routing_key_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calibration</span> <span class="o">=</span> <span class="n">calibration</span>
+
+        <span class="c1"># keep a reference to the on_set (possibly decorated in a subclass), needed for changing *_on_set configurations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initial_on_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_on_set</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_on_set</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_on_set</span> <span class="o">=</span> <span class="n">get_on_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_on_set</span> <span class="o">=</span> <span class="n">log_on_set</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_interval</span> <span class="o">=</span> <span class="n">log_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">get_on_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_on_set</span>
+    <span class="nd">@get_on_set</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">get_on_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="n">_get_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_on_set</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_on_set</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="n">_log_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_set</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_on_set</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unable to disable get_on_set while log_on_set is enabled&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_on_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_on_set</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">log_on_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_on_set</span>
+    <span class="nd">@log_on_set</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">log_on_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_on_set</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unable to enable log_on_set when get_on_set is disabled&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="n">_log_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_on_set</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_on_set</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span> <span class="o">=</span> <span class="n">_get_on_set_decoration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_set</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_on_set</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">log_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_interval</span>
+    <span class="nd">@log_interval</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">log_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_interval</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_interval</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_interval</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">new_interval</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_interval</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_interval</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="o">**</span><span class="n">new_interval</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_interval</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_interval</span> <span class="o">=</span> <span class="n">new_interval</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to interpret a new_interval of type &lt;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">new_interval</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Entity.scheduled_log"><a class="viewcode-back" href="../../../apidoc/dripline.core.entity.html#dripline.core.entity.Entity.scheduled_log">[docs]</a>    <span class="k">def</span> <span class="nf">scheduled_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;in a scheduled log event&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_a_value</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entity.log_a_value"><a class="viewcode-back" href="../../../apidoc/dripline.core.entity.html#dripline.core.entity.Entity.log_a_value">[docs]</a>    <span class="k">def</span> <span class="nf">log_a_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_value</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;value to log is:</span><span class="se">\n</span><span class="si">{</span><span class="n">the_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">the_alert</span> <span class="o">=</span> <span class="n">MsgAlert</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">payload</span><span class="o">=</span><span class="n">scarab</span><span class="o">.</span><span class="n">to_param</span><span class="p">(</span><span class="n">the_value</span><span class="p">),</span> <span class="n">routing_key</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_routing_key_prefix</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">alert_sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">the_alert</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entity.start_logging"><a class="viewcode-back" href="../../../apidoc/dripline.core.entity.html#dripline.core.entity.Entity.start_logging">[docs]</a>    <span class="k">def</span> <span class="nf">start_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">unschedule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_interval</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;should start logging every </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_interval</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheduled_log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_interval</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">execution_buffer</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unable to start logging when log_interval evaluates false&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;log action id is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entity.stop_logging"><a class="viewcode-back" href="../../../apidoc/dripline.core.entity.html#dripline.core.entity.Entity.stop_logging">[docs]</a>    <span class="k">def</span> <span class="nf">stop_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO: should it be an error to stop_logging() when already not logging?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">unschedule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_action_id</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

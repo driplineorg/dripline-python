@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.implementations.ethernet_scpi_service &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/modules.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for dripline.implementations.ethernet_scpi_service</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">scarab</span>
+
+<span class="kn">from</span> <span class="nn">dripline.core</span> <span class="kn">import</span> <span class="n">Service</span><span class="p">,</span> <span class="n">ThrowReply</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;EthernetSCPIService&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="EthernetSCPIService"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.ethernet_scpi_service.html#dripline.implementations.ethernet_scpi_service.EthernetSCPIService">[docs]</a><span class="k">class</span> <span class="nc">EthernetSCPIService</span><span class="p">(</span><span class="n">Service</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.</span>
+<span class="sd">    In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.</span>
+<span class="sd">    In particular, devices must support sending a response to every command received (either natively, or via SCPI&#39;s command composition) and responses are expected to include a termination marking complete transmission.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">socket_timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">socket_info</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">1234</span><span class="p">),</span>
+                 <span class="n">cmd_at_reconnect</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*OPC?&#39;</span><span class="p">],</span>
+                 <span class="n">reconnect_test</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                 <span class="n">command_terminator</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">response_terminator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reply_echo_cmd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span>
+                 <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            socket_timeout (int): number of seconds to wait for a reply from the device before timeout.</span>
+<span class="sd">            socket_info (tuple or string): either socket.socket.connect argument tuple, or string that</span>
+<span class="sd">                parses into one.</span>
+<span class="sd">            cmd_at_reconnect ([str,...]): a list of commands to send to the device every time the socket</span>
+<span class="sd">                connection is estabilished note that these will be sent on *every* connection, which may be</span>
+<span class="sd">                disruptive to ongoing activity.</span>
+<span class="sd">            reconnect_test (str): expected return from the last command in the cmd_at_reconnect list, must</span>
+<span class="sd">                match exactly or the reconnect is deemed a failure</span>
+<span class="sd">            command_terminator (str): string to be post-pended to commands, indicating to the device that</span>
+<span class="sd">                the transmission is complete (often \\r, \\n, or \\r\\n - where escaping depends on string types)</span>
+<span class="sd">            response_terminator (str): string added to the end of a reply from the device, indicates the</span>
+<span class="sd">                end of the reply</span>
+<span class="sd">            reply_echo_cmd (bool): indicates that the device includes the the received command in its reply</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Service</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">socket_info</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Formatting socket_info: </span><span class="si">{</span><span class="n">socket_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">re_str</span> <span class="o">=</span> <span class="s2">&quot;\([</span><span class="se">\&quot;</span><span class="s2">&#39;](\S+)[</span><span class="se">\&quot;</span><span class="s2">&#39;], ?(\d+)\)&quot;</span>
+            <span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="n">port</span><span class="p">)</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">re_str</span><span class="p">,</span><span class="n">socket_info</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">socket_info</span> <span class="o">=</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">response_terminator</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">response_terminator</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;service_error_invalid_value&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Invalid response terminator: &lt;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">response_terminator</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;! Expect string&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmd_at_reconnect</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">cmd_at_reconnect</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cmd_at_reconnect</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;service_error_invalid_value&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Invalid cmd_at_reconnect: &lt;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">cmd_at_reconnect</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;! Expect non-zero length list&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">socket_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_info</span> <span class="o">=</span> <span class="n">socket_info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd_at_reconnect</span> <span class="o">=</span> <span class="n">cmd_at_reconnect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconnect_test</span> <span class="o">=</span> <span class="n">reconnect_test</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command_terminator</span> <span class="o">=</span> <span class="n">command_terminator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_terminator</span> <span class="o">=</span> <span class="n">response_terminator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reply_echo_cmd</span> <span class="o">=</span> <span class="n">reply_echo_cmd</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Method establishing socket to ethernet instrument.</span>
+<span class="sd">        Called by __init__ or send (on failed communication).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;connection </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_info</span><span class="si">}</span><span class="s2"> refused: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_connection&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Unable to establish ethernet socket </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ethernet socket </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_info</span><span class="si">}</span><span class="s2"> established&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Lantronix xDirect adapters have no query options</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_at_reconnect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_at_reconnect</span><span class="p">[:]</span>
+        <span class="c1"># Agilent/Keysight instruments give an unprompted *IDN? response on</span>
+        <span class="c1">#   connection. This must be cleared before communicating with a blank</span>
+        <span class="c1">#   listen or all future queries will be offset.</span>
+        <span class="k">while</span> <span class="n">commands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Emptying reconnect buffer&quot;</span><span class="p">)</span>
+            <span class="n">commands</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_listen</span><span class="p">(</span><span class="n">blank_command</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_commands</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span>
+        <span class="c1"># Final cmd_at_reconnect should return &#39;1&#39; to test connection.</span>
+        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconnect_test</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed connection test.  Response was </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># exceptions.DriplineHardwareConnectionError</span>
+            <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_connection&#39;</span><span class="p">,</span> <span class="s2">&quot;Failed connection test.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EthernetSCPIService.send_to_device"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.ethernet_scpi_service.html#dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device">[docs]</a>    <span class="k">def</span> <span class="nf">send_to_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Standard device access method to communicate with instrument.</span>
+<span class="sd">        NEVER RENAME THIS METHOD!</span>
+
+<span class="sd">        commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!</span>
+<span class="sd">                             : if impossible, set as None to skip</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">commands</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">commands</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_commands</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;socket.error &lt;</span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&gt; received, attempting reconnect&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_commands</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Ethernet connection reestablished&quot;</span><span class="p">)</span>
+        <span class="c1"># exceptions.DriplineHardwareResponselessError</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reconnect</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_commands</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Query successful after ethernet connection recovered&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">:</span> <span class="c1"># simply trying to make it possible to catch the error below</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Ethernet reconnect failed, dead socket&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_connection&#39;</span><span class="p">,</span> <span class="s2">&quot;Broken ethernet socket&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span> <span class="c1">##TODO handle all exceptions, that seems questionable</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Query failed after successful ethernet socket reconnect&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_no_response&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="n">to_return</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;should return:</span><span class="se">\n</span><span class="si">{</span><span class="n">to_return</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">to_return</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_send_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commands</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Take a list of commands, send to instrument and receive responses, do any necessary formatting.</span>
+
+<span class="sd">        commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!</span>
+<span class="sd">                             : if impossible, set as None to skip</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">all_data</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_terminator</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sending: </span><span class="si">{</span><span class="n">command</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_terminator</span><span class="p">:</span>
+                <span class="n">blank_command</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">blank_command</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listen</span><span class="p">(</span><span class="n">blank_command</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_echo_cmd</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">command</span><span class="p">):</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">command</span><span class="p">):]</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">blank_command</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;device_error_connection&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Bad ethernet query return: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sync: </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">command</span><span class="p">)</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">all_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_data</span>
+
+
+    <span class="k">def</span> <span class="nf">_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blank_command</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query socket for response.</span>
+
+<span class="sd">        blank_comands (bool): flag which is True when command is exactly the command terminator</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response_terminator</span><span class="p">):</span>
+                    <span class="n">terminator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_terminator</span>
+                    <span class="k">break</span>
+                <span class="c1"># Special exception for disconnect of prologix box to avoid infinite loop</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_no_response&#39;</span><span class="p">,</span> <span class="s2">&quot;Empty socket.recv packet&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;socket.timeout condition met; received:</span><span class="se">\n</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">blank_command</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_no_response&#39;</span><span class="p">,</span> <span class="s2">&quot;Unexpected socket.timeout&quot;</span><span class="p">)</span>
+            <span class="n">terminator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">data</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">terminator</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
