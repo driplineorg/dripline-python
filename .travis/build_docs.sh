@@ -1,6 +1,6 @@
 #! /bin/bash
 
-echo $(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "master" ]];
+echo $(if [[ "$TRAVIS_BRANCH" == "develop" || "$TRAVIS_BRANCH" == "main" ]];
 then echo "$TRAVIS_BRANCH"; elif [[ ! -z "$TRAVIS_TAG" ]]; then echo "tags/$TRAVIS_TAG";
 else echo "branches/$(echo $TRAVIS_BRANCH | tr / _ | tr - .)"; fi) | tee /tmp/output_location
 docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=$(echo ${TRAVIS_BRANCH} | tr / _) .

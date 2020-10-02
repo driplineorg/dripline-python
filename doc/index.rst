@@ -1,4 +1,4 @@
-.. dripline-python documentation master file
+.. dripline-python documentation primary file
 
 ===========================================
 Welcome to Dripline-python's documentation!

@@ -6,7 +6,7 @@ You can find [it here](http://www.project8.org/dripline).
 
 # Quick-start
 The installation of dripline-python is done via setuptools and so the standard pip-based procedures should work.
-More detailed notes are on the [getting started page](https://dripline-python.readthedocs.io/en/master/getting_started.html), along with description of the dependencies.
+More detailed notes are on the [getting started page](https://driplineorg.github.io/dripline-python/latest/getting_started.html), along with description of the dependencies.
 
 # Repo navigation
 The repo is organized with the following subdirectories

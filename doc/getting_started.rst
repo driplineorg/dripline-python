@@ -29,7 +29,7 @@ Docker containers
 -----------------
 
 The easiest way to get started with dripline is simply to use a container image from the `dockerhub repository <https://hub.docker.com/r/driplineorg/dripline-python/>`_.
-These are built automatically based on tagged releases, as well as merges into the master or develop branch.
+These are built automatically based on tagged releases, as well as merges into the main or develop branch.
 Images are automatically built for both x86 and armv7 architectures, and a container manifest allows use of common tag references to resolve to the architectures-specific images.
 
 You may also use the ``Dockerfile`` located in the dripline-python GitHub repository's root directory to build the image yourself (the full repository is the required build context).
