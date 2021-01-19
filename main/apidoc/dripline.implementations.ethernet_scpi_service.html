@@ -6,13 +6,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>dripline.implementations.ethernet_scpi_service module &#8212; Dripline-Python unknown documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -104,7 +103,7 @@
 <span id="dripline-implementations-ethernet-scpi-service-module"></span><h1>dripline.implementations.ethernet_scpi_service module<a class="headerlink" href="#module-dripline.implementations.ethernet_scpi_service" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.ethernet_scpi_service.</code><code class="sig-name descname">EthernetSCPIService</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">socket_timeout</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">socket_info</span><span class="o">=</span><span class="default_value">'localhost', 1234</span></em>, <em class="sig-param"><span class="n">cmd_at_reconnect</span><span class="o">=</span><span class="default_value">['*OPC?']</span></em>, <em class="sig-param"><span class="n">reconnect_test</span><span class="o">=</span><span class="default_value">'1'</span></em>, <em class="sig-param"><span class="n">command_terminator</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">response_terminator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reply_echo_cmd</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.ethernet_scpi_service.</code><code class="sig-name descname">EthernetSCPIService</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">socket_timeout</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">socket_info</span><span class="o">=</span><span class="default_value">('localhost', 1234)</span></em>, <em class="sig-param"><span class="n">cmd_at_reconnect</span><span class="o">=</span><span class="default_value">['*OPC?']</span></em>, <em class="sig-param"><span class="n">reconnect_test</span><span class="o">=</span><span class="default_value">'1'</span></em>, <em class="sig-param"><span class="n">command_terminator</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">response_terminator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reply_echo_cmd</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Service</span></code></p>
 <p>A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.
 In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.
@@ -154,7 +153,7 @@ NEVER RENAME THIS METHOD!</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

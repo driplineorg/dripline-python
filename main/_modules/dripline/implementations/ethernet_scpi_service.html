@@ -6,13 +6,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>dripline.implementations.ethernet_scpi_service &#8212; Dripline-Python unknown documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/DL3Logo.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -228,7 +227,7 @@
                 <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_connection&#39;</span><span class="p">,</span> <span class="s2">&quot;Broken ethernet socket&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span> <span class="c1">##TODO handle all exceptions, that seems questionable</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Query failed after successful ethernet socket reconnect&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_no_response&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error_no_response&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
         <span class="n">to_return</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -302,7 +301,7 @@
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
