@@ -136,7 +136,7 @@ class EthernetSCPIService(Service):
                 raise ThrowReply('resource_error_connection', "Broken ethernet socket")
             except Exception as err: ##TODO handle all exceptions, that seems questionable
                 logger.critical("Query failed after successful ethernet socket reconnect")
-                raise ThrowReply('resource_error_no_response', err)
+                raise ThrowReply('resource_error_no_response', str(err))
         finally:
             self.alock.release()
         to_return = ';'.join(data)
