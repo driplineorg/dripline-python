@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contribute &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dripline.version module" href="apidoc/dripline.version.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apidoc/modules.html">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#branching">Branching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#merging">Merging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coding-style">Coding Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="apidoc/dripline.version.html" title="previous chapter">dripline.version module</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="contribute">
+<h1>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="branching">
+<h2>Branching<a class="headerlink" href="#branching" title="Permalink to this headline">¶</a></h2>
+<p>Branches are cheap, lets do more of those.
+For more details, <a class="reference external" href="nvie.com/posts/a-successful-git-branching-model">this branching model</a> has served us very well to date.
+In particular, please note that main is for tagged/release versions while develop is the latest working version.
+We name branches off of develop as <code class="docutils literal notranslate"><span class="pre">feature/&lt;description&gt;</span></code> and bug fixes off of main as <code class="docutils literal notranslate"><span class="pre">hotfix/&lt;description&gt;</span></code> so that they are sorted and easier to navigate.
+In the hopefullly infrequent event of a major version change to the dripline standard, we will follow a parallel structure of branches for the new version prefixed with <code class="docutils literal notranslate"><span class="pre">dl&lt;N&gt;</span></code> (where <code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code> is replaced with the major version number of dripline).</p>
+<p>Anyone is welcome to fork the repo and pass back changes via pull request.
+Frequent contributors may request membership in the github organization, which will allow pushing feature and hotfix branches directly to the driplineorg repo.</p>
+</div>
+<div class="section" id="merging">
+<h2>Merging<a class="headerlink" href="#merging" title="Permalink to this headline">¶</a></h2>
+<p>Merging follows the instruction from the branching section above in most cases, but there are a few additional notes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>With the default travis-ci config, if the name of your branch ends in <code class="docutils literal notranslate"><span class="pre">\build</span></code>, then when you push it will trigger travis-ci tasks</p></li>
+<li><p>Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the <code class="docutils literal notranslate"><span class="pre">develop</span></code> or <code class="docutils literal notranslate"><span class="pre">main</span></code> branches.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="coding-style">
+<h2>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<p>The internet is full of arguments over coding style which we’re not really interested in getting into; in this repo we’re going just go ahead and start with the following assumptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Regardless of what that style is, consistent styling makes code easier to read</p></li>
+<li><p>If we follow what is used in the python community then that is more intuitive to new people</p></li>
+<li><p>We’re not robots and common sense can win out</p></li>
+<li><p>doc strings can be special, depending on how they are expected to be rendered (for example in the API docs section of this page)</p></li>
+</ul>
+</div></blockquote>
+<p>Based on that we prefer/stress the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Generally we try to follow <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP-8</a></p></li>
+<li><p>We’re using sphinx with <code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span></code> and have the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html">sphinx.ext.napolean extension</a>. Google style docstrings are preferred, but proper parsing is most important.</p></li>
+<li><p>The 80 column limit makes things harder to read as often as easier (displays have had more than 80 columns and editors have been wrapping text for some time now). Use your judgement on when forced line-wrapping is needed</p></li>
+<li><p>For multi-line python data structures which support it, place a comma after the final element and the closing symbol on its own line, that way any element may be easily commented out.</p></li>
+<li><p>Use unix-style line endings and soft tabs in all files (other than the documentation Makefile)</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Since we reuse some cpp code here using Pybind, we have provided some unit tests to make sure such classes and methods work properly. These tests are contained in the <code class="docutils literal notranslate"><span class="pre">/tests</span></code> folder and can be run using PyTest. An overview can be found <a class="reference external" href="http://doc.pytest.org/en/5.3.5/goodpractices.html/">there</a>.</p>
+<dl class="simple">
+<dt>How to run the tests:</dt><dd><ul class="simple">
+<li><p>After installing the package, either navigate to the folder and run all tests within it using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span></code>, or specify the path to the test to be run using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/to/be/run/test_something.py</span></code>.</p></li>
+<li><p>To disable the caching, use <code class="docutils literal notranslate"><span class="pre">PYTHONDONTWRITEBYTECODE=1</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">-p</span> <span class="pre">no:cacheprovider</span></code>.</p></li>
+</ul>
+</dd>
+<dt>How to add a new test:</dt><dd><ul class="simple">
+<li><p>Name your file with <code class="docutils literal notranslate"><span class="pre">test_</span></code> prefix, followed by the name of the class to be tested.</p></li>
+<li><p>Within the file, write <code class="docutils literal notranslate"><span class="pre">test</span></code> prefixed methods to be run. Ideally, one such method is supposed to test only one case. To keep unit tests simple and independent of each other, test classes are not suggested.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/contribute.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

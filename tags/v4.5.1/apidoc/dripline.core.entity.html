@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.core.entity module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.core.interface module" href="dripline.core.interface.html" />
+    <link rel="prev" title="dripline.core.endpoint module" href="dripline.core.endpoint.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.core.html">dripline.core package</a><ul>
+      <li>Previous: <a href="dripline.core.endpoint.html" title="previous chapter">dripline.core.endpoint module</a></li>
+      <li>Next: <a href="dripline.core.interface.html" title="next chapter">dripline.core.interface module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dripline.core.entity">
+<span id="dripline-core-entity-module"></span><h1>dripline.core.entity module<a class="headerlink" href="#module-dripline.core.entity" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dripline.core.entity.Entity">
+<em class="property">class </em><code class="sig-prename descclassname">dripline.core.entity.</code><code class="sig-name descname">Entity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_on_set</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log_routing_key_prefix</span><span class="o">=</span><span class="default_value">'sensor_value'</span></em>, <em class="sig-param"><span class="n">log_interval</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">log_on_set</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">calibration</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dripline.core.endpoint.html#dripline.core.endpoint.Endpoint" title="dripline.core.endpoint.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.endpoint.Endpoint</span></code></a></p>
+<p>Subclass of Endpoint which adds logic related to logging and confirming values.</p>
+<p>In particular, there is support for:
+get_on_set -&gt; setting the endpoint’s value returns a get() result rather than an empty success (particularly useful for devices which may round assignment values)
+log_on_set -&gt; further extends get_on_set to send an alert message in addtion to returning the value in a reply
+log_interval -&gt; leverages the scheduler class to log the on_get result at a regular cadence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>get_on_set</strong> – if true, calls to on_set are immediately followed by an on_get, which is returned</p></li>
+<li><p><strong>log_routing_key_prefix</strong> – first term in routing key used in alert messages which log values</p></li>
+<li><p><strong>log_interval</strong> – how often to log the Entity’s value. If 0 then scheduled logging is disabled;
+if a number, interpreted as number of seconds; if a dict, unpacked as arguments
+to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value</p></li>
+<li><p><strong>log_on_set</strong> – if true, always call log_a_value() immediately after on_set
+<strong>Note:</strong> requires get_on_set be true, overrides must be equivalent</p></li>
+<li><p><strong>calibration</strong> (<em>string || dict</em>) – if string, updated with raw on_get() result via str.format() in
+&#64;calibrate decorator, used to populate raw and calibrated values
+fields of a result payload. If a dictionary, the raw result is used
+to index the dict with the calibrated value being the dict’s value.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.get_on_set">
+<em class="property">property </em><code class="sig-name descname">get_on_set</code><a class="headerlink" href="#dripline.core.entity.Entity.get_on_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.log_a_value">
+<code class="sig-name descname">log_a_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">the_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.log_a_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.log_a_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.log_interval">
+<em class="property">property </em><code class="sig-name descname">log_interval</code><a class="headerlink" href="#dripline.core.entity.Entity.log_interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.log_on_set">
+<em class="property">property </em><code class="sig-name descname">log_on_set</code><a class="headerlink" href="#dripline.core.entity.Entity.log_on_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.scheduled_log">
+<code class="sig-name descname">scheduled_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.scheduled_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.scheduled_log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.start_logging">
+<code class="sig-name descname">start_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.start_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.start_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dripline.core.entity.Entity.stop_logging">
+<code class="sig-name descname">stop_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.stop_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.stop_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.core.entity.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,7 @@
+dripline.core.interface module
+==============================
+
+.. automodule:: dripline.core.interface
+   :members:
+   :undoc-members:
+   :show-inheritance:

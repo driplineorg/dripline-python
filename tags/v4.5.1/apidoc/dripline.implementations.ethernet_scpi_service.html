@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.implementations.ethernet_scpi_service module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.implementations.key_value_store module" href="dripline.implementations.key_value_store.html" />
+    <link rel="prev" title="dripline.implementations.entity_endpoints module" href="dripline.implementations.entity_endpoints.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.implementations.html">dripline.implementations package</a><ul>
+      <li>Previous: <a href="dripline.implementations.entity_endpoints.html" title="previous chapter">dripline.implementations.entity_endpoints module</a></li>
+      <li>Next: <a href="dripline.implementations.key_value_store.html" title="next chapter">dripline.implementations.key_value_store module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-dripline.implementations.ethernet_scpi_service">
+<span id="dripline-implementations-ethernet-scpi-service-module"></span><h1>dripline.implementations.ethernet_scpi_service module<a class="headerlink" href="#module-dripline.implementations.ethernet_scpi_service" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService">
+<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.ethernet_scpi_service.</code><code class="sig-name descname">EthernetSCPIService</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">socket_timeout</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">socket_info</span><span class="o">=</span><span class="default_value">('localhost', 1234)</span></em>, <em class="sig-param"><span class="n">cmd_at_reconnect</span><span class="o">=</span><span class="default_value">['*OPC?']</span></em>, <em class="sig-param"><span class="n">reconnect_test</span><span class="o">=</span><span class="default_value">'1'</span></em>, <em class="sig-param"><span class="n">command_terminator</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">response_terminator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reply_echo_cmd</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Service</span></code></p>
+<p>A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.
+In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.
+In particular, devices must support sending a response to every command received (either natively, or via SCPI’s command composition) and responses are expected to include a termination marking complete transmission.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>socket_timeout</strong> (<em>int</em>) – number of seconds to wait for a reply from the device before timeout.</p></li>
+<li><p><strong>socket_info</strong> (<em>tuple</em><em> or </em><em>string</em>) – either socket.socket.connect argument tuple, or string that
+parses into one.</p></li>
+<li><p><strong>cmd_at_reconnect</strong> (<em>[</em><em>str</em><em>,</em><em>..</em><em>]</em>) – a list of commands to send to the device every time the socket
+connection is estabilished note that these will be sent on <em>every</em> connection, which may be
+disruptive to ongoing activity.</p></li>
+<li><p><strong>reconnect_test</strong> (<em>str</em>) – expected return from the last command in the cmd_at_reconnect list, must
+match exactly or the reconnect is deemed a failure</p></li>
+<li><p><strong>command_terminator</strong> (<em>str</em>) – string to be post-pended to commands, indicating to the device that
+the transmission is complete (often r, n, or rn - where escaping depends on string types)</p></li>
+<li><p><strong>response_terminator</strong> (<em>str</em>) – string added to the end of a reply from the device, indicates the
+end of the reply</p></li>
+<li><p><strong>reply_echo_cmd</strong> (<em>bool</em>) – indicates that the device includes the the received command in its reply</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device">
+<code class="sig-name descname">send_to_device</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">commands</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService.send_to_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard device access method to communicate with instrument.
+NEVER RENAME THIS METHOD!</p>
+<dl class="simple">
+<dt>commands (list||None): list of command(s) to send to the instrument following (re)connection to the instrument, still must return a reply!</dt><dd><p>: if impossible, set as None to skip</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.implementations.ethernet_scpi_service.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
