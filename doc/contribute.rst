@@ -8,8 +8,8 @@ Branching
 
 Branches are cheap, lets do more of those.
 For more details, `this branching model <nvie.com/posts/a-successful-git-branching-model>`_ has served us very well to date.
-In particular, please note that master is for tagged/release versions while develop is the latest working version.
-We name branches off of develop as ``feature/<description>`` and bug fixes off of master as ``hotfix/<description>`` so that they are sorted and easier to navigate.
+In particular, please note that main is for tagged/release versions while develop is the latest working version.
+We name branches off of develop as ``feature/<description>`` and bug fixes off of main as ``hotfix/<description>`` so that they are sorted and easier to navigate.
 In the hopefullly infrequent event of a major version change to the dripline standard, we will follow a parallel structure of branches for the new version prefixed with ``dl<N>`` (where ``<N>`` is replaced with the major version number of dripline).
 
 Anyone is welcome to fork the repo and pass back changes via pull request.
@@ -22,7 +22,7 @@ Merging
 Merging follows the instruction from the branching section above in most cases, but there are a few additional notes:
 
   - With the default travis-ci config, if the name of your branch ends in ``\build``, then when you push it will trigger travis-ci tasks
-  - Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the ``develop`` or ``master`` branches.
+  - Anyone may offer contributions by forking and opening a PR, org members can push branches directly but are still expected to use PRs when contributing to the ``develop`` or ``main`` branches.
 
 
 Coding Style
