@@ -17,7 +17,7 @@ set( PUBLIC_EXT_LIBS )
 find_package( pybind11 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
 
-find_package( Dripline 2.4.0 CONFIG REQUIRED )
+find_package( Dripline 2.6.3 CONFIG REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS Dripline::Dripline Scarab::Scarab_Dripline )
 
 include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )

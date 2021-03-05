@@ -2,17 +2,22 @@ language: cpp
 
 stages:
 - name: Test
-  if: branch = main OR 
-    branch = develop OR 
-    branch =~ /.*\.(?i:build)$/ OR 
-    type = pull_request 
+  if: >
+      ( branch IN (main, develop) OR 
+        branch =~ /.*\.(?i:build)$/ ) OR 
+      type = pull_request 
 - name: Images
-  if: branch = main OR 
-    branch = develop OR 
-    branch =~ /^v\d+\.\d+\.\d+(-S*)?$/
+  if: >
+      (branch IN (main, develop) OR
+       branch =~ /^v\d+\.\d+\.\d+(-S*)?$/) AND
+      type = push AND
+      NOT type = pull_request
 - name: Documentation
-  if: branch = main OR 
-    branch = develop
+  if: >
+      (branch IN (main, develop) OR
+       branch =~ /^v\d+\.\d+\.\d+(-S*)?$/) AND
+      type = push AND
+      NOT type = pull_request
 # Removed these two conditions for build-images on 12/22/20 (NSO):
 #    branch =~ /.*\.(?i:build)$/ OR 
 #    type = pull_request OR 
@@ -55,7 +60,7 @@ jobs:
       --platform=linux/arm/v7,linux/arm64,linux/amd64 
       --build-arg img_user=driplineorg
       --build-arg img_repo=dripline-cpp 
-      --build-arg img_tag=v2.6.2
+      --build-arg img_tag=v2.6.3
       --tag driplineorg/dripline-python:$(echo ${TRAVIS_BRANCH} | tr /: _) .
   - stage: Images
     name: all archs dev
@@ -87,7 +92,7 @@ jobs:
       --platform=linux/arm/v7,linux/arm64,linux/amd64 
       --build-arg img_user=driplineorg
       --build-arg img_repo=dripline-cpp
-      --build-arg img_tag=v2.6.2-dev
+      --build-arg img_tag=v2.6.3-dev
       --tag driplineorg/dripline-python:$(echo ${TRAVIS_BRANCH} | tr /: _)-dev .
   ## build docs
   - stage: Documentation
