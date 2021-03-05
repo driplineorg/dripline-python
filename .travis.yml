@@ -54,6 +54,7 @@ jobs:
     - docker buildx create --name xbuilder --use
     - docker buildx ls
     script:
+    - set -e
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - >
       docker buildx build --push --progress plain 
@@ -86,6 +87,7 @@ jobs:
     - docker buildx create --name xbuilder --use
     - docker buildx ls
     script:
+    - set -e
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - >
       docker buildx build --push --progress plain 
