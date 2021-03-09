@@ -47,7 +47,8 @@ jobs:
         with:
           images: driplineorg/dripline-python
           tag-sha: false
-          tag-semver: {{raw}}
+          tag-semver: |
+            {{raw}}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -90,7 +91,8 @@ jobs:
         with:
           images: driplineorg/dripline-cpp
           tag-sha: false
-          tag-semver: {{raw}}
+          tag-semver: |
+            {{raw}}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -135,7 +137,8 @@ jobs:
         with:
           images: driplineorg/dripline-cpp
           tag-sha: false
-          tag-semver: {{raw}}
+          tag-semver: |
+            {{raw}}
       - name: Output location
         run: |
           export OUTPUT_LOCATION="unknown"
