@@ -30,7 +30,7 @@ jobs:
           build-args: |
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=2.6.3
+            img_tag=v2.6.3
           platforms: linux/amd64
 
   release:
@@ -69,7 +69,7 @@ jobs:
           build-args: |
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=2.6.3
+            img_tag=v2.6.3
           tags: ${{ steps.docker_meta.outputs.tags }}
           platforms: linux/amd64,linux/arm/v7,linux/arm64
       - name: Image digest
@@ -114,7 +114,7 @@ jobs:
           build-args: | 
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=2.6.3
+            img_tag=v2.6.3
           tags: ${{ steps.docker_meta.outputs.tags }}
           platforms: linux/amd64,linux/armv7,linux/arm64
       - name: Image digest
@@ -129,43 +129,45 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
-            tree \
-            doxygen \
-            python3-sphinx \
-            graphviz
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: driplineorg/dripline-cpp
+          tag-sha: false
+          tag-semver: {{raw}}
       - name: Output location
         run: |
           export OUTPUT_LOCATION="unknown"
+          export BRANCH_OR_TAG="unknown"
           echo "Github ref: $GITHUB_REF"
           if [[ $GITHUB_REF == refs/heads/develop ]]; then
               echo "Branch is develop"
+              export BRANCH_OR_TAG=develop
               export OUTPUT_LOCATION=develop
           elif [[ $GITHUB_REF == refs/heads/main ]]; then
               echo "Branch is main"
+              export BRANCH_OR_TAG=main
               export OUTPUT_LOCATION=main
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
               suffix=${GITHUB_REF#"refs/heads/"}
-              suffix=$(echo $suffix | tr '/' '_')
-              echo "Branch is $GITHUB_REF; directory will be $suffix"
-              export OUTPUT_LOCATION=branches/$suffix
+              export BRANCH_OR_TAG=$(echo $suffix | tr '/' '_')
+              echo "Branch is $GITHUB_REF; directory will be $BRANCH_OR_TAG"
+              export OUTPUT_LOCATION=branches/$BRANCH_OR_TAG
           elif [[ $GITHUB_REF == refs/tags/* ]]; then
-              suffx=${GITHUB_REF#"refs/tags/"}
-              echo "Tag is $GITHUB_REF; directory will be $suffix"
-              export OUTPUT_LOCATION=tags/$suffix
+              export BRANCH_OR_TAG=${GITHUB_REF#"refs/tags/"}
+              echo "Tag is $GITHUB_REF; directory will be $BRANCH_OR_TAG"
+              export OUTPUT_LOCATION=tags/$BRANCH_OR_TAG
           fi
+          echo "Branch or tag: $BRANCH_OR_TAG"
           echo "Output location: $OUTPUT_LOCATION"
-          # Persist the output location in future steps
+          # Persist the environment variables in future steps
+          echo "BRANCH_OR_TAG=$BRANCH_OR_TAG" >> $GITHUB_ENV
           echo "OUTPUT_LOCATION=$OUTPUT_LOCATION" >> $GITHUB_ENV
       - name: Build docs
         run: |
-          cd documentation
-          make html
-          ls ./build/html
-          mv ./build/html /tmp/build.html
+          docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=${BRANCH_OR_TAG} .
+          docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
