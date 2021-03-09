@@ -79,7 +79,7 @@ jobs:
 
   dev:
     runs-on: ubuntu-20.04
-    needs: [test_linux_docker]
+    needs: [test_docker]
     steps:
       - name: Checkout the repo 
         uses: actions/checkout@v2
