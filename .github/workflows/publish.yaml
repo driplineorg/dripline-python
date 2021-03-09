@@ -1,0 +1,175 @@
+name: Publish
+
+on:
+  push:
+    branches: [ main, develop, hotfix/4.5.2 ]
+    tags: 'v*.*.*'
+
+  workflow_dispatch:
+
+jobs:
+
+  test_docker:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: setup_buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build
+        id: build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          build-args: |
+            img_user=driplineorg
+            img_repo=dripline-cpp
+            img_tag=2.6.3
+          platforms: linux/amd64
+
+  release:
+    runs-on: ubuntu-20.04
+    needs: [test_docker]
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: driplineorg/dripline-python
+          tag-sha: false
+          tag-semver: {{raw}}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: setup_buildx
+        uses: docker/setup-buildx-action@v1
+      - name: List platforms
+        run: echo ${{ steps.setup_buildx.outputs.platforms }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push
+        id: build_push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          build-args: |
+            img_user=driplineorg
+            img_repo=dripline-cpp
+            img_tag=2.6.3
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+      - name: Image digest
+        run: >
+          echo ${{ steps.build_push.outputs.digest }}
+
+  dev:
+    runs-on: ubuntu-20.04
+    needs: [test_linux_docker]
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: driplineorg/dripline-cpp
+          tag-sha: false
+          tag-semver: {{raw}}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: setup_buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
+      - name: List platforms
+        run: echo ${{ steps.setup_buildx.outputs.platforms }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push
+        id: build_push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          build-args: | 
+            img_user=driplineorg
+            img_repo=dripline-cpp
+            img_tag=2.6.3
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          platforms: linux/amd64,linux/armv7,linux/arm64
+      - name: Image digest
+        run: >
+          echo ${{ steps.build_push.outputs.digest }}
+
+  docs:
+    runs-on: ubuntu-20.04
+    needs: [release]
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
+            tree \
+            doxygen \
+            python3-sphinx \
+            graphviz
+      - name: Output location
+        run: |
+          export OUTPUT_LOCATION="unknown"
+          echo "Github ref: $GITHUB_REF"
+          if [[ $GITHUB_REF == refs/heads/develop ]]; then
+              echo "Branch is develop"
+              export OUTPUT_LOCATION=develop
+          elif [[ $GITHUB_REF == refs/heads/main ]]; then
+              echo "Branch is main"
+              export OUTPUT_LOCATION=main
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+              suffix=${GITHUB_REF#"refs/heads/"}
+              suffix=$(echo $suffix | tr '/' '_')
+              echo "Branch is $GITHUB_REF; directory will be $suffix"
+              export OUTPUT_LOCATION=branches/$suffix
+          elif [[ $GITHUB_REF == refs/tags/* ]]; then
+              suffx=${GITHUB_REF#"refs/tags/"}
+              echo "Tag is $GITHUB_REF; directory will be $suffix"
+              export OUTPUT_LOCATION=tags/$suffix
+          fi
+          echo "Output location: $OUTPUT_LOCATION"
+          # Persist the output location in future steps
+          echo "OUTPUT_LOCATION=$OUTPUT_LOCATION" >> $GITHUB_ENV
+      - name: Build docs
+        run: |
+          cd documentation
+          make html
+          ls ./build/html
+          mv ./build/html /tmp/build.html
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: /tmp/build.html # The folder the action should deploy.
+          target-folder: ${{ env.OUTPUT_LOCATION }}
+          dry-run: false
