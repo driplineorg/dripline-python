@@ -1,0 +1,24 @@
+dripline.core package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   dripline.core.alert_consumer
+   dripline.core.calibrate
+   dripline.core.endpoint
+   dripline.core.entity
+   dripline.core.interface
+   dripline.core.return_codes
+   dripline.core.throw_reply
+
+Module contents
+---------------
+
+.. automodule:: dripline.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
