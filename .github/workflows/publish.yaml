@@ -118,7 +118,7 @@ jobs:
             img_repo=dripline-cpp
             img_tag=v2.6.3
           tags: ${{ steps.docker_meta.outputs.tags }}
-          platforms: linux/amd64,linux/armv7,linux/arm64
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
       - name: Image digest
         run: >
           echo ${{ steps.build_push.outputs.digest }}
@@ -154,7 +154,7 @@ jobs:
               export OUTPUT_LOCATION=main
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
               suffix=${GITHUB_REF#"refs/heads/"}
-              export BRANCH_OR_TAG=$(echo $suffix | tr '/' '_')
+              export BRANCH_OR_TAG=$(echo $suffix | tr '/' '-')
               echo "Branch is $GITHUB_REF; directory will be $BRANCH_OR_TAG"
               export OUTPUT_LOCATION=branches/$BRANCH_OR_TAG
           elif [[ $GITHUB_REF == refs/tags/* ]]; then
