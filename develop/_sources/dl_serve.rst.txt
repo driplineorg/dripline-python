@@ -42,7 +42,7 @@ Authentication
 
 Communication with the RabbitMQ broker requires the broker address and port, and user/password authentication.
 
-.. TODO update the link to use "latest" symbolic link, or master/develop, when that is available
+.. TODO update the link to use "latest" symbolic link, or main/develop, when that is available
 
 See `Authentication in the dripline-cpp docs <https://driplineorg.github.io/dripline-cpp/branches/dl3_develop/authentication.html>`_ for information on how to specify the broker and authentication information.
 

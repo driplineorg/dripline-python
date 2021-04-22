@@ -4,15 +4,14 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>dripline.core.interface module &#8212; Dripline-Python unknown documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -104,7 +103,7 @@
 <span id="dripline-core-interface-module"></span><h1>dripline.core.interface module<a class="headerlink" href="#module-dripline.core.interface" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="dripline.core.interface.Interface">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.core.interface.</code><code class="sig-name descname">Interface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dripline_config</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">confirm_retcodes</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.interface.Interface" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.core.interface.</span></code><code class="sig-name descname"><span class="pre">Interface</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dripline_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confirm_retcodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.interface.Interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Core</span></code></p>
 <p>A class on top of dripline.core.Core with more user-friendly methods for dripline interactions.
 Intended for use as a dripline client in scripts or interactive sessions.</p>
@@ -112,7 +111,7 @@ Intended for use as a dripline client in scripts or interactive sessions.</p>
 confirm_retcodes (bool): if True and if a reply is received with retcode!=0, raise an exception</p>
 <dl class="py method">
 <dt id="dripline.core.interface.Interface.cmd">
-<code class="sig-name descname">cmd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endpoint</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">ordered_args</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">keyed_args</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.cmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.interface.Interface.cmd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">cmd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ordered_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyed_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.interface.Interface.cmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>[kw]args:
 endpoint (string): routing key to which an OP_GET will be sent
 method (string): specifier to add to the message, naming the method to execute
@@ -121,7 +120,7 @@ arguments (dict): dictionary of arguments to the specified method</p>
 
 <dl class="py method">
 <dt id="dripline.core.interface.Interface.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endpoint</span></em>, <em class="sig-param"><span class="n">specifier</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.interface.Interface.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.interface.Interface.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>[kw]args:
 endpoint (string): routing key to which an OP_GET will be sent
 specifier (string|None): specifier to add to the message</p>
@@ -129,7 +128,7 @@ specifier (string|None): specifier to add to the message</p>
 
 <dl class="py method">
 <dt id="dripline.core.interface.Interface.set">
-<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">endpoint</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">specifier</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.interface.Interface.set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/interface.html#Interface.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.interface.Interface.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>[kw]args:
 endpoint (string): routing key to which an OP_GET will be sent
 value : value to assign
@@ -151,7 +150,7 @@ specifier (string|None): specifier to add to the message</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
