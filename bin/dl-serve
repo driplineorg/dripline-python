@@ -80,7 +80,7 @@ class Serve:
             self.return_code = 100
 
     def _run(self, the_app):
-        this_config = the_app.master_config.to_python()
+        this_config = the_app.primary_config.to_python()
 
         verbosity = the_app.global_verbosity
         #print(f"verbosity is {verbosity}")
