@@ -24,6 +24,26 @@ set( PB_DRIPLINE_CORE_HEADERFILES
 set( PB_DRIPLINE_CORE_SOURCEFILES
     dripline_core/dripline_core_namespace_pybind.cc
 )
+
 pybind11_add_module( _dripline ${PB_DRIPLINE_CORE_SOURCEFILES} )
-target_link_libraries( _dripline PRIVATE Dripline::Dripline )
-install( TARGETS _dripline DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+
+get_target_property( SOURCE_TREE_INCLUDE_DIRS _dripline INCLUDE_DIRECTORIES )
+message( STATUS "Adding install interface include dir: ${CMAKE_INSTALL_INCLUDEDIR}" )
+message( STATUS "Adding build interface include dirs: ${SOURCE_TREE_INCLUDE_DIRS}" )
+
+target_include_directories( _dripline
+    INTERFACE 
+        "$<BUILD_INTERFACE:${SOURCE_TREE_INCLUDE_DIRS}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+target_link_libraries( _dripline PRIVATE ${PUBLIC_EXT_LIBS} )
+
+set( PY_MODULE_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR} )
+# Override that install location if specified by the user
+if( DEFINED PBUILDER_PY_INSTALL_IN_SITELIB AND DEFINED Python3_SITELIB )
+    set( PY_MODULE_INSTALL_DIR ${Python3_SITELIB} )
+endif( DEFINED PBUILDER_PY_INSTALL_IN_SITELIB AND DEFINED Python3_SITELIB )
+message( STATUS "Installing module _dripline in ${PY_MODULE_INSTALL_DIR}" )
+
+install( TARGETS _dripline DESTINATION ${PY_MODULE_INSTALL_DIR} )
