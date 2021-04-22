@@ -117,7 +117,7 @@ jobs:
             img_user=driplineorg
             img_repo=dripline-cpp
             img_tag=v2.6.3
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: ${{ steps.docker_meta.outputs.tags }}-dev
           platforms: linux/amd64,linux/arm/v7,linux/arm64
       - name: Image digest
         run: >
@@ -147,11 +147,11 @@ jobs:
           if [[ $GITHUB_REF == refs/heads/develop ]]; then
               echo "Branch is develop"
               export BRANCH_OR_TAG=develop
-              export OUTPUT_LOCATION=develop
+              export OUTPUT_LOCATION=$BRANCH_OR_TAG
           elif [[ $GITHUB_REF == refs/heads/main ]]; then
               echo "Branch is main"
               export BRANCH_OR_TAG=main
-              export OUTPUT_LOCATION=main
+              export OUTPUT_LOCATION=$BRANCH_OR_TAG
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
               suffix=${GITHUB_REF#"refs/heads/"}
               export BRANCH_OR_TAG=$(echo $suffix | tr '/' '-')
