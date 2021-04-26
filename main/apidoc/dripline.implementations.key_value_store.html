@@ -103,7 +103,7 @@
 <span id="dripline-implementations-key-value-store-module"></span><h1>dripline.implementations.key_value_store module<a class="headerlink" href="#module-dripline.implementations.key_value_store" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="dripline.implementations.key_value_store.KeyValueStore">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.key_value_store.</code><code class="sig-name descname">KeyValueStore</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.key_value_store.</span></code><code class="sig-name descname"><span class="pre">KeyValueStore</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -112,7 +112,7 @@
 </dl>
 <dl class="py method">
 <dt id="dripline.implementations.key_value_store.KeyValueStore.on_get">
-<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for getting the value of an endpoint.
 Implementations may override to enable OP_GET operations.
 The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
@@ -120,7 +120,7 @@ The implementation must return a value which is able to be passed to the ParamVa
 
 <dl class="py method">
 <dt id="dripline.implementations.key_value_store.KeyValueStore.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for setting the value of an endpoint.
 Implementations may override to enable OP_SET operations.
 Any returned object must already be a scarab::Param object</p>
@@ -128,7 +128,7 @@ Any returned object must already be a scarab::Param object</p>
 
 <dl class="py method">
 <dt id="dripline.implementations.key_value_store.KeyValueStore.throw_something">
-<code class="sig-name descname">throw_something</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.throw_something"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.throw_something" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">throw_something</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.throw_something"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.throw_something" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -146,7 +146,7 @@ Any returned object must already be a scarab::Param object</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

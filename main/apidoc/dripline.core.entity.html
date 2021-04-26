@@ -103,7 +103,7 @@
 <span id="dripline-core-entity-module"></span><h1>dripline.core.entity module<a class="headerlink" href="#module-dripline.core.entity" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="dripline.core.entity.Entity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.core.entity.</code><code class="sig-name descname">Entity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_on_set</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log_routing_key_prefix</span><span class="o">=</span><span class="default_value">'sensor_value'</span></em>, <em class="sig-param"><span class="n">log_interval</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">log_on_set</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">calibration</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.core.entity.</span></code><code class="sig-name descname"><span class="pre">Entity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_on_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_routing_key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sensor_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_on_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.entity.Entity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dripline.core.endpoint.html#dripline.core.endpoint.Endpoint" title="dripline.core.endpoint.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.endpoint.Endpoint</span></code></a></p>
 <p>Subclass of Endpoint which adds logic related to logging and confirming values.</p>
 <p>In particular, there is support for:
@@ -129,37 +129,37 @@ to index the dict with the calibrated value being the dict’s value.</p></li>
 </dl>
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.get_on_set">
-<em class="property">property </em><code class="sig-name descname">get_on_set</code><a class="headerlink" href="#dripline.core.entity.Entity.get_on_set" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">get_on_set</span></code><a class="headerlink" href="#dripline.core.entity.Entity.get_on_set" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.log_a_value">
-<code class="sig-name descname">log_a_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">the_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.log_a_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.log_a_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">log_a_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">the_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.log_a_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.entity.Entity.log_a_value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.log_interval">
-<em class="property">property </em><code class="sig-name descname">log_interval</code><a class="headerlink" href="#dripline.core.entity.Entity.log_interval" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">log_interval</span></code><a class="headerlink" href="#dripline.core.entity.Entity.log_interval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.log_on_set">
-<em class="property">property </em><code class="sig-name descname">log_on_set</code><a class="headerlink" href="#dripline.core.entity.Entity.log_on_set" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">log_on_set</span></code><a class="headerlink" href="#dripline.core.entity.Entity.log_on_set" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.scheduled_log">
-<code class="sig-name descname">scheduled_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.scheduled_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.scheduled_log" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">scheduled_log</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.scheduled_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.entity.Entity.scheduled_log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.start_logging">
-<code class="sig-name descname">start_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.start_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.start_logging" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">start_logging</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.start_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.entity.Entity.start_logging" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="dripline.core.entity.Entity.stop_logging">
-<code class="sig-name descname">stop_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.stop_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.core.entity.Entity.stop_logging" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">stop_logging</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/core/entity.html#Entity.stop_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.core.entity.Entity.stop_logging" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -177,7 +177,7 @@ to index the dict with the calibrated value being the dict’s value.</p></li>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

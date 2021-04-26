@@ -112,7 +112,7 @@ The Entitys defined here are more broad-ranging than a single service, obviating
 - FormatEntity: utility Entity with expanded functionality</p>
 <dl class="py class">
 <dt id="dripline.implementations.entity_endpoints.FormatEntity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">FormatEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">get_reply_float</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">set_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">set_value_lowercase</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">set_value_map</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extract_raw_regex</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.entity_endpoints.</span></code><code class="sig-name descname"><span class="pre">FormatEntity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_reply_float</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_value_lowercase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_value_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_raw_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
 <p>Utility Entity allowing arbitrary set and query syntax and formatting for more complicated usage cases
 No assumption about SCPI communication syntax.</p>
@@ -131,7 +131,7 @@ No assumption about SCPI communication syntax.</p>
 </dl>
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.FormatEntity.on_get">
-<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for getting the value of an endpoint.
 Implementations may override to enable OP_GET operations.
 The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
@@ -139,7 +139,7 @@ The implementation must return a value which is able to be passed to the ParamVa
 
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.FormatEntity.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#FormatEntity.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.FormatEntity.on_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for setting the value of an endpoint.
 Implementations may override to enable OP_SET operations.
 Any returned object must already be a scarab::Param object</p>
@@ -149,7 +149,7 @@ Any returned object must already be a scarab::Param object</p>
 
 <dl class="py class">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">SimpleSCPIEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.entity_endpoints.</span></code><code class="sig-name descname"><span class="pre">SimpleSCPIEntity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
 <p>Convenience Entity for interacting with SCPI endpoints that support basic assignment and query syntax.
 (That is, assignments of the form “base_string &lt;new_value&gt;” and queries of the form “base_string?”)
@@ -161,7 +161,7 @@ Commands requiring a more complex structure, such as specifying channels or othe
 </dl>
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_get">
-<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for getting the value of an endpoint.
 Implementations may override to enable OP_GET operations.
 The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
@@ -169,7 +169,7 @@ The implementation must return a value which is able to be passed to the ParamVa
 
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIEntity.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity.on_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for setting the value of an endpoint.
 Implementations may override to enable OP_SET operations.
 Any returned object must already be a scarab::Param object</p>
@@ -179,14 +179,14 @@ Any returned object must already be a scarab::Param object</p>
 
 <dl class="py class">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIGetEntity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">SimpleSCPIGetEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIGetEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIGetEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.entity_endpoints.</span></code><code class="sig-name descname"><span class="pre">SimpleSCPIGetEntity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIGetEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIGetEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity" title="dripline.implementations.entity_endpoints.SimpleSCPIEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.implementations.entity_endpoints.SimpleSCPIEntity</span></code></a></p>
 <p>Identical to SimpleSCPIEntity, but with an explicit exception if on_set is attempted</p>
 <p>Args:
 base_str (str): string used to generate SCPI commands; get will be of the form “base_str?”; set will be of the form “base_str &lt;value&gt;;base_str?”</p>
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPIGetEntity.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIGetEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIGetEntity.on_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPIGetEntity.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPIGetEntity.on_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for setting the value of an endpoint.
 Implementations may override to enable OP_SET operations.
 Any returned object must already be a scarab::Param object</p>
@@ -196,7 +196,7 @@ Any returned object must already be a scarab::Param object</p>
 
 <dl class="py class">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPISetEntity">
-<em class="property">class </em><code class="sig-prename descclassname">dripline.implementations.entity_endpoints.</code><code class="sig-name descname">SimpleSCPISetEntity</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.entity_endpoints.</span></code><code class="sig-name descname"><span class="pre">SimpleSCPISetEntity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dripline.implementations.entity_endpoints.SimpleSCPIEntity" title="dripline.implementations.entity_endpoints.SimpleSCPIEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.implementations.entity_endpoints.SimpleSCPIEntity</span></code></a></p>
 <p>Modelled on SimpleSCPIEntity, but with an explicit exception if on_get is attempted.
 Uses *OPC? to ensure a response is generated when making an assignment.</p>
@@ -204,7 +204,7 @@ Uses *OPC? to ensure a response is generated when making an assignment.</p>
 base_str (str): string used to generate SCPI commands; get will be of the form “base_str?”; set will be of the form “base_str &lt;value&gt;;base_str?”</p>
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_get">
-<code class="sig-name descname">on_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity.on_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_get</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity.on_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for getting the value of an endpoint.
 Implementations may override to enable OP_GET operations.
 The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
@@ -212,7 +212,7 @@ The implementation must return a value which is able to be passed to the ParamVa
 
 <dl class="py method">
 <dt id="dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_set">
-<code class="sig-name descname">on_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity.on_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_set" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">on_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/entity_endpoints.html#SimpleSCPISetEntity.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.entity_endpoints.SimpleSCPISetEntity.on_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>placeholder method for setting the value of an endpoint.
 Implementations may override to enable OP_SET operations.
 Any returned object must already be a scarab::Param object</p>
@@ -233,7 +233,7 @@ Any returned object must already be a scarab::Param object</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
