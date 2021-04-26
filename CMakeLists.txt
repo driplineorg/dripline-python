@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.5.2 )
+project( DriplinePy VERSION 4.5.3 )
 
 # standard install directories
 include( GNUInstallDirs )
