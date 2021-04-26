@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.5.2 )
+project( DriplinePy VERSION 4.5.3 )
 
 # standard install directories
 include( GNUInstallDirs )
@@ -13,6 +13,9 @@ list( APPEND boost_components chrono filesystem system )
 find_package( Boost 1.47.0 REQUIRED COMPONENTS ${boost_components} )
 
 set( PUBLIC_EXT_LIBS )
+
+find_package( Threads REQUIRED )
+list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 
 find_package( pybind11 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
