@@ -26,7 +26,10 @@ namespace dripline_pybind
         all_items.push_back( "Core" );
         pybind11::class_< dripline::core,
                           std::shared_ptr< dripline::core >
-                        >( mod, "Core", "lower-level class for AMQP message sending and receiving" )
+                        > t_core( mod, "Core", "lower-level class for AMQP message sending and receiving" );
+
+        // bind the core class
+        t_core            
             .def( pybind11::init< const scarab::param_node&,
                                   const std::string&,
                                   const unsigned int,
@@ -58,6 +61,16 @@ namespace dripline_pybind
                 )
 
             ;
+
+        // bind core's internal types
+        pybind11::enum_<dripline::core::post_listen_status>(t_core, "PostListenStatus")
+            .value("Unknown", dripline::core::post_listen_status::unknown)
+            .value("MessageReceived", dripline::core::post_listen_status::message_received)
+            .value("", dripline::core::post_listen_status::timeout)
+            .value("", dripline::core::post_listen_status::soft_error)
+            .value("", dripline::core::post_listen_status::hard_error)
+            ;
+
         return all_items;
     }
 } /* namespace dripline_pybind */
