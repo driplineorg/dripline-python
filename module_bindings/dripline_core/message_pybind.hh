@@ -69,7 +69,7 @@ namespace dripline_pybind
             .def( "is_alert", &dripline::message::is_alert, "Returns true if the message is an alert, false otherwise" )
 
 
-            .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); } )
+            .def( "encode_full_message", [](const dripline::message& a_message){ return a_message.encode_full_message(4000); }, DL_BIND_CALL_GUARD_STREAMS )
             ;
 
         /************
