@@ -66,9 +66,9 @@ namespace dripline_pybind
         pybind11::enum_<dripline::core::post_listen_status>(t_core, "PostListenStatus")
             .value("Unknown", dripline::core::post_listen_status::unknown)
             .value("MessageReceived", dripline::core::post_listen_status::message_received)
-            .value("", dripline::core::post_listen_status::timeout)
-            .value("", dripline::core::post_listen_status::soft_error)
-            .value("", dripline::core::post_listen_status::hard_error)
+            .value("Timeout", dripline::core::post_listen_status::timeout)
+            .value("SoftError", dripline::core::post_listen_status::soft_error)
+            .value("HardError", dripline::core::post_listen_status::hard_error)
             ;
 
         return all_items;
