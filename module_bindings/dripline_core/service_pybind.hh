@@ -88,7 +88,7 @@ namespace dripline_pybind
             .def( "bind_keys",
                   &_service::bind_keys,
                   "overridable method to create all desired key bindings, overrides should still call this version",
-                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL
+                  DL_BIND_CALL_GUARD_STREAMS
                 )
             .def( "bind_key",
                   // Note, need to take a service pointer so that we can accept derived types... I think
@@ -98,7 +98,7 @@ namespace dripline_pybind
                   "bind the service's message queue to a particular exchange and key",
                   DL_BIND_CALL_GUARD_STREAMS
             )
-            .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+            .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS )
             .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "stop", &dripline::service::stop, DL_BIND_CALL_GUARD_STREAMS )
             .def( "add_child", &dripline::service::add_child, DL_BIND_CALL_GUARD_STREAMS )
