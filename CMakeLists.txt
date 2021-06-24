@@ -17,7 +17,7 @@ set( PUBLIC_EXT_LIBS )
 find_package( Threads REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 
-find_package( pybind11 REQUIRED )
+find_package( pybind11 2.3.0 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
 
 find_package( Dripline 2.6.3 CONFIG REQUIRED )
