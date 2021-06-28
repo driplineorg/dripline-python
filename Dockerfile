@@ -1,11 +1,12 @@
 ARG img_user=driplineorg
 ARG img_repo=dripline-cpp
 #ARG img_tag=hotfix_2.6.2
-ARG img_tag=v2.7.0
+ARG img_tag=v2.8.0
 #ARG img_arch=arm
 
 FROM ${img_user}/${img_repo}:${img_tag}
 #FROM ${img_user}/${img_repo}:${img_tag}-${img_arch}
+#FROM dlc_temp
 
 ## would prefer not to do this, just run ldconfig after the build to get things
 ## into the ld.so.conf cache... use this only when developing and adding libs
