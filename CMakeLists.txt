@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.5.3 )
+project( DriplinePy VERSION 4.5.4 )
+
+cmake_policy( SET CMP0074 NEW )
 
 # standard install directories
 include( GNUInstallDirs )
@@ -20,7 +22,7 @@ list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 find_package( pybind11 2.3.0 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
 
-find_package( Dripline 2.6.3 CONFIG REQUIRED )
+find_package( Dripline 2.8.0 CONFIG REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS Dripline::Dripline Scarab::Scarab_Dripline )
 
 include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )
