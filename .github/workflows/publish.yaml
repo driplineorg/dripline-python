@@ -30,7 +30,7 @@ jobs:
           build-args: |
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=v2.7.0
+            img_tag=v2.8.0
           platforms: linux/amd64
 
   release:
@@ -70,7 +70,7 @@ jobs:
           build-args: |
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=v2.7.0
+            img_tag=v2.8.0
           tags: ${{ steps.docker_meta.outputs.tags }}
           platforms: linux/amd64,linux/arm/v7,linux/arm64
       - name: Image digest
@@ -116,7 +116,7 @@ jobs:
           build-args: | 
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=v2.7.0
+            img_tag=v2.8.0
           tags: ${{ steps.docker_meta.outputs.tags }}-dev
           platforms: linux/amd64,linux/arm/v7,linux/arm64
       - name: Image digest

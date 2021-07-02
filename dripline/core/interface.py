@@ -35,14 +35,25 @@ class Interface(Core):
             raise DriplineError('unable to send request')
         return receive_reply
 
+    def _receive_reply(self, reply_pkg, timeout):
+        '''
+        internal helper method to standardize receiving reply messages
+        '''
+        sig_handler = scarab.SignalHandler()
+        sig_handler.add_cancelable(self._receiver)
+        result = self._receiver.wait_for_reply(reply_pkg, timeout)
+        sig_handler.remove_cancelable(self._receiver)
+        return result
+
     def get(self, endpoint, specifier=None, timeout=0):
         '''
         [kw]args:
         endpoint (string): routing key to which an OP_GET will be sent
         specifier (string|None): specifier to add to the message
+        timeout (int|0): timeout in ms
         '''
         reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier )
-        result = self._receiver.wait_for_reply(reply_pkg, timeout)
+        result = self._receive_reply( reply_pkg, timeout )
         return result
 
     def set(self, endpoint, value, specifier=None, timeout=0):
@@ -51,10 +62,11 @@ class Interface(Core):
         endpoint (string): routing key to which an OP_GET will be sent
         value : value to assign
         specifier (string|None): specifier to add to the message
+        timeout (int|0): timeout in ms
         '''
         payload = {'values':[value]}
         reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
-        result = self._receiver.wait_for_reply(reply_pkg, timeout)
+        result = self._receive_reply( reply_pkg, timeout )
         return result
 
     def cmd(self, endpoint, method, ordered_args=[], keyed_args={}, timeout=0):
@@ -63,9 +75,10 @@ class Interface(Core):
         endpoint (string): routing key to which an OP_GET will be sent
         method (string): specifier to add to the message, naming the method to execute
         arguments (dict): dictionary of arguments to the specified method
+        timeout (int|0): timeout in ms
         '''
         payload = {'values': ordered_args}
         payload.update(keyed_args)
         reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=method, payload=payload )
-        result = self._receiver.wait_for_reply(reply_pkg, timeout)
+        result = self._receive_reply( reply_pkg, timeout )
         return result

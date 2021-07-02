@@ -14,16 +14,19 @@ namespace dripline_pybind
 
             unsigned rc_value() const override
             {
+                pybind11::gil_scoped_acquire t_acquire;
                 PYBIND11_OVERLOAD_PURE( unsigned, dripline::return_code, rc_value );
             }
 
             std::string rc_name() const override
             {
+                pybind11::gil_scoped_acquire t_acquire;
                 PYBIND11_OVERLOAD_PURE( std::string, dripline::return_code, rc_name );
             }
 
             std::string rc_description() const override
             {
+                pybind11::gil_scoped_acquire t_acquire;
                 PYBIND11_OVERLOAD_PURE( std::string, dripline::return_code, rc_description );
             }
 
