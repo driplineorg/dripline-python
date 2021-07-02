@@ -31,5 +31,5 @@ jobs:
           build-args: |
             img_user=driplineorg
             img_repo=dripline-cpp
-            img_tag=v2.6.3
+            img_tag=v2.8.0
           platforms: linux/amd64

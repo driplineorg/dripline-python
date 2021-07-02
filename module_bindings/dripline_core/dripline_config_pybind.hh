@@ -2,6 +2,8 @@
 #define DRIPLINE_CONFIG_PYBIND_HH_
 
 #include "dripline_config.hh"
+#include "binding_helpers.hh"
+
 #include "application.hh"
 
 namespace dripline_pybind
@@ -13,7 +15,7 @@ namespace dripline_pybind
 
         all_members.push_back( "DriplineConfig" );
         pybind11::class_< dripline::dripline_config, scarab::param_node >( mod, "DriplineConfig" )
-            .def( pybind11::init<>() )
+            .def( pybind11::init<>(), DL_BIND_CALL_GUARD_STREAMS )
             ;
 
         all_members.push_back( "add_dripline_options" );

@@ -14,7 +14,7 @@ namespace dripline_pybind
         std::list< std::string > all_members;
 
         all_members.push_back( "Receiver" );
-        pybind11::class_< dripline::receiver >( mod, "Receiver", "Collect and combine message chunks into a full message object")
+        pybind11::class_< dripline::receiver, scarab::cancelable, std::shared_ptr<dripline::receiver> >( mod, "Receiver", "Collect and combine message chunks into a full message object")
             .def( pybind11::init<>() )
 
             .def_property( "single_message_wait_ms",
