@@ -1,0 +1,7 @@
+dripline.version module
+=======================
+
+.. automodule:: dripline.version
+   :members:
+   :undoc-members:
+   :show-inheritance:

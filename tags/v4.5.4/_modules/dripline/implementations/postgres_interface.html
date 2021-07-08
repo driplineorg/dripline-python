@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.implementations.postgres_interface &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/modules.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for dripline.implementations.postgres_interface</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">A service for interfacing with SQL database for storage. It is currently only developed and tested against Postgres,</span>
+<span class="sd">but should be relatively straight forward to generalize to support other SQL flavors if there is an interest.</span>
+
+<span class="sd">Note: services using this module will require sqlalchemy (and assuming we&#39;re still using postgresql, psycopg2 as the sqlalchemy backend)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1">#from __future__ import absolute_import</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># std libraries</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="c1"># 3rd party libraries</span>
+<span class="c1">#TODO either this should be an actual dependency, or we should move the package into a plugin.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">dripline.core</span> <span class="kn">import</span> <span class="n">Service</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">ThrowReply</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+
+<span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;PostgreSQLInterface&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="PostgreSQLInterface"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.postgres_interface.html#dripline.implementations.postgres_interface.PostgreSQLInterface">[docs]</a><span class="k">class</span> <span class="nc">PostgreSQLInterface</span><span class="p">(</span><span class="n">Service</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_name</span><span class="p">,</span> <span class="n">database_server</span><span class="p">,</span> <span class="n">auths_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            database_name (str): name of the &#39;database&#39; to connect to within the database server</span>
+<span class="sd">            database_server (str): network resolvable hostname of database server</span>
+<span class="sd">            auths_file (str): expandable path to an authentications file **Note**, this option is considered temporary and like to be removed in a future version</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;sqlalchemy&#39;</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;SQLAlchemy not found, required for PostgreSQLInterface class&#39;</span><span class="p">)</span>
+        <span class="n">service_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;broker&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="s1">&#39;auth_file&#39;</span><span class="p">,</span> <span class="s1">&#39;make_connection&#39;</span><span class="p">]}</span>
+        <span class="n">Service</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">service_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auths_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;you have passed an auths file directly to &#39;PostgreSQLInterface.__init-_&#39;, this capability is considered temporary&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_auths_file</span> <span class="o">=</span> <span class="n">auths_file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;auths file is currently required... until the future when we remove it from even being an option&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect_to_db</span><span class="p">(</span><span class="n">database_server</span><span class="p">,</span> <span class="n">database_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_connect_to_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_server</span><span class="p">,</span> <span class="n">database_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connecting to the db&#39;</span><span class="p">)</span>
+        <span class="c1">#TODO: this is a massive hack; as soon as scarab supports environment variable substitutions, this should be refactored</span>
+        <span class="n">credentials</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_auths_file</span><span class="p">)))</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="s1">&#39;postgresql&#39;</span><span class="p">]</span>
+        <span class="n">engine_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;postgresql://</span><span class="si">{</span><span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">credentials</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">@</span><span class="si">{</span><span class="n">database_server</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">database_name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">engine_str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">MetaData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PostgreSQLInterface.add_child"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.postgres_interface.html#dripline.implementations.postgres_interface.PostgreSQLInterface.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">):</span>
+        <span class="n">Service</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">SQLTable</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Adding sqlalchemy.Table object for &quot;</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="n">table_name</span><span class="si">}</span><span class="s1">&quot; to Endpoint&#39;</span><span class="p">)</span>
+            <span class="n">endpoint</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">endpoint</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">endpoint</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span></div></div>
+
+
+<span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SQLTable&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="SQLTable"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.postgres_interface.html#dripline.implementations.postgres_interface.SQLTable">[docs]</a><span class="k">class</span> <span class="nc">SQLTable</span><span class="p">(</span><span class="n">Endpoint</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class for making calls to _insert_with_return</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span>
+                 <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">required_insert_names</span><span class="o">=</span><span class="p">[],</span>
+                 <span class="n">return_col_names</span><span class="o">=</span><span class="p">[],</span>
+                 <span class="n">optional_insert_names</span><span class="o">=</span><span class="p">[],</span>
+                 <span class="n">default_insert_values</span><span class="o">=</span><span class="p">{},</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        table_name (str): name of the table within the database</span>
+<span class="sd">        schema (str): name of the schema where the table is located</span>
+<span class="sd">        required_insert_names (list): list of names (str||dict) of the table columns which must be included on every requested insert (if dict: keys are &#39;column&#39; and &#39;payload_key&#39;, if string it is assumed that both are that value)</span>
+<span class="sd">        return_col_names (list): list of names (str) of columns whose values should be returned on completion of the insert</span>
+<span class="sd">        optional_insert_names (list): list of names (str||dict) of columns which the user may specify on an insert request, but which may be omitted (if dict: keys are &#39;column&#39; and &#39;payload_key&#39;, if string it is assumed that both are that value)</span>
+<span class="sd">        default_insert_values (dict): dictionary of {column_names: values} to serve as defaults when inserting, any values provided explicitly on the insert request will override these values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;sqlalchemy&#39;</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;SQLAlchemy not found, required for SQLTable class&#39;</span><span class="p">)</span>
+        <span class="n">Endpoint</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_name</span> <span class="o">=</span> <span class="n">table_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_return_names</span> <span class="o">=</span> <span class="n">return_col_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_column_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_required_insert_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_col_key_map</span><span class="p">(</span><span class="n">required_insert_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optional_insert_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_col_key_map</span><span class="p">(</span><span class="n">optional_insert_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_insert_dict</span> <span class="o">=</span> <span class="n">default_insert_values</span>
+
+    <span class="k">def</span> <span class="nf">_ensure_col_key_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_list</span><span class="p">):</span>
+        <span class="n">to_return</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">a_col</span> <span class="ow">in</span> <span class="n">column_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a_col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">to_return</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;column&#39;</span><span class="p">:</span> <span class="n">a_col</span><span class="p">,</span> <span class="s1">&#39;payload_key&#39;</span><span class="p">:</span> <span class="n">a_col</span><span class="p">})</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_column_map</span><span class="p">[</span><span class="n">a_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_col</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a_col</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;column&#39;</span> <span class="ow">in</span> <span class="n">a_col</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s1">&#39;payload_key&#39;</span> <span class="ow">in</span> <span class="n">a_col</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;column insert map &lt;</span><span class="si">{</span><span class="n">a_col</span><span class="si">}</span><span class="s2">&gt; does not contain the required keys, [&#39;column&#39;, &#39;payload_key&#39;]&quot;</span><span class="p">)</span>
+                <span class="n">to_return</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a_col</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_column_map</span><span class="p">[</span><span class="n">a_col</span><span class="p">[</span><span class="s1">&#39;payload_key&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">a_col</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;column info &lt;</span><span class="si">{</span><span class="n">a_col</span><span class="si">}</span><span class="s2">&gt; is not of an expected type&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">to_return</span>
+
+<div class="viewcode-block" id="SQLTable.do_select"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.postgres_interface.html#dripline.implementations.postgres_interface.SQLTable.do_select">[docs]</a>    <span class="k">def</span> <span class="nf">do_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_cols</span><span class="o">=</span><span class="p">[],</span> <span class="n">where_eq_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">where_lt_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">where_gt_dict</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return_cols (list of str): string names of columns, internally converted to sql reference; if evaluates as false, all columns are returned</span>
+<span class="sd">        where_eq_dict (dict): keys are column names (str), and values are tested with &#39;==&#39;</span>
+<span class="sd">        where_lt_dict (dict): keys are column names (str), and values are tested with &#39;&lt;&#39;</span>
+<span class="sd">        where_gt_dict (dict): keys are column names (str), and values are tested with &#39;&gt;&#39;</span>
+
+<span class="sd">        Other select &quot;where&quot; statements are not supported</span>
+
+<span class="sd">        Returns: a tuple, 1st element is list of column names, 2nd is a list of tuples of the rows that matched the select</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_cols</span><span class="p">:</span>
+            <span class="n">return_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">return_cols</span><span class="p">]</span>
+        <span class="n">this_select</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">return_cols</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">where_eq_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">this_select</span> <span class="o">=</span> <span class="n">this_select</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="p">)</span><span class="o">==</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">where_lt_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">this_select</span> <span class="o">=</span> <span class="n">this_select</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="p">)</span><span class="o">&lt;</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">where_gt_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">this_select</span> <span class="o">=</span> <span class="n">this_select</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="p">)</span><span class="o">&gt;</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">this_select</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_insert_with_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">insert_kv_dict</span><span class="p">,</span> <span class="n">return_col_names_list</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="o">**</span><span class="n">insert_kv_dict</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_col_names_list</span><span class="p">:</span>
+                <span class="n">ins</span> <span class="o">=</span> <span class="n">ins</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">return_col_names_list</span><span class="p">])</span>
+            <span class="n">insert_result</span> <span class="o">=</span> <span class="n">ins</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">return_col_names_list</span><span class="p">:</span>
+                <span class="n">return_values</span> <span class="o">=</span> <span class="n">insert_result</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">return_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">except</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">exc</span><span class="o">.</span><span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;resource_error&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;database integreity error: &#39;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;received an unexpected SQL error while trying to insert:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ins</span><span class="p">)</span> <span class="o">%</span> <span class="n">insert_kv_dict</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;traceback is:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()))</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">return_col_names_list</span><span class="p">,</span> <span class="n">return_values</span><span class="p">))</span>
+
+<div class="viewcode-block" id="SQLTable.do_insert"><a class="viewcode-back" href="../../../apidoc/dripline.implementations.postgres_interface.html#dripline.implementations.postgres_interface.SQLTable.do_insert">[docs]</a>    <span class="k">def</span> <span class="nf">do_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># make sure that all provided insert values are expected</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_column_map</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;got an unexpected insert column &lt;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="c1"># make sure that all required columns are present</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required_insert_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span><span class="p">[</span><span class="s1">&#39;payload_key&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">ThrowReply</span><span class="p">(</span><span class="s1">&#39;service_error_invalid_value&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;a value for &lt;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&gt; is required!</span><span class="se">\n</span><span class="s1">got: </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># build the insert dict</span>
+        <span class="n">this_insert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_insert_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">this_insert</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">_column_map</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="n">return_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_insert_with_return</span><span class="p">(</span><span class="n">this_insert</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_return_names</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="n">return_vals</span></div></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

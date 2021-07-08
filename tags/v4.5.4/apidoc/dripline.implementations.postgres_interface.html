@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dripline.implementations.postgres_interface module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.implementations.postgres_sensor_logger module" href="dripline.implementations.postgres_sensor_logger.html" />
+    <link rel="prev" title="dripline.implementations.key_value_store module" href="dripline.implementations.key_value_store.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.implementations.html">dripline.implementations package</a><ul>
+      <li>Previous: <a href="dripline.implementations.key_value_store.html" title="previous chapter">dripline.implementations.key_value_store module</a></li>
+      <li>Next: <a href="dripline.implementations.postgres_sensor_logger.html" title="next chapter">dripline.implementations.postgres_sensor_logger module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-dripline.implementations.postgres_interface">
+<span id="dripline-implementations-postgres-interface-module"></span><h1>dripline.implementations.postgres_interface module<a class="headerlink" href="#module-dripline.implementations.postgres_interface" title="Permalink to this headline">¶</a></h1>
+<p>A service for interfacing with SQL database for storage. It is currently only developed and tested against Postgres,
+but should be relatively straight forward to generalize to support other SQL flavors if there is an interest.</p>
+<p>Note: services using this module will require sqlalchemy (and assuming we’re still using postgresql, psycopg2 as the sqlalchemy backend)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dripline.implementations.postgres_interface.PostgreSQLInterface">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">dripline.implementations.postgres_interface.</span></span><span class="sig-name descname"><span class="pre">PostgreSQLInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auths_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/postgres_interface.html#PostgreSQLInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.postgres_interface.PostgreSQLInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Service</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_name</strong> (<em>str</em>) – name of the ‘database’ to connect to within the database server</p></li>
+<li><p><strong>database_server</strong> (<em>str</em>) – network resolvable hostname of database server</p></li>
+<li><p><strong>auths_file</strong> (<em>str</em>) – expandable path to an authentications file <strong>Note</strong>, this option is considered temporary and like to be removed in a future version</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.postgres_interface.PostgreSQLInterface.add_child">
+<span class="sig-name descname"><span class="pre">add_child</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">_dripline.core.Service</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">_dripline.core._Endpoint</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="reference internal" href="../_modules/dripline/implementations/postgres_interface.html#PostgreSQLInterface.add_child"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.postgres_interface.PostgreSQLInterface.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dripline.implementations.postgres_interface.SQLTable">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">dripline.implementations.postgres_interface.</span></span><span class="sig-name descname"><span class="pre">SQLTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_insert_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_col_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_insert_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_insert_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/postgres_interface.html#SQLTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.postgres_interface.SQLTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dripline.core.endpoint.html#dripline.core.endpoint.Endpoint" title="dripline.core.endpoint.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.endpoint.Endpoint</span></code></a></p>
+<p>A class for making calls to _insert_with_return</p>
+<p>table_name (str): name of the table within the database
+schema (str): name of the schema where the table is located
+required_insert_names (list): list of names (str||dict) of the table columns which must be included on every requested insert (if dict: keys are ‘column’ and ‘payload_key’, if string it is assumed that both are that value)
+return_col_names (list): list of names (str) of columns whose values should be returned on completion of the insert
+optional_insert_names (list): list of names (str||dict) of columns which the user may specify on an insert request, but which may be omitted (if dict: keys are ‘column’ and ‘payload_key’, if string it is assumed that both are that value)
+default_insert_values (dict): dictionary of {column_names: values} to serve as defaults when inserting, any values provided explicitly on the insert request will override these values</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.postgres_interface.SQLTable.do_insert">
+<span class="sig-name descname"><span class="pre">do_insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/postgres_interface.html#SQLTable.do_insert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.postgres_interface.SQLTable.do_insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.postgres_interface.SQLTable.do_select">
+<span class="sig-name descname"><span class="pre">do_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_eq_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_lt_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_gt_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/postgres_interface.html#SQLTable.do_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.postgres_interface.SQLTable.do_select" title="Permalink to this definition">¶</a></dt>
+<dd><p>return_cols (list of str): string names of columns, internally converted to sql reference; if evaluates as false, all columns are returned
+where_eq_dict (dict): keys are column names (str), and values are tested with ‘==’
+where_lt_dict (dict): keys are column names (str), and values are tested with ‘&lt;’
+where_gt_dict (dict): keys are column names (str), and values are tested with ‘&gt;’</p>
+<p>Other select “where” statements are not supported</p>
+<p>Returns: a tuple, 1st element is list of column names, 2nd is a list of tuples of the rows that matched the select</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.implementations.postgres_interface.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
