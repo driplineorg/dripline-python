@@ -1,0 +1,7 @@
+dripline.core.return\_codes module
+==================================
+
+.. automodule:: dripline.core.return_codes
+   :members:
+   :undoc-members:
+   :show-inheritance:

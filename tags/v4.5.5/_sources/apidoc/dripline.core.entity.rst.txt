@@ -1,0 +1,7 @@
+dripline.core.entity module
+===========================
+
+.. automodule:: dripline.core.entity
+   :members:
+   :undoc-members:
+   :show-inheritance:
