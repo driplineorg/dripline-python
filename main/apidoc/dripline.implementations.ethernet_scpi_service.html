@@ -4,11 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>dripline.implementations.ethernet_scpi_service module &#8212; Dripline-Python unknown documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -77,7 +78,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -99,11 +100,11 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-dripline.implementations.ethernet_scpi_service">
+  <section id="module-dripline.implementations.ethernet_scpi_service">
 <span id="dripline-implementations-ethernet-scpi-service-module"></span><h1>dripline.implementations.ethernet_scpi_service module<a class="headerlink" href="#module-dripline.implementations.ethernet_scpi_service" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">dripline.implementations.ethernet_scpi_service.</span></code><code class="sig-name descname"><span class="pre">EthernetSCPIService</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('localhost',</span> <span class="pre">1234)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_at_reconnect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['*OPC?']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_terminator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_terminator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply_echo_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">dripline.implementations.ethernet_scpi_service.</span></span><span class="sig-name descname"><span class="pre">EthernetSCPIService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">socket_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('localhost',</span> <span class="pre">1234)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_at_reconnect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['*OPC?']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconnect_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command_terminator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_terminator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply_echo_cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_dripline.core.Service</span></code></p>
 <p>A fairly generic subclass of Service for connecting to ethernet-capable instruments/devices.
 In is developed for and tested against devices with a SCPI-compliant command set, but may be usable with devices which do not strictly conform.
@@ -114,7 +115,7 @@ In particular, devices must support sending a response to every command received
 <li><p><strong>socket_timeout</strong> (<em>int</em>) – number of seconds to wait for a reply from the device before timeout.</p></li>
 <li><p><strong>socket_info</strong> (<em>tuple</em><em> or </em><em>string</em>) – either socket.socket.connect argument tuple, or string that
 parses into one.</p></li>
-<li><p><strong>cmd_at_reconnect</strong> (<em>[</em><em>str</em><em>,</em><em>..</em><em>]</em>) – a list of commands to send to the device every time the socket
+<li><p><strong>cmd_at_reconnect</strong> (<em>[</em><em>str</em><em>,</em><em>...</em><em>]</em>) – a list of commands to send to the device every time the socket
 connection is estabilished note that these will be sent on <em>every</em> connection, which may be
 disruptive to ongoing activity.</p></li>
 <li><p><strong>reconnect_test</strong> (<em>str</em>) – expected return from the last command in the cmd_at_reconnect list, must
@@ -128,8 +129,8 @@ end of the reply</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device">
-<code class="sig-name descname"><span class="pre">send_to_device</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commands</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService.send_to_device"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device">
+<span class="sig-name descname"><span class="pre">send_to_device</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commands</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/ethernet_scpi_service.html#EthernetSCPIService.send_to_device"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.ethernet_scpi_service.EthernetSCPIService.send_to_device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard device access method to communicate with instrument.
 NEVER RENAME THIS METHOD!</p>
 <dl class="simple">
@@ -140,7 +141,7 @@ NEVER RENAME THIS METHOD!</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -153,7 +154,7 @@ NEVER RENAME THIS METHOD!</p>
       &copy;2020, The Dripline-Python Authors.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
