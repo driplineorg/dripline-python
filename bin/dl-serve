@@ -111,10 +111,17 @@ class Serve:
                 an_endpoint.start_logging()
 
         logger.info("about to start the service")
-        the_service.start()
+        if not the_service.start():
+            raise RuntimeError("There was a problem starting the service")
+
         logger.info("services started, now to listen")
-        the_service.listen()
-        the_service.stop()
+        if not the_service.listen():
+            raise RuntimeError("there was a problem listening for messages")
+
+        logger.info("stopping the service")
+        if not the_service.stop():
+            raise RuntimeError("there was a problem stopping the service")
+
 
 if __name__ == '__main__':
     the_main = scarab.MainApp()
