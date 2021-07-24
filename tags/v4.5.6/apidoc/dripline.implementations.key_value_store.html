@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>dripline.implementations.key_value_store module &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dripline.implementations.postgres_interface module" href="dripline.implementations.postgres_interface.html" />
+    <link rel="prev" title="dripline.implementations.ethernet_scpi_service module" href="dripline.implementations.ethernet_scpi_service.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dripline.html">dripline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">dripline</a><ul>
+  <li><a href="dripline.html">dripline package</a><ul>
+  <li><a href="dripline.implementations.html">dripline.implementations package</a><ul>
+      <li>Previous: <a href="dripline.implementations.ethernet_scpi_service.html" title="previous chapter">dripline.implementations.ethernet_scpi_service module</a></li>
+      <li>Next: <a href="dripline.implementations.postgres_interface.html" title="next chapter">dripline.implementations.postgres_interface module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-dripline.implementations.key_value_store">
+<span id="dripline-implementations-key-value-store-module"></span><h1>dripline.implementations.key_value_store module<a class="headerlink" href="#module-dripline.implementations.key_value_store" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dripline.implementations.key_value_store.KeyValueStore">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">dripline.implementations.key_value_store.</span></span><span class="sig-name descname"><span class="pre">KeyValueStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dripline.core.entity.html#dripline.core.entity.Entity" title="dripline.core.entity.Entity"><code class="xref py py-class docutils literal notranslate"><span class="pre">dripline.core.entity.Entity</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>initial_value</strong> (<em>any</em>) – the starting value for the endpoint</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.key_value_store.KeyValueStore.on_get">
+<span class="sig-name descname"><span class="pre">on_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for getting the value of an endpoint.
+Implementations may override to enable OP_GET operations.
+The implementation must return a value which is able to be passed to the ParamValue constructor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.key_value_store.KeyValueStore.on_set">
+<span class="sig-name descname"><span class="pre">on_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.on_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.on_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>placeholder method for setting the value of an endpoint.
+Implementations may override to enable OP_SET operations.
+Any returned object must already be a scarab::Param object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dripline.implementations.key_value_store.KeyValueStore.throw_something">
+<span class="sig-name descname"><span class="pre">throw_something</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dripline/implementations/key_value_store.html#KeyValueStore.throw_something"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dripline.implementations.key_value_store.KeyValueStore.throw_something" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/apidoc/dripline.implementations.key_value_store.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

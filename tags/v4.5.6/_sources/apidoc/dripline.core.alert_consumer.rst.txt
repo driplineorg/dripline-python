@@ -1,0 +1,7 @@
+dripline.core.alert\_consumer module
+====================================
+
+.. automodule:: dripline.core.alert_consumer
+   :members:
+   :undoc-members:
+   :show-inheritance:
