@@ -38,9 +38,9 @@ jobs:
           context: .
           push: false
           build-args: |
-            img_user=${BASE_IMAGE_USER}
-            img_repo=${BASE_IMAGE_REPO}
-            img_tag=${BASE_IMAGE_TAG}
+            img_user=${{ env.BASE_IMAGE_USER }}
+            img_repo=${{ env.BASE_IMAGE_REPO }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}
           platforms: linux/amd64
 
   build_and_push:
