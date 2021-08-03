@@ -73,7 +73,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v3
         with:
-          images: driplineorg/dripline-cpp
+          images: driplineorg/dripline-python
           flavor: |
             latest=auto
             suffix=${{ matrix.tag-suffix }},onlatest=true
@@ -126,7 +126,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: driplineorg/dripline-cpp
+          images: driplineorg/dripline-python
           tag-sha: false
           tag-semver: |
             {{raw}}
