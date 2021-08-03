@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dripline.core.throw_reply &#8212; Dripline-Python unknown documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/DL3Logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/DL3Logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../../index.html">Dripline-Python</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=driplineorg&repo=dripline-python&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dl_serve.html">Dripline Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/modules.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribute.html">Contribute</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for dripline.core.throw_reply</h1><div class="highlight"><pre>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="kn">import</span> <span class="nn">scarab</span>
+<span class="kn">from</span> <span class="nn">_dripline.core</span> <span class="kn">import</span> <span class="n">DL_Success</span><span class="p">,</span> <span class="n">DL_ServiceError</span><span class="p">,</span> <span class="n">set_reply_cache</span>
+<span class="kn">from</span> <span class="nn">.return_codes</span> <span class="kn">import</span> <span class="n">get_return_codes_dict</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ThrowReply&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="ThrowReply"><a class="viewcode-back" href="../../../apidoc/dripline.core.throw_reply.html#dripline.core.throw_reply.ThrowReply">[docs]</a><span class="k">class</span> <span class="nc">ThrowReply</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Exception class for use throughout the codebase for exceptions which do not fatally interrupt a running dripline service.</span>
+<span class="sd">    These exceptions are caught in the top of the message handling call stack and result in an reply message being sent indicating an error.</span>
+<span class="sd">    The preferred way to send a reply indicating an error (or warning) is to raise an instance of ThrowReply.</span>
+<span class="sd">    In cases where a dependency library throws a custom exception, or any piece of code throws a standard python exception, if the expected behavior is an error reply and continued service operation, that exception must be handled and ThrowReply raised instead.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_code</span><span class="o">=</span><span class="n">DL_Success</span><span class="p">(),</span> <span class="n">message</span><span class="o">=</span><span class="n">DL_Success</span><span class="p">()</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">scarab</span><span class="o">.</span><span class="n">Param</span><span class="p">()):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            return_code (_dripline.core.ReturnCode || string) : instance of subclass of ReturnCode, or the string name of a return code;</span>
+<span class="sd">                    it must be an instance which is already registered and is used to determine various header fields of the resulting dripline message.</span>
+<span class="sd">            message (string) : provides more specific information about the particular exception (beyond the fixed ReturnCode&#39;s description</span>
+<span class="sd">            payload (scarab.Param) : any data to include in the payload of the reply message (in a Warning, should match the normal success data)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">return_code</span> <span class="o">=</span> <span class="n">get_return_codes_dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">DL_ServiceError</span><span class="p">())</span>
+        <span class="n">set_reply_cache</span><span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2020, The Dripline-Python Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

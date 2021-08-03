@@ -1,0 +1,7 @@
+dripline.implementations.entity\_endpoints module
+=================================================
+
+.. automodule:: dripline.implementations.entity_endpoints
+   :members:
+   :undoc-members:
+   :show-inheritance:
