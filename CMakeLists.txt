@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project( DriplinePy VERSION 4.5.7 )
+project( DriplinePy VERSION 4.5.8 )
 
 cmake_policy( SET CMP0074 NEW )
 
