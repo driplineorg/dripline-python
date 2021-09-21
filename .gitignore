@@ -63,3 +63,8 @@ dripline/version.py
 # Build directories
 build*/
 
+# Virtual environment
+venv/
+
+# Pycharm
+.idea
