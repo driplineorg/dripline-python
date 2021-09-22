@@ -24,6 +24,19 @@ class Endpoint(_Endpoint):
         '''
         _Endpoint.__init__(self, name)
 
+    def result_to_scarab_payload(self, result: str):
+        """
+        Intercept result values and throw error if scarab is unable to convert to param
+        TODO: Handles global Exception case, could be more specific
+        Args:
+            result (str): request message passed
+        """
+        try:
+            return scarab.to_param(result)
+        except Exception as e:
+            raise ThrowReply('service_error_bad_payload',
+                             f"{self.name} unable to convert result to scarab payload: {result}")
+
     def do_get_request(self, a_request_message):
         logger.info("in get_request")
         a_specifier = a_request_message.specifier.to_string()
@@ -43,7 +56,7 @@ class Endpoint(_Endpoint):
         else:
             logger.debug('no specifier')
             the_value = self.on_get()
-            return a_request_message.reply(payload=scarab.to_param(the_value))
+            return a_request_message.reply(payload=self.result_to_scarab_payload(the_value))
 
     def do_set_request(self, a_request_message):
 
@@ -54,7 +67,7 @@ class Endpoint(_Endpoint):
         new_value = a_request_message.payload["values"][0]()
         new_value = getattr(new_value, "as_" + new_value.type())()
         logger.debug(f'Attempting to set new_value to [{new_value}]')
-        
+
         if (a_specifier):
             if not hasattr(self, a_specifier):
                 raise ThrowReply('service_error_invalid_specifier',
@@ -63,7 +76,7 @@ class Endpoint(_Endpoint):
             return a_request_message.reply()
         else:
             result = self.on_set(new_value)
-            return a_request_message.reply(payload=scarab.to_param(result))
+            return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
     def do_cmd_request(self, a_request_message):
         # Note: any command executed in this way must return a python data structure which is
@@ -77,7 +90,7 @@ class Endpoint(_Endpoint):
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
         result = method_ref(*the_args, **the_kwargs)
-        return a_request_message.reply(payload=scarab.to_param(result))
+        return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
     def on_get(self):
         '''
