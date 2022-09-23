@@ -1,7 +1,7 @@
 ARG img_user=driplineorg
 ARG img_repo=dripline-cpp
 #ARG img_tag=hotfix_2.6.2
-ARG img_tag=v2.8.2
+ARG img_tag=v2.8.5
 #ARG img_arch=arm
 
 FROM ${img_user}/${img_repo}:${img_tag}
