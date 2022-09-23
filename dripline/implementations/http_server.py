@@ -2,6 +2,7 @@ from aiohttp import web
 import json
 
 from dripline.core import Interface
+import dripline.core
 
 import scarab
 
@@ -76,13 +77,14 @@ class HTTPServer(Interface):
             reply = self.get(endpoint=routing_key, specifier=request.headers.get('specifier'))
         except Exception as err:
             return web.Response(text=f'Unable to send GET request: {err}')
+        payload_json = json.dumps(scarab.to_python(reply.payload)) if reply.payload else None
         return web.Response(
             status=self.ret_code_conversion.get(reply.return_code, 400),
             reason=reply.return_message,
             headers={
-                'dl_return_code': reply.return_code
+                'dl_return_code': f'{reply.return_code}'
             },
-            body=json.dumps(scarab.to_python(reply.payload)),
+            body=payload_json,
         )
 
     async def handle_put(self, request):
