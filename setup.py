@@ -72,6 +72,7 @@ class CMakeBuild(build_ext):
 
 requirements = [
     'PyYAML',
+    'aiohttp',
     'asteval',
     'setuptools_scm',
     #these two for postgreSQL, move to plugin?
@@ -103,5 +104,5 @@ setup(
     zip_safe=False,
     install_requires=requirements,
     packages=packages,
-    scripts=["bin/dl-serve"]
+    scripts=["bin/dl-serve", "bin/dl-http-server"]
 )
