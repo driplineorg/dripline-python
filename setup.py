@@ -69,15 +69,39 @@ class CMakeBuild(build_ext):
         #subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
         subprocess.check_call(['make', 'install', 'VERBOSE=1'], cwd=self.build_temp)
 
-if __name__ == "__main__":
+requirements = [
+    'PyYAML',
+    'aiohttp',
+    'asteval',
+    'setuptools_scm',
+    #these two for postgreSQL, move to plugin?
+    'sqlalchemy',
+    'psycopg2',
+    'colorlog', #we could make this optional if we wnat to minimize dependencies
+]
 
-    setup(
-        ext_modules=[CMakeExtension('dripline_python')],
-        cmdclass=dict(build_ext=CMakeBuild),
-        packages=["dripline", "_dripline"],
-        package_dir={
-            'dripline': 'dripline',
-            '_dripline': 'module_bindings',
-        },
-        scripts=["bin/dl-serve", "bin/dl-http-server"],
-    )
+packages = ["dripline"] + ["dripline."+i_package for i_package in find_packages("dripline")]
+print('packages are: {}'.format(packages))
+
+setup(
+    name='dripline',
+    use_scm_version={
+        "root": ".",
+        "write_to": "./dripline/version.py",
+        'version_scheme': lambda x: "v{}".format(x.tag),
+        'local_scheme': lambda x: '',
+    },
+    #version='4.0.0-beta',
+    author='us',
+    author_email='driplineorg@email.tld',
+    description='a description would be good',
+    long_description='',
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
+    ext_modules=[CMakeExtension('dripline_python')],
+    cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
+    install_requires=requirements,
+    packages=packages,
+    scripts=["bin/dl-serve", "bin/dl-http-server"]
+)
