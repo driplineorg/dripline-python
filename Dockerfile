@@ -12,8 +12,9 @@ FROM ${img_user}/${img_repo}:${img_tag}
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-RUN pip install ipython
-RUN pip install pytest
+RUN /usr/local/bin/python -m pip install --upgrade pip &&\
+    pip install ipython &&\
+    pip install pytest
 
 COPY module_bindings /usr/local/src_py/module_bindings
 COPY dripline /usr/local/src_py/dripline

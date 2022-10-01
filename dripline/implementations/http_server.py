@@ -20,7 +20,7 @@ class HTTPServer(Interface):
     When the Dripline reply is received, that's converted to an HTTP response and returned to the HTTP client.
     '''
     def __init__(self,
-                 http_host='localhost',
+                 http_host=None,
                  http_port=8080,
                  **kwargs
                  ):
@@ -89,22 +89,33 @@ class HTTPServer(Interface):
 
     async def handle_put(self, request):
         routing_key = self.path_to_routing_key(request.path)
-        return web.Response(text=f'Doing set request for {routing_key}\n')
+        return web.Response(text=f'Received SET request for {routing_key}\nSET requests are not yet implemented.\n')
 
     async def handle_post(self, request):
         routing_key = self.path_to_routing_key(request.path)
-        return web.Response(text=f'Doing cmd request for {routing_key}\n')
+        return web.Response(text=f'Received CMD request for {routing_key}\nCMD requests are not yet implemented.\n')
+
+    async def hello(self, request):
+        return web.Response(text='Hello, world\n')
+
+    async def agent(self, request):
+        return web.FileResponse(path='/root/agent.html')
 
     def http_listen(self):
         '''
         Starts the HTTP server
         '''
         app = web.Application()
-        app.router.add_route('GET', '/{tail:.*}', self.handle_get)
-        app.router.add_route('PUT', '/{tail:.*}', self.handle_put)
-        app.router.add_route('POST', '/{tail:.*}', self.handle_post)
+        app.router.add_route('GET', '/hello', self.hello)
+        app.router.add_route('GET', '/agent', self.agent)
+        app.router.add_route('GET', '/dl/{tail:.*}', self.handle_get)
+        app.router.add_route('PUT', '/dl/{tail:.*}', self.handle_put)
+        app.router.add_route('POST', '/dl/{tail:.*}', self.handle_post)
 
         web.run_app(app, host=self.http_host, port=self.http_port)
 
     def path_to_routing_key(self, input:str):
-        return input[1:].replace('/', '.')
+        # Start at index 4: URLs are expected to start with `/dl/`
+        # Replace '/' with '.': Routing keys '.' instead of '/' as a separator
+        # Replace '?' with '': If using a form, a GET request with have a '?' after the path, which we don't need
+        return input[4:].replace('/', '.').replace('?', '')

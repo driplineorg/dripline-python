@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Dripline Agent</title>
+        <meta name="description" content="Very basic dl-agent page">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+          function send_request() {
+            console.log("hi");
+
+            var rk = document.getElementById("routing_key");
+            console.log(rk.value);
+
+            var dl_types = document.getElementsByName("dl_type");
+            var dl_type_checked = "GET";
+            for(i = 0; i < dl_types.length; i++) {
+              if (dl_types[i].checked) dl_type_checked = dl_types[i].value;
+            }
+            console.log(dl_type_checked);
+
+            var url = "http://localhost:8080/" + rk.value;
+            $.ajax({
+              url: url,
+              type: dl_type_checked,
+              success: function(result) {
+                console.log("Success: ${result}")
+                var result = document.getElementById("result");
+                result.innerHTML = "Success: " + xhr.responseText;
+              },
+              error: function(xhr, status, error) {
+                //var err = eval("(" + xhr.responseText + ")");
+                console.log("Error: " + xhr.responseText);
+                var result = document.getElementById("result");
+                result.innerHTML = "Error: " + xhr.responseText;
+              }
+            });
+
+            return false;
+          }
+        </script>
+    </head>
+    <body>
+        <h1>dl-agent</h1>
+        <form action='#' onsubmit="send_request()" id="send_req_form">
+        Type:<br>
+        <input type="radio" id="dl_type_get" name="dl_type" value="GET" checked="checked">
+        <label for="dl_type">Get</label><br>
+        <input type="radio" id="dl_type_set" name="dl_type" value="SET">
+        <label for="dl_type">Set</label><br>
+        <input type="radio" id="dl_type_cmd" name="dl_type" value="CMD">
+        <label for="dl_type">Cmd</label><br>
+
+        Routing Key: <input type="text" id="routing_key" value="peaches"><br>
+        <input type="button" value="Send" onclick="send_request()">
+        </form>
+        <div id="result"></div>
+    </body>
+</html>
