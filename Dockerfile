@@ -12,18 +12,19 @@ FROM ${img_user}/${img_repo}:${img_tag}
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-RUN apt-get update && \
-    apt-get clean && \
-    apt-get --fix-missing  -y install \
-        libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN /usr/local/bin/python -m pip install --upgrade pip &&\
+    pip install ipython &&\
+    pip install pytest
 
+COPY module_bindings /usr/local/src_py/module_bindings
+COPY dripline /usr/local/src_py/dripline
+COPY bin /usr/local/src_py/bin
+COPY .git /usr/local/src_py/.git
+COPY setup.py /usr/local/src_py/setup.py
+COPY CMakeLists.txt /usr/local/src_py/CMakeLists.txt
+COPY tests /usr/local/src_py/tests
 
-RUN pip install ipython pytest
-
-COPY . /usr/local/src_py/
-
-RUN pip install -v /usr/local/src_py
+RUN pip install /usr/local/src_py
 
 #RUN cd /usr/local/src_py &&\
 #    python setup.py install
