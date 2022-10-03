@@ -8,6 +8,7 @@ import scarab
 
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel('DEBUG')
 
 __all__ = []
 
@@ -33,6 +34,11 @@ class HTTPServer(Interface):
 
         '''
         Interface.__init__(self, **kwargs)
+        logger.error('Error test')
+        logger.warning('Warning test')
+        logger.info('Info test')
+        logger.debug('Debug test')
+        print('Print test')
 
         self.http_host = '127.0.0.1' if http_host=='localhost' else http_host
         self.http_port = http_port
@@ -74,13 +80,19 @@ class HTTPServer(Interface):
             dripline.core.DL_ClientErrorUnableToSend.value: 503, # Service Unavailable
             dripline.core.DL_ClientErrorTimeout.value: 504, # Gateway Timeout
         }
+        print(self.ret_code_conversion)
 
     async def handle_get(self, request):
+        logger.warning(f'Received HTTP GET request {request}')
         routing_key = self.path_to_routing_key(request.path)
         try:
-            reply = self.get(endpoint=routing_key, specifier=request.headers.get('specifier'))
+            reply = self.get(
+                endpoint=routing_key, 
+                specifier=request.headers.get('specifier'),
+            )
         except Exception as err:
-            return web.Response(text=f'Unable to send GET request: {err}')
+            return web.Response(text=f'Unable to send GET request: {err}', status=400)
+        logger.warning(f'Received DL reply:\n{reply.__str__()}')
         payload_json = json.dumps(scarab.to_python(reply.payload)) if reply.payload else None
         return web.Response(
             status=self.ret_code_conversion.get(reply.return_code, 400),
