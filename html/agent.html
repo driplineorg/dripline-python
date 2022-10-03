@@ -1,58 +1,99 @@
 <!doctype html>
-<html>
-    <head>
-        <title>Dripline Agent</title>
-        <meta name="description" content="Very basic dl-agent page">
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-        <script>
-          function send_request() {
-            console.log("hi");
+<html lang="en">
+  <head>
+    <title>Dripline Agent</title>
+    <meta name="description" content="Very basic dl-agent page">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+      function send_request() {
+        console.log("hi");
 
-            var rk = document.getElementById("routing_key");
-            console.log(rk.value);
+        var rk = document.getElementById("routing_key");
+        console.log(rk.value);
 
-            var dl_types = document.getElementsByName("dl_type");
-            var dl_type_checked = "GET";
-            for(i = 0; i < dl_types.length; i++) {
-              if (dl_types[i].checked) dl_type_checked = dl_types[i].value;
-            }
-            console.log(dl_type_checked);
+        var dl_types = document.getElementsByName("dl_type");
+        var dl_type_checked = "GET";
+        for(i = 0; i < dl_types.length; i++) {
+          console.log(dl_types[i])
+          if (dl_types[i].checked) dl_type_checked = dl_types[i].value;
+        }
+        console.log(dl_type_checked);
 
-            var url = "http://localhost:8080/" + rk.value;
-            $.ajax({
-              url: url,
-              type: dl_type_checked,
-              success: function(result) {
-                console.log("Success: ${result}")
-                var result = document.getElementById("result");
-                result.innerHTML = "Success: " + xhr.responseText;
-              },
-              error: function(xhr, status, error) {
-                //var err = eval("(" + xhr.responseText + ")");
-                console.log("Error: " + xhr.responseText);
-                var result = document.getElementById("result");
-                result.innerHTML = "Error: " + xhr.responseText;
-              }
-            });
-
-            return false;
+        var url = "http://localhost:8080/dl/" + rk.value;
+        $.ajax({
+          url: url,
+          type: dl_type_checked,
+          success: function(result) {
+            console.log("Success: ${result}")
+            var result = document.getElementById("result");
+            result.innerHTML = "Success: " + xhr.responseText;
+          },
+          error: function(xhr, status, error) {
+            //var err = eval("(" + xhr.responseText + ")");
+            console.log("Error: " + xhr.responseText);
+            var result = document.getElementById("result");
+            result.value = xhr.responseText; //"Error: " + xhr.responseText;
           }
-        </script>
-    </head>
-    <body>
-        <h1>dl-agent</h1>
-        <form action='#' onsubmit="send_request()" id="send_req_form">
-        Type:<br>
-        <input type="radio" id="dl_type_get" name="dl_type" value="GET" checked="checked">
-        <label for="dl_type">Get</label><br>
-        <input type="radio" id="dl_type_set" name="dl_type" value="SET">
-        <label for="dl_type">Set</label><br>
-        <input type="radio" id="dl_type_cmd" name="dl_type" value="CMD">
-        <label for="dl_type">Cmd</label><br>
+        });
 
-        Routing Key: <input type="text" id="routing_key" value="peaches"><br>
-        <input type="button" value="Send" onclick="send_request()">
-        </form>
-        <div id="result"></div>
-    </body>
+        return false;
+      }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="icon" type="image/x-icon" href="/web/DL3Logo.ico">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row mb-5 mt-3">
+        <div class="col-md-auto">
+          <img src="/web/DL3Logo.png" class="img-fluid" alt="Dripline Logo" width="100">
+        </div>
+        <div class="col">
+          <h1 class="display-1">Dripline Agent</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <form action='#' id="send_req_form">
+            <div class="mb-3">
+              <label class="form-label">Type:&nbsp;</label>
+
+              <input type="radio" class="btn-check" name="dl_type" id="dl_type_get" autocomplete="off" value="GET" checked>
+              <label class="btn btn-outline-primary btn-sm" for="dl_type_get">GET</label>
+
+              <input type="radio" class="btn-check" name="dl_type" id="dl_type_set" autocomplete="off" value="SET" disabled>
+              <label class="btn btn-outline-primary btn-sm" for="dl_type_set">SET</label>
+
+              <input type="radio" class="btn-check" name="dl_type" id="dl_type_cmd" autocomplete="off" value="CMD" disabled>
+              <label class="btn btn-outline-primary btn-sm" for="dl_type_cmd">CMD</label>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="routing_key">Routing Key</label>
+              <input type="text" class="form-control" id="routing_key" value="peaches">
+            </div>
+            <div class="mb-3">
+              <input type="button" value="Send" onclick="send_request()">
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col">
+          <div class="input-group">
+              <span class="input-group-text">Reply</span>
+              <textarea class="form-control" id="result" aria-label="Reply"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+<!--
+            <form action="#" id="reply_form">
+            </form>
+
+
+-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  </body>
 </html>
