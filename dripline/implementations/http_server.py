@@ -22,18 +22,22 @@ class HTTPServer(Interface):
     def __init__(self,
                  http_host=None,
                  http_port=8080,
+                 web_root=None,
                  **kwargs
                  ):
         '''
         Args:
             http_host (string): IP address or URL for the HTTP server host
             http_port (int): Port for the HTTP server host
+            web_root (string): Path to the root directory for static web pages
 
         '''
         Interface.__init__(self, **kwargs)
 
         self.http_host = '127.0.0.1' if http_host=='localhost' else http_host
         self.http_port = http_port
+
+        self.web_root = web_root if web_root else '/web'
 
         self.ret_code_conversion = {
             dripline.core.DL_Success.value: 200, # Success
@@ -98,16 +102,13 @@ class HTTPServer(Interface):
     async def hello(self, request):
         return web.Response(text='Hello, world\n')
 
-    async def agent(self, request):
-        return web.FileResponse(path='/root/agent.html')
-
     def http_listen(self):
         '''
         Starts the HTTP server
         '''
         app = web.Application()
+        app.router.add_static('/web/', f'{self.web_root}')
         app.router.add_route('GET', '/hello', self.hello)
-        app.router.add_route('GET', '/agent', self.agent)
         app.router.add_route('GET', '/dl/{tail:.*}', self.handle_get)
         app.router.add_route('PUT', '/dl/{tail:.*}', self.handle_put)
         app.router.add_route('POST', '/dl/{tail:.*}', self.handle_post)
