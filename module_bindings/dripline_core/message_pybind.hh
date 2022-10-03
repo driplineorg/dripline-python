@@ -80,6 +80,14 @@ namespace dripline_pybind
                         >( mod, "MsgRequest", message, "dripline messages containing a request to be sent to an endpoint" )
             // constructor(s)
             .def( pybind11::init< >() )
+
+            // conversion to string
+            .def( "__str__", [](dripline::request_ptr_t a_req){
+              scarab::param_node t_encoding_options;
+              t_encoding_options.add( "style", "pretty" );
+              return a_req->encode_full_message(5000, t_encoding_options);
+            } )
+
             // properties
             // mv_referrable
             //TODO even better if we could interface with python's UUID library instead of passing strings
@@ -136,6 +144,13 @@ namespace dripline_pybind
             // constructor(s)
             .def( pybind11::init< >() )
 
+            // conversion to string
+            .def( "__str__", [](dripline::reply_ptr_t a_rep){
+              scarab::param_node t_encoding_options;
+              t_encoding_options.add( "style", "pretty" );
+              return a_rep->encode_full_message(5000, t_encoding_options);
+            } )
+
             // properties
             // mv_referrable
             .def_property( "return_message", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_message,
@@ -186,6 +201,13 @@ namespace dripline_pybind
                         >( mod, "MsgAlert", message, "dripline message containing alert information" )
             // constructor(s)
             .def( pybind11::init< >() )
+
+            // conversion to string
+            .def( "__str__", [](dripline::alert_ptr_t a_alert){
+              scarab::param_node t_encoding_options;
+              t_encoding_options.add( "style", "pretty" );
+              return a_alert->encode_full_message(5000, t_encoding_options);
+            } )
 
             // general methods
             .def_static( "create",
