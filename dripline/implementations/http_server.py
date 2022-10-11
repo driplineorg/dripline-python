@@ -109,12 +109,12 @@ class HTTPServer(Interface):
         logger.warning(f'Received HTTP SET request {request}')
         routing_key = self.path_to_routing_key(request.path)
         try:
-            if request.has_body:
+            if request.can_read_body:
                 body_json = await request.json()
-                value = body_json.get('value', None) 
+                values = body_json.get('values', None) 
             reply = self.set(
                 endpoint=routing_key,
-                value=value,
+                values=values,
                 specifier=request.headers.get('specifier'),
                 lockout_key=request.headers.get('lockout-key'),
             )
@@ -143,6 +143,8 @@ class HTTPServer(Interface):
         '''
         Starts the HTTP server
         '''
+        #logging.basicConfig(level=logging.DEBUG)
+
         app = web.Application()
         app.router.add_static('/web/', f'{self.web_root}')
         app.router.add_route('GET', '/hello', self.hello)
@@ -150,7 +152,7 @@ class HTTPServer(Interface):
         app.router.add_route('PUT', '/dl/{tail:.*}', self.handle_put)
         app.router.add_route('POST', '/dl/{tail:.*}', self.handle_post)
 
-        web.run_app(app, host=self.http_host, port=self.http_port)
+        web.run_app(app, host=self.http_host, port=self.http_port, access_log_format=" :: %r %s %T %t")
 
     def path_to_routing_key(self, input:str):
         # Start at index 4: URLs are expected to start with `/dl/`
