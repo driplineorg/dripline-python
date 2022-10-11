@@ -10,8 +10,8 @@
       function send_request() {
         console.log("hi");
 
-        var rk = document.getElementById("routing_key");
-        console.log(rk.value);
+        var rk = document.getElementById("routing_key").value;
+        console.log(rk);
 
         var dl_types = document.getElementsByName("dl_type");
         var dl_type_checked = "GET";
@@ -19,15 +19,20 @@
           if (dl_types[i].checked) dl_type_checked = dl_types[i].value;
         }
         console.log(dl_type_checked);
+        var value = document.getElementById('value').value;
         var specifier = document.getElementById('specifier').value;
         var lockout_key = document.getElementById('lockout_key').value;
 
-        var url = "http://localhost:8080/dl/" + rk.value;
+        var payload = {'values': [value]};
+
+        var url = "http://localhost:8080/dl/" + rk;
         $.ajax({
           url: url,
           type: dl_type_checked,
           headers: { 'lockout-key': lockout_key,
                      'specifier': specifier },
+          data: payload,
+          dataType: 'json',
           success: function(data, status, xhr) {
             console.log("Success: ${data}")
             var result = document.getElementById("result");
@@ -66,7 +71,7 @@
               <input type="radio" class="btn-check" name="dl_type" id="dl_type_get" autocomplete="off" value="GET" checked>
               <label class="btn btn-outline-primary btn-sm" for="dl_type_get">GET</label>
 
-              <input type="radio" class="btn-check" name="dl_type" id="dl_type_set" autocomplete="off" value="SET" disabled>
+              <input type="radio" class="btn-check" name="dl_type" id="dl_type_set" autocomplete="off" value="SET">
               <label class="btn btn-outline-primary btn-sm" for="dl_type_set">SET</label>
 
               <input type="radio" class="btn-check" name="dl_type" id="dl_type_cmd" autocomplete="off" value="CMD" disabled>
@@ -75,6 +80,10 @@
             <div class="mb-3">
               <label class="form-label" for="routing_key">Routing Key</label>
               <input type="text" class="form-control" id="routing_key" value="peaches">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="value">Value (for SET and CMD)</label>
+              <input type="text" class=""form-control" id="value">
             </div>
             <div class="border container mb-3">
               <div class="mb-3">
