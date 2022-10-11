@@ -24,12 +24,13 @@ class Interface(Core):
         self._confirm_retcode = confirm_retcodes
         self._receiver = Receiver()
 
-    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=False):
+    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=None):
         '''
         internal helper method to standardize sending request messages
         '''
         a_specifier = specifier if specifier is not None else ""
         a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
+        a_request.lockout_key = lockout_key if lockout_key is not None else ""
         receive_reply = self.send(a_request)
         if not receive_reply.successful_send:
             raise DriplineError('unable to send request')
@@ -45,40 +46,47 @@ class Interface(Core):
         sig_handler.remove_cancelable(self._receiver)
         return result
 
-    def get(self, endpoint, specifier=None, timeout=0):
+    def get(self, endpoint, specifier=None, lockout_key=None, timeout=0):
         '''
         [kw]args:
         endpoint (string): routing key to which an OP_GET will be sent
         specifier (string|None): specifier to add to the message
         timeout (int|0): timeout in ms
         '''
-        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier )
+        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout )
         return result
 
-    def set(self, endpoint, value, specifier=None, timeout=0):
+    def set(self, endpoint, value=None, values=None, keyed_args=None, specifier=None, lockout_key=None, timeout=0):
         '''
         [kw]args:
-        endpoint (string): routing key to which an OP_GET will be sent
-        value : value to assign
+        endpoint (string): routing key to which an OP_SET will be sent
+        value (any value|None): single value to assign (will be combined with `values` if both are set)
+        values (array|None): array of values to assign (will be combined with `value` if both are set)
+        keyed_args (dict|None): set of key/value pairs to add as the payload
         specifier (string|None): specifier to add to the message
         timeout (int|0): timeout in ms
         '''
-        payload = {'values':[value]}
-        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
+        all_values = [value] if value is not None else []
+        if values is not None:
+            all_values.extend(values)
+        payload = keyed_args if keyed_args is not None else {}
+        payload['values'] = all_values
+        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout )
         return result
 
-    def cmd(self, endpoint, method, ordered_args=[], keyed_args={}, timeout=0):
+    def cmd(self, endpoint, specifier, ordered_args=[], keyed_args={}, lockout_key=None, timeout=0):
         '''
         [kw]args:
-        endpoint (string): routing key to which an OP_GET will be sent
-        method (string): specifier to add to the message, naming the method to execute
-        arguments (dict): dictionary of arguments to the specified method
+        endpoint (string): routing key to which an OP_CMD will be sent
+        specifier (string): specifier to add to the message, naming the method to execute
+        ordered_args (list): array of values to add to the payload as `values`
+        keyed_args (dict): set of key/value pairs to add as the payload
         timeout (int|0): timeout in ms
         '''
-        payload = {'values': ordered_args}
-        payload.update(keyed_args)
-        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=method, payload=payload )
+        payload = keyed_args if keyed_args is not None else {}
+        payload['values'] = ordered_args
+        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout )
         return result
