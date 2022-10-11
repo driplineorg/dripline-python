@@ -43,42 +43,42 @@ class HTTPServer(Interface):
         self.http_host = '127.0.0.1' if http_host=='localhost' else http_host
         self.http_port = http_port
 
-        self.web_root = web_root if web_root else '/web'
+        self.web_root = web_root if web_root is not None else '/web'
 
         self.ret_code_conversion = {
-            dripline.core.DL_Success.value: 200, # Success
+            dripline.core.DL_Success().value: 200, # Success
 
-            dripline.core.DL_WarningNoActionTaken.value: 100, # Continue
-            dripline.core.DL_WarningDeprecatedFeature.value: 110, # Response is Stale
-            dripline.core.DL_WarningDryRun.value: 112, # Disconnected Operation
-            dripline.core.DL_WarningOffline.value: 112, # Disconnected Operation
-            dripline.core.DL_WarningSubService.value: 199, # Miscellaneous Warning
+            dripline.core.DL_WarningNoActionTaken().value: 100, # Continue
+            dripline.core.DL_WarningDeprecatedFeature().value: 110, # Response is Stale
+            dripline.core.DL_WarningDryRun().value: 112, # Disconnected Operation
+            dripline.core.DL_WarningOffline().value: 112, # Disconnected Operation
+            dripline.core.DL_WarningSubService().value: 199, # Miscellaneous Warning
 
-            dripline.core.DL_AmqpError.value: 500, # Internal Server Error
-            dripline.core.DL_AmqpErrorBrokerConnection.value: 500, # Internal Server Error
-            dripline.core.DL_AmqpErrorRoutingkeyNotfound.value: 404, # Not found
+            dripline.core.DL_AmqpError().value: 500, # Internal Server Error
+            dripline.core.DL_AmqpErrorBrokerConnection().value: 500, # Internal Server Error
+            dripline.core.DL_AmqpErrorRoutingkeyNotfound().value: 404, # Not found
 
-            dripline.core.DL_ResourceError.value: 500, # Internal Server Error
-            dripline.core.DL_ResourceErrorConnection.value: 503, # Service Unavailable
-            dripline.core.DL_ResourceErrorNoResponse.value: 503, # Service Unavailable
-            dripline.core.DL_ResourceErrorSubService.value: 503, # Service Unavailable
+            dripline.core.DL_ResourceError().value: 500, # Internal Server Error
+            dripline.core.DL_ResourceErrorConnection().value: 503, # Service Unavailable
+            dripline.core.DL_ResourceErrorNoResponse().value: 503, # Service Unavailable
+            dripline.core.DL_ResourceErrorSubService().value: 503, # Service Unavailable
 
-            dripline.core.DL_ServiceError.value: 400, # Bad request
-            dripline.core.DL_ServiceErrorNoEncoding.value: 400, # Bad request
-            dripline.core.DL_ServiceErrorDecodingFail.value: 400, # Bad request
-            dripline.core.DL_ServiceErrorBadPayload.value: 422, # Unprocessable entity
-            dripline.core.DL_ServiceErrorInvalidValue.value: 422, # Unprocessable entity
-            dripline.core.DL_ServiceErrorTimeout.value: 503, # Service Unavailable
-            dripline.core.DL_ServiceErrorInvalidMethod.value: 501, # Not implemented
-            dripline.core.DL_ServiceErrorAccessDenied.value: 403, # Forbidden
-            dripline.core.DL_ServiceErrorInvalidKey.value: 423, # Locked
-            dripline.core.DL_ServiceErrorInvalidSpecifier.value: 422, # Unprocessable entity
+            dripline.core.DL_ServiceError().value: 400, # Bad request
+            dripline.core.DL_ServiceErrorNoEncoding().value: 400, # Bad request
+            dripline.core.DL_ServiceErrorDecodingFail().value: 400, # Bad request
+            dripline.core.DL_ServiceErrorBadPayload().value: 422, # Unprocessable entity
+            dripline.core.DL_ServiceErrorInvalidValue().value: 422, # Unprocessable entity
+            dripline.core.DL_ServiceErrorTimeout().value: 503, # Service Unavailable
+            dripline.core.DL_ServiceErrorInvalidMethod().value: 501, # Not implemented
+            dripline.core.DL_ServiceErrorAccessDenied().value: 403, # Forbidden
+            dripline.core.DL_ServiceErrorInvalidKey().value: 423, # Locked
+            dripline.core.DL_ServiceErrorInvalidSpecifier().value: 422, # Unprocessable entity
 
-            dripline.core.DL_ClientError.value: 500, # Internal Server Error
-            dripline.core.DL_ClientErrorInvalidRequest.value: 400, # Bad Request
-            dripline.core.DL_ClientErrorHandlingReply.value: 500, # Internal Server Error
-            dripline.core.DL_ClientErrorUnableToSend.value: 503, # Service Unavailable
-            dripline.core.DL_ClientErrorTimeout.value: 504, # Gateway Timeout
+            dripline.core.DL_ClientError().value: 500, # Internal Server Error
+            dripline.core.DL_ClientErrorInvalidRequest().value: 400, # Bad Request
+            dripline.core.DL_ClientErrorHandlingReply().value: 500, # Internal Server Error
+            dripline.core.DL_ClientErrorUnableToSend().value: 503, # Service Unavailable
+            dripline.core.DL_ClientErrorTimeout().value: 504, # Gateway Timeout
         }
         print(self.ret_code_conversion)
 
@@ -89,6 +89,7 @@ class HTTPServer(Interface):
             reply = self.get(
                 endpoint=routing_key, 
                 specifier=request.headers.get('specifier'),
+                lockout_key=request.headers.get('lockout-key'),
             )
         except Exception as err:
             return web.Response(text=f'Unable to send GET request: {err}', status=400)
@@ -97,15 +98,39 @@ class HTTPServer(Interface):
         return web.Response(
             status=self.ret_code_conversion.get(reply.return_code, 400),
             reason=reply.return_message,
+            content_type='application/json',
             headers={
-                'dl_return_code': f'{reply.return_code}'
+                'dl_return_code': f'{reply.return_code}',
             },
             body=payload_json,
         )
 
     async def handle_put(self, request):
+        logger.warning(f'Received HTTP SET request {request}')
         routing_key = self.path_to_routing_key(request.path)
-        return web.Response(text=f'Received SET request for {routing_key}\nSET requests are not yet implemented.\n')
+        try:
+            if request.has_body:
+                body_json = await request.json()
+                value = body_json.get('value', None) 
+            reply = self.set(
+                endpoint=routing_key,
+                value=value,
+                specifier=request.headers.get('specifier'),
+                lockout_key=request.headers.get('lockout-key'),
+            )
+        except Exception as err:
+            return web.Response(text=f'Unable to send SET request: {err}', status=400)
+        logger.warning(f'Received DL reply:\n{reply.__str__()}')
+        payload_json = json.dumps(scarab.to_python(reply.payload)) if reply.payload else None
+        return web.Response(
+            status=self.ret_code_conversion.get(reply.return_code, 199),
+            reason=reply.return_message,
+            content_type='application/json',
+            headers={
+                'dl_return_code': f'{reply.return_code}',
+            },
+            body=payload_json,
+        )
 
     async def handle_post(self, request):
         routing_key = self.path_to_routing_key(request.path)
