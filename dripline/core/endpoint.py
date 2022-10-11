@@ -59,17 +59,14 @@ class Endpoint(_Endpoint):
             return a_request_message.reply(payload=self.result_to_scarab_payload(the_value))
 
     def do_set_request(self, a_request_message):
-
-        a_specifier = a_request_message.specifier.to_string()
-        if not "values" in a_request_message.payload:
-            raise ThrowReply('service_error_bad_payload', 'setting called without values, but values are required for set')
-        if not isinstance(a_request_message.payload["values"], list) or len(a_request_message.payload["values"]) == 0:
-            raise ThrowReply('service_error_bad_payload', 'setting called with invalid values; expected list of length 1 or greater')
-        new_value = a_request_message.payload["values"][0]()
-        new_value = getattr(new_value, "as_" + new_value.type())()
-        logger.debug(f'Attempting to set new_value to [{new_value}]')
-
-        if (a_specifier):
+        a_specifier =  a_request_message.specifier.to_string()
+        try:
+            new_value = a_request_message.payload["values"][0]()
+        except Exception as err:
+            raise ThrowReply('service_error_bad_payload', f'Set called with invalid values: {err}')
+        new_value = getattr(new_value, "as_"+new_value.type())()
+        logger.debug(f'new_value is [{new_value}]')
+        if ( a_specifier ):
             if not hasattr(self, a_specifier):
                 raise ThrowReply('service_error_invalid_specifier',
                                  "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
