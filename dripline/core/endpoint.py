@@ -62,8 +62,9 @@ class Endpoint(_Endpoint):
 
         a_specifier = a_request_message.specifier.to_string()
         if not "values" in a_request_message.payload:
-            raise ThrowReply('service_error_bad_payload',
-                             'setting called without values, but values are required for set')
+            raise ThrowReply('service_error_bad_payload', 'setting called without values, but values are required for set')
+        if not isinstance(a_request_message.payload["values"], list) or len(a_request_message.payload["values"]) == 0:
+            raise ThrowReply('service_error_bad_payload', 'setting called with invalid values; expected list of length 1 or greater')
         new_value = a_request_message.payload["values"][0]()
         new_value = getattr(new_value, "as_" + new_value.type())()
         logger.debug(f'Attempting to set new_value to [{new_value}]')
