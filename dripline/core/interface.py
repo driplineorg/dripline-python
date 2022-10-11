@@ -57,7 +57,7 @@ class Interface(Core):
         result = self._receive_reply( reply_pkg, timeout )
         return result
 
-    def set(self, endpoint, value=None, values=None, keyed_args=None, specifier=None, lockout_key=None, timeout=0):
+    def set(self, endpoint, value=None, values=[], keyed_args=None, specifier=None, lockout_key=None, timeout=0):
         '''
         [kw]args:
         endpoint (string): routing key to which an OP_SET will be sent
@@ -67,11 +67,10 @@ class Interface(Core):
         specifier (string|None): specifier to add to the message
         timeout (int|0): timeout in ms
         '''
-        all_values = [value] if value is not None else []
-        if values is not None:
-            all_values.extend(values)
+        if value is not None:
+            values.insert(0, value)
         payload = keyed_args if keyed_args is not None else {}
-        payload['values'] = all_values
+        payload['values'] = values
         reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout )
         return result
