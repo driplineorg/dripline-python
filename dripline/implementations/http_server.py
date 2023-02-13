@@ -80,7 +80,6 @@ class HTTPServer(Interface):
             dripline.core.DL_ClientErrorUnableToSend().value: 503, # Service Unavailable
             dripline.core.DL_ClientErrorTimeout().value: 504, # Gateway Timeout
         }
-        print(self.ret_code_conversion)
 
     async def handle_get(self, request):
         logger.warning(f'Received HTTP GET request {request}')

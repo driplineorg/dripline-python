@@ -22,9 +22,9 @@
         var value = document.getElementById('value').value;
         var specifier = document.getElementById('specifier').value;
         var lockout_key = document.getElementById('lockout_key').value;
-
+        console.log(value)
         var payload = {'values': [value]};
-
+        console.log(payload)
         var url = "http://localhost:8080/dl/" + rk;
         $.ajax({
           url: url,
