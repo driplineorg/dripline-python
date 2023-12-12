@@ -1,3 +1,10 @@
+'''
+This is an experimental implementation of a Scpi-Service which accepts a list of response-terminators. The main use of it is in connecting a motor with strange behaviour regarding his response-terminators. TODO: Move to dragonfly for DL3
+
+Maxim Astaschov, Mainz, 12.2023
+'''
+
+
 import re
 import socket
 import threading
