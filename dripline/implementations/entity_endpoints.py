@@ -177,9 +177,9 @@ class ProviderAttributeEntity(Entity):
 
     @calibrate()
     def on_get(self):
-        return getattr(self.provider, self._attribute_name)
+        return getattr(self.service, self._attribute_name)
 
     def on_set(self, value):
-        setattr(self.provider, self._attribute_name, value)
+        setattr(self.service, self._attribute_name, value)
         
 
