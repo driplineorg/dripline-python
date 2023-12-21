@@ -116,8 +116,8 @@ class PidController(AlertConsumer):
         }
 
         con = Interface(connection)
-        logger.info("{} returns {}".format(self._status_channel,value))
         value = con.get(self._status_channel)
+        logger.info("{} returns {}".format(self._status_channel,value))
         if value == 'enabled':
             logger.debug("{} returns {}".format(self._status_channel,value))
         else:
