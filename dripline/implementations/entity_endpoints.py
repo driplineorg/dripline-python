@@ -157,3 +157,29 @@ class FormatEntity(Entity):
             mapped_value = self.evaluator(self._set_value_map.format(value))
         logger.debug(f'value is {value}; mapped value is: {mapped_value}')
         return self.service.send_to_device([self._set_str.format(mapped_value)])
+        
+        
+        
+        
+__all__.append('ProviderAttributeEntity')
+class ProviderAttributeEntity(Entity):
+    '''
+    Spime allowing communication with provider property.
+    '''
+
+    def __init__(self,
+                 attribute_name,
+                 disable_set=False,
+                 **kwargs):
+       Entity.__init__(self, **kwargs)
+       self._attribute_name = attribute_name
+       self._disable_set = disable_set
+
+    @calibrate()
+    def on_get(self):
+        return getattr(self.provider, self._attribute_name)
+
+    def on_set(self, value):
+        setattr(self.provider, self._attribute_name, value)
+        
+
