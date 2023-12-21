@@ -99,7 +99,7 @@ class PidController(AlertConsumer):
         }
 
         con = Interface(connection)
-        value = con.get(self._check_channel)[self.payload_field]
+        value = con.get(self._check_channel).payload.value_cal
         logger.info('current get is {}'.format(value))
 
         try:
@@ -115,7 +115,7 @@ class PidController(AlertConsumer):
         }
 
         con = Interface(connection)
-        value = con.get(self._status_channel)[self.payload_field]
+        value = con.get(self._status_channel).payload.value_cal
         if value == 'enabled':
             logger.debug("{} returns {}".format(self._status_channel,value))
         else:
