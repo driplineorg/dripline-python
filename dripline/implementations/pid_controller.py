@@ -9,7 +9,7 @@ import time
 import datetime
 from dripline.core import AlertConsumer
 from dripline.core import Interface
-from dripline.core import ThrowReply as exceptions
+from dripline.core import ThrowReply 
 
 import logging
 logger = logging.getLogger(__name__)
@@ -99,13 +99,14 @@ class PidController(AlertConsumer):
         }
 
         con = Interface(connection)
-        value = con.get(self._check_channel.to_string()).payload.value_cal
+        value = con.get(self._check_channel)
         logger.info('current get is {}'.format(value))
 
         try:
             value = float(value)
-        except (TypeError, ValueError):
-            raise exceptions.DriplineValueError('value get ({}) is not floatable'.format(value))
+            
+        except Exception as err: ##TODO correct exceptions
+            raise ThrowReply('value get ({}) is not floatable'.format(value))    
         return value
 
     def __validate_status(self):
@@ -115,12 +116,13 @@ class PidController(AlertConsumer):
         }
 
         con = Interface(connection)
-        value = con.get(self._status_channel.to_string()).payload.value_cal
+        logger.info("{} returns {}".format(self._status_channel,value))
+        value = con.get(self._status_channel)
         if value == 'enabled':
             logger.debug("{} returns {}".format(self._status_channel,value))
         else:
             logger.critical("Invalid status of {} for PID control by {}".format(self._status_channel,self.name))
-            raise exceptions.DriplineHardwareError("{} returns {}".format(self._status_channel,value))
+            raise ThrowReply("{} returns {}".format(self._status_channel,value))
 
     def this_consume(self, message, method):
         logger.info('consuming message')
@@ -208,7 +210,7 @@ class PidController(AlertConsumer):
             logger.debug("current set is equal to current get")
         else:
             self.__validate_status()
-            raise exceptions.DriplineValueError("set value ({}) is not equal to checked value ({})".format(new_current,current_get))
+            raise ThrowReply("set value ({}) is not equal to checked value ({})".format(new_current,current_get))
 
         logger.info("current set is: {}".format(new_current))
         self._old_current = new_current
