@@ -133,10 +133,14 @@ class FormatEntity(Entity):
         result = self.service.send_to_device([self._get_str])
         logger.debug(f'result is: {result}')
         if self._extract_raw_regex is not None:
-            first_result = result
+            try:
+                first_result = str(result)
+            except:
+                logger.error('Failed to convert {} to string'.format(result))
+                raise ThrowReply('resource_error', 'Failed to convert [{}] to string'.format(result))
             matches = re.search(self._extract_raw_regex, first_result)
             if matches is None:
-                logger.error('matching returned none')
+                logger.error('matching [{}] with regex [{}] returned none'.format(first_result, self._extract_raw_regex))
                 # exceptions.DriplineValueError
                 raise ThrowReply('resource_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             logger.debug(f"matches are: {matches.groupdict()}")
