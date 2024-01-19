@@ -2,7 +2,9 @@ API
 ===
 
 .. autosummary::
-   :toctree: generated
+    :toctree: _autosummary
+    :recursive:
 
-   dripline
-   
+    dripline.core
+    dripline.implementations
+    
