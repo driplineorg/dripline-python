@@ -1,0 +1,25 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "setuptools-scm>=8.0",
+    "wheel", 
+    "pybind11>=2.6.1",
+    "cmake>=3.12",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dripline"
+dynamic = ["version"]
+dependencies = [
+    'PyYAML',
+    'asteval',
+    'setuptools_scm',
+    #these two for postgreSQL, move to plugin?
+    'sqlalchemy',
+    'psycopg2',
+    'colorlog', #we could make this optional if we wnat to minimize dependencies
+]
+
+[tool.setuptools_scm]
+version_file = "dripline/version.py"
