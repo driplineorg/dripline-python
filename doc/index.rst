@@ -17,7 +17,7 @@ the components in a running service.
 
    getting_started
    dl_serve
-   api
+   API <apidoc/dripline>
    contribute
 
 ..
