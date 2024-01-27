@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)  # <3.5 is deprecated by CMake
 project( DriplinePy VERSION 4.5.11 )
 
 cmake_policy( SET CMP0074 NEW )
@@ -22,7 +22,10 @@ list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 find_package( pybind11 2.3.0 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
 
-find_package( Dripline 2.8.0 CONFIG REQUIRED )
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_package( Dripline CONFIG REQUIRED )
+set(CMAKE_FIND_DEBUG_MODE FALSE)
+
 list( APPEND PUBLIC_EXT_LIBS Dripline::Dripline Scarab::Scarab_Dripline )
 
 include_directories( BEFORE ${PROJECT_SOURCE_DIR}/module_bindings/dripline_core )

@@ -37,7 +37,7 @@ target_include_directories( _dripline
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-target_link_libraries( _dripline PRIVATE ${PUBLIC_EXT_LIBS} )
+target_link_libraries( _dripline PUBLIC ${PUBLIC_EXT_LIBS} )
 
 set( PY_MODULE_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR} )
 # Override that install location if specified by the user
