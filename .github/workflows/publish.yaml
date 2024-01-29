@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: docker.io
+  REGISTRY: ghcr.io
+  REGISTRY_OLD: docker.io
   BASE_IMAGE_USER: driplineorg
   BASE_IMAGE_REPO: dripline-cpp
   BASE_IMAGE_VER: 'v2.8.8'
@@ -71,7 +72,9 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v5
         with:
-          images: driplineorg/dripline-python
+          images: |
+            ${{ env.REGISTRY_OLD }}/driplineorg/dripline-python
+            ${{ env.REGISTRY }}/driplineorg/dripline-python
           flavor: |
             latest=auto
             suffix=${{ matrix.tag-suffix }},onlatest=true
@@ -93,12 +96,16 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.REGISTRY_OLD }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-#         for ghcr.io, use:
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         id: build_push
