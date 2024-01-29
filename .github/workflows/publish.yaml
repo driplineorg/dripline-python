@@ -3,17 +3,15 @@ name: Publish
 on:
   push:
     branches: [ main, develop ]
-    tags: ['v*.*.*']
-
+    tags: ['*']
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-
   workflow_dispatch:
 
 env:
+  REGISTRY: docker.io
   BASE_IMAGE_USER: driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  BASE_IMAGE_VER: 'v2.8.4'
+  BASE_IMAGE_VER: 'v2.8.8'
 
 jobs:
 
@@ -21,17 +19,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         id: setup_buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       - name: Build
         id: build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         env:
           BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}-dev
         with:
@@ -65,13 +63,13 @@ jobs:
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: driplineorg/dripline-python
           flavor: |
@@ -81,25 +79,30 @@ jobs:
             type=semver,pattern={{raw}}
             type=ref,event=branch
             type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads{0}', 'main') }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         id: setup_buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
         with:
           buildkitd-flags: --debug
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
+          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+#         for ghcr.io, use:
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         id: build_push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         env:
           BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.tag-suffix }}
         with:
