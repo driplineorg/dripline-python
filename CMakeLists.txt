@@ -22,9 +22,7 @@ list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 find_package( pybind11 2.3.0 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
 
-set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_package( Dripline CONFIG REQUIRED )
-set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 list( APPEND PUBLIC_EXT_LIBS Dripline::Dripline Scarab::Scarab_Dripline )
 
