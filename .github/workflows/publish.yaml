@@ -11,7 +11,7 @@ env:
   REGISTRY: docker.io
   BASE_IMAGE_USER: driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  BASE_IMAGE_VER: 'v2.8.7'
+  BASE_IMAGE_VER: 'v2.8.8'
 
 jobs:
 
