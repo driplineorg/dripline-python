@@ -36,6 +36,7 @@ class CMakeBuild(build_ext):
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
+                      '-DINSTALL_DLPYBIND_IN_SITELIB=TRUE',
                      ]
 
         cfg = 'Debug' if self.debug else 'Release'
