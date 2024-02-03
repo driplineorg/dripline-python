@@ -94,7 +94,7 @@ Installation
 
 We highly recommend using dripline-python in a Docker container.  However, there is nothing to prevent 
 installing and running directly on your host system.  For using Docker containers, see the next section.  
-For installing on a host machine, skip to :ref:`host_install:`.
+For installing on a host machine, skip to :ref:`host_install`.
 
 
 .. _docker_containers:
@@ -127,7 +127,7 @@ We highly recommend using a virtual environment for this installation (e.g. virt
 
 First, clone the dripline-python repository: 
 
-   ``> git clone git@github.com:driplineorg/dripline-python``
+  ``> git clone git@github.com:driplineorg/dripline-python``
 
 or download a zip file of the source from `GitHub <https://github.com/driplineorg/dripline-python>`_ and unpack it.
 
@@ -135,7 +135,7 @@ From the top directory of dripline-python, build with ``pip``.  You have a few o
 
 If dripline-cpp was installed in a system location (e.g. `/usr/local`), that will look like:
 
-  ``> pip install .
+  ``> pip install .``
 
 If you want to install so that you can edit the dripline-python code, use the ``-e`` option: 
 
