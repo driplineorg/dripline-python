@@ -24,17 +24,21 @@ If you are using Dripline in a Docker container, please go directly to :ref:`doc
 Non-Python Dependencies
 *************************
 
-Dripline-python is wraps and extends the C++ package `dripline-cpp <https://dripline-cpp.readthedocs.io/en/latest/>`. 
+Dripline-python is wraps and extends the C++ package `dripline-cpp <https://dripline-cpp.readthedocs.io/en/latest/>`_. 
 To install dripline-cpp, please consult its 
-`installation instructions <https://dripline-cpp.readthedocs.io/en/latest/building.html>` (use the "standalone" option).  
+`installation instructions <https://dripline-cpp.readthedocs.io/en/latest/building.html>`_ (use the "standalone" option).  
 If you install dripline-cpp in a non-system installation location (e.g. ``/usr/local``), you will need to know 
 the location of the installed CMake config files for the dripline-python build below (usually ``[prefix]/lib/cmake/Dripline``).
 
-The Python wrapping of C++ code is done with `Pybind11 <https://pybind11.readthedocs.io/>`.  
+Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.5, 
+Boost 1.46, rapidjson 1.0, yaml-cpp, and rabbitmq-c.  
+Everything should be available from standard package managers.
+
+The Python wrapping of C++ code is done with `Pybind11 <https://pybind11.readthedocs.io/>`_.  
 Version 2.6.0 or higher is required.  
 It can be installed from most package managers or by following their instructions. 
 
-You will need `CMake <https://cmake.org/>` to build the C++ wrappers.  
+You will need `CMake <https://cmake.org/>`_ to build the C++ wrappers.  
 Version 3.5 or higher is required.  
 It can be installed from most package managers or by following their instructions.
 
@@ -125,7 +129,7 @@ First, clone the dripline-python repository:
 
    ``> git clone git@github.com:driplineorg/dripline-python``
 
-or download a zip file of the source from `GitHub <https://github.com/driplineorg/dripline-python>` and unpack it.
+or download a zip file of the source from `GitHub <https://github.com/driplineorg/dripline-python>`_ and unpack it.
 
 From the top directory of dripline-python, build with ``pip``.  You have a few options for what that command looks like:
 
