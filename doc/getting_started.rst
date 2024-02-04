@@ -27,8 +27,12 @@ Non-Python Dependencies
 Dripline-python is wraps and extends the C++ package `dripline-cpp <https://dripline-cpp.readthedocs.io/en/latest/>`_. 
 To install dripline-cpp, please consult its 
 `installation instructions <https://dripline-cpp.readthedocs.io/en/latest/building.html>`_ (use the "standalone" option).  
-If you install dripline-cpp in a non-system installation location (e.g. ``/usr/local``), you will need to know 
-the location of the installed CMake config files for the dripline-python build below (usually ``[prefix]/lib/cmake/Dripline``).
+We recommend you set the CMake variable ``PBUILDER_PY_INSTALL_IN_SITELIB`` to ``TRUE`` so that the scarab 
+python package is installed in the Python site-packages directory.  
+If you install dripline-cpp in a non-system installation location (e.g. with the default install prefix, 
+which is inside the build directory), you will need to know the location of the installed CMake config files 
+for the dripline-python build below (usually ``[prefix]/lib/cmake/Dripline``).  As an alternative, you could 
+make a system-wide install at ``/usr/local``.
 
 Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.5, 
 Boost 1.46, rapidjson 1.0, yaml-cpp, and rabbitmq-c.  
