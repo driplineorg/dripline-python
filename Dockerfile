@@ -19,9 +19,14 @@ COPY module_bindings /usr/local/src_py/module_bindings
 COPY dripline /usr/local/src_py/dripline
 COPY bin /usr/local/src_py/bin
 COPY .git /usr/local/src_py/.git
+COPY pyproject.toml /usr/local/src_py/pyproject.toml
 COPY setup.py /usr/local/src_py/setup.py
 COPY CMakeLists.txt /usr/local/src_py/CMakeLists.txt
 COPY tests /usr/local/src_py/tests
+COPY LICENSE /usr/local/src_py/LICENSE
+COPY README.md /usr/local/src_py/README.md
+COPY pytest.ini /usr/local/src_py/pytest.ini
+
 
 RUN pip install /usr/local/src_py
 

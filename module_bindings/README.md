@@ -1,4 +1,10 @@
-# General guides
+# Library installation
+The library file that contains the Python package can be installed in the Python site-packages directory, or 
+in the lib install directory.
+- To install in site-packages (as defined by `${Python3_SITELIB}`), set `INSTALL_DLPYBIND_IN_SITELIB` to `TRUE`
+- To install in the lib install directory (as defined by `${CMAKE_INSTALL_LIBDIR}`), set `INSTALL_DLPYBIND_IN_SITELIB` to `FALSE`
+
+# General python binding guides
 - The python module is defined in a single source file, it runs exporter functions defined in header files which correspond one-to-one with source files in dripline-python; they have names ending in `_pybind.hh`.
 - When needed, trampoline classes and extra functions in support of bindings should be defined in their own source and header files as needed.
 - It is preferrable to try to achieve pythonic interfaces for bound classes; this means naming arguments and providing default values where possible and including doc strings.
