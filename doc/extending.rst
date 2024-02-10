@@ -29,6 +29,7 @@ will illustrate everything.
 **Basic Setup**
 
 .. code-block:: python
+
     def my_cmd(self, [args], [**kwargs])
         [do something]
         return [a variable]
@@ -43,6 +44,7 @@ The function can include both positional arguments and keyword arguments.  Posit
 would be defined as:
 
 .. code-block:: python
+
     def concatenate(self, an_arg1, an_arg2):
         return repr(an_arg1) + repr(an_arg2)
 
@@ -55,6 +57,7 @@ The return value would be ``My number is 5``.
 Keyword arguments would be defined as:
 
 .. code-block:: python
+
     def make_list(self, a_kwarg1, a_kwarg2=100):
         return [a_kwarg1, a_kwarg2]
 
@@ -74,6 +77,7 @@ array-like data (a list in Python), or dictionary-like data (a dict in Python).
 Endpoint definition:
 
 .. code-block:: python
+
     class AnEndpoint(dripline.core.Entity):
         def __init__(self, base_str="The answer is: "):
             self.base = base_str
@@ -93,6 +97,7 @@ Endpoint definition:
 Usage (with ``dripline.core.Interface``):
 
 .. code-block:: python
+    
     import dripline.core.Interface as Interface
     ifc = Interface([config info])
     print( ifc.get('an_endpoint') )
@@ -101,7 +106,7 @@ Usage (with ``dripline.core.Interface``):
     print( ifc.cmd('an_endpoint', 'make_list', a_kwarg1='Hello, ', a_kwarg2='world') )
 
 The output should be::
-    
+
     The answer is:
     The answer is: Hello, world
     As a list: ['Hello, ', 'world']
