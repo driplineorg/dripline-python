@@ -4,7 +4,8 @@ Extending Dripline
 
 Dripline-python can be conveniently extended using the namespace plugin method.  The controls-guide 
 repository includes an example set of files that can be copied into a new repository to create 
-an extension to the ``dripline`` namespace.  Please see the the controls-guide documentation 
+an extension to the ``dripline`` namespace.  Please see the 
+`controls-guide documentation <https://controls-guide.readthedocs.io/en/latest/>`_
 to follow a walkthrough that will implement a new dripline extension.
 
 Adding a Service Class
@@ -97,7 +98,7 @@ Endpoint definition:
 Usage (with ``dripline.core.Interface``):
 
 .. code-block:: python
-    
+
     import dripline.core.Interface as Interface
     ifc = Interface([config info])
     print( ifc.get('an_endpoint') )
