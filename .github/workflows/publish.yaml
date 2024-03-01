@@ -42,6 +42,7 @@ jobs:
             img_tag=${{ env.BASE_IMAGE_TAG }}
           platforms: linux/amd64
 
+
   build_and_push:
 
     runs-on: ubuntu-latest
