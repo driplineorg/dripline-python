@@ -35,7 +35,7 @@ COPY README.md /usr/local/src_py/README.md
 COPY pytest.ini /usr/local/src_py/pytest.ini
 
 
-RUN pip install /usr/local/src_py
+RUN pip install -v /usr/local/src_py
 
 #RUN cd /usr/local/src_py &&\
 #    python setup.py install
