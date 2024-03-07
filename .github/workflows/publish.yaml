@@ -10,9 +10,9 @@ on:
 env:
   REGISTRY: ghcr.io
   REGISTRY_OLD: docker.io
-  BASE_IMAGE_USER: driplineorg
+  BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  BASE_IMAGE_VER: 'v2.8.8'
+  BASE_IMAGE_VER: 'v2.9.0'
 
 jobs:
 
@@ -41,6 +41,7 @@ jobs:
             img_repo=${{ env.BASE_IMAGE_REPO }}
             img_tag=${{ env.BASE_IMAGE_TAG }}
           platforms: linux/amd64
+
 
   build_and_push:
 

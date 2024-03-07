@@ -45,6 +45,8 @@ It can be installed from most package managers or by following their instruction
 You will need `CMake <https://cmake.org/>`_ to build the C++ wrappers.  
 Version 3.5 or higher is required.  
 It can be installed from most package managers or by following their instructions.
+Note that this is not included as a dependency in the Python installation process.  
+See ``pyproject.toml`` for more details.
 
 Python Libraries
 ****************
