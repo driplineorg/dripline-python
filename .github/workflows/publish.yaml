@@ -46,7 +46,7 @@ jobs:
       - name: Unit Tests
         run: |
           docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test bash -c "
-            cd /home/runner/work/dripline-python/dripline-python/tests
+            cd /usr/local/src_py/tests
             pytest"
         
 # For debugging
