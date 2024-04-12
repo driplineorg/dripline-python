@@ -49,7 +49,10 @@ jobs:
             cd /home/runner/work/dripline-python/dripline-python/tests
             pytest"
         
-
+# For debugging
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 
   build_and_push:
 
