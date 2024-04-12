@@ -7,8 +7,8 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 cleanup () {
-  docker-compose -p integration kill
-  docker-compose -p integration rm -f
+  docker compose -p integration kill
+  docker compose -p integration rm -f
 }
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
