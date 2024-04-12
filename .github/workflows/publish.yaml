@@ -50,7 +50,7 @@ jobs:
             pytest"
       - name: Integration Tests
         run: |
-          cd tests
+          cd tests/integration
           docker build \
               --build-arg img_tag=gha-test \
               -t ${{ env.BASE_IMAGE_USER }}${{ github.repository }}:gha-int-test \
