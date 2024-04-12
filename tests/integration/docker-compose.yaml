@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+
+  rabbit-broker:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=dripline
+      - RABBITMQ_DEFAULT_PASS=dripline
+#    networks:
+#      - dl-test
+
+  key-value-store:
+    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+    depends_on:
+      - rabbit-broker
+    volumes:
+      - ./key-value-store.yaml:/root/key-value-store.yaml
+      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+    command: >
+      bash -c "/root/wait-for-broker.sh &&
+              dl-serve -vvv -c /root/key-value-store.yaml"
+    configs:
+      - auths.json
+#    networks:
+#      - dl-test
+
+#  test:
+#    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+#    depends_on:
+#      - rabbit-broker
+#      - key-value-store
+#    volumes:
+#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+#      - ./run-tests.sh:/root/run-tests.sh
+#    command: >
+#      bash -c "/root/wait-for-broker.sh &&
+#              sleep 1 &&
+#              /root/run-tests.sh"
+#    configs:
+#      - auths.json
+#    networks:
+#      - dl-test
+
+#networks:
+#  dl-test:
+#    driver: bridge
+
+configs:
+  auths.json:
+    file: ./authentications.json
