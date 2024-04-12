@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Usage:
+#  do-testing.sh [image tag]
+
 # source: https://blog.harrison.dev/2016/06/19/integration-testing-with-docker-compose.html
 
 RED='\033[0;31m'
@@ -12,7 +15,7 @@ cleanup () {
 }
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
-IMG_TAG=v4.7.0-test docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml build && IMG_TAG=v4.7.0-test docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml up -d
+IMG_TAG=$1 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml build && IMG_TAG=v4.7.0-test docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml up -d
 
 if [ $? -ne 0 ] ; then
   printf "${RED}Docker Compose Failed${NC}\n"

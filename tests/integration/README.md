@@ -10,7 +10,14 @@ We recommend you tag the image `ghcr.io/driplineorg/dripline-python:[version tag
 
 ## Run Tests
 
-    > IMG_TAG=v[ver]-test docker compose -f docker-compose.yaml -f docker-compose-test.yaml up
+You can run the tests directly with `docker compose`:
+
+    > IMG_TAG=[image tag] docker compose -f docker-compose.yaml -f docker-compose-test.yaml up
+
+Or you can use the convenience script, `do-testing.sh`:
+
+    > ./do-testing.sh [image tag]
+
 
 ## Notes
 
