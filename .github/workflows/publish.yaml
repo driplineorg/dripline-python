@@ -31,16 +31,24 @@ jobs:
       - name: Build
         id: build
         uses: docker/build-push-action@v5
-        env:
-          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}-dev
         with:
           context: .
           push: false
+          load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ env.BASE_IMAGE_REPO }}
             img_tag=${{ env.BASE_IMAGE_TAG }}
           platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${BASE_IMAGE_USER}/${{}}:gha-test
+      - name: Unit Tests
+        run: |
+          docker run --rm ${BASE_IMAGE_USER}/${{}}:gha-test bash -c "
+            cd /home/runner/work/dripline-python/dripline-python/tests
+            pytest"
+        
 
 
   build_and_push:
