@@ -49,7 +49,7 @@ jobs:
             cd /usr/local/src_py/tests
             pytest"
       - name: Build Integration Tests
-        id: build
+        id: build_int_tests
         uses: docker/build-push-action@v5
         with:
           context: ./tests/integration
