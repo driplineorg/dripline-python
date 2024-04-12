@@ -42,10 +42,10 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ${BASE_IMAGE_USER}/${{ github.repository }}:gha-test
+          tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test
       - name: Unit Tests
         run: |
-          docker run --rm ${BASE_IMAGE_USER}/${{ github.repository }}:gha-test bash -c "
+          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test bash -c "
             cd /home/runner/work/dripline-python/dripline-python/tests
             pytest"
         
