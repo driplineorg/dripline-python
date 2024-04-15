@@ -25,7 +25,7 @@ jobs:
           submodules: recursive
       - name: Build
         run: |
-          cd dripline-python
+          pwd
           docker build \
             --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
             --build-arg img_repo=${{ env.BASE_IMAGE_REPO }} \
