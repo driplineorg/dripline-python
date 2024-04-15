@@ -36,7 +36,8 @@ jobs:
           docker build \
             --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
             --build-arg img_repo=${{ github.repository }} \
-            --build-arg img_tage=gha-int-test
+            --build-arg img_tage=gha-int-test \
+            .
       - name: Unit Tests
         run: |
           docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
