@@ -71,8 +71,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./tests/integration
-          push: false
-          load: true
+#          push: false
+#          load: true
+          outputs: type=tar,dest=/home/runner/work/dripline-python/gha-int-test.tar
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ github.repository }}
@@ -83,6 +84,7 @@ jobs:
           tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test
       - name: Unit Tests
         run: |
+          docker import /home/runner/work/dripline-python/gha-int-test.tar
           docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
             cd /usr/local/src_py/tests
             pytest"
