@@ -23,74 +23,74 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Build
-        run: |
-          pwd
-          docker build \
-            --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
-            --build-arg img_repo=${{ env.BASE_IMAGE_REPO }} \
-            --build-arg img_tag=${{ env.BASE_IMAGE_TAG }} \
-            -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test \
-            .
-          cd tests/integration
-          docker build \
-            --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
-            --build-arg img_repo=${{ github.repository }} \
-            --build-arg img_tage=gha-test \
-            -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test \
-            .
-      - name: Unit Tests
-        run: |
-          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
-            cd /usr/local/src_py/tests
-            pytest"
-      #- name: Set up QEMU
-      #  uses: docker/setup-qemu-action@v3
-      #- name: Set up Docker Buildx
-      #  id: setup_buildx
-      #  uses: docker/setup-buildx-action@v3
-      #  with:
-      #    driver: docker
       #- name: Build
-      #  id: build
-      #  uses: docker/build-push-action@v5
-      #  with:
-      #    context: .
-      #    push: false
-      #    load: true
-      #    build-args: |
-      #      img_user=${{ env.BASE_IMAGE_USER }}
-      #      img_repo=${{ env.BASE_IMAGE_REPO }}
-      #      img_tag=${{ env.BASE_IMAGE_TAG }}
-      #    platforms: linux/amd64
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-      #    tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test
+      #  run: |
+      #    pwd
+      #    docker build \
+      #      --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
+      #      --build-arg img_repo=${{ env.BASE_IMAGE_REPO }} \
+      #      --build-arg img_tag=${{ env.BASE_IMAGE_TAG }} \
+      #      -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test \
+      #      .
+      #    cd tests/integration
+      #    docker build \
+      #      --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
+      #      --build-arg img_repo=${{ github.repository }} \
+      #      --build-arg img_tage=gha-test \
+      #      -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test \
+      #      .
       #- name: Unit Tests
       #  run: |
-      #    docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test bash -c "
+      #    docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
       #      cd /usr/local/src_py/tests
       #      pytest"
-      #- name: Build Integration Tests
-      #  id: build_int_tests
-      #  uses: docker/build-push-action@v5
-      #  with:
-      #    context: ./tests/integration
-      #    push: false
-      #    load: true
-      #    build-args: |
-      #      img_user=${{ env.BASE_IMAGE_USER }}
-      #      img_repo=${{ github.repository }}
-      #      img_tag=gha-int-test
-      #    platforms: linux/amd64
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        id: setup_buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+      - name: Build
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          build-args: |
+            img_user=${{ env.BASE_IMAGE_USER }}
+            img_repo=${{ env.BASE_IMAGE_REPO }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}
+          platforms: linux/amd64
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
-      #    tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test
-      #- name: Integration Tests
-      #  run: |
-      #    cd tests/integration
-      #    ./do-testing.sh gha-int-test
-        
+          tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test
+      - name: Unit Tests
+        run: |
+          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test bash -c "
+            cd /usr/local/src_py/tests
+            pytest"
+      - name: Build Integration Tests
+        id: build_int_tests
+        uses: docker/build-push-action@v5
+        with:
+          context: ./tests/integration
+          push: false
+          load: true
+          build-args: |
+            img_user=${{ env.BASE_IMAGE_USER }}
+            img_repo=${{ github.repository }}
+            img_tag=gha-test
+          platforms: linux/amd64
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+          tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test
+      - name: Integration Tests
+        run: |
+          cd tests/integration
+          ./do-testing.sh gha-int-test
+       
 # For debugging
       - name: Setup tmate session
         if: ${{ ! success() }}
