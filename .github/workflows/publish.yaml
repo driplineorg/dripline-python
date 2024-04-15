@@ -65,7 +65,7 @@ jobs:
           platforms: linux/amd64
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
-          tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test
+          tags: ghcr.io/${{ github.repository }}:gha-test
       - name: Build Integration Tests
         id: build_int_tests
         uses: docker/build-push-action@v5
@@ -76,16 +76,16 @@ jobs:
           outputs: type=tar,dest=/home/runner/work/dripline-python/gha-int-test.tar
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
-            img_repo=${{ github.repository }}
+            img_repo=dripline-python
             img_tag=gha-test
           platforms: linux/amd64
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
-          tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test
+          tags: ghcr.io/${{ github.repository }}:gha-int-test
       - name: Unit Tests
         run: |
-          docker import /home/runner/work/dripline-python/gha-int-test.tar
-          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
+          docker import /home/runner/work/dripline-python/gha-int-test.tar ghcr.io/${{ github.repository }}:gha-int-test
+          docker run --rm ghcr.io/${{ github.repository }}:gha-int-test bash -c "
             cd /usr/local/src_py/tests
             pytest"
       - name: Integration Tests
