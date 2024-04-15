@@ -66,11 +66,6 @@ jobs:
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
           tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test
-      - name: Unit Tests
-        run: |
-          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test bash -c "
-            cd /usr/local/src_py/tests
-            pytest"
       - name: Build Integration Tests
         id: build_int_tests
         uses: docker/build-push-action@v5
@@ -86,6 +81,11 @@ jobs:
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
           tags: ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test
+      - name: Unit Tests
+        run: |
+          docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
+            cd /usr/local/src_py/tests
+            pytest"
       - name: Integration Tests
         run: |
           cd tests/integration
