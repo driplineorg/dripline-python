@@ -105,7 +105,7 @@ jobs:
         build: [dev, release]
         include:
           - build: dev
-            tag-suffix: ${{ env.DEV_SUFFIX }}
+            tag-suffix: '-dev'
             do-integration: true
             int-tag-suffix: '-int-test'
           - build: release
