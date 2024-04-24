@@ -13,44 +13,39 @@ env:
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
   BASE_IMAGE_TAG: 'v2.9.0'
+  DEV_SUFFIX: '-dev'
 
 jobs:
 
   test_docker:
+
     runs-on: ubuntu-latest
+
+    env:
+      TAG: gha-test
+      INT_TEST: gha-int-test
+
     steps:
+
+      - name: Concatenate env variables
+        run: |
+          echo "DL_PY_TAG=${{ env.REGISTRY }}/${{ github.repository }}:${{ env.TAG }}" >> $GITHUB_ENV
+          echo "DL_PY_INT_TAG=${{ env.REGISTRY }}/${{ github.repository }}:${{ env.INT_TAG }}" >> $GITHUB_ENV
+
       - name: Checkout the repo 
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      #- name: Build
-      #  run: |
-      #    pwd
-      #    docker build \
-      #      --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
-      #      --build-arg img_repo=${{ env.BASE_IMAGE_REPO }} \
-      #      --build-arg img_tag=${{ env.BASE_IMAGE_TAG }} \
-      #      -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-test \
-      #      .
-      #    cd tests/integration
-      #    docker build \
-      #      --build-arg img_user=${{ env.BASE_IMAGE_USER }} \
-      #      --build-arg img_repo=${{ github.repository }} \
-      #      --build-arg img_tage=gha-test \
-      #      -t ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test \
-      #      .
-      #- name: Unit Tests
-      #  run: |
-      #    docker run --rm ${{ env.BASE_IMAGE_USER }}/${{ github.repository }}:gha-int-test bash -c "
-      #      cd /usr/local/src_py/tests
-      #      pytest"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         id: setup_buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver: docker
+
       - name: Build
         id: build
         uses: docker/build-push-action@v5
@@ -61,11 +56,10 @@ jobs:
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ env.BASE_IMAGE_REPO }}
-            img_tag=${{ env.BASE_IMAGE_TAG }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           platforms: linux/amd64
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository }}:gha-test
+          tags: ${{ env.DL_PY_TAG }}
+
       - name: Build Integration Tests
         id: build_int_tests
         uses: docker/build-push-action@v5
@@ -76,24 +70,25 @@ jobs:
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=dripline-python
-            img_tag=gha-test
+            img_tag=${{ env.TAG }}
           platforms: linux/amd64
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository }}:gha-int-test
+          tags: ${{ env.DL_PY_INT_TAG }}
+
       - name: Unit Tests
         run: |
-          docker run --rm ghcr.io/${{ github.repository }}:gha-int-test bash -c "
+          docker run --rm ${{ env.DL_PY_INT_TAG }} bash -c "
             cd /usr/local/src_py/tests
             pytest"
+
       - name: Integration Tests
         run: |
           cd tests/integration
-          ./do-testing.sh gha-int-test
+          ./do-testing.sh ${{ env.INT_TAG }}
+
 # For debugging
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
   build_and_push:
 
@@ -110,9 +105,13 @@ jobs:
         build: [dev, release]
         include:
           - build: dev
-            tag-suffix: '-dev'
+            tag-suffix: ${{ env.DEV_SUFFIX }}
+            do-integration: true
+            int-tag-suffix: '-int-test'
           - build: release
             tag-suffix: ''
+            do-integration: false
+            int-tag-suffix: ''
 
     steps:
 
@@ -131,6 +130,22 @@ jobs:
           flavor: |
             latest=auto
             suffix=${{ matrix.tag-suffix }},onlatest=true
+          tags: |
+            type=semver,pattern={{raw}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads{0}', 'main') }}
+
+      - name: Docker meta - integration
+        id: docker_meta_integration
+        if: ${{ matrix.do-integration }}
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/driplineorg/dripline-python
+          flavor: |
+            latest=auto
+            suffix=${{ matrix.int-tag-suffix }},onlatest=true
           tags: |
             type=semver,pattern={{raw}}
             type=ref,event=branch
@@ -171,8 +186,24 @@ jobs:
           build-args: | 
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ env.BASE_IMAGE_REPO }}
-            img_tag=${{ env.BASE_IMAGE_TAG }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           tags: ${{ steps.docker_meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+
+      - name: Build and push - integration
+        id: build_push_integration
+        if: ${{ matrix.do-integration }}
+        uses: docker/build-push-action@v5
+        env:
+          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.int-tag-suffix }}
+        with:
+          context: ./tests/integration
+          push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
+          build-args: | 
+            img_user=${{ env.REGISTRY }}/driplineorg
+            img_repo=dripline-python
+            img_tag=latest-dev
+          tags: ${{ steps.docker_meta_integration.outputs.tags }}
           platforms: linux/amd64,linux/arm/v7,linux/arm64
 
       - name: Release
