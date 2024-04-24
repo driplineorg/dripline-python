@@ -13,7 +13,7 @@ services:
 #      - dl-test
 
   key-value-store:
-    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
       - rabbit-broker
     volumes:
@@ -22,6 +22,23 @@ services:
     command: >
       bash -c "/root/wait-for-broker.sh &&
               dl-serve -vvv -c /root/key-value-store.yaml"
+#      bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
+    configs:
+      - auths.json
+#    networks:
+#      - dl-test
+
+  simple-service:
+    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
+    depends_on:
+      - rabbit-broker
+    volumes:
+      - ./key-value-store.yaml:/root/key-value-store.yaml
+      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+    command: >
+      bash -c "/root/wait-for-broker.sh &&
+              run_simple_service -vvv --auth-file /auths.json"
+#      bash -c "run_simple_service -vvv --auth-file /auths.json"
     configs:
       - auths.json
 #    networks:

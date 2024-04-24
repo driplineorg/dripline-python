@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# Runs the test suite using docker compose
+#
 # Usage:
 #  do-testing.sh [image tag]
 

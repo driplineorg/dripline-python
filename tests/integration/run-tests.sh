@@ -7,3 +7,7 @@
 @test "get peaches" {
     dl-agent -vv --auth-file /auths.json get peaches
 }
+
+@test "set peaches" {
+    dl-agent -vv --auth-file /auths.json set peaches 500
+}

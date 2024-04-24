@@ -3,12 +3,19 @@
 ## Docker Container
 
 This directory contains a Dockerfile that adds a few utilities used in the integration testing to the dripline-python image.
-We recommend you tag the image `ghcr.io/driplineorg/dripline-python:[version tag]-test`:
+We recommend you tag the image with something like `ghcr.io/driplineorg/dripline-python:[version tag]-test`:
 
     > docker build --build-arg img_tag=[version tag]-dev -t ghcr.io/driplineorg/dripline-python:[version tag]-test .
 
+## The Tests
 
-## Run Tests
+The integration tests are specified in `run-tests.sh`.  They're run using the [bats framework](https://bats-core.readthedocs.io/en/stable/index.html). Currently the tests include:
+
+* `dl-agent cmd ping -s my_store`
+* `dl-agent get peaches`
+* `dl-agent set peaches 500`
+
+## Run the Tests
 
 You can run the tests directly with `docker compose`:
 
@@ -18,8 +25,10 @@ Or you can use the convenience script, `do-testing.sh`:
 
     > ./do-testing.sh [image tag]
 
+Note that the terminal output is suppressed using the `do-testing.sh` script.  Output from the test container will be printed.  Output from the service(s) in use will be printed on error.
 
-## Notes
+
+## Implementation Notes
 
 * Synchronizing containers
   * Anything using the broker needs to wait until the broker is ready; this is done by running the wait-for-broker.sh script, which sends HTTP requests to the broker to determine if it's running
