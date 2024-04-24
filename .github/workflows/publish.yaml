@@ -188,7 +188,7 @@ jobs:
             img_repo=${{ env.BASE_IMAGE_REPO }}
             img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           tags: ${{ steps.docker_meta.outputs.tags }}
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
 
       - name: Build and push - integration
         id: build_push_integration
@@ -204,7 +204,7 @@ jobs:
             img_repo=dripline-python
             img_tag=latest-dev
           tags: ${{ steps.docker_meta_integration.outputs.tags }}
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
 
       - name: Release
         uses: softprops/action-gh-release@v1
