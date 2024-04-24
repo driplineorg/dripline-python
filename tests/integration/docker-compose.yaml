@@ -9,20 +9,23 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=dripline
       - RABBITMQ_DEFAULT_PASS=dripline
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u dripline:dripline http://rabbit-broker:15672/api/overview &> /dev/null || exit 1"]
 #    networks:
 #      - dl-test
 
   key-value-store:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
-      - rabbit-broker
+      rabbit-broker:
+        condition: service_healthy
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
-      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
     command: >
-      bash -c "/root/wait-for-broker.sh &&
-              dl-serve -vvv -c /root/key-value-store.yaml"
-#      bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
+      bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
+#      bash -c "/root/wait-for-broker.sh &&
+#              dl-serve -vvv -c /root/key-value-store.yaml"
     configs:
       - auths.json
 #    networks:
@@ -31,14 +34,15 @@ services:
   simple-service:
     image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
     depends_on:
-      - rabbit-broker
+      rabbit-broker:
+        condition: service_healthy
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
-      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
     command: >
-      bash -c "/root/wait-for-broker.sh &&
-              run_simple_service -vvv --auth-file /auths.json"
-#      bash -c "run_simple_service -vvv --auth-file /auths.json"
+      bash -c "run_simple_service -vvv --auth-file /auths.json"
+#      bash -c "/root/wait-for-broker.sh &&
+#              run_simple_service -vvv --auth-file /auths.json"
     configs:
       - auths.json
 #    networks:

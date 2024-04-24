@@ -7,11 +7,10 @@ services:
       - rabbit-broker
       - key-value-store
     volumes:
-      - ./wait-for-broker.sh:/root/wait-for-broker.sh
+#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
       - ./run-tests.sh:/root/run-tests.sh
     command: >
-      bash -c "/root/wait-for-broker.sh &&
-              sleep 1 &&
+      bash -c "sleep 1 &&
               /root/run-tests.sh"
     configs:
       - auths.json
