@@ -11,8 +11,6 @@ services:
       - RABBITMQ_DEFAULT_PASS=dripline
     healthcheck:
       test: ["CMD-SHELL", "curl -u dripline:dripline http://rabbit-broker:15672/api/overview &> /dev/null || exit 1"]
-#    networks:
-#      - dl-test
 
   key-value-store:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
@@ -21,15 +19,10 @@ services:
         condition: service_healthy
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
-#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
     command: >
       bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
-#      bash -c "/root/wait-for-broker.sh &&
-#              dl-serve -vvv -c /root/key-value-store.yaml"
     configs:
       - auths.json
-#    networks:
-#      - dl-test
 
   simple-service:
     image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
@@ -38,36 +31,10 @@ services:
         condition: service_healthy
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
-#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
     command: >
       bash -c "run_simple_service -vvv --auth-file /auths.json"
-#      bash -c "/root/wait-for-broker.sh &&
-#              run_simple_service -vvv --auth-file /auths.json"
     configs:
       - auths.json
-#    networks:
-#      - dl-test
-
-#  test:
-#    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
-#    depends_on:
-#      - rabbit-broker
-#      - key-value-store
-#    volumes:
-#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
-#      - ./run-tests.sh:/root/run-tests.sh
-#    command: >
-#      bash -c "/root/wait-for-broker.sh &&
-#              sleep 1 &&
-#              /root/run-tests.sh"
-#    configs:
-#      - auths.json
-#    networks:
-#      - dl-test
-
-#networks:
-#  dl-test:
-#    driver: bridge
 
 configs:
   auths.json:

@@ -5,14 +5,12 @@ services:
     image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
     depends_on:
       - rabbit-broker
+      - simple-service
       - key-value-store
     volumes:
-#      - ./wait-for-broker.sh:/root/wait-for-broker.sh
       - ./run-tests.sh:/root/run-tests.sh
     command: >
       bash -c "sleep 1 &&
               /root/run-tests.sh"
     configs:
       - auths.json
-#    networks:
-#      - dl-test
