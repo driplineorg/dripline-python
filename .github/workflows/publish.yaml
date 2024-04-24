@@ -23,7 +23,7 @@ jobs:
 
     env:
       TAG: gha-test
-      INT_TEST: gha-int-test
+      INT_TAG: gha-int-test
 
     steps:
 
