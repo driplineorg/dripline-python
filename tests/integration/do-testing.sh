@@ -27,7 +27,10 @@ fi
 TEST_EXIT_CODE=`docker wait integration-test-1`
 docker logs integration-test-1
 if [ -z ${TEST_EXIT_CODE+x} ] || [ "$TEST_EXIT_CODE" -ne 0 ] ; then
+  docker logs integration-test-1
   docker logs integration-key-value-store-1
+  docker logs integration-simple-service-1
+  docker logs integration-rabbit-broker-1
   printf "${RED}Tests Failed${NC} - Exit Code: $TEST_EXIT_CODE\n"
 else
   printf "${GREEN}Tests Passed${NC}\n"
