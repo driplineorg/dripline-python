@@ -10,7 +10,7 @@ FROM ${img_user}/${img_repo}:${img_tag}
 
 ## would prefer not to do this, just run ldconfig after the build to get things
 ## into the ld.so.conf cache... use this only when developing and adding libs
-ENV LD_LIBRARY_PATH /usr/local/lib
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 RUN apt-get update && \
     apt-get clean && \
