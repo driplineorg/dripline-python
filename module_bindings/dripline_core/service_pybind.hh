@@ -29,21 +29,15 @@ namespace dripline_pybind
                           std::shared_ptr< _service >
                         >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
             .def( pybind11::init< const scarab::param_node&,
-                                  const std::string&,
-                                  const std::string&,
-                                  const unsigned int,
-                                  const std::string&,
+                                  const scarab::authentication&,
                                   const bool
                                 >(),
-                   DL_BIND_CALL_GUARD_STREAMS,
-                   pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
-                   pybind11::arg( "name" ) = "",
-                   pybind11::arg( "broker" ) = "",
-                   pybind11::arg( "port" ) = 0,
-                   pybind11::arg( "auth_file" ) = "",
-                   pybind11::arg( "make_connection" ) = true
-            )
-            .def( pybind11::init( []( const pybind11::dict a_config,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg_v( "config", scarab::param_node(), "ParamNode()" ),
+                  pybind11::arg_v( "auth", scarab::authentication(), "Authentication()" ),
+                  pybind11::arg( "make_connection" ) = true
+                )
+    /*        .def( pybind11::init( []( const pybind11::dict a_config,
                                       const std::string& a_name,
                                       const std::string& a_broker,
                                       const unsigned int a_port,
@@ -76,7 +70,7 @@ namespace dripline_pybind
                    pybind11::arg( "auth_file" ) = "",
                    pybind11::arg( "make_connection" ) = true
             )
-
+*/
             // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )

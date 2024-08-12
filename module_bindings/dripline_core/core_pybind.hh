@@ -6,6 +6,8 @@
 #include "core.hh"
 #include "dripline_fwd.hh"
 
+#include "authentication.hh"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
@@ -31,17 +33,13 @@ namespace dripline_pybind
         // bind the core class
         t_core            
             .def( pybind11::init< const scarab::param_node&,
-                                  const std::string&,
-                                  const unsigned int,
-                                  const std::string&,
+                                  const scarab::authentication&,
                                   const bool
                                 >(),
-                   DL_BIND_CALL_GUARD_STREAMS,
-                   pybind11::arg_v( "config", scarab::param_node(), "ParamNode()"),
-                   pybind11::arg( "broker" ) = "",
-                   pybind11::arg( "port" ) = 0,
-                   pybind11::arg( "auth_file" ) = "",
-                   pybind11::arg( "make_connection" ) = true
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg_v( "config", scarab::param_node(), "ParamNode()" ),
+                  pybind11::arg_v( "auth", scarab::authentication(), "Authentication()" ),
+                  pybind11::arg( "make_connection" ) = true
                 )
 
             .def( "send",
