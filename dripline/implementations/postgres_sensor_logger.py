@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 import re
 
-import scarab
+from scarab import Authentication
 
 # internal imports
 from dripline.core import AlertConsumer
@@ -25,11 +25,11 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
 
     The assumption made is that complex logic dealing with organization or structure of the particular database should live in the database itself (possibly in a view, with a trigger, ...) and that here we can simply do an insert.
     '''
-    def __init__(self, insertion_table_endpoint_name, **kwargs):
+    def __init__(self, insertion_table_endpoint_name, auth=Authentication(), **kwargs):
         '''
         '''
-        PostgreSQLInterface.__init__(self, **kwargs)
-        AlertConsumer.__init__(self, **kwargs)
+        PostgreSQLInterface.__init__(self, auth=auth, **kwargs)
+        AlertConsumer.__init__(self, auth=auth, **kwargs)
 
         self.insertion_table_endpoint_name = insertion_table_endpoint_name
 

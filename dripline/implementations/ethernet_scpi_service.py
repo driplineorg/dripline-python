@@ -20,6 +20,7 @@ class EthernetSCPIService(Service):
     In particular, devices must support sending a response to every command received (either natively, or via SCPI's command composition) and responses are expected to include a termination marking complete transmission.
     '''
     def __init__(self,
+                 auth=scarab.Authentication(),
                  socket_timeout=1.0,
                  socket_info=('localhost', 1234),
                  cmd_at_reconnect=['*OPC?'],
@@ -46,7 +47,7 @@ class EthernetSCPIService(Service):
             reply_echo_cmd (bool): indicates that the device includes the the received command in its reply
 
         '''
-        Service.__init__(self, **kwargs)
+        Service.__init__(self, auth=auth, **kwargs)
 
         if isinstance(socket_info, str):
             logger.debug(f"Formatting socket_info: {socket_info}")

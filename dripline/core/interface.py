@@ -1,6 +1,6 @@
 __all__ = []
 
-import scarab
+from scarab import Authentication
 
 from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
 
@@ -13,14 +13,14 @@ class Interface(Core):
     A class on top of dripline.core.Core with more user-friendly methods for dripline interactions.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
-    def __init__(self, dripline_config={}, confirm_retcodes=True):
+    def __init__(self, dripline_config={}, auth=Authentication(), confirm_retcodes=True):
         '''
         dripline_config (dict): passed to dripline.core.Core to configure connection details
         confirm_retcodes (bool): if True and if a reply is received with retcode!=0, raise an exception
         '''
         default_config = DriplineConfig().to_python()
         default_config.update(dripline_config)
-        Core.__init__(self, config=scarab.to_param(default_config))
+        Core.__init__(self, config=scarab.to_param(default_config), auth=auth)
         self._confirm_retcode = confirm_retcodes
         self._receiver = Receiver()
 
