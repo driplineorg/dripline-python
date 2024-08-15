@@ -19,7 +19,13 @@ namespace dripline_pybind
             ;
 
         all_members.push_back( "add_dripline_options" );
-        mod.def( "add_dripline_options", &dripline::add_dripline_options, "Add standard dripline options to a scarab.MainApp" );
+        mod.def( "add_dripline_options", &dripline::add_dripline_options, "Add standard dripline CL options to a scarab.MainApp" );
+
+        all_members.push_back( "add_dripline_auth_spec" );
+        mod.def( "add_dripline_auth_spec", &dripline::add_dripline_auth_spec, 
+                 pybind11::arg( "an_app", scarab::main_app ),
+                 pybind11::arg( "a_use_auth_file" ) = false,
+                 "Add default dripline authentication specifications to a scarab.MainApp" );
 
         return all_members;
     }
