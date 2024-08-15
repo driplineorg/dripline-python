@@ -32,7 +32,7 @@ class Serve:
             self._logging_format = logging.Formatter(modified_format, time_format[:-4])
         self.handler.setFormatter(self._logging_format)
 
-    def create_object(self, a_config, a_auth):
+    def create_object(self, a_config, a_auth = None):
         logger.debug("creating object from:\n{}\n...".format(a_config))
         module_name = a_config.pop('module')
         module_path = a_config.pop('module_path', False)
@@ -67,7 +67,12 @@ class Serve:
                 module = getattr(dripline.core, module_name)
             else:
                 raise NameError('no module "{}" in available namespaces'.format(module_name))
-        the_object = module( auth=a_auth, **a_config )
+            
+        if a_auth is not None:
+            logger.debug("creating object with authentication")
+            the_object = module( auth=a_auth, **a_config )
+        else:
+            the_object = module( **a_config )
 
         return the_object
 
@@ -81,24 +86,33 @@ class Serve:
 
     def _run(self, the_app):
         this_config = the_app.primary_config.to_python()
-        this_auth = the_app.auth()
+        this_auth = the_app.auth
 
         verbosity = the_app.global_verbosity
         #print(f"verbosity is {verbosity}")
         self.handler.setLevel(verbosity)
 
-        logger.info('python got a master config:\n{}'.format(this_config))
+        logger.debug('Serve (Python) got this primary config:\n{}'.format(this_config))
 
         sig_handler = scarab.SignalHandler()
 
-        run_config = this_config.get('runtime-config')
-        the_endpoints = run_config.pop("endpoints", [])
+        # Prior to v4.8.0, service configuration information was nested within the `runtime-config` block
+        # This deprecates that usage and moves everything within `runtime-config` to the top level of the configuration
+        if 'runtime-config' in this_config:
+            logger.warning('The configuration uses the deprecated \'runtime-config\' structure.  This usage is deprecated and will be removed in a future version.')
+            logger.warning('Please update your configuration file by moving everything within \'runtime-config\' to the top level of your configuration.')
+            runtime_config = this_config.pop('runtime-config')
+            this_config.update(runtime_config)
 
-        service_config = run_config.copy()
-        service_config.update({'config': this_config})
+        # Remove the endpoints configuration before creating and configuring the service
+        the_endpoints = this_config.pop("endpoints", [])
 
-        the_service = self.create_object( run_config, this_auth )
-        the_service.enable_scheduling = True
+#        service_config = run_config.copy()
+#        service_config.update({'config': this_config})
+#        logger.info(f'service config: {service_config}')
+#        logger.info(f'run config: {run_config}')
+
+        the_service = self.create_object( this_config, this_auth )
         sig_handler.add_cancelable(the_service)
         logger.info('service built')
 
@@ -125,14 +139,28 @@ class Serve:
 
 
 if __name__ == '__main__':
+    # App object
     the_main = scarab.MainApp()
-    dripline_config = {'dripline': dripline.core.DriplineConfig().to_python()}
-    the_main.default_config = scarab.to_param(dripline_config, True)
+
+    # Default configuration for a Service
+    the_main.default_config = dripline.core.ServiceConfig()
+    # We want scheduling to be on
+    the_main.default_config['enable-scheduling'] = True
+
+    # Add the default dripline authentication specification and CL options
+    dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
 
+    # Package version information
+    the_main.set_version(dripline.core.get_version( "dripline-python" ))
+
+    # Create the Serve object
     the_server = Serve()
-    # add flags
+
+    # Callback function that will run everything
     the_main.set_callback(lambda : the_server.run(the_main))
+
+    # Execute the callback (done via CLI11_PARSE)
     import sys
     the_main.execute(sys.argv)
 
