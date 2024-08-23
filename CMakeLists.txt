@@ -3,6 +3,9 @@ project( DriplinePy VERSION 4.7.1 )
 
 cmake_policy( SET CMP0074 NEW )
 
+# Required by Scarab
+set( CMAKE_CXX_STANDARD 17 )
+
 # standard install directories
 include( GNUInstallDirs )
 
