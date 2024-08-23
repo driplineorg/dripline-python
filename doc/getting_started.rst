@@ -150,3 +150,31 @@ If you want to install so that you can edit the dripline-python code, use the ``
 If you need to specify the location of dripline-cpp, set the ``Dripline_DIR`` environment variable first, e.g.:
 
   ``> Dripline_DIR=/install/prefix/lib/cmake/Dripline pip install .``
+
+CMake-Only Build
+----------------
+
+.. note::
+
+  This section is intended for developers working on the Python bindings.  
+  Do not use these instructions if you're intending to have a full dripline-python installation.
+
+If you want to build the python bindings directly with CMake we recommend these steps:
+
+#. Create a build directory and go into that directory.
+
+#. Configure the build with cmake or ccmake:
+
+  ``> cmake ..``
+
+  If you want to specify a local installation of dripline-cpp, you can set an environment variable:
+
+  ``> Dripline_DIR=/install/prefix/lib/cmake/Dripline cmake ..``
+
+  or a CMake variable:
+
+  ``> cmake -DDripline_DIR=/install/prefix/lib/cmake/Dripline ..``
+
+#. Build:
+
+  ``> make``
