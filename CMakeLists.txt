@@ -24,6 +24,10 @@ list( APPEND PUBLIC_EXT_LIBS Threads::Threads )
 
 find_package( pybind11 2.6.0 REQUIRED )
 list( APPEND PUBLIC_EXT_LIBS pybind11::module )
+string( TOLOWER ${CMAKE_BUILD_TYPE} build_type_lower )
+if( "${build_type_lower}" STREQUAL "debug" )
+    add_compile_definitions( PYBIND11_DETAILED_ERROR_MESSAGES=1 )
+endif()
 
 find_package( Dripline CONFIG REQUIRED )
 
