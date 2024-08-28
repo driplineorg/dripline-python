@@ -2,7 +2,7 @@
 #define DRIPLINE_PYBIND_SERVICE
 
 #include "binding_helpers.hh"
-#include "service_trampoline.hh"
+#include "_service_trampoline.hh"
 
 #include "core.hh"
 #include "service.hh"
@@ -14,12 +14,13 @@
 #include "pybind11/iostream.h"
 
 
+
 namespace dripline_pybind
 {
     std::list< std::string>  export_service( pybind11::module& mod )
     {
         std::list< std::string > all_items;
-        all_items.push_back( "Service" );
+        all_items.push_back( "_Service" );
         pybind11::class_< _service,
                           _service_trampoline,
                           dripline::core,
@@ -27,7 +28,7 @@ namespace dripline_pybind
                           dripline::scheduler<>,
                           scarab::cancelable,
                           std::shared_ptr< _service >
-                        >( mod, "Service", "responsible for dripline-compliant AMQP message sending and receiving" )
+                        >( mod, "_Service", "Service binding" )
 /*            .doc(R"""(The primary unit of software that connects to a broker and typically provides an interface with an instrument or other software.
 
                 The Service class is the implementation of the "service" concept in Dripline.
@@ -103,6 +104,26 @@ Extracts necessary configuration and authentication information and prepares the
     - a_make_connection Flag for whether or not to contact a broker; if true, this object operates in "dry-run" mode
                   )"""*/
                 )
+/*            .def( pybind11::init< const std::string& a_name,
+                                  const bool a_enable_scheduling,
+                                  const std::string& a_broadcast_key,
+                                  const unsigned a_loop_timeout_ms,
+                                  const unsigned a_message_wait_ms,
+                                  const unsigned a_heartbeat_interval_s,
+                                  const bool a_make_connection,
+                                  const pybind11::kwargs& kwargs
+                                >(),
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg( "name" ) = "dlpy_service",
+                  pybind11::arg( "enable_scheduling" ) = true,
+                  pybind11::arg( "broadcast_key" ) = "broadcast",
+                  pybind11::arg( "loop_timeout_ms" ) = 1000,
+                  pybind11::arg( "message_wait_ms" ) = 1000,
+                  pybind11::arg( "heartbeat_interal_s" ) = 60,
+                  pybind11::arg( "make_connection" ) = true,
+                  pybind11::arg( "kwargs" ) = {}
+            )*/
+                              // mv_ bindings
     /*        .def( pybind11::init( []( const pybind11::dict a_config,
                                       const std::string& a_name,
                                       const std::string& a_broker,
@@ -137,7 +158,6 @@ Extracts necessary configuration and authentication information and prepares the
                    pybind11::arg( "make_connection" ) = true
             )
 */
-            // mv_ bindings
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
@@ -165,7 +185,7 @@ Extracts necessary configuration and authentication information and prepares the
             .def( "add_async_child", &dripline::service::add_async_child, DL_BIND_CALL_GUARD_STREAMS )
             //.def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
 
-            .def( "on_alert_message", &_service::on_alert_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+            .def( "on_request_message", &_service::on_request_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             ;
         return all_items;
     }

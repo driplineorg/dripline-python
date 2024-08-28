@@ -15,6 +15,7 @@ namespace dripline_pybind
             //make methods public for use in overload macro
             using dripline::service::bind_keys;
             using dripline::core::bind_key;
+            using dripline::service::on_request_message;
 
     };
 

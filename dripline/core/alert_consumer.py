@@ -1,6 +1,6 @@
 import re
 
-from _dripline.core import Service
+from .service import Service
 
 from scarab import Authentication
 

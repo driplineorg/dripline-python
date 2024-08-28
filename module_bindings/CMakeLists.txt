@@ -5,6 +5,8 @@
 set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/_endpoint.hh
     dripline_core/_endpoint_trampoline.hh
+    dripline_core/_service_pybind.hh
+    dripline_core/_service_trampoline.hh
     dripline_core/binding_helpers.hh
     dripline_core/core_pybind.hh
     dripline_core/constants_pybind.hh
@@ -16,8 +18,6 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/reply_cache_pybind.hh
     dripline_core/return_codes.hh
     dripline_core/return_code_trampoline.hh
-    dripline_core/service_pybind.hh
-    dripline_core/service_trampoline.hh
     dripline_core/scheduler_pybind.hh
     dripline_core/version_store_pybind.hh
 )
