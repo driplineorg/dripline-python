@@ -1,7 +1,7 @@
 __all__ = []
 
 import scarab
-from _dripline.core import _Service
+from _dripline.core import _Service, create_dripline_auth_spec
 from .throw_reply import ThrowReply
 
 import logging
@@ -22,11 +22,41 @@ class Service(_Service):
     def __init__(self, name, make_connection=True, enable_scheduling=False, 
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
-                 dripline_config={}, auth_config=scarab.Authentication()):
+                 auth={}, authentication_obj=None,
+                 **kwargs):
         '''
-        Args:
-            name (str) : the name of the endpoint, specifies the binding key for request messages to which this object should reply
-            TODO: fill out information here
+        Configures a service with the necessary parameters.
+
+        Parameters
+        ----------
+            name : string
+                The name of the endpoint, which specifies the binding key for request messages sent to this service.
+            make_connection : bool, optional
+                Flag for indicating whether the service should connect to the broker; if false, the service will be in "dry-run" mode.
+            enable_scheduling : bool, optional
+            broadcast_key : string, optional
+            loop_timeout_ms : int, optional
+            message_wait_ms : int, optional
+            heartbeat_interval_s : int, optional
+            auth : dict, optional
+                Manually-specified authentication information; do not use authentication_obj if using this.
+                Potential (all optional) contents are:
+                    'username': {
+                        'value': <provide the username directly>,
+                        'file': <provide a filename that contains only the username>,
+                        'env': <provide an environment variable that contains the username; default is "DRIPLINE_USER">,
+                        'default': <provide a default username; default (for the default) is "guest">,
+                    },
+                    'password': {
+                        'value': <provide the password directly (this is not recommended for security reasons)>,
+                        'file': <provide a filename that contains only the password>,
+                        'env': <provide an environment variable that contains the password; default is "DRIPLINE_PASSWORD">,
+                        'default': <provide a default password; default (for the default) is "guest">,
+                    }
+            authentication_obj : scarab.Authentication, optional
+                Authentication information provided as a scarab.Authentication object; this will override the auth parameter.
+            **kwargs : optional
+                Provide optional dripline configuration information
         '''
         config = {
             'name': name,
@@ -35,9 +65,20 @@ class Service(_Service):
             'loop-timeout-ms': loop_timeout_ms,
             'message-wait-ms': message_wait_ms,
             'heartbeat-interval-s': heartbeat_interval_s,
-            'dripline': dripline_config,
+            'dripline': kwargs,
         }
-        _Service.__init__(self, scarab.to_param(config), auth_config, make_connection)
+        if authentication_obj is not None:
+            auth = authentication_obj
+        else:
+            dl_auth_spec = create_dripline_auth_spec()
+            dl_auth_spec.merge( scarab.to_param(auth) )
+            auth_spec = scarab.ParamNode()
+            auth_spec.add('dripline', dl_auth_spec)
+            logger.debug(f'Loading auth spec:\n{auth_spec}')
+            auth = scarab.Authentication()
+            auth.add_groups(auth_spec)
+            auth.process_spec()
+        _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
     def result_to_scarab_payload(self, result: str):
         """
