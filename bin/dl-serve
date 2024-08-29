@@ -34,7 +34,7 @@ class Serve:
 
     def create_object(self, a_config, a_auth = None):
         logger.debug("creating object from:\n{}\n...".format(a_config))
-        module_name = a_config.pop('module')
+        module_name = a_config.pop('module', 'Service')
         module_path = a_config.pop('module_path', False)
         extra_namespace = object()
         if module_path:
@@ -70,7 +70,7 @@ class Serve:
             
         if a_auth is not None:
             logger.debug("creating object with authentication")
-            the_object = module( auth=a_auth, **a_config )
+            the_object = module( authentication_obj=a_auth, **a_config )
         else:
             the_object = module( **a_config )
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     # Default configuration for a Service
     the_main.default_config = dripline.core.ServiceConfig()
     # We want scheduling to be on
-    the_main.default_config['enable-scheduling'] = True
+    the_main.default_config.add('enable-scheduling', scarab.ParamValue(True))
 
     # Add the default dripline authentication specification and CL options
     dripline.core.add_dripline_auth_spec(the_main)
