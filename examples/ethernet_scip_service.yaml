@@ -1,13 +1,12 @@
-runtime-config:
-  name: some_device_name # change this for your device
-  auth_file: /root/auths.json
-  module: EthernetSCPIProvider
-  socket_info: "('localhost', 5025)" #change localhost to either a resolovable hostname or IP (as a string)
-  socket_timeout: 10
-  command_terminator: "\n"
-  response_terminator: "\n"
-  endpoints:
-    - name: some_device_description
-      module: SimpleSCPIGetEntity
-      base_str: "*IDN?"
-      log_interval: 30
+name: some_device_name # change this for your device
+auth_file: /root/auths.json
+module: EthernetSCPIProvider
+socket_info: "('localhost', 5025)" #change localhost to either a resolovable hostname or IP (as a string)
+socket_timeout: 10
+command_terminator: "\n"
+response_terminator: "\n"
+endpoints:
+  - name: some_device_description
+    module: SimpleSCPIGetEntity
+    base_str: "*IDN?"
+    log_interval: 30

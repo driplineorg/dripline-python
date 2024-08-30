@@ -21,6 +21,10 @@ namespace dripline_pybind
                 )
             ;
 
+        all_members.push_back( "add_service_options" );
+        mod.def( "add_service_options", &dripline::add_service_options, 
+                 "Add service CL options to a scarab.MainApp" );
+
         return all_members;
     }
 

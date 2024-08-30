@@ -23,7 +23,7 @@ class Service(_Service):
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
                  auth={}, authentication_obj=None,
-                 **kwargs):
+                 dripline_mesh={}):
         '''
         Configures a service with the necessary parameters.
 
@@ -55,17 +55,17 @@ class Service(_Service):
                     }
             authentication_obj : scarab.Authentication, optional
                 Authentication information provided as a scarab.Authentication object; this will override the auth parameter.
-            **kwargs : optional
-                Provide optional dripline configuration information
+            dripline_mesh : dict, optional
+                Provide optional dripline mesh configuration information
         '''
         config = {
             'name': name,
-            'enable-scheduling': enable_scheduling,
-            'broadcast-key': broadcast_key,
-            'loop-timeout-ms': loop_timeout_ms,
-            'message-wait-ms': message_wait_ms,
-            'heartbeat-interval-s': heartbeat_interval_s,
-            'dripline': kwargs,
+            'enable_scheduling': enable_scheduling,
+            'broadcast_key': broadcast_key,
+            'loop_timeout_ms': loop_timeout_ms,
+            'message_wait_ms': message_wait_ms,
+            'heartbeat_interval_s': heartbeat_interval_s,
+            'dripline_mesh': dripline_mesh,
         }
         if authentication_obj is not None:
             auth = authentication_obj

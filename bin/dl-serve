@@ -85,24 +85,27 @@ class Serve:
             self.return_code = 100
 
     def _run(self, the_app):
-        this_config = the_app.primary_config.to_python()
+        this_config_param = the_app.primary_config
         this_auth = the_app.auth
 
         verbosity = the_app.global_verbosity
         #print(f"verbosity is {verbosity}")
         self.handler.setLevel(verbosity)
 
-        logger.debug('Serve (Python) got this primary config:\n{}'.format(this_config))
-
         sig_handler = scarab.SignalHandler()
 
         # Prior to v4.8.0, service configuration information was nested within the `runtime-config` block
         # This deprecates that usage and moves everything within `runtime-config` to the top level of the configuration
-        if 'runtime-config' in this_config:
+        if 'runtime-config' in this_config_param:
             logger.warning('The configuration uses the deprecated \'runtime-config\' structure.  This usage is deprecated and will be removed in a future version.')
             logger.warning('Please update your configuration file by moving everything within \'runtime-config\' to the top level of your configuration.')
-            runtime_config = this_config.pop('runtime-config')
-            this_config.update(runtime_config)
+            runtime_config = this_config_param.remove('runtime-config')
+            this_config_param.merge(runtime_config)
+
+        logger.debug(f'Serve (Python) got this primary config:\n{this_config_param}')
+
+        # Convert config to a dict
+        this_config = this_config_param.to_python()
 
         # Remove the endpoints configuration before creating and configuring the service
         the_endpoints = this_config.pop("endpoints", [])
@@ -112,6 +115,7 @@ class Serve:
 #        logger.info(f'service config: {service_config}')
 #        logger.info(f'run config: {run_config}')
 
+        # Create the service and register it with the signal handler
         the_service = self.create_object( this_config, this_auth )
         sig_handler.add_cancelable(the_service)
         logger.info('service built')
@@ -145,11 +149,12 @@ if __name__ == '__main__':
     # Default configuration for a Service
     the_main.default_config = dripline.core.ServiceConfig()
     # We want scheduling to be on
-    the_main.default_config.add('enable-scheduling', scarab.ParamValue(True))
+    the_main.default_config.add('enable_scheduling', scarab.ParamValue(True))
 
     # Add the default dripline authentication specification and CL options
     dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
+    dripline.core.add_service_options(the_main)
 
     # Package version information
     the_main.set_version(dripline.core.get_version( "dripline-python" ))

@@ -20,7 +20,7 @@ namespace dripline_pybind
 
         all_members.push_back( "add_dripline_options" );
         mod.def( "add_dripline_options", &dripline::add_dripline_options, 
-                 "Add standard dripline CL options to a scarab.MainApp" );
+                 "Add dripline mesh CL options to a scarab.MainApp" );
 
         all_members.push_back( "create_dripline_auth_spec" );
         mod.def( "create_dripline_auth_spec", &dripline::create_dripline_auth_spec,

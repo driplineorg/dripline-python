@@ -3,7 +3,7 @@
 # Runs the test suite using docker compose
 #
 # Usage:
-#  do-testing.sh [image tag]
+#  do-testing.sh [dl-py image tag] [dl-cpp image tag]
 
 # source: https://blog.harrison.dev/2016/06/19/integration-testing-with-docker-compose.html
 
@@ -17,7 +17,7 @@ cleanup () {
 }
 trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP INT QUIT PIPE TERM
 
-IMG_TAG=$1 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml build && IMG_TAG=$1 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml up -d
+DLPY_IMG_TAG=$1 DLCPP_IMG_TAG=$2 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml build && DLPY_IMG_TAG=$1 DLCPP_IMG_TAG=$2 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml up -d
 
 if [ $? -ne 0 ] ; then
   printf "${RED}Docker Compose Failed${NC}\n"
