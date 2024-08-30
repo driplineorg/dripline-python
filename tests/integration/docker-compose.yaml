@@ -22,6 +22,16 @@ services:
     configs:
       - dl_pw.txt
 
+  base-service:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    command: >
+      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+    configs:
+      - dl_pw.txt
+
   simple-service:
     image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
     depends_on:

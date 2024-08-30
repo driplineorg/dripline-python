@@ -23,3 +23,7 @@
 @test "set peaches" {
     dl-agent -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt set peaches 500
 }
+
+@test "ping base" {
+    dl-agent -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt cmd dlpy_service -s ping
+}
