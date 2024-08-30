@@ -1,5 +1,3 @@
-version: '3'
-
 services:
 
   rabbit-broker:
@@ -20,9 +18,9 @@ services:
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
     command: >
-      bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
+      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/key-value-store.yaml"
     configs:
-      - auths.json
+      - dl_pw.txt
 
   simple-service:
     image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
@@ -32,10 +30,12 @@ services:
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
     command: >
-      bash -c "run_simple_service -vvv --auth-file /auths.json"
+      bash -c "run_simple_service -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
     configs:
-      - auths.json
+      - dl_pw.txt
 
 configs:
-  auths.json:
-    file: ./authentications.json
+  dl_pw.txt:
+    file: ./password.txt
+#  auths.json:
+#    file: ./authentications.json

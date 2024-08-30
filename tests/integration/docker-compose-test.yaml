@@ -1,8 +1,6 @@
-version: '3'
-
 services:
   test:
-    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
       - rabbit-broker
       - simple-service
@@ -13,4 +11,4 @@ services:
       bash -c "sleep 1 &&
               /root/run-tests.sh"
     configs:
-      - auths.json
+      - dl_pw.txt
