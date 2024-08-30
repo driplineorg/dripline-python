@@ -2,8 +2,6 @@ import re
 
 from .service import Service
 
-from scarab import Authentication
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -18,7 +16,7 @@ class AlertConsumer(Service):
     1. More advanced: override the existing on_alert_message method with whatever behavior is desired
     2. Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.
     '''
-    def __init__(self, auth=Authentication(), alert_keys=["#"], alert_key_parser_re='', **kwargs):
+    def __init__(self, alert_keys=["#"], alert_key_parser_re='', **kwargs):
         '''
         Args:
             alert_keys: an iterable of strings which will be used as binding keys on the alerts exchange
@@ -28,7 +26,7 @@ class AlertConsumer(Service):
                              error. We use re.match and return the groupdict.
         '''
         logger.debug("in AlertConsumer init")
-        Service.__init__(self, auth=auth, **kwargs)
+        Service.__init__(self, **kwargs)
         self._alert_keys = alert_keys
         self._alert_key_parser_re= alert_key_parser_re
 

@@ -1,5 +1,6 @@
 services:
 
+  # The broker for the mesh
   rabbit-broker:
     image: rabbitmq:3-management
     ports:
@@ -10,6 +11,20 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -u dripline:dripline http://rabbit-broker:15672/api/overview &> /dev/null || exit 1"]
 
+  # The run_simple_service example from dl-cpp
+  simple-service:
+    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./key-value-store.yaml:/root/key-value-store.yaml
+    command: >
+      bash -c "run_simple_service -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+    configs:
+      - dl_pw.txt
+
+  # The classic key-value store, a configuration based on the base Service class
   key-value-store:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
@@ -22,6 +37,7 @@ services:
     configs:
       - dl_pw.txt
 
+  # Just the base service class
   base-service:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
@@ -32,15 +48,16 @@ services:
     configs:
       - dl_pw.txt
 
-  simple-service:
-    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
+  # The bare alert consumer
+  alert-consumer:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
       rabbit-broker:
         condition: service_healthy
     volumes:
-      - ./key-value-store.yaml:/root/key-value-store.yaml
+      - ./alert-consumer.yaml:/root/alert-consumer.yaml
     command: >
-      bash -c "run_simple_service -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/alert-consumer.yaml"
     configs:
       - dl_pw.txt
 
