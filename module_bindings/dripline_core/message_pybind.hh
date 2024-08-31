@@ -80,6 +80,16 @@ namespace dripline_pybind
                         >( mod, "MsgRequest", message, "dripline messages containing a request to be sent to an endpoint" )
             // constructor(s)
             .def( pybind11::init< >() )
+
+            .def( "__str__", 
+                  [](const dripline::msg_reply& a_msg) {
+                    std::ostringstream t_stream;
+                    t_stream << a_msg;
+                    return t_stream.str();
+                  },
+                  DL_BIND_CALL_GUARD_STREAMS
+                )
+
             // properties
             // mv_referrable
             //TODO even better if we could interface with python's UUID library instead of passing strings
@@ -136,6 +146,15 @@ namespace dripline_pybind
             // constructor(s)
             .def( pybind11::init< >() )
 
+            .def( "__str__", 
+                  [](const dripline::msg_reply& a_msg) {
+                    std::ostringstream t_stream;
+                    t_stream << a_msg;
+                    return t_stream.str();
+                  },
+                  DL_BIND_CALL_GUARD_STREAMS
+                )
+
             // properties
             // mv_referrable
             .def_property( "return_message", (std::string& (dripline::msg_reply::*)()) &dripline::msg_reply::return_message,
@@ -186,6 +205,15 @@ namespace dripline_pybind
                         >( mod, "MsgAlert", message, "dripline message containing alert information" )
             // constructor(s)
             .def( pybind11::init< >() )
+
+            .def( "__str__", 
+                  [](const dripline::msg_reply& a_msg) {
+                    std::ostringstream t_stream;
+                    t_stream << a_msg;
+                    return t_stream.str();
+                  },
+                  DL_BIND_CALL_GUARD_STREAMS
+                )
 
             // general methods
             .def_static( "create",
