@@ -1,7 +1,7 @@
 __all__ = []
 
 import scarab
-from _dripline.core import _Service, create_dripline_auth_spec
+from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
 
 import logging
@@ -58,6 +58,11 @@ class Service(_Service):
             dripline_mesh : dict, optional
                 Provide optional dripline mesh configuration information
         '''
+
+        # Final dripline_mesh config should be the default updated by the parameters passed by the caller
+        dripline_config = DriplineConfig().to_python()
+        dripline_config.update(dripline_mesh)
+
         config = {
             'name': name,
             'enable_scheduling': enable_scheduling,
@@ -65,8 +70,9 @@ class Service(_Service):
             'loop_timeout_ms': loop_timeout_ms,
             'message_wait_ms': message_wait_ms,
             'heartbeat_interval_s': heartbeat_interval_s,
-            'dripline_mesh': dripline_mesh,
+            'dripline_mesh': dripline_config,
         }
+
         if authentication_obj is not None:
             auth = authentication_obj
         else:
@@ -78,6 +84,7 @@ class Service(_Service):
             auth = scarab.Authentication()
             auth.add_groups(auth_spec)
             auth.process_spec()
+            
         _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
     def result_to_scarab_payload(self, result: str):
