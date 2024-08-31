@@ -1,8 +1,8 @@
 __all__ = []
 
-from scarab import Authentication
+import scarab
 
-from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
+from _dripline.core import op_t, create_dripline_auth_spec, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
 
 import logging
 logger = logging.getLogger(__name__)
@@ -13,16 +13,29 @@ class Interface(Core):
     A class on top of dripline.core.Core with more user-friendly methods for dripline interactions.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
-    def __init__(self, dripline_config={}, auth=Authentication(), confirm_retcodes=True):
+    def __init__(self, timeout_s=10, confirm_retcodes=True, auth={}, dripline_mesh={}):
         '''
         dripline_config (dict): passed to dripline.core.Core to configure connection details
         confirm_retcodes (bool): if True and if a reply is received with retcode!=0, raise an exception
         '''
-        default_config = DriplineConfig().to_python()
-        default_config.update(dripline_config)
-        Core.__init__(self, config=scarab.to_param(default_config), auth=auth)
+
+        dripline_config = DriplineConfig().to_python()
+        dripline_config.update(dripline_mesh)
+
+        dl_auth_spec = create_dripline_auth_spec()
+        dl_auth_spec.merge( scarab.to_param(auth) )
+        auth_spec = scarab.ParamNode()
+        auth_spec.add('dripline', dl_auth_spec)
+        logger.debug(f'Loading auth spec:\n{auth_spec}')
+        auth = scarab.Authentication()
+        auth.add_groups(auth_spec)
+        auth.process_spec()
+
         self._confirm_retcode = confirm_retcodes
+        self.timeout_s = timeout_s
         self._receiver = Receiver()
+
+        Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
 
     def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=False):
         '''
