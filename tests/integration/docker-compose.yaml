@@ -24,6 +24,17 @@ services:
     configs:
       - dl_pw.txt
 
+  # Just the base service class
+  base-service:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    command: >
+      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+    configs:
+      - dl_pw.txt
+
   # The classic key-value store, a configuration based on the base Service class
   key-value-store:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
@@ -34,17 +45,6 @@ services:
       - ./key-value-store.yaml:/root/key-value-store.yaml
     command: >
       bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/key-value-store.yaml"
-    configs:
-      - dl_pw.txt
-
-  # Just the base service class
-  base-service:
-    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
-    command: >
-      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
     configs:
       - dl_pw.txt
 
