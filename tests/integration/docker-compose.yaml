@@ -20,7 +20,7 @@ services:
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
     command: >
-      bash -c "run_simple_service -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+      bash -c "run_simple_service -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
     configs:
       - dl_pw.txt
 
@@ -31,7 +31,7 @@ services:
       rabbit-broker:
         condition: service_healthy
     command: >
-      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
     configs:
       - dl_pw.txt
 
@@ -44,7 +44,7 @@ services:
     volumes:
       - ./key-value-store.yaml:/root/key-value-store.yaml
     command: >
-      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/key-value-store.yaml"
+      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/key-value-store.yaml"
     configs:
       - dl_pw.txt
 
@@ -57,7 +57,7 @@ services:
     volumes:
       - ./alert-consumer.yaml:/root/alert-consumer.yaml
     command: >
-      bash -c "dl-serve -vvv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/alert-consumer.yaml"
+      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/alert-consumer.yaml"
     configs:
       - dl_pw.txt
 
