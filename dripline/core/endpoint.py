@@ -89,7 +89,11 @@ class Endpoint(_Endpoint):
                              "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
-        result = method_ref(*the_args, **the_kwargs)
+        try:
+            result = method_ref(*the_args, **the_kwargs)
+        except TypeError as e:
+            raise ThrowReply('service_error_invalid_value', 
+                             f'A TypeError occurred while calling the requested method for endpoint {self.name}: {method_name}. Values provided may be invalid.\nOriginal error: {str(e)}')
         return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
     def on_get(self):
