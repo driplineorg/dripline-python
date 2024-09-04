@@ -22,8 +22,8 @@ class Service(_Service):
     def __init__(self, name, make_connection=True, enable_scheduling=False, 
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
-                 auth={}, authentication_obj=None,
-                 dripline_mesh={}):
+                 username=None, password=None, authentication_obj=None,
+                 dripline_mesh=None):
         '''
         Configures a service with the necessary parameters.
 
@@ -61,7 +61,7 @@ class Service(_Service):
 
         # Final dripline_mesh config should be the default updated by the parameters passed by the caller
         dripline_config = DriplineConfig().to_python()
-        dripline_config.update(dripline_mesh)
+        dripline_config.update({} if dripline_mesh is None else dripline_mesh)
 
         config = {
             'name': name,
@@ -77,14 +77,18 @@ class Service(_Service):
             auth = authentication_obj
         else:
             dl_auth_spec = create_dripline_auth_spec()
-            dl_auth_spec.merge( scarab.to_param(auth) )
+            auth_args = {
+                'username': {} if username is None else username,
+                'password': {} if password is None else password,
+            }
+            dl_auth_spec.merge( scarab.to_param(auth_args) )
             auth_spec = scarab.ParamNode()
             auth_spec.add('dripline', dl_auth_spec)
             logger.debug(f'Loading auth spec:\n{auth_spec}')
             auth = scarab.Authentication()
             auth.add_groups(auth_spec)
             auth.process_spec()
-            
+
         _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
     def result_to_scarab_payload(self, result: str):
