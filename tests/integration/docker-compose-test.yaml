@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  test:
+    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+    depends_on:
+      - rabbit-broker
+      - simple-service
+      - key-value-store
+    volumes:
+      - ./run-tests.sh:/root/run-tests.sh
+    command: >
+      bash -c "sleep 1 &&
+              /root/run-tests.sh"
+    configs:
+      - auths.json

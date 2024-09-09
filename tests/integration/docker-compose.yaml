@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+
+  rabbit-broker:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=dripline
+      - RABBITMQ_DEFAULT_PASS=dripline
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u dripline:dripline http://rabbit-broker:15672/api/overview &> /dev/null || exit 1"]
+
+  http-server:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "dl-http-server"
+    configs:
+      - auths.json
+
+  key-value-store:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./key-value-store.yaml:/root/key-value-store.yaml
+    command: >
+      bash -c "dl-serve -vvv -c /root/key-value-store.yaml"
+    configs:
+      - auths.json
+
+  simple-service:
+    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./key-value-store.yaml:/root/key-value-store.yaml
+    command: >
+      bash -c "run_simple_service -vvv --auth-file /auths.json"
+    configs:
+      - auths.json
+
+configs:
+  auths.json:
+    file: ./authentications.json

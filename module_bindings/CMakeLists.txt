@@ -37,13 +37,13 @@ target_include_directories( _dripline
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-target_link_libraries( _dripline PRIVATE ${PUBLIC_EXT_LIBS} )
+target_link_libraries( _dripline PUBLIC ${PUBLIC_EXT_LIBS} )
 
 set( PY_MODULE_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR} )
 # Override that install location if specified by the user
-if( DEFINED PBUILDER_PY_INSTALL_IN_SITELIB AND DEFINED Python3_SITELIB )
+if( INSTALL_DLPYBIND_IN_SITELIB AND DEFINED Python3_SITELIB )
     set( PY_MODULE_INSTALL_DIR ${Python3_SITELIB} )
-endif( DEFINED PBUILDER_PY_INSTALL_IN_SITELIB AND DEFINED Python3_SITELIB )
+endif( INSTALL_DLPYBIND_IN_SITELIB AND DEFINED Python3_SITELIB )
 message( STATUS "Installing module _dripline in ${PY_MODULE_INSTALL_DIR}" )
 
 install( TARGETS _dripline DESTINATION ${PY_MODULE_INSTALL_DIR} )

@@ -6,6 +6,6 @@ server = dripline.implementations.HTTPServer(
     http_host='0.0.0.0', 
     http_port=8080, 
     web_root='/html',
-    dripline_config={'auth-file':'/root/authentications.json'},
+    dripline_config={'auth-file':'/auths.json'},
 )
 server.http_listen()

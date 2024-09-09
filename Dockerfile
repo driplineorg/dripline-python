@@ -1,7 +1,7 @@
-ARG img_user=driplineorg
+ARG img_user=ghcr.io/driplineorg
 ARG img_repo=dripline-cpp
 #ARG img_tag=hotfix_2.6.2
-ARG img_tag=v2.8.5
+ARG img_tag=v2.9.1
 #ARG img_arch=arm
 
 FROM ${img_user}/${img_repo}:${img_tag}
@@ -12,19 +12,18 @@ FROM ${img_user}/${img_repo}:${img_tag}
 ## into the ld.so.conf cache... use this only when developing and adding libs
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-RUN /usr/local/bin/python -m pip install --upgrade pip &&\
-    pip install ipython &&\
-    pip install pytest
+RUN apt-get update && \
+    apt-get clean && \
+    apt-get --fix-missing  -y install \
+        libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY module_bindings /usr/local/src_py/module_bindings
-COPY dripline /usr/local/src_py/dripline
-COPY bin /usr/local/src_py/bin
-COPY .git /usr/local/src_py/.git
-COPY setup.py /usr/local/src_py/setup.py
-COPY CMakeLists.txt /usr/local/src_py/CMakeLists.txt
-COPY tests /usr/local/src_py/tests
 
-RUN pip install /usr/local/src_py
+RUN pip install ipython pytest
+
+COPY . /usr/local/src_py/
+
+RUN pip install -v /usr/local/src_py
 
 #RUN cd /usr/local/src_py &&\
 #    python setup.py install

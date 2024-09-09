@@ -3,49 +3,96 @@ name: Publish
 on:
   push:
     branches: [ main, develop ]
-    tags: ['v*.*.*']
-
+    tags: ['*']
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-
   workflow_dispatch:
 
 env:
-  BASE_IMAGE_USER: driplineorg
+  REGISTRY: ghcr.io
+  REGISTRY_OLD: docker.io
+  BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  BASE_IMAGE_VER: 'v2.8.5'
+  BASE_IMAGE_TAG: 'v2.9.1'
+  DEV_SUFFIX: '-dev'
 
 jobs:
 
   test_docker:
-    runs-on: ubuntu-20.04
+
+    runs-on: ubuntu-latest
+
+    env:
+      TAG: gha-test
+      INT_TAG: gha-int-test
+
     steps:
+
+      - name: Concatenate env variables
+        run: |
+          echo "DL_PY_TAG=${{ env.REGISTRY }}/${{ github.repository }}:${{ env.TAG }}" >> $GITHUB_ENV
+          echo "DL_PY_INT_TAG=${{ env.REGISTRY }}/${{ github.repository }}:${{ env.INT_TAG }}" >> $GITHUB_ENV
+
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         id: setup_buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
       - name: Build
         id: build
-        uses: docker/build-push-action@v2
-        env:
-          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}-dev
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: false
+          load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ env.BASE_IMAGE_REPO }}
-            img_tag=${{ env.BASE_IMAGE_TAG }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           platforms: linux/amd64
+          tags: ${{ env.DL_PY_TAG }}
+
+      - name: Build Integration Tests
+        id: build_int_tests
+        uses: docker/build-push-action@v5
+        with:
+          context: ./tests/integration
+          push: false
+          load: true
+          build-args: |
+            img_user=${{ env.BASE_IMAGE_USER }}
+            img_repo=dripline-python
+            img_tag=${{ env.TAG }}
+          platforms: linux/amd64
+          tags: ${{ env.DL_PY_INT_TAG }}
+
+      - name: Unit Tests
+        run: |
+          docker run --rm ${{ env.DL_PY_INT_TAG }} bash -c "
+            cd /usr/local/src_py/tests
+            pytest"
+
+      - name: Integration Tests
+        run: |
+          cd tests/integration
+          ./do-testing.sh ${{ env.INT_TAG }}
+
+# For debugging
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
   build_and_push:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     if: |
       github.event_name == 'push' ||
@@ -59,21 +106,27 @@ jobs:
         include:
           - build: dev
             tag-suffix: '-dev'
+            do-integration: true
+            int-tag-suffix: '-int-test'
           - build: release
             tag-suffix: ''
+            do-integration: false
+            int-tag-suffix: ''
 
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
-          images: driplineorg/dripline-python
+          images: |
+            ${{ env.REGISTRY_OLD }}/driplineorg/dripline-python
+            ${{ env.REGISTRY }}/driplineorg/dripline-python
           flavor: |
             latest=auto
             suffix=${{ matrix.tag-suffix }},onlatest=true
@@ -81,25 +134,50 @@ jobs:
             type=semver,pattern={{raw}}
             type=ref,event=branch
             type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads{0}', 'main') }}
+
+      - name: Docker meta - integration
+        id: docker_meta_integration
+        if: ${{ matrix.do-integration }}
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/driplineorg/dripline-python
+          flavor: |
+            latest=auto
+            suffix=${{ matrix.int-tag-suffix }},onlatest=true
+          tags: |
+            type=semver,pattern={{raw}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads{0}', 'main') }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         id: setup_buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
         with:
           buildkitd-flags: --debug
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
+          registry: ${{ env.REGISTRY_OLD }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push
         id: build_push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         env:
           BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.tag-suffix }}
         with:
@@ -108,64 +186,26 @@ jobs:
           build-args: | 
             img_user=${{ env.BASE_IMAGE_USER }}
             img_repo=${{ env.BASE_IMAGE_REPO }}
-            img_tag=${{ env.BASE_IMAGE_TAG }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           tags: ${{ steps.docker_meta.outputs.tags }}
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
 
-  docs:
-    runs-on: ubuntu-20.04
-    # This job only runs for pushed tags
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    needs: [build_and_push]
-    steps:
-      - name: Checkout the repo 
-        uses: actions/checkout@v2
+      - name: Build and push - integration
+        id: build_push_integration
+        if: ${{ matrix.do-integration }}
+        uses: docker/build-push-action@v5
+        env:
+          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.int-tag-suffix }}
         with:
-          submodules: recursive
-      - name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: driplineorg/dripline-python
-          tag-sha: false
-          tag-semver: |
-            {{raw}}
-      - name: Output location
-        run: |
-          export OUTPUT_LOCATION="unknown"
-          export BRANCH_OR_TAG="unknown"
-          echo "Github ref: $GITHUB_REF"
-          if [[ $GITHUB_REF == refs/heads/develop ]]; then
-              echo "Branch is develop"
-              export BRANCH_OR_TAG=develop
-              export OUTPUT_LOCATION=$BRANCH_OR_TAG
-          elif [[ $GITHUB_REF == refs/heads/main ]]; then
-              echo "Branch is main"
-              export BRANCH_OR_TAG=main
-              export OUTPUT_LOCATION=$BRANCH_OR_TAG
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-              suffix=${GITHUB_REF#"refs/heads/"}
-              export BRANCH_OR_TAG=$(echo $suffix | tr '/' '-')
-              echo "Branch is $GITHUB_REF; directory will be $BRANCH_OR_TAG"
-              export OUTPUT_LOCATION=branches/$BRANCH_OR_TAG
-          elif [[ $GITHUB_REF == refs/tags/* ]]; then
-              export BRANCH_OR_TAG=${GITHUB_REF#"refs/tags/"}
-              echo "Tag is $GITHUB_REF; directory will be $BRANCH_OR_TAG"
-              export OUTPUT_LOCATION=tags/$BRANCH_OR_TAG
-          fi
-          echo "Branch or tag: $BRANCH_OR_TAG"
-          echo "Output location: $OUTPUT_LOCATION"
-          # Persist the environment variables in future steps
-          echo "BRANCH_OR_TAG=$BRANCH_OR_TAG" >> $GITHUB_ENV
-          echo "OUTPUT_LOCATION=$OUTPUT_LOCATION" >> $GITHUB_ENV
-      - name: Build docs
-        run: |
-          docker build -f Dockerfile.docs -t docs_image --build-arg img_tag=${BRANCH_OR_TAG} .
-          docker cp $(docker create docs_image):/root/build/doc/_build/html /tmp/build.html
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.0
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: /tmp/build.html # The folder the action should deploy.
-          target-folder: ${{ env.OUTPUT_LOCATION }}
-          dry-run: false
+          context: ./tests/integration
+          push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
+          build-args: | 
+            img_user=${{ env.REGISTRY }}/driplineorg
+            img_repo=dripline-python
+            img_tag=latest-dev
+          tags: ${{ steps.docker_meta_integration.outputs.tags }}
+          platforms: linux/amd64,linux/arm64
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}

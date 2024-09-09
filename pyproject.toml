@@ -1,0 +1,33 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "setuptools-scm>=8.0",
+    "wheel", 
+    "pybind11>=2.6.0",
+]
+# Removing CMake as a build-system dependency
+# This was causing arm/v7 builds to take 4+ hours and often fail.
+# CMake is not available as a pre-built wheel for the arm/v7 architecture, 
+# so it would build CMake from source (hence the hours-long build). 
+# The failures happened during CMake's testing that happened as part of the build, one test would fail.
+# This could be put back in if arm/v7 support is dropped, or a way is found to satisfy this 
+# requirement based on system-installed (i.e. non-pip) CMake.
+#    "cmake>=3.12",
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dripline"
+dynamic = ["version"]
+dependencies = [
+    'PyYAML',
+    'aiohttp',
+    'asteval',
+    'setuptools_scm',
+    #these two for postgreSQL, move to plugin?
+    'sqlalchemy',
+    'psycopg2',
+    'colorlog', #we could make this optional if we wnat to minimize dependencies
+]
+
+[tool.setuptools_scm]
+version_file = "dripline/version.py"

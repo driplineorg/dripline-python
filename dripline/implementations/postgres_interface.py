@@ -63,13 +63,13 @@ class PostgreSQLInterface(Service):
         credentials = json.loads(open(os.path.expandvars(os.path.expanduser(self._auths_file))).read())['postgresql']
         engine_str = f'postgresql://{credentials["username"]}:{credentials["password"]}@{database_server}/{database_name}'
         self.engine = sqlalchemy.create_engine(engine_str)
-        self.meta = sqlalchemy.MetaData(self.engine)
+        self.meta = sqlalchemy.MetaData()
 
     def add_child(self, endpoint):
         Service.add_child(self, endpoint)
         if isinstance(endpoint, SQLTable):
             logger.debug(f'Adding sqlalchemy.Table object for "{endpoint.table_name}" to Endpoint')
-            endpoint.table = sqlalchemy.Table(endpoint.table_name, self.meta, autoload=True, schema=endpoint.schema)
+            endpoint.table = sqlalchemy.Table(endpoint.table_name, self.meta, autoload_with=self.engine, schema=endpoint.schema)
 
 
 __all__.append("SQLTable")
@@ -142,7 +142,8 @@ class SQLTable(Endpoint):
             this_select = this_select.where(getattr(self.table.c,c)<v)
         for c,v in where_gt_dict.items():
             this_select = this_select.where(getattr(self.table.c,c)>v)
-        result = self.service.engine.execute(this_select)
+        conn = self.service.engine.connect()
+        result = conn.execute(this_select)
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
@@ -150,7 +151,8 @@ class SQLTable(Endpoint):
             ins = self.table.insert().values(**insert_kv_dict)
             if return_col_names_list:
                 ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
-            insert_result = ins.execute()
+            conn = self.service.engine.connect()
+            insert_result = conn.execute(ins)
             if return_col_names_list:
                 return_values = insert_result.first()
             else:

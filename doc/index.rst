@@ -16,6 +16,7 @@ the components in a running service.
    :maxdepth: 2
 
    getting_started
+   extending
    dl_serve
    API Documentation <apidoc/modules>
    contribute

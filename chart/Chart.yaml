@@ -1,7 +1,7 @@
 apiVersion: v1
 ## the appVersion is used as the container image tag for the main container in the pod from the deployment
 ## it can be overridden by a values.yaml file in image.tag
-appVersion: "v4.5.8"
+appVersion: "v4.7.1"
 description: Deploy a dripline-python microservice
 name: dripline-python
 version: 1.1.2
