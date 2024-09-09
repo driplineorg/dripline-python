@@ -19,6 +19,8 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    volumes:
+      - ../../html:/html
     command: >
       bash -c "dl-http-server"
     configs:
