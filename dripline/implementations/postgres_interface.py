@@ -23,9 +23,6 @@ from datetime import datetime
 from itertools import groupby
 import collections
 
-# Scarab
-from scarab import Authentication
-
 # local imports
 from dripline.core import Service, Endpoint, ThrowReply
 
@@ -39,21 +36,22 @@ class PostgreSQLInterface(Service):
     '''
     '''
 
-    def __init__(self, database_name, database_server, auth=Authentication(), **kwargs):
+    def __init__(self, database_name, database_server, **kwargs):
         '''
         Args:
             database_name (str): name of the 'database' to connect to within the database server
             database_server (str): network resolvable hostname of database server
-            auth (scarab.Authentication):  authentication object; must include both "dripline" and "postgres" login details
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
-        Service.__init__(self, auth=auth, **service_kwargs)
+        ##service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
+        ##Service.__init__(self, **service_kwargs)
+        #Service.__init__(self, **kwargs)
+        super(PostgreSQLInterface, self).__init__(**kwargs)
 
-        if not auth.has('postgres'):
+        if not self.auth.has('postgres'):
             raise RuntimeError('Authentication is missing "postgres" login details')
-        self._connect_to_db(database_server, database_name, auth)
+        self._connect_to_db(database_server, database_name, self.auth)
 
     def _connect_to_db(self, database_server, database_name, auth):
         '''

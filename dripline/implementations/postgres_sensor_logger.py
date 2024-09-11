@@ -25,11 +25,12 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
 
     The assumption made is that complex logic dealing with organization or structure of the particular database should live in the database itself (possibly in a view, with a trigger, ...) and that here we can simply do an insert.
     '''
-    def __init__(self, insertion_table_endpoint_name, auth=Authentication(), **kwargs):
+    def __init__(self, insertion_table_endpoint_name, **kwargs):
         '''
         '''
-        PostgreSQLInterface.__init__(self, auth=auth, **kwargs)
-        AlertConsumer.__init__(self, auth=auth, **kwargs)
+        #PostgreSQLInterface.__init__(self, **kwargs)
+        #AlertConsumer.__init__(self, **kwargs)
+        super(PostgresSensorLogger, self).__init__(**kwargs)
 
         self.insertion_table_endpoint_name = insertion_table_endpoint_name
 

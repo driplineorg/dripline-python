@@ -89,7 +89,8 @@ class Service(_Service):
             auth.add_groups(auth_spec)
             auth.process_spec()
 
-        _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+        #_Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+        super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
     def result_to_scarab_payload(self, result: str):
         """
