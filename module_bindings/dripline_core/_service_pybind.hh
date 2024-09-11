@@ -7,6 +7,7 @@
 #include "core.hh"
 #include "service.hh"
 
+#include "authentication.hh"
 #include "param_binding_helpers.hh"
 
 #include "pybind11/pybind11.h"
@@ -158,6 +159,9 @@ Extracts necessary configuration and authentication information and prepares the
                    pybind11::arg( "make_connection" ) = true
             )
 */
+            .def_property( "auth", (scarab::authentication& (dripline::service::*)()) &dripline::service::auth, 
+                           [](_service& a_service, const scarab::authentication& a_auth){a_service.auth() = a_auth;}, 
+                           pybind11::return_value_policy::reference_internal )
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )
