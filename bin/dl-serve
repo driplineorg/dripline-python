@@ -5,9 +5,8 @@ import importlib.util
 import inspect
 import traceback
 
-import yaml
-
 import dripline
+
 import scarab
 
 import logging
@@ -155,6 +154,10 @@ if __name__ == '__main__':
     dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
     dripline.core.add_service_options(the_main)
+
+    # Add the default implementation-specific authentication specifications and CL options
+    dripline.implementations.add_postgres_auth_spec(the_main)
+    #dripline.implementations.add_postgres_options(the_main) #to use if this gets implemented
 
     # Package version information
     the_main.set_version(dripline.core.get_version( "dripline-python" ))
