@@ -25,81 +25,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # The run_simple_service example from dl-cpp
-  simple-service:
-    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
+  scpi-device:
+    image: python:3.12.1-slim-bookworm
     volumes:
-      - ./key-value-store.yaml:/root/key-value-store.yaml
-    command: >
-      bash -c "run_simple_service -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
-    configs:
-      - dl_pw.txt
-
-  # Just the base service class
-  base-service:
-    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
-    command: >
-      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
-    configs:
-      - dl_pw.txt
-
-  # The classic key-value store, a configuration based on the base Service class
-  key-value-store:
-    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
-    volumes:
-      - ./key-value-store.yaml:/root/key-value-store.yaml
-    command: >
-      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/key-value-store.yaml"
-    configs:
-      - dl_pw.txt
-
-  # The bare alert consumer
-  alert-consumer:
-    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
-    volumes:
-      - ./alert-consumer.yaml:/root/alert-consumer.yaml
-    command: >
-      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/alert-consumer.yaml"
-    configs:
-      - dl_pw.txt
-
-  sensor-logger:
-    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    depends_on:
-      rabbit-broker:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./sensor-logger.yaml:/root/sensor-logger.yaml
-    command:
-      - dl-serve
-      - -vv
-      - -b
-      - rabbit-broker
-      - -c
-      - /root/sensor-logger.yaml
-      - -u
-      - dripline
-      - --password-file
-      - /dl_pw.txt
-    configs:
-      - dl_pw.txt
-
-configs:
-  dl_pw.txt:
-    file: ./password.txt
-#  auths.json:
-#    file: ./authentications.json
+      - ./scpi_device/scpi_device.py:/root/scpi_device.py
+    command: 
+      - /root/scpi_device.py
+      - scpi-device
+    environment:
+      PYTHONUNBUFFERED: 1  # don't buffer printing to stdout

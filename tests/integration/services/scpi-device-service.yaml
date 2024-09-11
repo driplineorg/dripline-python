@@ -1,0 +1,22 @@
+name: my_device
+module: EthernetSCPIService
+socket_info: ('scpi-device',24596)
+cmd_at_reconnect: null
+command_terminator: "\n"
+response_terminator: "\n"
+endpoints:
+  - name: idn
+    module: SimpleSCPIEntity
+    base_str: IDN
+  - name: opt
+    module: SimpleSCPIEntity
+    base_str: OPT
+  - name: READ
+    module: SimpleSCPIEntity
+    base_str: READ
+  - name: voltage
+    module: SimpleSCPIEntity
+    base_str: VOLTage
+  - name: frequency
+    module: SimpleSCPIEntity
+    base_str: FREQuency
