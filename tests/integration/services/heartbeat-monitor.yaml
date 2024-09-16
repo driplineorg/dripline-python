@@ -1,0 +1,11 @@
+name: heartbeat_monitor
+module: HeartbeatMonitor
+
+# AlertConsumer Inits
+alert_keys:
+  - "heartbeat.#"
+alert_key_parser_re: 'heartbeat\.(?P<service_name>\w+)'
+
+endpoints:
+  - name: heartbeat_monitor
+    module: HeartbeatTracker

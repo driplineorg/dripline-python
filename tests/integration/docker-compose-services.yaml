@@ -76,6 +76,18 @@ services:
     configs:
       - dl_pw.txt
 
+  heartbeat-monitor:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./services/heartbeat-monitor.yaml:/root/heartbeat-monitor.yaml
+    command:
+      bash -c "dl-serve -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt -c /root/heartbeat-monitor.yaml heartbeat_interval_s=10"
+    configs:
+      - dl_pw.txt
+
 configs:
   dl_pw.txt:
     file: ./password.txt
