@@ -3,15 +3,15 @@ __all__ = []
 import scarab
 from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
+from .object_creator import ObjectCreator
 
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 __all__.append('Service')
-
-
-class Service(_Service):
+class Service(_Service, ObjectCreator):
     '''
     A service is the primary type of entity on a dripline mesh, and represents the 
     interface between dripline and a device or devices.
@@ -19,7 +19,7 @@ class Service(_Service):
     dl-serve is primarily responsible for starting up, configuring, and running a single service.
     '''
 
-    def __init__(self, name, make_connection=True, enable_scheduling=False, 
+    def __init__(self, name, make_connection=True, endpoints=None, enable_scheduling=False, 
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
                  username=None, password=None, authentication_obj=None,
@@ -91,6 +91,37 @@ class Service(_Service):
 
         #_Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
         super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+
+        # Endpoints
+        all_endpoints = []
+        for an_endpoint_conf in endpoints:
+            an_endpoint = self.create_object(an_endpoint_conf, 'Endpoint')
+            self.add_child( an_endpoint )
+            all_endpoints.append(an_endpoint)
+            if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
+                logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
+                an_endpoint.start_logging()
+
+    def run(self):
+        '''
+        Runs the service, which consists of three stages:
+        1. Starting the service -- sets up the connection with the broker
+        2. Listens for messages -- waits on the queue to receive messages, and then handles them
+        3. Stops the service -- breaks down everything that was setup in start()
+
+        Override this to customize when happens when a service runs.
+        '''
+        logger.info("Starting the service")
+        if not self.start():
+            raise RuntimeError("There was a problem starting the service")
+
+        logger.info("Service started, now to listen")
+        if not self.listen():
+            raise RuntimeError("there was a problem listening for messages")
+
+        logger.info("stopping the service")
+        if not self.stop():
+            raise RuntimeError("there was a problem stopping the service")
 
     def result_to_scarab_payload(self, result: str):
         """
