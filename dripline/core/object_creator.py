@@ -12,6 +12,7 @@ logger = logging.getLogger('dripline')
 __all__.append('ObjectCreator')
 class ObjectCreator:
     '''
+    Mixin class providing the ability to create a class based on a provided configuration dictionary.
     '''
 
     def __init__(self, **kwargs):
@@ -19,7 +20,20 @@ class ObjectCreator:
         '''
         pass
 
-    def create_object(self, config, default_module: str, auth = None):
+    def create_object(self, config: dict, default_module: str, auth = None):
+        '''
+        Creates the object.
+
+        Parameters
+        ----------
+            config: dict
+                Configuration details.  Should contain the 'module' (optional; default will be used otherwise) and 'module_path' (optional, if not part of the Python path).
+            default_module: str
+                Module name used by default if `config` does not contain the key 'module'.
+            auth: scarab.authentication, optional
+                Optional authentication object that, if present, will be passed to the object's `__init__()` function as `authentication_obj`.
+
+        '''
         logger.debug(f"Creating object from:\n\n{config}")
 
         module_name = config.pop('module', default_module)

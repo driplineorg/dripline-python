@@ -11,6 +11,12 @@ logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
 
 class Serve(dripline.core.ObjectCreator):
+    '''
+    Service launcher class
+
+    This class is responsible for launching a Service based on a scarab.main_app.
+    '''
+
     def __init__(self):
         super(Serve, self).__init__()
 
