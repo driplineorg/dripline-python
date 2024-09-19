@@ -2,7 +2,7 @@ __all__ = []
 
 import scarab
 
-from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
+from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError #cpp python bindings
 
 import logging
 logger = logging.getLogger(__name__)
@@ -62,17 +62,18 @@ class Interface(Core):
         [kw]args:
         endpoint (string): routing key to which an OP_SET will be sent
         value (any value|None): single value to assign (will be combined with `values` if both are set)
-        values (array|None): array of values to assign (will be combined with `value` if both are set)
+        values (array|None): array of values to assign (will be combined with `value` if both are set) 
         keyed_args (dict|None): set of key/value pairs to add as the payload
         specifier (string|None): specifier to add to the message
         timeout (int|0): timeout in ms
         '''
-        if value is not None:
+        if value is not None: # values will never be None since default is []. are there other functions that could pass None?
             values.insert(0, value)
         payload = keyed_args if keyed_args is not None else {}
         payload['values'] = values
         reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout )
+
         return result
 
     def cmd(self, endpoint, specifier, ordered_args=[], keyed_args={}, lockout_key=None, timeout=0):
