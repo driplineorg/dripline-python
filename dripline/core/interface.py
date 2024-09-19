@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 __all__.append("Interface")
 class Interface(Core):
     '''
-    A class user-friendly methods for dripline interactions in a Python interpreter.
+    A class that provides user-friendly methods for dripline interactions in a Python interpreter.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
     def __init__(self, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
@@ -37,7 +37,7 @@ class Interface(Core):
                     - 'env': provide an environment variable that contains the password -- the dripline default is 'DRIPLINE_PASSWORD'.  This overrides the 'default' value option.
                     - 'default': set the default password -- dripline default is 'dripline'
             dripline_mesh : dict, optional
-                Provide optional dripline mesh configuration information
+                Provide optional dripline mesh configuration information (see dripline_config for more information)
             timeout_s: int, optional
                 Time to wait for a reply, in seconds -- default is 10 s
             confirm_retcodes: bool, optional  

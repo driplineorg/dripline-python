@@ -13,10 +13,46 @@ logger = logging.getLogger(__name__)
 __all__.append('Service')
 class Service(_Service, ObjectCreator):
     '''
-    A service is the primary type of entity on a dripline mesh, and represents the 
-    interface between dripline and a device or devices.
-    Service is the bse class for all Python service objects.
-    dl-serve is primarily responsible for starting up, configuring, and running a single service.
+    The primary unit of software that connects to a broker and typically provides an interface with an instrument or other software.
+
+    The Service class is the implementation of the "service" concept in Dripline.
+    It's the primary component that makes up a Dripline mesh, and it is the base class for all Python-based dripline services.
+
+    The lifetime of a service is defined by the three main functions:
+    1. `start()` -- create the AMQP channel, create the AMQP queue, bind the routing keys, and start consuming AMQP messages
+    2. `listen()` -- starts the heartbeat and scheduler threads (optional), starts the receiver thread, and waits for and handles messages on the queue
+    3. `stop()` -- (called asynchronously) cancels the listening service
+
+    The ability to handle and respond to Dripline messages is embodied in the `endpoint` class.  
+    Service uses `endoint` in three ways:
+    1. Service is an endpoint.  A service can be setup to handle messages directed to it.
+    2. Service has basic child endpoints.  These are also called "synchronous" endpoints.  
+        These endpoints use the same AMQP queue as the service itself.  Messages send to the 
+        service and to the synchronous endpoints are all handled serially.
+    3. Service has asynchronous child endpoints.  These endpoints each have their own AMQP 
+        queue and thread responsible for receiving and handling their messages.
+
+    A service has a number of key characteristics (most of which come from its parent classes):
+    * `core` -- Has all of the basic AMQP capabilities, sending messages, and making and manipulating connections
+    * `endpoint` -- Handles Dripline messages
+    * `listener_receiver` -- Asynchronously recieves AMQP messages and turns them into Dripline messages
+    * `heartbeater` -- Sends periodic heartbeat messages
+    * `scheduler` -- Can schedule events
+    
+    As is apparent from the above descriptions, a service is responsible for a number of threads 
+    when it executes:
+    * Listening -- grabs AMQP messages off the channel when they arrive
+    * Message-wait -- any incomplete multi-part Dripline message will setup a thread to wait 
+    *                 until the message is complete, and then submits it for handling
+    * Receiver -- grabs completed Dripline messages and handles it
+    * Async endpoint listening -- same as abovefor each asynchronous endpoint
+    * Async endpoint message-wait -- same as above for each asynchronous endpoint
+    * Async endpoint receiver -- same as above for each asynchronous endpoint
+    * Heatbeater -- sends regular heartbeat messages
+    * Scheduler -- executes scheduled events
+
+    In addition to receiving messages from the broker, a user or client code can give messages directly to the service 
+    using `process_message(message)`.)
     '''
 
     def __init__(self, name, make_connection=True, endpoints=None, enable_scheduling=False, 
@@ -56,7 +92,7 @@ class Service(_Service, ObjectCreator):
             authentication_obj : scarab.Authentication, optional
                 Authentication information provided as a scarab.Authentication object; this will override the auth parameter.
             dripline_mesh : dict, optional
-                Provide optional dripline mesh configuration information
+                Provide optional dripline mesh configuration information (see dripline_config for more information)
         '''
 
         # Final dripline_mesh config should be the default updated by the parameters passed by the caller

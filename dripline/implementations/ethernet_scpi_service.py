@@ -191,7 +191,7 @@ class EthernetSCPIService(Service):
         except socket.timeout:
             logger.warning(f"socket.timeout condition met; received:\n{repr(data)}")
             if blank_command == False:
-                raise ThrowReply('resource_error_no_response', "Unexpected socket.timeout")
+                raise ThrowReply('resource_error_no_response', "Timeout while waiting for a response from the instrument")
             terminator = ''
         logger.debug(repr(data))
         data = data[0:data.rfind(terminator)]
