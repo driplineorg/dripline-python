@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import datetime
-import importlib.util
-import inspect
 import traceback
 
 import dripline
@@ -13,9 +10,18 @@ import logging
 logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
 
-class Serve:
+class Serve(dripline.core.ObjectCreator):
+    '''
+    Service launcher class
+
+    This class is responsible for launching a Service based on a scarab.main_app.
+    '''
+
     def __init__(self):
+        super(Serve, self).__init__()
+
         self.return_code = 0
+
         self.handler = logging.StreamHandler()
         self.handler.setLevel(logging.WARNING)
         logger.addHandler(self.handler)
@@ -31,49 +37,6 @@ class Serve:
             self._logging_format = logging.Formatter(modified_format, time_format[:-4])
         self.handler.setFormatter(self._logging_format)
 
-    def create_object(self, a_config, a_auth = None):
-        logger.debug("creating object from:\n{}\n...".format(a_config))
-        module_name = a_config.pop('module', 'Service')
-        module_path = a_config.pop('module_path', False)
-        extra_namespace = object()
-        if module_path:
-            try:
-                spec = importlib.util.spec_from_file_location('extra_namespace', module_path)
-                extra_namespace = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(extra_namespace)
-            except IOError as e:
-                logger.error("unable to load source from: {}".format(module_path))
-                raise e
-        module = None
-        #first priority, if it is in the module_path provided (if any)
-        if hasattr(extra_namespace, module_name):
-            module = getattr(extra_namespace, module_name)
-        #second priority, if it is in any extensions installed
-        elif hasattr(dripline.extensions, module_name):
-            module = getattr(dripline.extensions, module_name)
-        ## Note: we only loop one layer down in the config file, this could possibly be made more generic
-        else:
-            for m in [getattr(dripline.extensions, i_mod) for i_mod in dir(dripline.extensions)]:
-                if inspect.ismodule(m):
-                    if hasattr(m, module_name):
-                        module = getattr(m, module_name)
-        if module is None: # continue above elifs
-        #third priority, if it is part of the base set of implementations
-            if hasattr(dripline.implementations, module_name):
-                module = getattr(dripline.implementations, module_name)
-        #fourth priority, if it is in core
-            elif hasattr(dripline.core, module_name):
-                module = getattr(dripline.core, module_name)
-            else:
-                raise NameError('no module "{}" in available namespaces'.format(module_name))
-            
-        if a_auth is not None:
-            logger.debug("creating object with authentication")
-            the_object = module( authentication_obj=a_auth, **a_config )
-        else:
-            the_object = module( **a_config )
-
-        return the_object
 
     def run(self, the_app):
         try:
@@ -106,40 +69,13 @@ class Serve:
         # Convert config to a dict
         this_config = this_config_param.to_python()
 
-        # Remove the endpoints configuration before creating and configuring the service
-        the_endpoints = this_config.pop("endpoints", [])
-
-#        service_config = run_config.copy()
-#        service_config.update({'config': this_config})
-#        logger.info(f'service config: {service_config}')
-#        logger.info(f'run config: {run_config}')
-
         # Create the service and register it with the signal handler
-        the_service = self.create_object( this_config, this_auth )
+        the_service = self.create_object( this_config, 'Service', this_auth )
         sig_handler.add_cancelable(the_service)
-        logger.info('service built')
+        logger.info(f'Service {the_service.name} has been built')
 
-        all_endpoints = []
-        for an_endpoint_conf in the_endpoints:
-            an_endpoint = self.create_object(an_endpoint_conf)
-            the_service.add_child( an_endpoint )
-            all_endpoints.append(an_endpoint)
-            if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
-                logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
-                an_endpoint.start_logging()
-
-        logger.info("about to start the service")
-        if not the_service.start():
-            raise RuntimeError("There was a problem starting the service")
-
-        logger.info("services started, now to listen")
-        if not the_service.listen():
-            raise RuntimeError("there was a problem listening for messages")
-
-        logger.info("stopping the service")
-        if not the_service.stop():
-            raise RuntimeError("there was a problem stopping the service")
-
+        # Run the service
+        the_service.run()
 
 if __name__ == '__main__':
     # App object

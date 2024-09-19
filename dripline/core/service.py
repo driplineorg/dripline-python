@@ -3,23 +3,59 @@ __all__ = []
 import scarab
 from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
+from .object_creator import ObjectCreator
 
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 __all__.append('Service')
-
-
-class Service(_Service):
+class Service(_Service, ObjectCreator):
     '''
-    A service is the primary type of entity on a dripline mesh, and represents the 
-    interface between dripline and a device or devices.
-    Service is the bse class for all Python service objects.
-    dl-serve is primarily responsible for starting up, configuring, and running a single service.
+    The primary unit of software that connects to a broker and typically provides an interface with an instrument or other software.
+
+    The Service class is the implementation of the "service" concept in Dripline.
+    It's the primary component that makes up a Dripline mesh, and it is the base class for all Python-based dripline services.
+
+    The lifetime of a service is defined by the three main functions:
+    1. `start()` -- create the AMQP channel, create the AMQP queue, bind the routing keys, and start consuming AMQP messages
+    2. `listen()` -- starts the heartbeat and scheduler threads (optional), starts the receiver thread, and waits for and handles messages on the queue
+    3. `stop()` -- (called asynchronously) cancels the listening service
+
+    The ability to handle and respond to Dripline messages is embodied in the `endpoint` class.  
+    Service uses `endoint` in three ways:
+    1. Service is an endpoint.  A service can be setup to handle messages directed to it.
+    2. Service has basic child endpoints.  These are also called "synchronous" endpoints.  
+        These endpoints use the same AMQP queue as the service itself.  Messages send to the 
+        service and to the synchronous endpoints are all handled serially.
+    3. Service has asynchronous child endpoints.  These endpoints each have their own AMQP 
+        queue and thread responsible for receiving and handling their messages.
+
+    A service has a number of key characteristics (most of which come from its parent classes):
+    * `core` -- Has all of the basic AMQP capabilities, sending messages, and making and manipulating connections
+    * `endpoint` -- Handles Dripline messages
+    * `listener_receiver` -- Asynchronously recieves AMQP messages and turns them into Dripline messages
+    * `heartbeater` -- Sends periodic heartbeat messages
+    * `scheduler` -- Can schedule events
+    
+    As is apparent from the above descriptions, a service is responsible for a number of threads 
+    when it executes:
+    * Listening -- grabs AMQP messages off the channel when they arrive
+    * Message-wait -- any incomplete multi-part Dripline message will setup a thread to wait 
+    *                 until the message is complete, and then submits it for handling
+    * Receiver -- grabs completed Dripline messages and handles it
+    * Async endpoint listening -- same as abovefor each asynchronous endpoint
+    * Async endpoint message-wait -- same as above for each asynchronous endpoint
+    * Async endpoint receiver -- same as above for each asynchronous endpoint
+    * Heatbeater -- sends regular heartbeat messages
+    * Scheduler -- executes scheduled events
+
+    In addition to receiving messages from the broker, a user or client code can give messages directly to the service 
+    using `process_message(message)`.)
     '''
 
-    def __init__(self, name, make_connection=True, enable_scheduling=False, 
+    def __init__(self, name, make_connection=True, endpoints=None, enable_scheduling=False, 
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
                  username=None, password=None, authentication_obj=None,
@@ -56,7 +92,7 @@ class Service(_Service):
             authentication_obj : scarab.Authentication, optional
                 Authentication information provided as a scarab.Authentication object; this will override the auth parameter.
             dripline_mesh : dict, optional
-                Provide optional dripline mesh configuration information
+                Provide optional dripline mesh configuration information (see dripline_config for more information)
         '''
 
         # Final dripline_mesh config should be the default updated by the parameters passed by the caller
@@ -91,6 +127,37 @@ class Service(_Service):
 
         #_Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
         super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+
+        # Endpoints
+        all_endpoints = []
+        for an_endpoint_conf in endpoints:
+            an_endpoint = self.create_object(an_endpoint_conf, 'Endpoint')
+            self.add_child( an_endpoint )
+            all_endpoints.append(an_endpoint)
+            if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
+                logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
+                an_endpoint.start_logging()
+
+    def run(self):
+        '''
+        Runs the service, which consists of three stages:
+        1. Starting the service -- sets up the connection with the broker
+        2. Listens for messages -- waits on the queue to receive messages, and then handles them
+        3. Stops the service -- breaks down everything that was setup in start()
+
+        Override this to customize when happens when a service runs.
+        '''
+        logger.info("Starting the service")
+        if not self.start():
+            raise RuntimeError("There was a problem starting the service")
+
+        logger.info("Service started, now to listen")
+        if not self.listen():
+            raise RuntimeError("there was a problem listening for messages")
+
+        logger.info("stopping the service")
+        if not self.stop():
+            raise RuntimeError("there was a problem stopping the service")
 
     def result_to_scarab_payload(self, result: str):
         """
