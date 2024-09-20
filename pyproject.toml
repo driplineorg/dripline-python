@@ -20,6 +20,7 @@ name = "dripline"
 dynamic = ["version"]
 dependencies = [
     'PyYAML',
+    'aiohttp',
     'asteval',
     'setuptools_scm',
     #these two for postgreSQL, move to plugin?

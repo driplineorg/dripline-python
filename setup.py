@@ -39,8 +39,8 @@ class CMakeBuild(build_ext):
                       '-DINSTALL_DLPYBIND_IN_SITELIB=TRUE',
                      ]
 
-        cfg = 'Debug' if self.debug else 'Release'
-        #cfg = 'DEBUG'
+        #cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'DEBUG'
         build_args = ['--config', cfg]
 
         if platform.system() == "Windows":
@@ -82,5 +82,5 @@ if __name__ == "__main__":
             '_dripline': 'module_bindings',
             '_dripline.core': 'module_bindings/dripline_core',
         },
-        scripts=["bin/dl-serve"],
+        scripts=["bin/dl-serve", "bin/dl-http-server"],
     )

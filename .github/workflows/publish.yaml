@@ -12,8 +12,8 @@ env:
   REGISTRY_OLD: docker.io
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  BASE_IMAGE_TAG: 'v2.9.1'
-  DEV_SUFFIX: '-dev'
+#  BASE_IMAGE_VER: 'v2.8.5'
+  BASE_IMAGE_VER: 'new-auth'
 
 jobs:
 

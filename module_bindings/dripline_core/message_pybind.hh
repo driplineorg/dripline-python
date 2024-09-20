@@ -82,7 +82,7 @@ namespace dripline_pybind
             .def( pybind11::init< >() )
 
             .def( "__str__", 
-                  [](const dripline::msg_reply& a_msg) {
+                  [](const dripline::msg_request& a_msg) {
                     std::ostringstream t_stream;
                     t_stream << a_msg;
                     return t_stream.str();
@@ -207,7 +207,7 @@ namespace dripline_pybind
             .def( pybind11::init< >() )
 
             .def( "__str__", 
-                  [](const dripline::msg_reply& a_msg) {
+                  [](const dripline::msg_alert& a_msg) {
                     std::ostringstream t_stream;
                     t_stream << a_msg;
                     return t_stream.str();
