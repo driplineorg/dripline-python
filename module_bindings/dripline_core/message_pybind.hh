@@ -8,6 +8,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/iostream.h"
+#include "pybind11/eval.h"
 
 #include "uuid.hh"
 
@@ -75,6 +76,10 @@ namespace dripline_pybind
         /************
          msg_request
          ************/
+
+        pybind11::module_ py_uuid = pybind11::module_::import("uuid");
+        using namespace pybind11::literals;
+
         all_items.push_back( "MsgRequest" );
         pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request >
                         >( mod, "MsgRequest", message, "dripline messages containing a request to be sent to an endpoint" )
@@ -93,12 +98,22 @@ namespace dripline_pybind
             // properties
             // mv_referrable
             //TODO even better if we could interface with python's UUID library instead of passing strings
-            .def_property( "lockout_key",
+            //py::object result = calc.attr("add")(1, 2);
+            /*.def_property( "lockout_key",
                            [](dripline::request_ptr_t a_req){ return boost::uuids::to_string(a_req->lockout_key()); },
                            [](dripline::request_ptr_t a_req, const std::string& a_lockout_key ){
                                 bool t_lockout_key_valid = true;
                                 a_req->lockout_key() = dripline::uuid_from_string( a_lockout_key, t_lockout_key_valid );
                                 a_req->set_lockout_key_valid( t_lockout_key_valid );
+                             }
+                         )*/
+            .def_property( "lockout_key",
+                           [py_uuid](dripline::request_ptr_t a_req){ return py_uuid.attr("UUID")("bytes"_a=a_req->lockout_key()); },
+                           [py_uuid](dripline::request_ptr_t a_req, void* a_lockout_key ){
+                                memcpy( &a_req->lockout_key(), a_lockout_key, 16 );
+                                //bool t_lockout_key_valid = true;
+                                //a_req->lockout_key() = dripline::uuid_from_string( a_lockout_key, t_lockout_key_valid );
+                                //a_req->set_lockout_key_valid( t_lockout_key_valid );
                              }
                          )
             // mv_accessible
