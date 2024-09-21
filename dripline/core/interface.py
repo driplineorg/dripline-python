@@ -124,7 +124,7 @@ class Interface(Core):
         '''
         payload = {'values':[value]}
         reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
-        result = self._receive_reply( reply_pkg, timeout )
+        result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
     def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, timeout: int | float=0) -> MsgReply:
