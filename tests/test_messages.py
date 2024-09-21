@@ -140,6 +140,7 @@ def test_alert_create_nondefault():
     assert(len(an_alert.correlation_id) == 36)
 
 def test_message_encode_full_message():
+    import json
     a_payload = scarab.ParamValue(99)
     messages = []
     messages.append(_dripline.core.MsgRequest.create(payload = a_payload))
@@ -149,7 +150,7 @@ def test_message_encode_full_message():
         a_full_message = messages[i].encode_full_message()
         assert(type(a_full_message) == str)
         assert(len(a_full_message) > 0)
-        assert(type(eval(a_full_message) == dict))
+        assert(type(json.loads(a_full_message) == dict))
 
 ## we don't bind this currently, so don't test it.
 #def test_message_derived_modify_message_param():
