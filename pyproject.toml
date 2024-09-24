@@ -21,6 +21,7 @@ dynamic = ["version"]
 dependencies = [
     'PyYAML',
     'aiohttp',
+    'uuid',
     'asteval',
     'setuptools_scm',
     #these two for postgreSQL, move to plugin?
