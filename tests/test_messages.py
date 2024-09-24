@@ -1,5 +1,7 @@
 import scarab, _dripline.core
 
+import uuid
+
 def test_request_create_default():
     a_request = _dripline.core.MsgRequest.create()
     assert(isinstance(a_request, _dripline.core.MsgRequest))
@@ -37,6 +39,16 @@ def test_request_create_nondefault():
     assert(a_request.reply_to == a_reply_to)
     assert(a_request.encoding.name == "json")
     assert(len(a_request.correlation_id) == 36)
+
+def test_lockout_key_roundtrip():
+    a_request = _dripline.core.MsgRequest.create()
+    nil_uuid = uuid.UUID('00000000-0000-0000-0000-000000000000')
+    assert(a_request.lockout_key == nil_uuid)  # test the default
+
+    random_uuid = uuid.uuid4()
+    a_request.lockout_key = random_uuid  # set the id
+    lk_rt = a_request.lockout_key  # get the id back
+    assert(lk_rt == random_uuid)  # test being able to set and then get the id
 
 def test_request_reply_default():
     a_request = _dripline.core.MsgRequest.create(reply_to = "a_receiver")
