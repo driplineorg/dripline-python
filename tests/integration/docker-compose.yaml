@@ -24,7 +24,7 @@ services:
     command: >
       bash -c "dl-http-server"
     configs:
-      - auths.json
+      - authentications.json
 
   postgres:
     image: postgres:16.0
