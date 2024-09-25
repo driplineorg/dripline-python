@@ -128,7 +128,7 @@ class Interface(Core):
         result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, timeout_s: int | float=0) -> MsgReply:
+    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
         '''
         Send a cmd request to an endpoint and return the reply message.
 
