@@ -22,9 +22,9 @@ services:
     volumes:
       - ../../html:/html
     command: >
-      bash -c "dl-http-server"
+      bash -c "dl-http-server -b rabbit-broker -u dripline --password-file /dl_pw.txt"
     configs:
-      - ./authentications.json
+      - dl_pw.txt
 
   postgres:
     image: postgres:16.0
