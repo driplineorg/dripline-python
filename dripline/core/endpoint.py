@@ -47,7 +47,7 @@ class Endpoint(_Endpoint):
                 an_attribute = getattr(self, a_specifier)
                 logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
                 the_node = scarab.ParamNode()
-                the_node["values"] = scarab.ParamArray()
+                the_node.add("values", scarab.ParamArray())
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
             except AttributeError as this_error:
