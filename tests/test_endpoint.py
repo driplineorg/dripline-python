@@ -11,7 +11,7 @@ def test_submit_request_message():
     a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "name", "a_receiver")
     a_reply = an_endpoint.submit_request_message(a_request)
     assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 310) # 0
+    assert(a_reply.return_code == 0)
     assert(a_reply.correlation_id == a_request.correlation_id)
     a_reply.payload.to_python()['values'] == [a_name]
 
@@ -21,7 +21,7 @@ def test_on_request_message():
     a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "name", "a_receiver")
     a_reply = an_endpoint.on_request_message(a_request)
     assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 310) # 0
+    assert(a_reply.return_code == 0) # 0
     assert(a_reply.correlation_id == a_request.correlation_id)
     a_reply.payload.to_python()['values'] == [a_name]
 
@@ -112,7 +112,7 @@ def test_do_set_request_valid_specifier():
         a_value = value1
     an_endpoint = EndpointWithMember("an_endpoint")
     the_node = scarab.ParamNode()
-    the_node("values", scarab.ParamArray())
+    the_node.add("values", scarab.ParamArray())
     the_node["values"].push_back(scarab.ParamValue(value2))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey", "a_value", "a_receiver")
     a_reply = an_endpoint.do_set_request(a_set_request)
@@ -142,7 +142,7 @@ def test_do_cmd_request_valid_specifier():
             return n1 + n2
     an_endpoint = AnotherEndpoint("an_endpoint")
     the_node = scarab.ParamNode()
-    the_node("values", scarab.ParamArray())
+    the_node.add("values", scarab.ParamArray())
     n1, n2 = 10, 13
     the_node["values"].push_back(scarab.ParamValue(n1))
     the_node["values"].push_back(scarab.ParamValue(n2))
