@@ -125,8 +125,8 @@ class Service(_Service, ObjectCreator):
             auth.add_groups(auth_spec)
             auth.process_spec()
 
-        #_Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
-        super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+        _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+        #super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
         # Endpoints
         all_endpoints = []
@@ -137,27 +137,6 @@ class Service(_Service, ObjectCreator):
             if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
                 logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
                 an_endpoint.start_logging()
-
-    def run(self):
-        '''
-        Runs the service, which consists of three stages:
-        1. Starting the service -- sets up the connection with the broker
-        2. Listens for messages -- waits on the queue to receive messages, and then handles them
-        3. Stops the service -- breaks down everything that was setup in start()
-
-        Override this to customize when happens when a service runs.
-        '''
-        logger.info("Starting the service")
-        if not self.start():
-            raise RuntimeError("There was a problem starting the service")
-
-        logger.info("Service started, now to listen")
-        if not self.listen():
-            raise RuntimeError("there was a problem listening for messages")
-
-        logger.info("stopping the service")
-        if not self.stop():
-            raise RuntimeError("there was a problem stopping the service")
 
     def result_to_scarab_payload(self, result: str):
         """

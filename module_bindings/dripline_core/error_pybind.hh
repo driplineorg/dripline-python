@@ -13,8 +13,8 @@ namespace dripline_pybind
 
         //TODO how do we actually want to deal with errors?
         all_items.push_back( "DriplineError" );
-        pybind11::register_exception< dripline::dripline_error >( mod, "DriplineError" );
-
+        pybind11::register_exception< dripline::dripline_error >( mod, "DriplineError", PyExc_RuntimeError );
+/*
         pybind11::register_exception_translator( [](std::exception_ptr p)
         {
             try
@@ -27,7 +27,7 @@ namespace dripline_pybind
                 pybind11::set_error( PyExc_Exception, e.what() );
             }
         }
-        );
+        );*/
         return all_items;
     }
 
