@@ -65,6 +65,6 @@ build*/
 
 # Virtual environment
 venv/
-
+.venv/
 # Pycharm
 .idea

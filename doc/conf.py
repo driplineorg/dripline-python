@@ -28,6 +28,8 @@ api_doc_cmd = ['sphinx-apidoc',
                '../dripline', ## path to source
                ## exclude these:
                '../dripline/extensions',
+               '../dripline/core',
+               
               ]
 subprocess.check_call(api_doc_cmd)
 sys.path.insert(0, os.path.abspath('.'))
