@@ -17,6 +17,17 @@ import sys
 import os
 import subprocess
 
+# Configuration for specifying the C++ binding generation with pybind11
+# cpp_path = os.path.abspath('../module_bindings')
+cpp_bindings_path = os.path.abspath('../module_bindings/dripline_core')
+
+# Generate API documentation for C++ bindings
+subprocess.call([
+    'pybind11-stubgen',
+    '-o', cpp_bindings_path,
+    'your_cpp_module'
+])
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -28,7 +39,7 @@ api_doc_cmd = ['sphinx-apidoc',
                '../dripline', ## path to source
                ## exclude these:
                '../dripline/extensions',
-               '../dripline/core',
+              #  '../dripline/core',
                
               ]
 subprocess.check_call(api_doc_cmd)
