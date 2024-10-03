@@ -26,7 +26,6 @@ api_doc_cmd = ['sphinx-apidoc',
                '-e', ## put modules each on their own page
                '-f', ## overwrite existing files
                '../dripline', ## path to source
-               '../module_bindings', ## path to source
                ## exclude these:
                '../dripline/extensions',
               #  '../dripline/core',

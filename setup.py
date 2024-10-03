@@ -33,11 +33,12 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
-                      '-DINSTALL_DLPYBIND_IN_SITELIB=TRUE',
-                     ]
+        cmake_args = [
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+            '-DPYTHON_EXECUTABLE=' + sys.executable,
+            '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
+            '-DINSTALL_DLPYBIND_IN_SITELIB=TRUE',
+        ]
 
         cfg = 'Debug' if self.debug else 'Release'
         #cfg = 'DEBUG'
@@ -57,27 +58,20 @@ class CMakeBuild(build_ext):
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        # We need to remove the cache file because pip makes new /tmp source directories each time
-        print('remove cache')
-        subprocess.check_call(['rm', '-f', 'CMakeCache.txt'], cwd=self.build_temp, env=env)
-        print("should make a cmake call:")
-        print(' '.join(['cmake', ext.sourcedir] + cmake_args), 'cwd={}'.format(self.build_temp), 'env={}'.format(env))
+
+        # Remove cache if necessary (optional)
+        cache_path = os.path.join(self.build_temp, 'CMakeCache.txt')
+        if os.path.isfile(cache_path):
+            os.remove(cache_path)
+
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        print("should make a build call:")
-        print(['cmake', '--build', '.'] + build_args, 'cwd={}'.format(self.build_temp))
-        #subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
-        subprocess.check_call(['make', 'install', 'VERBOSE=1'], cwd=self.build_temp)
+        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+
 
 if __name__ == "__main__":
-
     setup(
-        ext_modules=[CMakeExtension('dripline_python')],
+        ext_modules=[CMakeExtension('dripline_python', sourcedir='module_bindings')],
         cmdclass=dict(build_ext=CMakeBuild),
-        packages=["dripline", "_dripline"],
-        package_dir={
-            'dripline': 'dripline',
-            '_dripline': 'module_bindings',
-        },
+        packages=find_packages(exclude=("tests",)),
         scripts=["bin/dl-serve"],
     )
