@@ -26,6 +26,7 @@ dependencies = [
     'sqlalchemy',
     'psycopg2',
     'colorlog', #we could make this optional if we wnat to minimize dependencies
+    'pybind11-stubgen',
 ]
 
 [tool.setuptools_scm]
