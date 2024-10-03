@@ -1,5 +1,7 @@
+#include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
+// Include custom header files
 #include "constants_pybind.hh"
 #include "core_pybind.hh"
 #include "dripline_config_pybind.hh"
@@ -11,7 +13,7 @@
 #include "reply_cache_pybind.hh"
 #include "return_codes_pybind.hh"
 #include "scheduler_pybind.hh"
-//#include "run_simple_service_pybind.hh"
+// #include "run_simple_service_pybind.hh"
 #include "specifier_pybind.hh"
 #include "service_pybind.hh"
 #include "version_store_pybind.hh"
@@ -29,6 +31,8 @@ PYBIND11_MODULE(_dripline, dripline_mod) {
         .. autosummary::
            :toctree: _generate
 
+           Exported Functions and Classes
+
            core
     )pbdoc";
 
@@ -37,78 +41,102 @@ PYBIND11_MODULE(_dripline, dripline_mod) {
     // The bound classes belong in a submodule, create that
     py::module dripline_core_mod = dripline_mod.def_submodule("core", "Core dripline standard implementation classes");
 
-    // Call exporters for the dripline.core namespace with documentation
-    all_members.splice(all_members.end(), dripline_pybind::export_constants(dripline_core_mod));
-    all_members.splice(all_members.end(), dripline_pybind::export_core(dripline_core_mod));
+    // Example documentation for export functions in core
+    all_members.splice(all_members.end(), dripline_pybind::export_constants(dripline_core_mod, R"pbdoc(
+        Constants
+        ---------
+
+        Functions to export constants.
+    )pbdoc"));
+
+    all_members.splice(all_members.end(), dripline_pybind::export_core(dripline_core_mod, R"pbdoc(
+        Core
+        ----
+
+        Functions related to the core functionality of dripline.
+    )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_dripline_config(dripline_core_mod, R"pbdoc(
         Dripline Config
         ---------------
-        
-        Functionality related to the dripline configuration.
+
+        Functions to handle config functionalities in dripline.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_endpoint(dripline_core_mod, R"pbdoc(
         Endpoint
         --------
-        
-        Endpoint related functionalities.
+
+        Functions to handle endpoint-related functionalities.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_error(dripline_core_mod, R"pbdoc(
         Error Handling
         --------------
-        
-        Error handling mechanisms.
+
+        Functions for error handling.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_message(dripline_core_mod, R"pbdoc(
         Message Handling
         ----------------
-        
-        Handle different types of messages.
+
+        Functions to handle different message types.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_receiver(dripline_core_mod, R"pbdoc(
         Receiver
         --------
-        
-        Functionality for receiving messages.
+
+        Functions for receiving messages.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_return_codes(dripline_core_mod, R"pbdoc(
         Return Codes
         ------------
-        
-        Standardized return codes used in the module.
+
+        Functions to handle return codes.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_scheduler(dripline_core_mod, R"pbdoc(
         Scheduler
         ---------
-        
-        Scheduling tasks and handling execution.
+
+        Functions to manage scheduling tasks.
     )pbdoc"));
+
+    // Uncomment if applicable
     // all_members.splice(all_members.end(), dripline_pybind::export_run_simple_service(dripline_core_mod));
+
     all_members.splice(all_members.end(), dripline_pybind::export_specifier(dripline_core_mod, R"pbdoc(
-        Specifier
-        ---------
-        
-        Specification of various components.
+        Specifiers
+        ----------
+
+        Functions to handle specifiers in dripline.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_service(dripline_core_mod, R"pbdoc(
         Service
         -------
-        
-        Service related functionalities.
+
+        Functions to manage services.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_throw_reply(dripline_core_mod, R"pbdoc(
         Reply Handling
         --------------
-        
-        Handling replies to messages.
+
+        Functions for handling replies.
     )pbdoc"));
+
     all_members.splice(all_members.end(), dripline_pybind::export_version_store(dripline_core_mod, R"pbdoc(
         Version Store
         -------------
-        
-        Storing and managing versions.
+
+        Functions to manage version storage.
     )pbdoc"));
 
-    // Add __all__
+    // Add __all__ attribute
     dripline_core_mod.attr("__all__") = all_members;
 
 #ifdef VERSION_INFO
