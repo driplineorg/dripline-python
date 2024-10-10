@@ -42,8 +42,9 @@ class Serve(dripline.core.ObjectCreator):
         try:
             self._run(the_app)
         except:
-            logger.error("got an error...")
-            logger.error("traceback was:\n{}".format(traceback.format_exc()))
+            logger.error("Caught an exceptoin while running the service")
+            logger.error("Traceback was:\n{}".format(traceback.format_exc()))
+            logger.error("Exiting service")
             self.return_code = 100
 
     def _run(self, the_app):
