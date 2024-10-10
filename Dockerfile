@@ -16,10 +16,8 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get --fix-missing  -y install \
         libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-
-RUN pip install ipython pytest
+    rm -rf /var/lib/apt/lists/* && \
+    pip install ipython pytest
 
 COPY . /usr/local/src_py/
 
