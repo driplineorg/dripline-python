@@ -1,7 +1,7 @@
 ARG img_user=ghcr.io/driplineorg
 ARG img_repo=dripline-cpp
-#ARG img_tag=hotfix_2.6.2
-ARG img_tag=v2.8.5
+ARG img_tag=develop
+#ARG img_tag=v2.9.1
 #ARG img_arch=arm
 
 FROM ${img_user}/${img_repo}:${img_tag}
@@ -16,10 +16,8 @@ RUN apt-get update && \
     apt-get clean && \
     apt-get --fix-missing  -y install \
         libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-
-RUN pip install ipython pytest
+    rm -rf /var/lib/apt/lists/* && \
+    pip install ipython pytest
 
 COPY . /usr/local/src_py/
 

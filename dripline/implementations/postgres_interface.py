@@ -5,12 +5,9 @@ but should be relatively straight forward to generalize to support other SQL fla
 Note: services using this module will require sqlalchemy (and assuming we're still using postgresql, psycopg2 as the sqlalchemy backend)
 '''
 
-#from __future__ import absolute_import
 __all__ = []
 
 # std libraries
-import json
-import os
 import traceback
 
 # 3rd party libraries
@@ -19,9 +16,6 @@ try:
     import sqlalchemy
 except ImportError:
     pass
-from datetime import datetime
-from itertools import groupby
-import collections
 
 # local imports
 from dripline.core import Service, Endpoint, ThrowReply
@@ -44,9 +38,6 @@ class PostgreSQLInterface(Service):
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        ##service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
-        ##Service.__init__(self, **service_kwargs)
-        #Service.__init__(self, **kwargs)
         super(PostgreSQLInterface, self).__init__(**kwargs)
 
         if not self.auth.has('postgres'):

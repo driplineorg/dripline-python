@@ -63,7 +63,7 @@ namespace dripline_pybind
                   DL_BIND_CALL_GUARD_STREAMS
             )
             
-            .def( "run", &dripline::service::run, DL_BIND_CALL_GUARD_STREAMS )
+            .def( "run", &dripline::service::run, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS )
             .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "stop", &dripline::service::stop, DL_BIND_CALL_GUARD_STREAMS )

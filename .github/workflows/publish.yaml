@@ -13,9 +13,9 @@ env:
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
 #  BASE_IMAGE_TAG: 'v2.9.1'
-#  DEV_SUFFIX: '-dev'
-  BASE_IMAGE_TAG: 'new-auth'
-  DEV_SUFFIX: ''
+  DEV_SUFFIX: '-dev'
+  BASE_IMAGE_TAG: 'develop'
+#  DEV_SUFFIX: ''
 
 jobs:
 

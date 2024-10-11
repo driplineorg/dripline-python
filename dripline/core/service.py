@@ -126,17 +126,15 @@ class Service(_Service, ObjectCreator):
             auth.process_spec()
 
         _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
-        #super(Service, self).__init__(config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
         # Endpoints
-        all_endpoints = []
-        for an_endpoint_conf in endpoints:
-            an_endpoint = self.create_object(an_endpoint_conf, 'Endpoint')
-            self.add_child( an_endpoint )
-            all_endpoints.append(an_endpoint)
-            if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
-                logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
-                an_endpoint.start_logging()
+        if endpoints is not None:
+            for an_endpoint_conf in endpoints:
+                an_endpoint = self.create_object(an_endpoint_conf, 'Endpoint')
+                self.add_child( an_endpoint )
+                if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
+                    logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
+                    an_endpoint.start_logging()
 
     def result_to_scarab_payload(self, result: str):
         """
