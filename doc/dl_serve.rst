@@ -13,7 +13,7 @@ Use
 
   ``> dl-serve [options] [keyword arguments]``
 
-The user provides a configuration file.
+The user typically provides a configuration file with the ``-c`` (``--config``) option.
 
 Options
 -------
@@ -22,25 +22,75 @@ Options
 
   -h,--help                   Print this help message and exit
   -c,--config TEXT:FILE       Config file filename
-  --verbosity UINT            Global logger verosity
+  --config-encoding TEXT      Config file encoding
+  -v,--verbose                Increase verbosity
+  -q,--quiet                  Decrease verbosity
   -V,--version                Print the version message and exit
+  -u,--username TEXT          Specify the username for the rabbitmq broker
+  --password TEXT             Specify a password for the rabbitmq broker -- NOTE: this will be plain text on the command line and may end up in your command history!
+  --password-file TEXT        Specify a file (e.g. a secrets file) to be read in as the rabbitmq broker password
+  --auth-file TEXT            Set the authentication file path
   -b,--broker TEXT            Set the dripline broker address
   -p,--port UINT              Set the port for communication with the dripline broker
-  --auth-file TEXT            Set the authentication file path
   --requests-exchange TEXT    Set the name of the requests exchange
   --alerts-exchange TEXT      Set the name of the alerts exchange
   --max-payload UINT          Set the maximum payload size (in bytes)
-  --loop-timeout-msdripline.loop-timeout-ms UINT
-  --message-wait-msdripline.message-wait-ms UINT
   --heartbeat-routing-key TEXT
                               Set the first token of heartbeat routing keys: [token].[origin]
+  --max-connection-attempts UINT
+                              Maximum number of times to attempt to connect to the broker
+  --loop-timeout-msloop_timeout_ms UINT
+  --message-wait-msmessage_wait_ms UINT
   --heartbeat-interval-s UINT Set the interval between heartbeats in s
+
+
+Configuration
+=============
+
+For information applicable to all dripline application configurations, see :doc:`dripline-cpp:configuration`.
+
+The full configuration for a service, with default values, is:
+
+.. code-block:: YAML
+   dripline_mesh : 
+     alerts_exchange : alerts
+     broker : localhost
+     broker_port : 5672
+     heartbeat_routing_key : heartbeat
+     max_connection_attempts : 10
+     max_payload_size : 10000
+     requests_exchange : requests
+   
+   enable_scheduling : true
+   heartbeat_interval_s : 60
+   loop_timeout_ms : 1000
+   message_wait_ms : 1000
+
+   name : dlpy_service
+   module: <provide module>
+   module-path: <provide module path (optional)>
+
+   endpoints:
+     <first endpoint>:
+       name: <endpoint 1 name>
+       module: <endpoint 1 module>
+       module-path: <endpoint 1 module path (optional)>
+     <second endpoint>:
+       name: <endpoint 2 name>
+       module: <endpoint 2 module>
+       module-path: <endpoint 2 module path (optional)>
+     <...>
+
+Any paramters for which you want to use the default values can be left out of the configuration file and do not 
+need to be specified in other ways (e.g. with a command-line option).  The parameters in angle brackets (``<>``) 
+do not have default values because they'll be specific to the service and will need to be provided by the user.
+
 
 
 Authentication
 ==============
 
-Communication with the RabbitMQ broker requires the broker address and port, and user/password authentication.
+Communication with the RabbitMQ broker requires user/password authentication.
 
 .. TODO update the link to use "latest" symbolic link, or main/develop, when that is available
 
