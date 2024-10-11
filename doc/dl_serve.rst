@@ -51,7 +51,8 @@ For information applicable to all dripline application configurations, see :doc:
 
 The full configuration for a service, with default values, is:
 
-.. code-block:: YAML
+.. code-block:: yaml
+
     dripline_mesh : 
       alerts_exchange : alerts
       broker : localhost
@@ -89,12 +90,12 @@ When starting the service, ``module`` and ``module_path`` are used to create the
 the remaining configuration information is provided as keyword arguments to the service's ``__init__()`` function.
 
 .. note::
-   As a matter of convention, dripline-python classes all accept extra keyword arguments to their ``__init__`` functions, usting the ``**kwargs`` argument packing.
-   These are passed along when the class calls the ``__init__`` of its base class(es), allowing the complete set of keyword arguments to be provided.
+    As a matter of convention, dripline-python classes all accept extra keyword arguments to their ``__init__`` functions, usting the ``**kwargs`` argument packing.
+    These are passed along when the class calls the ``__init__`` of its base class(es), allowing the complete set of keyword arguments to be provided.
 
 .. note::
-   Whenever possible, dripline-python classes provide default values to keyword arguments so that derrived classes are able to be created given the above convention.
-   All required arguments of the class and its base classes must be passed to the ``__init__`` of any class (for example, ``Endpoint``, which is a base of all available classes, requires the ``name`` keyword argument, meaning that every instance node must have a name argument).
+    Whenever possible, dripline-python classes provide default values to keyword arguments so that derrived classes are able to be created given the above convention.
+    All required arguments of the class and its base classes must be passed to the ``__init__`` of any class (for example, ``Endpoint``, which is a base of all available classes, requires the ``name`` keyword argument, meaning that every instance node must have a name argument).
 
 For a complete example of configuring a service, please see the :doc:`controls-guide:guides/first-mesh`.
 
@@ -122,12 +123,14 @@ Configuration File
 
 For most uses of ``dl-serve``, most of the configuration information (other than the defaults) will be provided in a configuration file.  
 
-To maximize the ability to reuse configuration files in different meshes, we suggest that mesh configuration details be provided in a ``.dripline_mesh.yaml`` file, 
-and the service configuration file be specific to the particular service.
+.. tip::
+    To maximize the ability to reuse configuration files in different meshes, we suggest that mesh configuration details be provided in a :ref:`:ref: .dripline_mesh.yaml <dripline-cpp:default-mesh-yaml>`` file, 
+    and the service configuration file be specific to the particular service.
 
 Here is an example service configuration file:
 
-..code-block:: YAML
+.. code-block:: yaml
+  
     name: my_store
     module: Service
     endpoints:
