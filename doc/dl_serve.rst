@@ -130,7 +130,7 @@ For most uses of ``dl-serve``, most of the configuration information (other than
 Here is an example service configuration file:
 
 .. code-block:: yaml
-  
+
     name: my_store
     module: Service
     endpoints:
@@ -167,7 +167,4 @@ Authentication
 
 Communication with the RabbitMQ broker requires user/password authentication.
 
-.. TODO update the link to use "latest" symbolic link, or main/develop, when that is available
-
-See `Authentication in the dripline-cpp docs <https://driplineorg.github.io/dripline-cpp/branches/dl3_develop/authentication.html>`_ for information on how to specify the broker and authentication information.
-
+See :doc:`dripline-cpp:authentication` for information on how to specify the authentication information.

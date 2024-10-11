@@ -21,6 +21,11 @@ the components in a running service.
    API Documentation <apidoc/modules>
    contribute
 
+From the dripline-cpp docs you can find information on:
+
+* General :doc:`dripline application configuration <dripline-cpp:configuration>` details
+* :doc:`dripline-cpp:dl-agent` for sending messages from the CLI
+* :doc:`dripline-cpp:dl-mon` for monitoring messages on the mesh
 
 Indices and tables
 ==================
