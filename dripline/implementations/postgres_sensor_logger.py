@@ -28,8 +28,6 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
     def __init__(self, insertion_table_endpoint_name, **kwargs):
         '''
         '''
-        #PostgreSQLInterface.__init__(self, **kwargs)
-        #AlertConsumer.__init__(self, **kwargs)
         super(PostgresSensorLogger, self).__init__(**kwargs)
 
         self.insertion_table_endpoint_name = insertion_table_endpoint_name
