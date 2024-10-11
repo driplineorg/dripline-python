@@ -1,6 +1,5 @@
 name: my_store
 module: Service
-auth_file: /root/auths.json
 endpoints:
   - name: peaches
     module: KeyValueStore
@@ -19,10 +18,4 @@ endpoints:
     #log_on_set: True
     calibration: '1.*{}'
     initial_value: 4.00
-  - name: peaches_status
-    #log_on_set: True
-    module: KeyValueStore
-    initial_value: "CLOSE"
-    calibration:
-      CLOSE: "on"
-      OPEN: "off"
+

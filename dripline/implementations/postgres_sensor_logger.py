@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 import re
 
-import scarab
+from scarab import Authentication
 
 # internal imports
 from dripline.core import AlertConsumer
@@ -28,8 +28,7 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
     def __init__(self, insertion_table_endpoint_name, **kwargs):
         '''
         '''
-        PostgreSQLInterface.__init__(self, **kwargs)
-        AlertConsumer.__init__(self, **kwargs)
+        super(PostgresSensorLogger, self).__init__(**kwargs)
 
         self.insertion_table_endpoint_name = insertion_table_endpoint_name
 

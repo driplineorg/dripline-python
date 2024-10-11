@@ -13,8 +13,16 @@ namespace dripline_pybind
                  (void (*)(const std::string&, scarab::version_semantic_ptr_t)) &dripline::add_version,
                  pybind11::arg( "name" ),
                  pybind11::arg( "version" ),
-                 "add a scarab.SemanticVersion (version) to the dripline version_store singleton"
+                 "Add a scarab.SemanticVersion (version) to the dripline version_store singleton"
              );
+
+        all_members.push_back("get_version");
+        mod.def( "get_version",
+                 (scarab::version_semantic_ptr_t (*)(const std::string& )) &dripline::get_version,
+                 pybind11::arg( "name" ),
+                 "Get a scarab.SemanticVersion (version) from the dripline version_store singleton"
+             );
+             
         return all_members;
     }
 } /* namespace dripline_pybind */

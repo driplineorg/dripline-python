@@ -1,5 +1,7 @@
 import scarab, _dripline.core
 
+import uuid
+
 def test_request_create_default():
     a_request = _dripline.core.MsgRequest.create()
     assert(isinstance(a_request, _dripline.core.MsgRequest))
@@ -37,6 +39,16 @@ def test_request_create_nondefault():
     assert(a_request.reply_to == a_reply_to)
     assert(a_request.encoding.name == "json")
     assert(len(a_request.correlation_id) == 36)
+
+def test_lockout_key_roundtrip():
+    a_request = _dripline.core.MsgRequest.create()
+    nil_uuid = uuid.UUID('00000000-0000-0000-0000-000000000000')
+    assert(a_request.lockout_key == nil_uuid)  # test the default
+
+    random_uuid = uuid.uuid4()
+    a_request.lockout_key = random_uuid  # set the id
+    lk_rt = a_request.lockout_key  # get the id back
+    assert(lk_rt == random_uuid)  # test being able to set and then get the id
 
 def test_request_reply_default():
     a_request = _dripline.core.MsgRequest.create(reply_to = "a_receiver")
@@ -140,6 +152,7 @@ def test_alert_create_nondefault():
     assert(len(an_alert.correlation_id) == 36)
 
 def test_message_encode_full_message():
+    import json
     a_payload = scarab.ParamValue(99)
     messages = []
     messages.append(_dripline.core.MsgRequest.create(payload = a_payload))
@@ -149,7 +162,7 @@ def test_message_encode_full_message():
         a_full_message = messages[i].encode_full_message()
         assert(type(a_full_message) == str)
         assert(len(a_full_message) > 0)
-        assert(type(eval(a_full_message) == dict))
+        assert(type(json.loads(a_full_message) == dict))
 
 ## we don't bind this currently, so don't test it.
 #def test_message_derived_modify_message_param():

@@ -22,7 +22,7 @@ The integration tests are specified in `run-tests.sh`.  They're run using the [b
 
 You can run the tests directly with `docker compose`:
 
-    > IMG_TAG=[image tag] docker compose -f docker-compose.yaml -f docker-compose-test.yaml up
+    > DLPY_IMG_TAG=[image tag] DLCPP_IMG_TAG=[image tag] docker compose -f docker-compose.yaml -f docker-compose-test.yaml up
 
 Or you can use the convenience script, `do-testing.sh`:
 

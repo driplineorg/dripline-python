@@ -2,7 +2,7 @@ __all__ = []
 
 import scarab
 
-from dripline.core import op_t, Core, DriplineConfig, Receiver, MsgRequest, DriplineError
+from _dripline.core import op_t, create_dripline_auth_spec, Core, DriplineConfig, Receiver, MsgRequest, MsgReply, DriplineError
 
 import logging
 logger = logging.getLogger(__name__)
@@ -10,19 +10,62 @@ logger = logging.getLogger(__name__)
 __all__.append("Interface")
 class Interface(Core):
     '''
-    A class on top of dripline.core.Core with more user-friendly methods for dripline interactions.
+    A class that provides user-friendly methods for dripline interactions in a Python interpreter.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
-    def __init__(self, dripline_config={}, confirm_retcodes=True):
+    def __init__(self, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
         '''
-        dripline_config (dict): passed to dripline.core.Core to configure connection details
-        confirm_retcodes (bool): if True and if a reply is received with retcode!=0, raise an exception
+        Configures an interface with the necessary parameters.
+
+        Parameters
+        ----------
+            username : string or dict, optional
+                Provide a username for authenticating with the broker, either directly or by indicating how to get the username information.
+                Username can be provided directly as a string.  This will override all other username specifications (default, environment variable, etc).
+                Options for providing the username can be supplied as a dict.  If a dict is used, the possible elements, and their dripline defaults, are:
+                    - 'value': provide the username directly (same effect as if the string option were used).  This overrides the 'file', 'env', and 'default' options.
+                    - 'file': provide a file that contains only the username.  This overrides the 'env' and 'default' options.
+                    - 'env': provide an environment variable that contains the username -- the dripline default is 'DRIPLINE_USER'.  This overrides the 'default' value option.
+                    - 'default': set the default username -- dripline default is 'dripline'
+            password: string or dict, optional
+                Provide a password directly or indicate how to get the password information.
+                Password can be provided directly as a string, though this is not recommended since it will remain in your Python command history.  This will override all other password specifications (default, environment variable, etc).
+                Recommended methods for providing a password are as an environment variable or in a password file.
+                Options for providing the password can be supplied as a dict.  If a dict is used, the possible elements, and their dripline defaults, are:
+                    - 'value': provide the password directly (same effect as if the string option were used).  This overrides the 'file', 'env', and 'default' options.
+                    - 'file': provide a file that contains only the password.  This overrides the 'env' and 'default' options.
+                    - 'env': provide an environment variable that contains the password -- the dripline default is 'DRIPLINE_PASSWORD'.  This overrides the 'default' value option.
+                    - 'default': set the default password -- dripline default is 'dripline'
+            dripline_mesh : dict, optional
+                Provide optional dripline mesh configuration information (see dripline_config for more information)
+            timeout_s: int, optional
+                Time to wait for a reply, in seconds -- default is 10 s
+            confirm_retcodes: bool, optional  
+                If True, and if a reply is received with retcode != 0, raises an exception -- default is True          
         '''
-        default_config = DriplineConfig().to_python()
-        default_config.update(dripline_config)
-        Core.__init__(self, config=scarab.to_param(default_config))
+
+        dripline_config = DriplineConfig().to_python()
+        if dripline_mesh is not None:
+            dripline_config.update(dripline_mesh)
+
+        dl_auth_spec = create_dripline_auth_spec()
+        auth_args = {
+            'username': {} if username is None else username,
+            'password': {} if password is None else password,
+        }
+        dl_auth_spec.merge( scarab.to_param(auth_args) )
+        auth_spec = scarab.ParamNode()
+        auth_spec.add('dripline', dl_auth_spec)
+        logger.debug(f'Loading auth spec:\n{auth_spec}')
+        auth = scarab.Authentication()
+        auth.add_groups(auth_spec)
+        auth.process_spec()
+
         self._confirm_retcode = confirm_retcodes
+        self.timeout_s = timeout_s
         self._receiver = Receiver()
+
+        Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
 
     def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=False):
         '''
@@ -35,50 +78,75 @@ class Interface(Core):
             raise DriplineError('unable to send request')
         return receive_reply
 
-    def _receive_reply(self, reply_pkg, timeout):
+    def _receive_reply(self, reply_pkg, timeout_s):
         '''
         internal helper method to standardize receiving reply messages
         '''
         sig_handler = scarab.SignalHandler()
         sig_handler.add_cancelable(self._receiver)
-        result = self._receiver.wait_for_reply(reply_pkg, timeout)
+        result = self._receiver.wait_for_reply(reply_pkg, timeout_s * 1000) # receiver expects ms
         sig_handler.remove_cancelable(self._receiver)
         return result
 
-    def get(self, endpoint, specifier=None, timeout=0):
+    def get(self, endpoint: str, specifier: str=None, timeout_s: int=0) -> MsgReply:
         '''
-        [kw]args:
-        endpoint (string): routing key to which an OP_GET will be sent
-        specifier (string|None): specifier to add to the message
-        timeout (int|0): timeout in ms
+        Send a get request to an endpoint and return the reply message.
+
+        Parameters
+        ----------
+            endpoint: str
+                Routing key to which the request should be sent.
+            specifier: str, optional
+                Specifier to add to the request, if needed.
+            timeout_s: int | float, optional
+                Maximum time to wait for a reply in seconds (default is 0)
+                A timeout of 0 seconds means no timeout will be used.
         '''
         reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier )
-        result = self._receive_reply( reply_pkg, timeout )
+        result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def set(self, endpoint, value, specifier=None, timeout=0):
+    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, timeout_s: int | float=0) -> MsgReply:
         '''
-        [kw]args:
-        endpoint (string): routing key to which an OP_GET will be sent
-        value : value to assign
-        specifier (string|None): specifier to add to the message
-        timeout (int|0): timeout in ms
+        Send a set request to an endpoint and return the reply message.
+
+        Parameters
+        ----------
+            endpoint: str
+                Routing key to which the request should be sent.
+            value: str | int | float | bool
+                Value to assign in the set operation
+            specifier: str, optional
+                Specifier to add to the request, if needed.
+            timeout_s: int | float, optional
+                Maximum time to wait for a reply in seconds (default is 0)
+                A timeout of 0 seconds means no timeout will be used.
         '''
         payload = {'values':[value]}
         reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
-        result = self._receive_reply( reply_pkg, timeout )
+        result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def cmd(self, endpoint, method, ordered_args=[], keyed_args={}, timeout=0):
+    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, timeout: int | float=0) -> MsgReply:
         '''
-        [kw]args:
-        endpoint (string): routing key to which an OP_GET will be sent
-        method (string): specifier to add to the message, naming the method to execute
-        arguments (dict): dictionary of arguments to the specified method
-        timeout (int|0): timeout in ms
+        Send a cmd request to an endpoint and return the reply message.
+
+        Parameters
+        ----------
+            endpoint: str
+                Routing key to which the request should be sent.
+            ordered_args: array, optional
+                Array of values to assign under 'values' in the payload, if any
+            keyed_args: dict, optional
+                Keyword arguments to assign to the payload, if any
+            specifier: str
+                Specifier to add to the request.  For a dripline-python endpoint, this will be the method executed.
+            timeout_s: int | float, optional
+                Maximum time to wait for a reply in seconds (default is 0)
+                A timeout of 0 seconds means no timeout will be used.
         '''
-        payload = {'values': ordered_args}
-        payload.update(keyed_args)
-        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=method, payload=payload )
+        payload = {'values': [] if ordered_args is None else ordered_args}
+        payload.update({} if keyed_args is None else keyed_args)
+        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=specifier, payload=payload )
         result = self._receive_reply( reply_pkg, timeout )
         return result

@@ -5,12 +5,9 @@ but should be relatively straight forward to generalize to support other SQL fla
 Note: services using this module will require sqlalchemy (and assuming we're still using postgresql, psycopg2 as the sqlalchemy backend)
 '''
 
-#from __future__ import absolute_import
 __all__ = []
 
 # std libraries
-import json
-import os
 import traceback
 
 # 3rd party libraries
@@ -19,9 +16,6 @@ try:
     import sqlalchemy
 except ImportError:
     pass
-from datetime import datetime
-from itertools import groupby
-import collections
 
 # local imports
 from dripline.core import Service, Endpoint, ThrowReply
@@ -36,32 +30,25 @@ class PostgreSQLInterface(Service):
     '''
     '''
 
-    def __init__(self, database_name, database_server, auths_file=None, **kwargs):
+    def __init__(self, database_name, database_server, **kwargs):
         '''
         Args:
             database_name (str): name of the 'database' to connect to within the database server
             database_server (str): network resolvable hostname of database server
-            auths_file (str): expandable path to an authentications file **Note**, this option is considered temporary and like to be removed in a future version
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
-        Service.__init__(self, **service_kwargs)
-        if auths_file is not None:
-            logger.warning("you have passed an auths file directly to 'PostgreSQLInterface.__init-_', this capability is considered temporary")
-            self._auths_file = auths_file
-        else:
-            logger.warning("auths file is currently required... until the future when we remove it from even being an option")
+        super(PostgreSQLInterface, self).__init__(**kwargs)
 
-        self._connect_to_db(database_server, database_name)
+        if not self.auth.has('postgres'):
+            raise RuntimeError('Authentication is missing "postgres" login details')
+        self._connect_to_db(database_server, database_name, self.auth)
 
-    def _connect_to_db(self, database_server, database_name):
+    def _connect_to_db(self, database_server, database_name, auth):
         '''
         '''
         logger.debug('Connecting to the db')
-        #TODO: this is a massive hack; as soon as scarab supports environment variable substitutions, this should be refactored
-        credentials = json.loads(open(os.path.expandvars(os.path.expanduser(self._auths_file))).read())['postgresql']
-        engine_str = f'postgresql://{credentials["username"]}:{credentials["password"]}@{database_server}/{database_name}'
+        engine_str = f'postgresql://{auth.get('postgres', 'username')}:{auth.get('postgres', 'password')}@{database_server}/{database_name}'
         self.engine = sqlalchemy.create_engine(engine_str)
         self.meta = sqlalchemy.MetaData()
 

@@ -1,16 +1,32 @@
-version: '3'
-
 services:
-  test:
-    image: ghcr.io/driplineorg/dripline-python:${IMG_TAG:-latest-dev}
+
+  test-basic:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
       - rabbit-broker
       - simple-service
-      - key-value-store
     volumes:
-      - ./run-tests.sh:/root/run-tests.sh
+      - ./run-tests-basic.bats:/root/run-tests-basic.bats
     command: >
       bash -c "sleep 1 &&
-              /root/run-tests.sh"
+              /root/run-tests-basic.bats &&
+              /bin/true"
     configs:
-      - auths.json
+      - dl_pw.txt
+
+  test-core:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      - rabbit-broker
+#      - key-value-store
+#      - base-service
+      - alert-consumer
+    volumes:
+      - ./run-tests-core.bats:/root/run-tests-core.bats
+    command: >
+      bash -c "sleep 1 &&
+              /root/run-tests-core.bats &&
+              /bin/true"
+    configs:
+      - dl_pw.txt
+

@@ -39,8 +39,8 @@ class CMakeBuild(build_ext):
                       '-DINSTALL_DLPYBIND_IN_SITELIB=TRUE',
                      ]
 
-        cfg = 'Debug' if self.debug else 'Release'
-        #cfg = 'DEBUG'
+        #cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'DEBUG'
         build_args = ['--config', cfg]
 
         if platform.system() == "Windows":
@@ -74,10 +74,13 @@ if __name__ == "__main__":
     setup(
         ext_modules=[CMakeExtension('dripline_python')],
         cmdclass=dict(build_ext=CMakeBuild),
-        packages=["dripline", "_dripline"],
+        packages=['dripline',  'dripline.core', 'dripline.extensions', 'dripline.implementations', 
+                  '_dripline', '_dripline.core',
+        ],
         package_dir={
             'dripline': 'dripline',
             '_dripline': 'module_bindings',
+            '_dripline.core': 'module_bindings/dripline_core',
         },
         scripts=["bin/dl-serve"],
     )
