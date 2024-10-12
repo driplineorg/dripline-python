@@ -180,8 +180,6 @@ jobs:
       - name: Build and push
         id: build_push
         uses: docker/build-push-action@v5
-        env:
-          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.tag-suffix }}
         with:
           context: .
           push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
@@ -190,14 +188,12 @@ jobs:
             img_repo=${{ env.BASE_IMAGE_REPO }}
             img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           tags: ${{ steps.docker_meta.outputs.tags }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Build and push - integration
         id: build_push_integration
         if: ${{ matrix.do-integration }}
         uses: docker/build-push-action@v5
-        env:
-          BASE_IMAGE_TAG: ${{ env.BASE_IMAGE_VER }}${{ matrix.int-tag-suffix }}
         with:
           context: ./tests/integration
           push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
@@ -206,7 +202,7 @@ jobs:
             img_repo=dripline-python
             img_tag=latest-dev
           tags: ${{ steps.docker_meta_integration.outputs.tags }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Release
         uses: softprops/action-gh-release@v2
