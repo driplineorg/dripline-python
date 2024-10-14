@@ -106,6 +106,7 @@ intersphinx_mapping = {
     "dripline": ("https://dripline.readthedocs.io/en/latest/", None),
     "dripline-cpp": ("https://dripline-cpp.readthedocs.io/en/latest/", None),
     "controls-guide": ("https://controls-guide.readthedocs.io/en/latest/", None),
+    "dl-home": ("https://driplineorggithubio.readthedocs.io/en/latest/", None),
 }
 
 # We recommend adding the following config value.

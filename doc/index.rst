@@ -21,11 +21,14 @@ the components in a running service.
    API Documentation <apidoc/modules>
    contribute
 
-From the dripline-cpp docs you can find information on:
+.. toctree::
+   :caption: Links:
 
-* General :doc:`dripline application configuration <dripline-cpp:configuration>` details
-* :doc:`dripline-cpp:dl_agent` for sending messages from the CLI
-* :doc:`dripline-cpp:dl_mon` for monitoring messages on the mesh
+   :doc:`Dripline Home <dl-home:index>`
+   :doc:`Protocol <dripline:index>`
+   :doc:`Guides and Walkthroughs <controls-guide:index>`
+   :doc:`C++ Implementation <dripline-cpp:index>`
+   Python Implementation <index>
 
 Indices and tables
 ==================
