@@ -159,18 +159,13 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'piccolo_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-  'fixed_sidebar': True,
-  'sidebar_collapse': True,
-  'github_user': 'driplineorg',
-  'github_repo': 'dripline-python',
-  'badge_branch': 'dl3/develop',
-  'github_button': True,
+  'source_url': 'https://github.com/driplineorg/dripline-python',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
