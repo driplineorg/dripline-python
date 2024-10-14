@@ -1,2 +1,2 @@
 # Webpage theme
-piccolo-theme
+furo
