@@ -78,8 +78,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Dripline-Python'
-copyright = '2020, The Dripline-Python Authors'
+project = 'dripline-python'
+copyright = '2024, The dripline-python Authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
