@@ -166,7 +166,8 @@ html_theme = 'furo'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-  'source_url': 'https://github.com/driplineorg/dripline-python',
+  'source_repository': 'https://github.com/driplineorg/dripline-python',
+  'navigation_with_keys': True,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
