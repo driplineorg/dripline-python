@@ -12,6 +12,9 @@ devices, resources, and behaviors; and ``extensions``, for enabling plugins via 
 There is also a commandline tool, ``dl-serve``, which enables ``YAML``-based configurations to define
 the components in a running service.
 
+Table of contents
+=================
+
 .. toctree::
    :maxdepth: 2
 
@@ -24,11 +27,11 @@ the components in a running service.
 .. toctree::
    :caption: Links:
 
-   :doc:`Dripline Home <dl-home:index>`
-   :doc:`Protocol <dripline:index>`
-   :doc:`Guides and Walkthroughs <controls-guide:index>`
-   :doc:`C++ Implementation <dripline-cpp:index>`
-   Python Implementation <index>
+   Documentation Home <https://driplineorggithubio.readthedocs.io/>
+   Guides and Walkthroughs <https://controls-guide.readthedocs.io/>
+   Protocol <https://dripline.readthedocs.io/>
+   C++ Implementation <https://dripline-cpp.readthedocs.io/>
+   Python Implementation <https://dripline-python.readthedocs.io/>
 
 Indices and tables
 ==================
