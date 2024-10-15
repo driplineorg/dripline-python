@@ -167,6 +167,8 @@ html_theme = 'furo'
 # documentation.
 html_theme_options = {
   'source_repository': 'https://github.com/driplineorg/dripline-python',
+  'source_branch': 'main',
+  'source_directory': 'doc/',
   'navigation_with_keys': True,
 }
 
