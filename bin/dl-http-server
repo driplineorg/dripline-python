@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import scarab
+import dripline
+
+import logging
+logger = logging.getLogger('dripline')
+logger.setLevel(logging.DEBUG)
+
+def setup_logging():
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.WARNING)
+    logger.addHandler(handler)
+    time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+    base_format = '%(asctime)s{}[%(levelname)-8s] %(name)s(%(lineno)d) -> {}%(message)s'
+    _logging_format = None
+    try:
+        import colorlog
+        modified_format = base_format.format('%(log_color)s', '%(purple)s')
+        _logging_format = colorlog.ColoredFormatter(modified_format, datefmt=time_format[:-4])
+    except ImportError:
+        modified_format = base_format.format(' ', '')
+        _logging_format = logging.Formatter(modified_format, time_format[:-4])
+    handler.setFormatter(_logging_format)
+    return handler
+
+def run_server(the_app):
+    log_handler = setup_logging()
+
+    this_config_param = the_app.primary_config
+    this_auth = the_app.auth
+
+    verbosity = the_app.global_verbosity
+    #print(f"verbosity is {verbosity}")
+    log_handler.setLevel(verbosity)
+
+    logger.debug(f'dl-http-server got this primary config:\n{this_config_param}')
+
+    # Convert config to a dict
+    this_config = this_config_param.to_python()
+
+    server = dripline.implementations.HTTPServer(**this_config)
+    server.http_listen()
+
+if __name__ == '__main__':
+
+    # App object
+    the_main = scarab.MainApp()
+
+    # Default configuration for a Dripline command
+    the_main.default_config = dripline.core.DriplineConfig()
+    # We want scheduling to be on
+    the_main.default_config.add('http_host', scarab.ParamValue('0.0.0.0'))
+    the_main.default_config.add('http_port', scarab.ParamValue(8080))
+    the_main.default_config.add('web_root', scarab.ParamValue('/html'))
+
+    # Add the default dripline authentication specification and CL options
+    dripline.core.add_dripline_auth_spec(the_main)
+    dripline.core.add_dripline_options(the_main)
+
+    # Package version information
+    the_main.set_version(dripline.core.get_version( "dripline-python" ))
+
+    # Callback function that will run everything
+    the_main.set_callback(lambda : run_server(the_main))
+
+    # Execute the callback (done via CLI11_PARSE)
+    import sys
+    the_main.execute(sys.argv)

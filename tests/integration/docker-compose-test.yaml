@@ -29,4 +29,3 @@ services:
               /bin/true"
     configs:
       - dl_pw.txt
-

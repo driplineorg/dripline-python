@@ -67,12 +67,13 @@ class Interface(Core):
 
         Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
 
-    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=False):
+    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=None):
         '''
         internal helper method to standardize sending request messages
         '''
         a_specifier = specifier if specifier is not None else ""
         a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
+        a_request.lockout_key = lockout_key if lockout_key is not None else ""
         receive_reply = self.send(a_request)
         if not receive_reply.successful_send:
             raise DriplineError('unable to send request')
@@ -88,7 +89,7 @@ class Interface(Core):
         sig_handler.remove_cancelable(self._receiver)
         return result
 
-    def get(self, endpoint: str, specifier: str=None, timeout_s: int=0) -> MsgReply:
+    def get(self, endpoint: str, specifier: str=None, lockout_key=None, timeout_s: int=0) -> MsgReply:
         '''
         Send a get request to an endpoint and return the reply message.
 
@@ -102,11 +103,11 @@ class Interface(Core):
                 Maximum time to wait for a reply in seconds (default is 0)
                 A timeout of 0 seconds means no timeout will be used.
         '''
-        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier )
+        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, timeout_s: int | float=0) -> MsgReply:
+    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
         '''
         Send a set request to an endpoint and return the reply message.
 
@@ -123,11 +124,11 @@ class Interface(Core):
                 A timeout of 0 seconds means no timeout will be used.
         '''
         payload = {'values':[value]}
-        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload )
+        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
         result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, timeout: int | float=0) -> MsgReply:
+    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
         '''
         Send a cmd request to an endpoint and return the reply message.
 
@@ -147,6 +148,6 @@ class Interface(Core):
         '''
         payload = {'values': [] if ordered_args is None else ordered_args}
         payload.update({} if keyed_args is None else keyed_args)
-        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=specifier, payload=payload )
-        result = self._receive_reply( reply_pkg, timeout )
+        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=specifier, lockout_key=lockout_key, payload=payload )
+        result = self._receive_reply( reply_pkg, timeout_s )
         return result

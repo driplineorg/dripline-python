@@ -11,6 +11,21 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -u dripline:dripline http://rabbit-broker:15672/api/overview &> /dev/null || exit 1"]
 
+  http-server:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    # build: . use if developing/testing locally
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../../html:/html
+    command: >
+      bash -c "dl-http-server -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+    configs:
+      - dl_pw.txt
+
   postgres:
     image: postgres:16.0
     volumes:

@@ -82,5 +82,5 @@ if __name__ == "__main__":
             '_dripline': 'module_bindings',
             '_dripline.core': 'module_bindings/dripline_core',
         },
-        scripts=["bin/dl-serve"],
+        scripts=["bin/dl-serve", "bin/dl-http-server"],
     )
