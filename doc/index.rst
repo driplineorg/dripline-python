@@ -27,7 +27,7 @@ Table of contents
 .. toctree::
    :caption: Links:
 
-   Documentation Home <https://driplineorggithubio.readthedocs.io/>
+   Dripline Docs <https://driplineorggithubio.readthedocs.io/>
    Guides and Walkthroughs <https://controls-guide.readthedocs.io/>
    Protocol <https://dripline.readthedocs.io/>
    C++ Implementation <https://dripline-cpp.readthedocs.io/>
