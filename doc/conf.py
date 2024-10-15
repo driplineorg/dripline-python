@@ -91,13 +91,13 @@ copyright = '2024, The dripline-python Authors'
 try:
     import dripline, subprocess
     version = dripline.__version__#pkg_resources.require("dripline")[0].version
-# The full version, including alpha/beta/rc tags.
+    # The full version, including alpha/beta/rc tags.
     release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
 except Exception as e:
-    print("failure importing dripline")
+    print("failure importing dripline to get version")
     #print("error message is:\n{}".format(e.message))
-    version = "unknown"
-    release = "unknown"
+    version = "v?.?.?"
+    release = "release v?.?.?"
 print('version/release are: {}/{}'.format(version,release))
 
 # Intersphinx details
