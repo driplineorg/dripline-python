@@ -55,7 +55,6 @@ if __name__ == '__main__':
     the_main.default_config.add('web_root', scarab.ParamValue('/html'))
 
     # Add the default dripline authentication specification and CL options
-    dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
 
     # Package version information

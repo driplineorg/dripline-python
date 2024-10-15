@@ -88,7 +88,6 @@ if __name__ == '__main__':
     the_main.default_config.add('enable_scheduling', scarab.ParamValue(True))
 
     # Add the default dripline authentication specification and CL options
-    dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
     dripline.core.add_service_options(the_main)
 
