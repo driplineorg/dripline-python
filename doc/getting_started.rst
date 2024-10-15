@@ -34,16 +34,16 @@ which is inside the build directory), you will need to know the location of the 
 for the dripline-python build below (usually ``[prefix]/lib/cmake/Dripline``).  As an alternative, you could 
 make a system-wide install at ``/usr/local``.
 
-Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.5, 
-Boost 1.46, rapidjson 1.0, yaml-cpp, and rabbitmq-c.  
-Everything should be available from standard package managers.
+Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.12, 
+Boost 1.46, rapidjson 1.0, yaml-cpp, rabbitmq-c, and quill.  
+Everything should be available from standard package managers, except Quill, which is not in apt (for Ubuntu/Debian).
 
 The Python wrapping of C++ code is done with `Pybind11 <https://pybind11.readthedocs.io/>`_.  
 Version 2.6.0 or higher is required.  
 It can be installed from most package managers or by following their instructions. 
 
 You will need `CMake <https://cmake.org/>`_ to build the C++ wrappers.  
-Version 3.5 or higher is required.  
+Version 3.12 or higher is required.  
 It can be installed from most package managers or by following their instructions.
 Note that this is not included as a dependency in the Python installation process.  
 See ``pyproject.toml`` for more details.
