@@ -85,20 +85,15 @@ copyright = '2024, The dripline-python Authors'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-#version = #'0.0.1'
-#import pkg_resources
+this_version = 'v?.?.?'
 try:
-    import dripline, subprocess
-    version = dripline.__version__#pkg_resources.require("dripline")[0].version
-    # The full version, including alpha/beta/rc tags.
-    release = subprocess.check_output(['git', 'describe', '--long']).decode('utf-8').strip()
-except Exception as e:
-    print("failure importing dripline to get version")
-    #print("error message is:\n{}".format(e.message))
-    version = "v?.?.?"
-    release = "release v?.?.?"
-print('version/release are: {}/{}'.format(version,release))
+    #this_version = check_output(['git', 'describe', '--abbrev=0', '--tags']).decode('utf-8').strip()
+    this_version = subprocess.check_output(['git', 'describe', '--tags']).decode('utf-8').strip()
+except:
+    pass
+version = this_version
+release = this_version
+
 
 # Intersphinx details
 intersphinx_mapping = {
