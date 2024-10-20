@@ -38,11 +38,13 @@ class PostgreSQLInterface(Service):
         '''
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        super(PostgreSQLInterface, self).__init__(**kwargs)
 
         if not self.auth.has('postgres'):
             raise RuntimeError('Authentication is missing "postgres" login details')
         self._connect_to_db(database_server, database_name, self.auth)
+
+        super(PostgreSQLInterface, self).__init__(**kwargs)
+
 
     def _connect_to_db(self, database_server, database_name, auth):
         '''
