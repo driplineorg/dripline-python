@@ -21,10 +21,12 @@ services:
       - "8080:8080"
     volumes:
       - ../../html:/html
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
     command: >
-      bash -c "dl-http-server -b rabbit-broker -u dripline --password-file /dl_pw.txt"
-    configs:
-      - dl_pw.txt
+      bash -c "dl-http-server"
 
   postgres:
     image: postgres:16.0
