@@ -167,4 +167,4 @@ Authentication
 
 Communication with the RabbitMQ broker requires user/password authentication.
 
-See :doc:`dripline-cpp:authentication` for information on how to specify the authentication information.
+See :ref:`dripline-cpp:authentication` for information on how to specify the authentication information.
