@@ -33,11 +33,12 @@ services:
         condition: service_healthy
     volumes:
       - ./services/key-value-store.yaml:/root/key-value-store.yaml
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
     environment:
       - DRIPLINE_USER=dripline
       - DRIPLINE_PASSWORD=dripline
     command: >
-      bash -c "dl-serve -vv -b rabbit-broker -c /root/key-value-store.yaml"
+      bash -c "dl-serve -vv -c /root/key-value-store.yaml"
     configs:
       - dl_pw.txt
 
