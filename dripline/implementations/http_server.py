@@ -34,7 +34,7 @@ class HTTPServer(Interface):
             web_root (str): Path to the root directory for static web pages.
             **kwargs: Additional arguments passed to the Interface.
         '''
-        super().__init__(**kwargs)
+        Interface.__init__(self, **kwargs)
 
         self.http_host = '127.0.0.1' if http_host == 'localhost' else http_host
         self.http_port = http_port

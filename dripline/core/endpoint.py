@@ -38,7 +38,7 @@ class Endpoint(_Endpoint):
                              f"{self.name} unable to convert result to scarab payload: {result}")
 
     def do_get_request(self, a_request_message):
-        logger.info("in get_request")
+        logger.info("in do_get_request")
         a_specifier = a_request_message.specifier.to_string()
         if (a_specifier):
             logger.debug("has specifier")

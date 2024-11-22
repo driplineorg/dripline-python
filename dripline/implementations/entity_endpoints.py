@@ -37,11 +37,11 @@ class SimpleSCPIEntity(Entity):
         Args:
             base_str (str): string used to generate SCPI commands; get will be of the form "base_str?"; set will be of the form "base_str <value>;base_str?"
         '''
+        Entity.__init__(self, **kwargs)
         if base_str is None:
             raise ValueError('<base_str> is required to __init__ SimpleSCPIEntity instance')
         else:
             self.cmd_base = base_str
-        Entity.__init__(self, **kwargs)
 
     @calibrate()
     def on_get(self):

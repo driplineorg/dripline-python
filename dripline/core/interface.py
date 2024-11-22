@@ -61,11 +61,12 @@ class Interface(Core):
         auth.add_groups(auth_spec)
         auth.process_spec()
 
+        Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
+
         self._confirm_retcode = confirm_retcodes
         self.timeout_s = timeout_s
         self._receiver = Receiver()
 
-        Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
 
     def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=None):
         '''

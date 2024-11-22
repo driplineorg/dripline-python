@@ -7,6 +7,10 @@ services:
       - simple-service
     volumes:
       - ./run-tests-basic.bats:/root/run-tests-basic.bats
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
     command: >
       bash -c "sleep 1 &&
               /root/run-tests-basic.bats &&
@@ -23,6 +27,10 @@ services:
       - alert-consumer
     volumes:
       - ./run-tests-core.bats:/root/run-tests-core.bats
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
     command: >
       bash -c "sleep 1 &&
               /root/run-tests-core.bats &&
