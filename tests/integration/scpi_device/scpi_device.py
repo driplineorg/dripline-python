@@ -39,7 +39,7 @@ class SCPICommand:
         A set query will return (True, None)
         """
         query_tokens = query.split()
-        if not self.compare(query_tokens[0]):
+        if len(query_tokens) == 0 or not self.compare(query_tokens[0]):
             return False, None
         
         if query_tokens[0][-1] == '?':
@@ -48,7 +48,7 @@ class SCPICommand:
         if self.read_only:
             raise RuntimeError(f'Command {self.command} is read-only')
         
-        return self.set(query_tokens)
+        return self.set(query)
 
     def compare(self, command):
         command = command.lstrip('*').rstrip('?').casefold()
@@ -57,8 +57,12 @@ class SCPICommand:
     def get(self):
         return True, self.value
     
-    def set(self, command_tokens):
-        self.value = command_tokens[1:]
+    def set(self, query):
+        print(repr(query))
+        if len(query.split()) == 1:
+            raise RuntimeError(f'Empty set received for {self.command}')
+
+        self.value = query.lstrip('*').lstrip(self.command).strip()
         return True, None
 
 class ASCPIDevice:
@@ -99,16 +103,24 @@ class ASCPIDevice:
                 print(f"Listening for connections on {self.host}:{self.port}")
                 self.socket.listen(1)
                 try:
-                    self.connection, addr = self.socket.accept()
-                except:
+                    self.handle_connection()
+                except Exception as e:
+                    print(f"Error: {e}")
                     break
-                print(f'Connected to client from {addr}')
-                self.receive_data()
 
     def disconnect(self):
         if self.socket:
             self.socket.close()
         print("Disconnected")
+
+    def handle_connection(self):
+        self.connection, addr = self.socket.accept()
+        print(f'Connected to client from {addr}')
+        try:
+            while True:
+                self.receive_data()
+        except Exception as e:
+            print(f"Error: {e}")
 
     def handle_query(self, query):
         """
@@ -127,16 +139,17 @@ class ASCPIDevice:
     def receive_data(self):
         data = ''
         while True:
-            try:
-                print('Receiving data')
-                data += self.connection.recv(1024).decode('utf-8')
-                if data.endswith(self.ending):
-                    break
-                print('Adding data')
-                print(f'So far: {repr(data)}')
-            except Exception as e:
-                print(f"Error: {e}")
+            print('In receive data loop')
+            buf = self.connection.recv(1024).decode('utf-8')
+            if len(buf) == 0:
+                print('Empty buffer received, flushing incomplete buffer:')
+                print(repr(data))
+                raise RuntimeError('Forcing connection reset.')
+            data += buf
+            if data.endswith(self.ending):
                 break
+            print('Adding data')
+            print(f'So far: {repr(data)}')
 
         print(f'Received query: {repr(data)}')
         if data:
