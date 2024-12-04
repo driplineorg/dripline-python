@@ -48,7 +48,8 @@ if __name__ == '__main__':
     the_main = scarab.MainApp()
 
     # Default configuration for a Dripline command
-    the_main.default_config = dripline.core.DriplineConfig()
+    the_main.default_config = scarab.ParamNode()
+    the_main.default_config.add('dripline_mesh', dripline.core.DriplineConfig())
     # We want scheduling to be on
     the_main.default_config.add('http_host', scarab.ParamValue('0.0.0.0'))
     the_main.default_config.add('http_port', scarab.ParamValue(8080))
