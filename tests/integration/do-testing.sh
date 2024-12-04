@@ -30,9 +30,11 @@ fi
 
 TEST_BASIC_EXIT_CODE=`docker wait integration-test-basic-1`
 TEST_CORE_EXIT_CODE=`docker wait integration-test-core-1`
+TEST_IMPLEMENTATIONS_EXIT_CODE=`docker wait integration-test-implementations-1`
 
 docker logs integration-test-basic-1
 docker logs integration-test-core-1
+docker logs integration-test-implementations-1
 
 A_TEST_FAILED=0
 if [ -z ${TEST_BASIC_EXIT_CODE+x} ] || [ "$TEST_BASIC_EXIT_CODE" -ne 0 ] ; then
@@ -41,6 +43,12 @@ if [ -z ${TEST_BASIC_EXIT_CODE+x} ] || [ "$TEST_BASIC_EXIT_CODE" -ne 0 ] ; then
   A_TEST_FAILED=1
 fi
 if [ -z ${TEST_CORE_EXIT_CODE+x} ] || [ "$TEST_CORE_EXIT_CODE" -ne 0 ] ; then
+  docker logs integration-test-core-1
+  docker logs integration-key-value-store-1
+  docker logs integration-alert_consumer-1
+  A_TEST_FAILED=1
+fi
+if [ -z ${TEST_IMPLEMENTATIONS_EXIT_CODE+x} ] || [ "$TEST_IMPLEMENTATIONS_EXIT_CODE" -ne 0 ] ; then
   docker logs integration-test-core-1
   docker logs integration-key-value-store-1
   docker logs integration-alert_consumer-1

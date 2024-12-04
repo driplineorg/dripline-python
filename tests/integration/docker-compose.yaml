@@ -13,7 +13,6 @@ services:
 
   http-server:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
-    # build: . use if developing/testing locally
     depends_on:
       rabbit-broker:
         condition: service_healthy

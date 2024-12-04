@@ -6,7 +6,7 @@ services:
       - rabbit-broker
       - simple-service
     volumes:
-      - ./run-tests-basic.bats:/root/run-tests-basic.bats
+      - ./tests/run-tests-basic.bats:/root/run-tests-basic.bats
       - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
     environment:
       - DRIPLINE_USER=dripline
@@ -22,11 +22,11 @@ services:
     image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
     depends_on:
       - rabbit-broker
-#      - key-value-store
-#      - base-service
+      - key-value-store
+      - base-service
       - alert-consumer
     volumes:
-      - ./run-tests-core.bats:/root/run-tests-core.bats
+      - ./tests/run-tests-core.bats:/root/run-tests-core.bats
       - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
     environment:
       - DRIPLINE_USER=dripline
@@ -37,3 +37,20 @@ services:
               /bin/true"
     configs:
       - dl_pw.txt
+
+  test-implementations:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      - rabbit-broker
+      - scpi-service
+      - sensor-logger
+    volumes:
+      - ./tests/run-tests-implementations.bats:/root/run-tests-implementations.bats
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command: >
+      bash -c "sleep 1 &&
+              /root/run-tests-implementations.bats &&
+              /bin/true"
