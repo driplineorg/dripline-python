@@ -39,8 +39,9 @@ Boost 1.46, rapidjson 1.0, yaml-cpp, rabbitmq-c, and quill.
 Everything should be available from standard package managers, except Quill, which is not in apt (for Ubuntu/Debian).
 
 The Python wrapping of C++ code is done with `Pybind11 <https://pybind11.readthedocs.io/>`_.  
-Version 2.6.0 or higher is required.  
-It can be installed from most package managers or by following their instructions. 
+Version 2.6.0 or higher is required, and it must be on the `smart_holder <https://github.com/pybind/pybind11/tree/smart_holder>`_ branch. 
+The smart_holder branch closely tracks the master branch but includes the critical smart_holder feature. 
+See the `smart_holder docs <https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst>`_ for more info.
 
 You will need `CMake <https://cmake.org/>`_ to build the C++ wrappers.  
 Version 3.12 or higher is required.  

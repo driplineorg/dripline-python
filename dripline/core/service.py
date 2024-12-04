@@ -55,11 +55,11 @@ class Service(_Service, ObjectCreator):
     using `process_message(message)`.)
     '''
 
-    def __init__(self, name, make_connection=True, endpoints=None, enable_scheduling=False, 
+    def __init__(self, name, make_connection=True, endpoints=None, add_endpoints_now=True, enable_scheduling=False, 
                  broadcast_key='broadcast', loop_timeout_ms=1000, 
                  message_wait_ms=1000, heartbeat_interval_s=60, 
                  username=None, password=None, authentication_obj=None,
-                 dripline_mesh=None):
+                 dripline_mesh=None, **kwargs):
         '''
         Configures a service with the necessary parameters.
 
@@ -69,6 +69,10 @@ class Service(_Service, ObjectCreator):
                 The name of the endpoint, which specifies the binding key for request messages sent to this service.
             make_connection : bool, optional
                 Flag for indicating whether the service should connect to the broker; if false, the service will be in "dry-run" mode.
+            endpoints: list, optional
+                List of endpoint configurations to add to the service
+            add_endpoints_now: bool, optional
+                Flag to determine whether endpoints are built in the __init__() function; if False, then endpoints must be built later with add_endpoints_from_config()
             enable_scheduling : bool, optional
             broadcast_key : string, optional
             loop_timeout_ms : int, optional
@@ -94,7 +98,6 @@ class Service(_Service, ObjectCreator):
             dripline_mesh : dict, optional
                 Provide optional dripline mesh configuration information (see dripline_config for more information)
         '''
-
         # Final dripline_mesh config should be the default updated by the parameters passed by the caller
         dripline_config = DriplineConfig().to_python()
         dripline_config.update({} if dripline_mesh is None else dripline_mesh)
@@ -128,13 +131,22 @@ class Service(_Service, ObjectCreator):
         _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
 
         # Endpoints
-        if endpoints is not None:
-            for an_endpoint_conf in endpoints:
+        self.endpoint_configs = endpoints
+        if( add_endpoints_now ):
+            self.add_endpoints_from_config()
+
+        if kwargs:
+            logger.debug(f'Service received some kwargs that it doesn\'t handle, which will be ignored: {kwargs}')
+
+    def add_endpoints_from_config(self):
+        if self.endpoint_configs is not None:
+            for an_endpoint_conf in self.endpoint_configs:
                 an_endpoint = self.create_object(an_endpoint_conf, 'Endpoint')
                 self.add_child( an_endpoint )
                 if getattr(an_endpoint, 'log_interval', datetime.timedelta(seconds=0)) > datetime.timedelta(seconds=0):
                     logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
                     an_endpoint.start_logging()
+
 
     def result_to_scarab_payload(self, result: str):
         """

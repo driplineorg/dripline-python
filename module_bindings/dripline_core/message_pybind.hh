@@ -30,7 +30,7 @@ namespace dripline_pybind
          message
          ********/
         all_items.push_back( "Message" );
-        pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message( mod, "Message", "base class for all dripline messages" );
+        pybind11::classh< dripline::message, message_trampoline > message( mod, "Message", "base class for all dripline messages" );
 
         // internal types
         pybind11::enum_< dripline::message::encoding >( message, "encoding", "mime-type of message encoding" )
@@ -85,7 +85,7 @@ namespace dripline_pybind
         using namespace pybind11::literals;
 
         all_items.push_back( "MsgRequest" );
-        pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request >
+        pybind11::classh< dripline::msg_request, msg_request_trampoline
                         >( mod, "MsgRequest", message, "dripline messages containing a request to be sent to an endpoint" )
             // constructor(s)
             .def( pybind11::init< >() )
@@ -154,7 +154,7 @@ namespace dripline_pybind
          msg_reply
          ************/
         all_items.push_back( "MsgReply" );
-        pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply >
+        pybind11::classh< dripline::msg_reply, msg_reply_trampoline
                         >( mod, "MsgReply", message, "dripline messages containing a reply to a previously received request" )
             // constructor(s)
             .def( pybind11::init< >() )
@@ -214,7 +214,7 @@ namespace dripline_pybind
          msg_alert
          ************/
         all_items.push_back( "MsgAlert" );
-        pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert >
+        pybind11::classh< dripline::msg_alert, msg_alert_trampoline
                         >( mod, "MsgAlert", message, "dripline message containing alert information" )
             // constructor(s)
             .def( pybind11::init< >() )

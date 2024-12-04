@@ -28,14 +28,19 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
     def __init__(self, insertion_table_endpoint_name, **kwargs):
         '''
         '''
-        AlertConsumer.__init__(self, **kwargs)
+        AlertConsumer.__init__(self, add_endpoints_now=False, **kwargs)
         PostgreSQLInterface.__init__(self, **kwargs)
 
         self.insertion_table_endpoint_name = insertion_table_endpoint_name
 
+        self.connect_to_db(self.auth)
+
+        self.add_endpoints_from_config()
+
     # add_endpoint is a mess here because of the diamond inheritance, so let's be explicit
     def add_child(self, endpoint):
-        PostgreSQLInterface.add_child(self, endpoint)
+        AlertConsumer.add_child(self, endpoint)
+        self.add_child_table(endpoint)
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
         this_data_table = self.sync_children[self.insertion_table_endpoint_name]

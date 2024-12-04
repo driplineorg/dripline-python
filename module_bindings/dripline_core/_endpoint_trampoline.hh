@@ -8,7 +8,7 @@
 namespace dripline_pybind
 {
 
-    class _endpoint_trampoline : public dripline::endpoint
+    class _endpoint_trampoline : public dripline::endpoint, public pybind11::trampoline_self_life_support
     {
 
         public:

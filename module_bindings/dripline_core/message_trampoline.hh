@@ -7,7 +7,7 @@
 
 namespace dripline_pybind
 {
-    class message_trampoline : public dripline::message
+    class message_trampoline : public dripline::message, public pybind11::trampoline_self_life_support
     {
         public:
             using dripline::message::message; // Inheriting constructors
@@ -45,7 +45,7 @@ namespace dripline_pybind
 
     };
 
-    class msg_request_trampoline : public dripline::msg_request
+    class msg_request_trampoline : public dripline::msg_request, public pybind11::trampoline_self_life_support
     {
         public:
             using dripline::msg_request::msg_request;
@@ -72,7 +72,7 @@ namespace dripline_pybind
 
     };
 
-    class msg_reply_trampoline : public dripline::msg_reply
+    class msg_reply_trampoline : public dripline::msg_reply, public pybind11::trampoline_self_life_support
     {
         public:
             using dripline::msg_reply::msg_reply;
@@ -99,7 +99,7 @@ namespace dripline_pybind
 
     };
 
-    class msg_alert_trampoline : public dripline::msg_alert
+    class msg_alert_trampoline : public dripline::msg_alert, public pybind11::trampoline_self_life_support
     {
         public:
             using dripline::msg_alert::msg_alert;
