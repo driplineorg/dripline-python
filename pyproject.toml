@@ -30,3 +30,6 @@ dependencies = [
 
 [tool.setuptools_scm]
 version_file = "dripline/version.py"
+
+[tool.setuptools.packages.find]
+where = ["dripline"]
