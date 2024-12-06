@@ -53,7 +53,7 @@ def calibrate(cal_functions=None):
                 if val_dict['value_raw'] in self._calibration:
                     val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
                 else:
-                    raise ValueError(f"raw value <{repr(val_dict['value_raw'])}> not in cal dict)
+                    raise ValueError(f"raw value <{repr(val_dict['value_raw'])}> not in cal dict")
             else:
                 logger.warning('the _calibration property is of unknown type')
             return val_dict
