@@ -137,8 +137,7 @@ class FormatEntity(Entity):
             matches = re.search(self._extract_raw_regex, first_result)
             if matches is None:
                 logger.error('matching returned none')
-                # exceptions.DriplineValueError
-                raise ThrowReply('resource_error', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
+                raise ValueError('device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             logger.debug(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
         return result
@@ -146,7 +145,7 @@ class FormatEntity(Entity):
     def on_set(self, value):
         if self._set_str is None:
             # exceptions.DriplineMethodNotSupportedError
-            raise ThrowReply('service_error', f"endpoint '{self.name}' does not support set")
+            raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support set")
         if isinstance(value, str) and self._set_value_lowercase:
             value = value.lower()
         if self._set_value_map is None:
