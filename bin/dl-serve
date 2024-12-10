@@ -92,8 +92,17 @@ if __name__ == '__main__':
     dripline.core.add_service_options(the_main)
 
     # Add the default implementation-specific authentication specifications and CL options
-    dripline.implementations.add_postgres_auth_spec(the_main)
-    #dripline.implementations.add_postgres_options(the_main) #to use if this gets implemented
+    #dripline.implementations.add_postgres_auth_spec(the_main)
+    ##dripline.implementations.add_postgres_options(the_main) #to use if this gets implemented
+    try:
+        import dripline.extensions.add_auth_spec as add_auth_spec
+    except ImportError:
+        add_auth_spec = None
+
+    if add_auth_spec is not None:
+        logger.warning('Successful import of auth spec adder')
+    else:
+        logger.warning('No additional authentication specifications added')
 
     # Package version information
     the_main.set_version(dripline.core.get_version( "dripline-python" ))

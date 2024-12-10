@@ -17,6 +17,7 @@ def __get_version():
     core.add_version('dripline-python', version)
     return version
 version = __get_version()
+__version__ = version.version
 
 def __update_plugins():
     import importlib
