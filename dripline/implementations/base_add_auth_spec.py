@@ -19,10 +19,14 @@ class BaseAddAuthSpec:
     services and interfaces provided in dl-py's dripline.implementations.
     '''
 
-    def __init__(self):
+    def __init__(self, app):
         '''
+        Adds dl-py auth spec upon initialization.
+
+        This includes anything beyond the dl auth specs:
+          * PostgreSQL
         '''
-        pass
+        self.add_postgres_auth_spec(app)
 
     def add_postgres_auth_spec(self, app):
         '''
