@@ -22,4 +22,4 @@ def add_postgres_auth_spec(app):
         },
     }
 
-    app.add_default_auth_spec_group( 'postgres', scarab.to_param(auth_spec).as_node() );
+    app.add_default_auth_spec_group( 'postgres', scarab.to_param(auth_spec).as_node() )
