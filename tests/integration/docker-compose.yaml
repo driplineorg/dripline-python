@@ -2,7 +2,7 @@ services:
 
   # The broker for the mesh
   rabbit-broker:
-    image: rabbitmq:3-management
+    image: rabbitmq:4-management
     ports:
       - "15672:15672"
     environment:
