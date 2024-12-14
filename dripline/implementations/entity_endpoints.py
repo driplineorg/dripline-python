@@ -39,7 +39,7 @@ class SimpleSCPIEntity(Entity):
         '''
         Entity.__init__(self, **kwargs)
         if base_str is None:
-            raise ValueError('<base_str> is required to __init__ SimpleSCPIEntity instance')
+            raise ThrowReply('service_error_invalid_value', '<base_str> is required to __init__ SimpleSCPIEntity instance')
         else:
             self.cmd_base = base_str
 
@@ -120,10 +120,10 @@ class FormatEntity(Entity):
         self._extract_raw_regex = extract_raw_regex
         self.evaluator = asteval.Interpreter()
         if set_value_map is not None and not isinstance(set_value_map, (dict,str)):
-            raise ValueError(f"Invalid set_value_map config for {self.name}; type is {type(set_value_map)} not dict")
+            raise ThrowReply('service_error_invalid_value', f"Invalid set_value_map config for {self.name}; type is {type(set_value_map)} not dict")
         self._set_value_lowercase = set_value_lowercase
         if isinstance(set_value_map, dict) and not set_value_lowercase:
-            raise ValueError(f"Invalid config option for {self.name} with set_value_map and set_value_lowercase=False")
+            raise ThrowReply('service_error_invalid_value', f"Invalid config option for {self.name} with set_value_map and set_value_lowercase=False")
 
     @calibrate()
     def on_get(self):
@@ -137,7 +137,7 @@ class FormatEntity(Entity):
             matches = re.search(self._extract_raw_regex, first_result)
             if matches is None:
                 logger.error('matching returned none')
-                raise ValueError('device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
+                raise ThrowReply('service_error_invalid_value', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             logger.debug(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
         return result

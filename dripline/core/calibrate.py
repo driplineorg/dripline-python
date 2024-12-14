@@ -3,7 +3,7 @@ try:
 except ImportError:
     # optional only when doing a docs build
     pass
-
+from .throw_reply import ThrowReply
 
 
 __all__ = []
@@ -42,10 +42,9 @@ def calibrate(cal_functions=None):
                 try:
                     cal = evaluator(eval_str)
                 except OverflowError:
-                    logger.debug('GOT AN OVERFLOW ERROR')
-                    cal = None
+                    raise ThrowReply('service_error_bad_payload', 'GOT AN OVERFLOW ERROR')
                 except Exception as e:
-                    raise ValueError(repr(e))
+                    raise ThrowReply('service_error_invalid_value', repr(e))
                 if cal is not None:
                     val_dict['value_cal'] = cal
             elif isinstance(self._calibration, dict):
@@ -53,7 +52,7 @@ def calibrate(cal_functions=None):
                 if val_dict['value_raw'] in self._calibration:
                     val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
                 else:
-                    raise ValueError(f"raw value <{repr(val_dict['value_raw'])}> not in cal dict")
+                    raise ThrowReply('service_error_invalid_value', f"raw value <{repr(val_dict['value_raw'])}> not in cal dict")
             else:
                 logger.warning('the _calibration property is of unknown type')
             return val_dict
