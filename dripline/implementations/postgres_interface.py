@@ -22,7 +22,6 @@ from dripline.core import Service, Endpoint, ThrowReply
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 __all__.append('PostgreSQLInterface')
@@ -56,7 +55,6 @@ class PostgreSQLInterface():
         '''
         Connect to the postgres database using the provided information
         '''
-        logger.warning(f'auth spec: {auth.spec}')
         if not auth.has('postgres'):
             raise RuntimeError('Authentication is missing "postgres" login details')
         self._connect_to_db(self.database_server, self.database_name, auth)
