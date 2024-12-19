@@ -6,9 +6,6 @@ from __future__ import absolute_import
 
 # standard libs
 import logging
-import re
-
-from scarab import Authentication
 
 # internal imports
 from dripline.core import AlertConsumer
@@ -48,7 +45,8 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
         insert_data = {'timestamp': a_message_timestamp}
         insert_data.update(a_routing_key_data)
         insert_data.update(a_payload.to_python())
-        logger.info(f"insert data are:\n{insert_data}")
+        logger.info(f"Inserting from endpoint {self.insertion_table_endpoint_name}; data are:\n{insert_data}")
         # do the insert
-        this_data_table.do_insert(**insert_data)
+        insert_return = this_data_table.do_insert(**insert_data)
+        logger.debug(f"Return from insertion: {insert_return}")
         logger.info("finished processing data")

@@ -159,16 +159,18 @@ class SQLTable(Endpoint):
                 ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
             conn = self.service.engine.connect()
             insert_result = conn.execute(ins)
+            conn.commit()
             if return_col_names_list:
                 return_values = insert_result.first()
             else:
                 return_values = []
         except sqlalchemy.exc.IntegrityError as err:
+            logger.critical(f'Database integrity error: {repr(err)}')
             raise ThrowReply('resource_error', f"database integreity error: '{repr(err)}'")
         except Exception as err:
             logger.critical('received an unexpected SQL error while trying to insert:\n{}'.format(str(ins) % insert_kv_dict))
             logger.info('traceback is:\n{}'.format(traceback.format_exc()))
-            return
+            return {}
         return dict(zip(return_col_names_list, return_values))
 
     def do_insert(self, *args, **kwargs):
