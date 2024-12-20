@@ -7,6 +7,9 @@ from __future__ import absolute_import
 # standard libs
 import logging
 
+# 3rd party libs
+import sqlalchemy
+
 # internal imports
 from dripline.core import AlertConsumer
 from .postgres_interface import PostgreSQLInterface
@@ -40,13 +43,18 @@ class PostgresSensorLogger(AlertConsumer, PostgreSQLInterface):
         self.add_child_table(endpoint)
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
-        this_data_table = self.sync_children[self.insertion_table_endpoint_name]
-        # combine data sources
-        insert_data = {'timestamp': a_message_timestamp}
-        insert_data.update(a_routing_key_data)
-        insert_data.update(a_payload.to_python())
-        logger.info(f"Inserting from endpoint {self.insertion_table_endpoint_name}; data are:\n{insert_data}")
-        # do the insert
-        insert_return = this_data_table.do_insert(**insert_data)
-        logger.debug(f"Return from insertion: {insert_return}")
-        logger.info("finished processing data")
+        try:
+            this_data_table = self.sync_children[self.insertion_table_endpoint_name]
+            # combine data sources
+            insert_data = {'timestamp': a_message_timestamp}
+            insert_data.update(a_routing_key_data)
+            insert_data.update(a_payload.to_python())
+            logger.info(f"Inserting from endpoint {self.insertion_table_endpoint_name}; data are:\n{insert_data}")
+            # do the insert
+            insert_return = this_data_table.do_insert(**insert_data)
+            logger.debug(f"Return from insertion: {insert_return}")
+            logger.info("finished processing data")
+        except sqlalchemy.exc.SQLAlchemyError as err:
+            logger.critical(f'Received SQL error while doing insert: {err}')
+        except Exception as err:
+            logger.critical(f'An exception was raised while processing a payload to insert: {err}')
