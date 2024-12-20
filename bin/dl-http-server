@@ -6,6 +6,7 @@ import dripline
 import logging
 logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
 def setup_logging():
     handler = logging.StreamHandler()

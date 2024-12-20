@@ -9,6 +9,7 @@ import scarab
 import logging
 logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
 class Serve(dripline.core.ObjectCreator):
     '''
