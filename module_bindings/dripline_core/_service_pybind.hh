@@ -22,13 +22,12 @@ namespace dripline_pybind
     {
         std::list< std::string > all_items;
         all_items.push_back( "_Service" );
-        pybind11::class_< _service,
+        pybind11::classh< _service,
                           _service_trampoline,
                           dripline::core,
                           dripline::endpoint,
                           dripline::scheduler<>,
-                          scarab::cancelable,
-                          std::shared_ptr< _service >
+                          scarab::cancelable
                         >( mod, "_Service", "Service binding" )
             .def( pybind11::init< const scarab::param_node&,
                                   const scarab::authentication&,
@@ -62,6 +61,8 @@ namespace dripline_pybind
                   "bind the service's message queue to a particular exchange and key",
                   DL_BIND_CALL_GUARD_STREAMS
             )
+            
+            .def( "run", &dripline::service::run, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS )
             .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "stop", &dripline::service::stop, DL_BIND_CALL_GUARD_STREAMS )

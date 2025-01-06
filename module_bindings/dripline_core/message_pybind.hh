@@ -6,12 +6,17 @@
 #include "message.hh"
 #include "message_trampoline.hh"
 
-#include "pybind11/pybind11.h"
-#include "pybind11/iostream.h"
-
 #include "uuid.hh"
 
 #include "logger.hh"
+
+#include "pybind11/pybind11.h"
+#include "pybind11/iostream.h"
+#include "pybind11/eval.h"
+
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+
 LOGGER( dlog_mph, "message_pybind.hh" )
 
 namespace dripline_pybind
@@ -25,7 +30,7 @@ namespace dripline_pybind
          message
          ********/
         all_items.push_back( "Message" );
-        pybind11::class_< dripline::message, message_trampoline, std::shared_ptr< dripline::message > > message( mod, "Message", "base class for all dripline messages" );
+        pybind11::classh< dripline::message, message_trampoline > message( mod, "Message", "base class for all dripline messages" );
 
         // internal types
         pybind11::enum_< dripline::message::encoding >( message, "encoding", "mime-type of message encoding" )
@@ -75,14 +80,18 @@ namespace dripline_pybind
         /************
          msg_request
          ************/
+
+        pybind11::module_ py_uuid = pybind11::module_::import("uuid");
+        using namespace pybind11::literals;
+
         all_items.push_back( "MsgRequest" );
-        pybind11::class_< dripline::msg_request, msg_request_trampoline, std::shared_ptr< dripline::msg_request >
+        pybind11::classh< dripline::msg_request, msg_request_trampoline
                         >( mod, "MsgRequest", message, "dripline messages containing a request to be sent to an endpoint" )
             // constructor(s)
             .def( pybind11::init< >() )
 
             .def( "__str__", 
-                  [](const dripline::msg_reply& a_msg) {
+                  [](const dripline::msg_request& a_msg) {
                     std::ostringstream t_stream;
                     t_stream << a_msg;
                     return t_stream.str();
@@ -92,14 +101,18 @@ namespace dripline_pybind
 
             // properties
             // mv_referrable
-            //TODO even better if we could interface with python's UUID library instead of passing strings
             .def_property( "lockout_key",
-                           [](dripline::request_ptr_t a_req){ return boost::uuids::to_string(a_req->lockout_key()); },
-                           [](dripline::request_ptr_t a_req, const std::string& a_lockout_key ){
-                                bool t_lockout_key_valid = true;
-                                a_req->lockout_key() = dripline::uuid_from_string( a_lockout_key, t_lockout_key_valid );
-                                a_req->set_lockout_key_valid( t_lockout_key_valid );
-                             }
+                           [py_uuid](const dripline::request_ptr_t a_req){
+                                std::stringstream str_strm;
+                                str_strm << a_req->lockout_key();
+                                return py_uuid.attr("UUID")(str_strm.str());
+                           },
+                           [py_uuid](dripline::request_ptr_t a_req, const pybind11::object& a_uuid ){
+                                std::stringstream str_strm;
+                                str_strm << pybind11::str(a_uuid);
+                                a_req->lockout_key() = boost::lexical_cast<dripline::uuid_t>(str_strm.str());
+                           },
+                           pybind11::return_value_policy::move
                          )
             // mv_accessible
             .def_property( "lockout_key_valid", &dripline::msg_request::get_lockout_key_valid, &dripline::msg_request::set_lockout_key_valid )
@@ -141,7 +154,7 @@ namespace dripline_pybind
          msg_reply
          ************/
         all_items.push_back( "MsgReply" );
-        pybind11::class_< dripline::msg_reply, msg_reply_trampoline, std::shared_ptr< dripline::msg_reply >
+        pybind11::classh< dripline::msg_reply, msg_reply_trampoline
                         >( mod, "MsgReply", message, "dripline messages containing a reply to a previously received request" )
             // constructor(s)
             .def( pybind11::init< >() )
@@ -201,13 +214,13 @@ namespace dripline_pybind
          msg_alert
          ************/
         all_items.push_back( "MsgAlert" );
-        pybind11::class_< dripline::msg_alert, msg_alert_trampoline, std::shared_ptr< dripline::msg_alert >
+        pybind11::classh< dripline::msg_alert, msg_alert_trampoline
                         >( mod, "MsgAlert", message, "dripline message containing alert information" )
             // constructor(s)
             .def( pybind11::init< >() )
 
             .def( "__str__", 
-                  [](const dripline::msg_reply& a_msg) {
+                  [](const dripline::msg_alert& a_msg) {
                     std::ostringstream t_stream;
                     t_stream << a_msg;
                     return t_stream.str();

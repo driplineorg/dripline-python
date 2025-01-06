@@ -9,6 +9,7 @@ import scarab
 import logging
 logger = logging.getLogger('dripline')
 logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
 class Serve(dripline.core.ObjectCreator):
     '''
@@ -42,8 +43,9 @@ class Serve(dripline.core.ObjectCreator):
         try:
             self._run(the_app)
         except:
-            logger.error("got an error...")
-            logger.error("traceback was:\n{}".format(traceback.format_exc()))
+            logger.error("Caught an exception while running the service")
+            logger.error("Traceback was:\n{}".format(traceback.format_exc()))
+            logger.error("Exiting service")
             self.return_code = 100
 
     def _run(self, the_app):
@@ -87,13 +89,23 @@ if __name__ == '__main__':
     the_main.default_config.add('enable_scheduling', scarab.ParamValue(True))
 
     # Add the default dripline authentication specification and CL options
-    dripline.core.add_dripline_auth_spec(the_main)
     dripline.core.add_dripline_options(the_main)
     dripline.core.add_service_options(the_main)
 
-    # Add the default implementation-specific authentication specifications and CL options
-    dripline.implementations.add_postgres_auth_spec(the_main)
-    #dripline.implementations.add_postgres_options(the_main) #to use if this gets implemented
+    # See if there are extension authentication specifications to add
+    try:
+        import dripline.extensions.add_auth_spec as add_auth_spec
+    except ImportError:
+        add_auth_spec = None
+
+    if add_auth_spec is not None:
+        # Extension specifications were found
+        aas = add_auth_spec.AddAuthSpec(the_main)
+        logger.debug('Added dripline and extension authentication specifications')
+    else:
+        # Extension specifications were not found -- only add specs from Implementations
+        aas = dripline.implementations.base_add_auth_spec.BaseAddAuthSpec(the_main)
+        logger.debug('Only dripline authentication specifications added; no additional authentication specifications added')
 
     # Package version information
     the_main.set_version(dripline.core.get_version( "dripline-python" ))

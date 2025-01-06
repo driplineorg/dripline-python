@@ -5,17 +5,19 @@ Extending Dripline
 Dripline-python can be conveniently extended using the namespace plugin method.  The controls-guide 
 repository includes an example set of files that can be copied into a new repository to create 
 an extension to the ``dripline`` namespace.  Please see the 
-`controls-guide documentation <https://controls-guide.readthedocs.io/en/latest/>`_
+:doc:`controls-guide documentation <controls-guide:index>`_
 to follow a walkthrough that will implement a new dripline extension.
 
 Adding a Service Class
 ======================
 
+A new service class can be derived from ``Service`` or any of the service classes from ``dripline.implementations``.
+
 Adding an Endpoint Class
 ========================
 
 There are some situations in which you will need to create your own endpoint class to add functionality that's not 
-available in the the ``core`` or ``implementations`` sub-packages.  A new endpoing class can be derived from 
+available in the the ``core`` or ``implementations`` sub-packages.  A new endpoint class can be derived from 
 ``Endpoint``, ``Entity``, or any of the endpoint classes from ``dripline.implementations``.
 
 Adding ``CMD`` Handlers

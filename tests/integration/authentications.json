@@ -1,6 +1,5 @@
 {
-    "amqp": {
-        "broker": "rabbit-broker",
+    "dripline": {
         "username": "dripline",
         "password": "dripline"
     },

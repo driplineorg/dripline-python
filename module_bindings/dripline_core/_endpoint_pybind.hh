@@ -17,12 +17,12 @@ namespace dripline_pybind
         std::list< std::string > all_items;
 
         all_items.push_back( "_Endpoint" );
-        pybind11::class_< dripline::endpoint, _endpoint_trampoline, std::shared_ptr< dripline::endpoint > >( mod, "_Endpoint", "Endpoint binding" )
+        pybind11::classh< dripline::endpoint, _endpoint_trampoline >( mod, "_Endpoint", "Endpoint binding" )
             .def( pybind11::init< const std::string& >(), DL_BIND_CALL_GUARD_STREAMS )
 
             // mv_ properties
             .def_property_readonly( "name", (std::string& (dripline::endpoint::*)()) &dripline::endpoint::name )
-            .def_property_readonly( "service", ( dripline::service_ptr_t& (dripline::endpoint::*)()) &dripline::endpoint::service )
+            .def_property_readonly( "service", ( dripline::service& (dripline::endpoint::*)()) &dripline::endpoint::parent )
 
 
             // deal with messages

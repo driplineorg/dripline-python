@@ -3,10 +3,12 @@
 
 #include "service.hh"
 
+#include "pybind11/pybind11.h"
+
 namespace dripline_pybind
 {
     // we need an extra class so that we can make private/protected methods public for binding
-    class _service : public dripline::service
+    class _service : public dripline::service, public pybind11::trampoline_self_life_support
     {
         public:
             //inherit constructor
@@ -28,43 +30,41 @@ namespace dripline_pybind
             // Local overrides
             bool bind_keys() override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( bool, _service, bind_keys, );
+                PYBIND11_OVERRIDE( bool, _service, bind_keys, );
+            }
+
+            void run() override
+            {
+                PYBIND11_OVERRIDE( void, _service, run, );
             }
 
             //// Overrides from Endpoint
             // Overrides for virtual on_[messgate-type]_message()
             dripline::reply_ptr_t on_request_message( const dripline::request_ptr_t a_request ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( dripline::reply_ptr_t, _service, on_request_message, a_request );
+                PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, on_request_message, a_request );
             }
             void on_reply_message( const dripline::reply_ptr_t a_reply ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( void, _service, on_reply_message, a_reply );
+                PYBIND11_OVERRIDE( void, _service, on_reply_message, a_reply );
             }
             void on_alert_message( const dripline::alert_ptr_t a_alert ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( void, _service, on_alert_message, a_alert );
+                PYBIND11_OVERRIDE( void, _service, on_alert_message, a_alert );
             }
 
             // Overrides for virtual do_[request-type]_request
             dripline::reply_ptr_t do_get_request( const dripline::request_ptr_t a_request ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( dripline::reply_ptr_t, _service, do_get_request, a_request );
+                PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_get_request, a_request );
             }
             dripline::reply_ptr_t do_set_request( const dripline::request_ptr_t a_request ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( dripline::reply_ptr_t, _service, do_set_request, a_request );
+                PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_set_request, a_request );
             }
             dripline::reply_ptr_t do_cmd_request( const dripline::request_ptr_t a_request ) override
             {
-                pybind11::gil_scoped_acquire t_acquire;
-                PYBIND11_OVERLOAD( dripline::reply_ptr_t, _service, do_cmd_request, a_request );
+                PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_cmd_request, a_request );
             }
 
     };

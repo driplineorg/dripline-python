@@ -26,9 +26,7 @@ class AlertConsumer(Service):
                              match will return an empty dict, you are responsible for checkin and deciding if this is an
                              error. We use re.match and return the groupdict.
         '''
-        logger.debug("in AlertConsumer init")
-        #Service.__init__(self, **kwargs)
-        super(AlertConsumer, self).__init__(**kwargs)
+        Service.__init__(self, **kwargs)
         self._alert_keys = ["#"] if alert_keys is None else alert_keys
         self._alert_key_parser_re= alert_key_parser_re
 

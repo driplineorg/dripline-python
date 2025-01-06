@@ -5,35 +5,30 @@ but should be relatively straight forward to generalize to support other SQL fla
 Note: services using this module will require sqlalchemy (and assuming we're still using postgresql, psycopg2 as the sqlalchemy backend)
 '''
 
-#from __future__ import absolute_import
 __all__ = []
 
-# std libraries
-import json
-import os
-import traceback
-
 # 3rd party libraries
-#TODO either this should be an actual dependency, or we should move the package into a plugin.
-try:
-    import sqlalchemy
-except ImportError:
-    pass
-from datetime import datetime
-from itertools import groupby
-import collections
+import sqlalchemy
 
 # local imports
-from dripline.core import Service, Endpoint, ThrowReply
+from dripline.core import Endpoint
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 __all__.append('PostgreSQLInterface')
-class PostgreSQLInterface(Service):
+class PostgreSQLInterface():
     '''
+    A service's interface to a PostgreSQL database.
+
+    This is a mixin class for services that need to connect to PostgreSQL databases.
+
+    To use with a Service, the following order of operations must be followed in the derived class's __init__() function:
+    1. Initialize the Service with add_endpoints_now=False
+    2. Initialize this PostgreSQLInterface
+    3. Connect to the database with PostgreSQLInterface.connect_to_db()
+    3. Add endpoints using Service.add_endpoints_from_config()
     '''
 
     def __init__(self, database_name, database_server, **kwargs):
@@ -42,16 +37,20 @@ class PostgreSQLInterface(Service):
             database_name (str): name of the 'database' to connect to within the database server
             database_server (str): network resolvable hostname of database server
         '''
+        self.database_name = database_name
+        self.database_server = database_server
+
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for PostgreSQLInterface class')
-        ##service_kwargs = {k:v for k,v in kwargs.items() if k in ['config', 'name', 'broker', 'port', 'auth_file', 'make_connection']}
-        ##Service.__init__(self, **service_kwargs)
-        #Service.__init__(self, **kwargs)
-        super(PostgreSQLInterface, self).__init__(**kwargs)
 
-        if not self.auth.has('postgres'):
+
+    def connect_to_db(self, auth):
+        '''
+        Connect to the postgres database using the provided information
+        '''
+        if not auth.has('postgres'):
             raise RuntimeError('Authentication is missing "postgres" login details')
-        self._connect_to_db(database_server, database_name, self.auth)
+        self._connect_to_db(self.database_server, self.database_name, auth)
 
     def _connect_to_db(self, database_server, database_name, auth):
         '''
@@ -61,8 +60,12 @@ class PostgreSQLInterface(Service):
         self.engine = sqlalchemy.create_engine(engine_str)
         self.meta = sqlalchemy.MetaData()
 
-    def add_child(self, endpoint):
-        Service.add_child(self, endpoint)
+    def add_child_table(self, endpoint):
+        '''
+        Add a child endpoint that is an SQLTable.
+
+        This is meant to be called from the serivce that derives from this class, as part of overriding add_child().
+        '''
         if isinstance(endpoint, SQLTable):
             logger.debug(f'Adding sqlalchemy.Table object for "{endpoint.table_name}" to Endpoint')
             endpoint.table = sqlalchemy.Table(endpoint.table_name, self.meta, autoload_with=self.engine, schema=endpoint.schema)
@@ -143,22 +146,16 @@ class SQLTable(Endpoint):
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
-        try:
-            ins = self.table.insert().values(**insert_kv_dict)
-            if return_col_names_list:
-                ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
-            conn = self.service.engine.connect()
-            insert_result = conn.execute(ins)
-            if return_col_names_list:
-                return_values = insert_result.first()
-            else:
-                return_values = []
-        except sqlalchemy.exc.IntegrityError as err:
-            raise ThrowReply('resource_error', f"database integreity error: '{repr(err)}'")
-        except Exception as err:
-            logger.critical('received an unexpected SQL error while trying to insert:\n{}'.format(str(ins) % insert_kv_dict))
-            logger.info('traceback is:\n{}'.format(traceback.format_exc()))
-            return
+        ins = self.table.insert().values(**insert_kv_dict)
+        if return_col_names_list:
+            ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
+        conn = self.service.engine.connect()
+        insert_result = conn.execute(ins)
+        conn.commit()
+        if return_col_names_list:
+            return_values = insert_result.first()
+        else:
+            return_values = []
         return dict(zip(return_col_names_list, return_values))
 
     def do_insert(self, *args, **kwargs):
@@ -172,7 +169,8 @@ class SQLTable(Endpoint):
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col['payload_key'] in kwargs.keys():
-                raise ThrowReply('service_error_invalid_value', f'a value for <{col}> is required!\ngot: {kwargs}')
+                raise RuntimeError(f'a value for <{col}> is required!\ngot: {kwargs}')
+                #raise ThrowReply('service_error_invalid_value', f'a value for <{col}> is required!\ngot: {kwargs}')
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update({self._column_map[key]:value for key,value in kwargs.items()})

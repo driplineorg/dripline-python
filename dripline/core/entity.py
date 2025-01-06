@@ -100,7 +100,7 @@ class Entity(Endpoint):
                 self.on_set = _log_on_set_decoration(self.on_set)
         else:
             if self.log_on_set:
-                raise ValueError("unable to disable get_on_set while log_on_set is enabled")
+                raise ThrowReply('service_error_invalid_value', 'unable to disable get_on_set while log_on_set is enabled')
             self.on_set = self.__initial_on_set
         self._get_on_set = bool(value)
 
@@ -111,7 +111,7 @@ class Entity(Endpoint):
     def log_on_set(self, value):
         if value:
             if not self.get_on_set:
-                raise ValueError("unable to enable log_on_set when get_on_set is disabled")
+                raise ThrowReply('service_error_invalid_value', 'unable to enable log_on_set when get_on_set is disabled')
             self.on_set = _log_on_set_decoration(self, self.on_set)
         else:
             self.on_set = self.__initial_on_set
@@ -131,7 +131,7 @@ class Entity(Endpoint):
         elif isinstance(new_interval, datetime.timedelta):
             self._log_interval = new_interval
         else:
-            raise ValueError(f"unable to interpret a new_interval of type <{type(new_interval)}>")
+            raise ThrowReply('service_error_invalid_value', f"unable to interpret a new_interval of type <{type(new_interval)}>")
 
     def scheduled_log(self):
         logger.debug("in a scheduled log event")

@@ -19,8 +19,9 @@ trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP I
 
 export DLPY_IMG_TAG=$1 
 export DLCPP_IMG_TAG=$2 
-docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml build
-docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml up -d
+docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml  -f docker-compose-services.yaml build
+docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml  -f docker-compose-services.yaml up -d
+
 
 if [ $? -ne 0 ] ; then
   printf "${RED}Docker Compose Failed${NC}\n"
@@ -29,9 +30,11 @@ fi
 
 TEST_BASIC_EXIT_CODE=`docker wait integration-test-basic-1`
 TEST_CORE_EXIT_CODE=`docker wait integration-test-core-1`
+TEST_IMPLEMENTATIONS_EXIT_CODE=`docker wait integration-test-implementations-1`
 
 docker logs integration-test-basic-1
 docker logs integration-test-core-1
+docker logs integration-test-implementations-1
 
 A_TEST_FAILED=0
 if [ -z ${TEST_BASIC_EXIT_CODE+x} ] || [ "$TEST_BASIC_EXIT_CODE" -ne 0 ] ; then
@@ -40,6 +43,12 @@ if [ -z ${TEST_BASIC_EXIT_CODE+x} ] || [ "$TEST_BASIC_EXIT_CODE" -ne 0 ] ; then
   A_TEST_FAILED=1
 fi
 if [ -z ${TEST_CORE_EXIT_CODE+x} ] || [ "$TEST_CORE_EXIT_CODE" -ne 0 ] ; then
+  docker logs integration-test-core-1
+  docker logs integration-key-value-store-1
+  docker logs integration-alert_consumer-1
+  A_TEST_FAILED=1
+fi
+if [ -z ${TEST_IMPLEMENTATIONS_EXIT_CODE+x} ] || [ "$TEST_IMPLEMENTATIONS_EXIT_CODE" -ne 0 ] ; then
   docker logs integration-test-core-1
   docker logs integration-key-value-store-1
   docker logs integration-alert_consumer-1

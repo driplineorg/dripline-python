@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Dripline Agent</title>
+    <meta name="description" content="Very basic dl-agent page">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="icon" type="image/x-icon" href="/web/DL3Logo.ico">
+</head>
+<body>
+    <div class="container">
+        <div class="row mb-5 mt-3">
+            <div class="col-md-auto">
+                <img src="/web/DL3Logo.png" class="img-fluid" alt="Dripline Logo" width="100">
+            </div>
+            <div class="col">
+                <h1 class="display-1">Dripline Agent</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <form action='#' id="send_req_form">
+                    <div class="mb-3">
+                        <label class="form-label">Type:&nbsp;</label>
+                        <input type="radio" class="btn-check" name="dl_type" id="dl_type_get" autocomplete="off" value="GET" checked onchange="toggleFields()">
+                        <label class="btn btn-outline-primary btn-sm" for="dl_type_get">GET</label>
+                        <input type="radio" class="btn-check" name="dl_type" id="dl_type_set" autocomplete="off" value="SET" onchange="toggleFields()">
+                        <label class="btn btn-outline-primary btn-sm" for="dl_type_set">SET</label>
+                        <input type="radio" class="btn-check" name="dl_type" id="dl_type_cmd" autocomplete="off" value="CMD" onchange="toggleFields()">
+                        <label class="btn btn-outline-primary btn-sm" for="dl_type_cmd">CMD</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="routing_key">Routing Key</label>
+                        <input type="text" class="form-control" id="routing_key" value="peaches">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="value">Value (for SET and CMD)</label>
+                        <input type="text" class="form-control" id="value">
+                    </div>
+                    <div class="border container mb-3">
+                        <div class="mb-3">
+                            <label class="form-label" for="specifier">Specifier</label>
+                            <input type="text" class="form-control" id="specifier">
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label" for="lockout_key">Lockout Key</label>
+                            <input type="text" class="form-control" id="lockout_key" placeholder="Not yet implemented" disabled>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <input type="button" value="Send" onclick="send_request()">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text">Reply</span>
+                    <textarea class="form-control" id="result" aria-label="Reply"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="/web/scripts.js" defer></script>
+</body>
+</html>
