@@ -1,6 +1,6 @@
 import re
 
-from _dripline.core import Service
+from .service import Service
 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,18 +16,18 @@ class AlertConsumer(Service):
     1. More advanced: override the existing on_alert_message method with whatever behavior is desired
     2. Use the existing on_alert_message, which proceeds in two steps by calling parse_routing_key, followed by process_payload. The first may be used or overriden, the second must always be implemented.
     '''
-    def __init__(self, alert_keys=["#"], alert_key_parser_re='', **kwargs):
+    def __init__(self, alert_keys=None, alert_key_parser_re='', **kwargs):
         '''
         Args:
             alert_keys: an iterable of strings which will be used as binding keys on the alerts exchange
+                        If none is provided, the default is ['#']
             alert_key_parser_re: a regular expression (see python's re library) which is used in the default implementation
                              of parse_routing_key to extract useful data from the incoming routing key.  Note: a failed
                              match will return an empty dict, you are responsible for checkin and deciding if this is an
                              error. We use re.match and return the groupdict.
         '''
-        logger.debug("in AlertConsumer init")
         Service.__init__(self, **kwargs)
-        self._alert_keys = alert_keys
+        self._alert_keys = ["#"] if alert_keys is None else alert_keys
         self._alert_key_parser_re= alert_key_parser_re
 
     def bind_keys(self):

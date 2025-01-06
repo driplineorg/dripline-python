@@ -38,7 +38,7 @@ class Endpoint(_Endpoint):
                              f"{self.name} unable to convert result to scarab payload: {result}")
 
     def do_get_request(self, a_request_message):
-        logger.info("in get_request")
+        logger.info("in do_get_request")
         a_specifier = a_request_message.specifier.to_string()
         if (a_specifier):
             logger.debug("has specifier")
@@ -47,7 +47,7 @@ class Endpoint(_Endpoint):
                 an_attribute = getattr(self, a_specifier)
                 logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
                 the_node = scarab.ParamNode()
-                the_node["values"] = scarab.ParamArray()
+                the_node.add("values", scarab.ParamArray())
                 the_node["values"].push_back(scarab.ParamValue(an_attribute))
                 return a_request_message.reply(payload=the_node)
             except AttributeError as this_error:
@@ -59,16 +59,14 @@ class Endpoint(_Endpoint):
             return a_request_message.reply(payload=self.result_to_scarab_payload(the_value))
 
     def do_set_request(self, a_request_message):
-
-        a_specifier = a_request_message.specifier.to_string()
-        if not "values" in a_request_message.payload:
-            raise ThrowReply('service_error_bad_payload',
-                             'setting called without values, but values are required for set')
-        new_value = a_request_message.payload["values"][0]()
-        new_value = getattr(new_value, "as_" + new_value.type())()
-        logger.debug(f'Attempting to set new_value to [{new_value}]')
-
-        if (a_specifier):
+        a_specifier =  a_request_message.specifier.to_string()
+        try:
+            new_value = a_request_message.payload["values"][0]()
+        except Exception as err:
+            raise ThrowReply('service_error_bad_payload', f'Set called with invalid values: {err}')
+        new_value = getattr(new_value, "as_"+new_value.type())()
+        logger.debug(f'new_value is [{new_value}]')
+        if ( a_specifier ):
             if not hasattr(self, a_specifier):
                 raise ThrowReply('service_error_invalid_specifier',
                                  "endpoint {} has no attribute {}, unable to set".format(self.name, a_specifier))
@@ -89,7 +87,11 @@ class Endpoint(_Endpoint):
                              "error getting command's corresponding method: {}".format(str(e)))
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
-        result = method_ref(*the_args, **the_kwargs)
+        try:
+            result = method_ref(*the_args, **the_kwargs)
+        except TypeError as e:
+            raise ThrowReply('service_error_invalid_value', 
+                             f'A TypeError occurred while calling the requested method for endpoint {self.name}: {method_name}. Values provided may be invalid.\nOriginal error: {str(e)}')
         return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
     def on_get(self):

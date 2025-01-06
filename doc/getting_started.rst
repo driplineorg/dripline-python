@@ -34,16 +34,17 @@ which is inside the build directory), you will need to know the location of the 
 for the dripline-python build below (usually ``[prefix]/lib/cmake/Dripline``).  As an alternative, you could 
 make a system-wide install at ``/usr/local``.
 
-Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.5, 
-Boost 1.46, rapidjson 1.0, yaml-cpp, and rabbitmq-c.  
-Everything should be available from standard package managers.
+Dripline-cpp currently requires (all versions are minima): C++17 (via gcc or clang), CMake v3.12, 
+Boost 1.46, rapidjson 1.0, yaml-cpp, rabbitmq-c, and quill.  
+Everything should be available from standard package managers, except Quill, which is not in apt (for Ubuntu/Debian).
 
 The Python wrapping of C++ code is done with `Pybind11 <https://pybind11.readthedocs.io/>`_.  
-Version 2.6.0 or higher is required.  
-It can be installed from most package managers or by following their instructions. 
+Version 2.6.0 or higher is required, and it must be on the `smart_holder <https://github.com/pybind/pybind11/tree/smart_holder>`_ branch. 
+The smart_holder branch closely tracks the master branch but includes the critical smart_holder feature. 
+See the `smart_holder docs <https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst>`_ for more info.
 
 You will need `CMake <https://cmake.org/>`_ to build the C++ wrappers.  
-Version 3.5 or higher is required.  
+Version 3.12 or higher is required.  
 It can be installed from most package managers or by following their instructions.
 Note that this is not included as a dependency in the Python installation process.  
 See ``pyproject.toml`` for more details.
@@ -150,3 +151,31 @@ If you want to install so that you can edit the dripline-python code, use the ``
 If you need to specify the location of dripline-cpp, set the ``Dripline_DIR`` environment variable first, e.g.:
 
   ``> Dripline_DIR=/install/prefix/lib/cmake/Dripline pip install .``
+
+CMake-Only Build
+----------------
+
+.. note::
+
+  This section is intended for developers working on the Python bindings.  
+  Do not use these instructions if you're intending to have a full dripline-python installation.
+
+If you want to build the python bindings directly with CMake we recommend these steps:
+
+#. Create a build directory and go into that directory.
+
+#. Configure the build with cmake or ccmake:
+
+  ``> cmake ..``
+
+  If you want to specify a local installation of dripline-cpp, you can set an environment variable:
+
+  ``> Dripline_DIR=/install/prefix/lib/cmake/Dripline cmake ..``
+
+  or a CMake variable:
+
+  ``> cmake -DDripline_DIR=/install/prefix/lib/cmake/Dripline ..``
+
+#. Build:
+
+  ``> make``

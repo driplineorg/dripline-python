@@ -1,0 +1,6 @@
+name: alert_consumer
+module: AlertConsumer
+
+alert_keys:
+  - "an_alert"
+#alert_key_parser_re: 'sensor_value\.(?P<from>\w+)'

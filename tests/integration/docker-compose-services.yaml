@@ -1,0 +1,99 @@
+services:
+
+  # The run_simple_service example from dl-cpp
+  simple-service:
+    image: ghcr.io/driplineorg/dripline-cpp:${DLCPP_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    command: >
+      bash -c "run_simple_service -vv -b rabbit-broker -u dripline --password-file /dl_pw.txt"
+    configs:
+      - dl_pw.txt
+
+  # Just the base service class
+  base-service:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command: >
+      bash -c "dl-serve -vv -b rabbit-broker"
+    configs:
+      - dl_pw.txt
+
+  # The classic key-value store, a configuration based on the base Service class
+  key-value-store:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./services/key-value-store.yaml:/root/key-value-store.yaml
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command: >
+      bash -c "dl-serve -vv -c /root/key-value-store.yaml"
+    configs:
+      - dl_pw.txt
+
+  # The bare alert consumer
+  alert-consumer:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ./services/alert-consumer.yaml:/root/alert-consumer.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command: >
+      bash -c "dl-serve -vv -b rabbit-broker -c /root/alert-consumer.yaml"
+    configs:
+      - dl_pw.txt
+
+  sensor-logger:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/sensor-logger.yaml:/root/sensor-logger.yaml
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command:
+      bash -c "dl-serve -vv -c /root/sensor-logger.yaml"
+    configs:
+      - dl_pw.txt
+
+  scpi-service:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+      scpi-device:
+        condition: service_started
+    volumes:
+      - ./services/scpi-device-service.yaml:/root/scpi-device.yaml
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command:
+      bash -c "dl-serve -vv -c /root/scpi-device.yaml"
+    configs:
+      - dl_pw.txt
+
+configs:
+  dl_pw.txt:
+    file: ./password.txt
