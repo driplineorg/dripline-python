@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 import threading
 
@@ -61,7 +61,7 @@ class HeartbeatTracker(Endpoint):
             # report inactive heartbeat received
             logger.debug(f'Inactive heartbeat: time difference: {diff}')
             self.status = HeartbeatTracker.Status.UNKNOWN
-        return self.status
+        return {'status': self.status, 'time_since_last_hb': diff}
 
     class Status(Enum):
         OK = 0
@@ -138,7 +138,13 @@ class HeartbeatMonitor(AlertConsumer):
         }
         for an_endpoint in self.sync_children.values():
             try:
-                report_data[an_endpoint.check_delay()].append(an_endpoint.name)
+                endpoint_report = an_endpoint.check_delay()
+                report_data[endpoint_report['status']].append(
+                    {
+                    'name': an_endpoint.name, 
+                    'time_since_last_hb': endpoint_report['time_since_last_hb'],
+                    }
+                )
             except Exception as err:
                 logger.error(f'Unable to get status of endpoint {an_endpoint.name}: {err}')
         return report_data
@@ -150,13 +156,21 @@ class HeartbeatMonitor(AlertConsumer):
         This function can be overridden to handle the monitoring report differently.
         '''
         if report_data[HeartbeatTracker.Status.CRITICAL]:
-            logger.error(f'Services with CRITICAL status:\n{report_data[HeartbeatTracker.Status.CRITICAL]}')
+            logger.error('Services with CRITICAL status:')
+            for endpoint_data in report_data[HeartbeatTracker.Status.CRITICAL]:
+                logger.error(f'\t{endpoint_data['name']} -- TSLH: {timedelta(seconds=endpoint_data['time_since_last_hb'])}')
         if report_data[HeartbeatTracker.Status.WARNING]:
-            logger.warning(f'Services with WARNING status:\n{report_data[HeartbeatTracker.Status.WARNING]}')
+            logger.warning('Services with WARNING status:')
+            for endpoint_data in report_data[HeartbeatTracker.Status.WARNING]:
+                logger.warning(f'\t{endpoint_data['name']} -- TSLH: {timedelta(seconds=endpoint_data['time_since_last_hb'])}')
         if report_data[HeartbeatTracker.Status.OK]:
-            logger.info(f'Services with OK status:\n{report_data[HeartbeatTracker.Status.OK]}')
+            logger.info(f'Services with OK status:')
+            for endpoint_data in report_data[HeartbeatTracker.Status.OK]:
+                logger.info(f'\t{endpoint_data['name']} -- TSLH: {timedelta(seconds=endpoint_data['time_since_last_hb'])}')
         if report_data[HeartbeatTracker.Status.UNKNOWN]:
-            logger.info(f'Services with UNKNOWN status:\n{report_data[HeartbeatTracker.Status.UNKNOWN]}')
+            logger.info(f'Services with UNKNOWN status:')
+            for endpoint_data in report_data[HeartbeatTracker.Status.UNKNOWN]:
+                logger.info(f'\t{endpoint_data['name']} -- TSLH: {timedelta(seconds=endpoint_data['time_since_last_hb'])}')
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
         service_name = a_routing_key_data['service_name']
@@ -171,3 +185,7 @@ class HeartbeatMonitor(AlertConsumer):
             self.sync_children[service_name].process_heartbeat(a_message_timestamp)
         except Exception as err:
             logger.error(f'Unable to handle payload for heartbeat from service {service_name}: {err}')
+
+    def do_get(self):
+        return self.run_checks()
+    
