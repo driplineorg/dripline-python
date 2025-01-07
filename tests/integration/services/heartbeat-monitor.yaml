@@ -1,6 +1,9 @@
 name: heartbeat_monitor
 module: HeartbeatMonitor
 
+heartbeat_interval_s: 30
+warning_threshold_s: 45
+
 # AlertConsumer Inits
 alert_keys:
   - "heartbeat.#"
