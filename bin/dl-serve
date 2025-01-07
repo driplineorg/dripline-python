@@ -74,10 +74,13 @@ class Serve(dripline.core.ObjectCreator):
         # Create the service and register it with the signal handler
         the_service = self.create_object( this_config, 'Service', this_auth )
         sig_handler.add_cancelable(the_service)
+        #scarab.SignalHandler.add_cancelable(the_service)
         logger.info(f'Service {the_service.name} has been built')
 
         # Run the service
         the_service.run()
+
+        scarab.SignalHandler.remove_cancelable(the_service)
 
 if __name__ == '__main__':
     # App object
