@@ -2,6 +2,9 @@
 # The dripline-python source path is mounted into the container, assuming that this is being run from [dl-py top]/tests/integration
 # Once the container is started, run `pip install -e /usr/local/src_dev`
 # Then you should be able to run dripline applications and edit library source files on the host.
+# Note that the _dripline library does not get installed in the normal location with a `pip -e` installation, 
+# and it instead ends up in the source directory.
+# You can preface any dl-serve command with `PYTHONPATH=/usr/local/src_dev` to set the python path correctly.
 
 services:
   dev:
