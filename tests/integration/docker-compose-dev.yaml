@@ -1,0 +1,19 @@
+# Compose file that can be used for a development workflow, integrated with the rest of the integration environment
+# The dripline-python source path is mounted into the container, assuming that this is being run from [dl-py top]/tests/integration
+# Once the container is started, run `pip install -e /usr/local/src_dev`
+# Then you should be able to run dripline applications and edit library source files on the host.
+
+services:
+  dev:
+    image: ghcr.io/driplineorg/dripline-python:${DLPY_IMG_TAG:-latest-dev}
+    depends_on:
+      rabbit-broker:
+        condition: service_healthy
+    volumes:
+      - ../..:/usr/local/src_dev
+      - ./dripline_mesh.yaml:/root/.dripline_mesh.yaml
+    environment:
+      - DRIPLINE_USER=dripline
+      - DRIPLINE_PASSWORD=dripline
+    command: >
+      bash
