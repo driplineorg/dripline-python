@@ -14,6 +14,7 @@ import threading
 
 # internal imports
 from dripline.core import AlertConsumer, Endpoint
+import scarab
 
 __all__ = []
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class HeartbeatTracker(Endpoint):
         Endpoint.__init__(self, **kwargs)
         self.last_timestamp = time.time()
         self.is_active = True
-        self.status = HeartbeatTracker.Status.OK
+        self.status = HeartbeatTracker.Status.UNKNOWN
     
     def process_heartbeat(self, timestamp):
         '''
@@ -59,11 +60,14 @@ class HeartbeatTracker(Endpoint):
         else:
             # report inactive heartbeat received
             logger.debug(f'Inactive heartbeat: time difference: {diff}')
+            self.status = HeartbeatTracker.Status.UNKNOWN
+        return self.status
 
     class Status(Enum):
         OK = 0
         WARNING = 1
         CRITICAL = 2
+        UNKNOWN = -1
 
 __all__.append('HeartbeatMonitor')
 class HeartbeatMonitor(AlertConsumer):
@@ -88,7 +92,7 @@ class HeartbeatMonitor(AlertConsumer):
         self.time_between_checks_s = time_between_checks_s
         self.n_sleeps = max(1, round(time_between_checks_s / 5))
         self.sleep_time_s = self.time_between_checks_s / self.n_sleeps
-        logger.warning(f'Time between checks: {self.time_between_checks_s}, n_sleeps: {self.n_sleeps}, sleep_time: {self.sleep_time_s}')
+        #logger.warning(f'Time between checks: {self.time_between_checks_s}, n_sleeps: {self.n_sleeps}, sleep_time: {self.sleep_time_s}')
 
         self.warning_threshold_s = warning_threshold_s
         self.critical_threshold_s = critical_threshold_s
@@ -105,26 +109,54 @@ class HeartbeatMonitor(AlertConsumer):
         monitor_thread.join()
 
     def monitor_heartbeats(self):
+        '''
+        Performs heartbeat monitoring
+        '''
         while not self.is_canceled():
             try:
                 logger.debug('Checking endpoints')
-                self.run_checks()
+                self.process_report(self.run_checks())
 
-                logger.debug(f'Sleeping for {self.time_between_checks_s} s')
+                #logger.debug(f'Sleeping for {self.time_between_checks_s} s')
                 for i in range(self.n_sleeps):
                     if self.is_canceled():
                         return
                     time.sleep(self.sleep_time_s)
             except Exception as err:
                 logger.error(f'Exception caught in monitor_heartbeats\' outer check: {err}')
-                self.cancel(1)
+                scarab.SignalHandler.cancel_all(1)
 
     def run_checks(self):
+        '''
+        Checks all endpoints and collects endpoint names by heartbeat tracker status.
+        '''
+        report_data = {
+            HeartbeatTracker.Status.OK: [], 
+            HeartbeatTracker.Status.WARNING: [], 
+            HeartbeatTracker.Status.CRITICAL: [], 
+            HeartbeatTracker.Status.UNKNOWN: [],
+        }
         for an_endpoint in self.sync_children.values():
             try:
-                an_endpoint.check_delay()
+                report_data[an_endpoint.check_delay()].append(an_endpoint.name)
             except Exception as err:
                 logger.error(f'Unable to get status of endpoint {an_endpoint.name}: {err}')
+        return report_data
+    
+    def process_report(self, report_data):
+        '''
+        Print out the information from the monitoring report data.
+
+        This function can be overridden to handle the monitoring report differently.
+        '''
+        if report_data[HeartbeatTracker.Status.CRITICAL]:
+            logger.error(f'Services with CRITICAL status:\n{report_data[HeartbeatTracker.Status.CRITICAL]}')
+        if report_data[HeartbeatTracker.Status.WARNING]:
+            logger.warning(f'Services with WARNING status:\n{report_data[HeartbeatTracker.Status.WARNING]}')
+        if report_data[HeartbeatTracker.Status.OK]:
+            logger.info(f'Services with OK status:\n{report_data[HeartbeatTracker.Status.OK]}')
+        if report_data[HeartbeatTracker.Status.UNKNOWN]:
+            logger.info(f'Services with UNKNOWN status:\n{report_data[HeartbeatTracker.Status.UNKNOWN]}')
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
         service_name = a_routing_key_data['service_name']
