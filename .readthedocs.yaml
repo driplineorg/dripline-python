@@ -12,7 +12,6 @@ build:
     python: "3.11"
   jobs:
     pre_system_dependencies:
-      - apt update
       - apt install cmake
     pre_install:
       - git clone https://github.com/driplineorg/dripline-cpp --recurse-submodules
