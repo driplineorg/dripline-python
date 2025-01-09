@@ -4,12 +4,16 @@
 # Required
 version: 2
 
+
 # Set the OS, Python version and other tools you might need
 build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
   jobs:
+    pre_system_dependencies:
+      - sudo apt update
+      - sudo apt install cmake
     pre_install:
       - git clone https://github.com/driplineorg/dripline-cpp --recurse-submodules
       - cd dripline-cpp
