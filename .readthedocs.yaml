@@ -9,6 +9,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  jobs:
+    pre_install: ["docker build -t dripline-python:docs ."]
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
