@@ -155,6 +155,7 @@ class HeartbeatMonitor(AlertConsumer):
 
         This function can be overridden to handle the monitoring report differently.
         '''
+        logger.info('Heartbeat Monitor Status Check')
         if report_data[HeartbeatTracker.Status.CRITICAL]:
             logger.error('Services with CRITICAL status:')
             for endpoint_data in report_data[HeartbeatTracker.Status.CRITICAL]:
