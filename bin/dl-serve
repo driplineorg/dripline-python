@@ -32,7 +32,16 @@ class Serve(dripline.core.ObjectCreator):
         try:
             import colorlog
             modified_format = base_format.format('%(log_color)s', '%(purple)s')
-            self._logging_format = colorlog.ColoredFormatter(modified_format, datefmt=time_format[:-4])
+            self._logging_format = colorlog.ColoredFormatter(modified_format, 
+                                                             datefmt=time_format[:-4],
+                                                             log_colors={
+                                                                 'DEBUG': 'cyan',
+                                                                 'INFO': 'green',
+                                                                 'WARNING': 'yellow',
+                                                                 'ERROR': 'red',
+                                                                 'CRITICAL': 'red,bg_white',
+                                                             },
+                                                             )
         except ImportError:
             modified_format = base_format.format(' ', '')
             self._logging_format = logging.Formatter(modified_format, time_format[:-4])
@@ -52,9 +61,10 @@ class Serve(dripline.core.ObjectCreator):
         this_config_param = the_app.primary_config
         this_auth = the_app.auth
 
-        verbosity = the_app.global_verbosity
+        verbosity = scarab.s2py_verbosity(the_app.global_verbosity)
         #print(f"verbosity is {verbosity}")
         self.handler.setLevel(verbosity)
+        logger.setLevel(verbosity)
 
         sig_handler = scarab.SignalHandler()
 
