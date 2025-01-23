@@ -13,15 +13,15 @@ build:
   jobs:
     pre_system_dependencies:
       # - apt install quill -y not supported
-      - sudo apt-get install build-essential  -y
-      - sudo apt-get install cmake -y
-      - sudo apt-get install git -y
-      - sudo apt-get install libboost-chrono-dev install cmake -y
-      - sudo apt-get install libboost-filesystem-dev install cmake -y
-      - sudo apt-get install libboost-system-dev install cmake -y
-      - sudo apt-get install librabbitmq-dev install cmake -y
-      - sudo apt-get install libyaml-cpp-dev install cmake -y
-      - sudo apt-get install rapidjson-dev install cmake -y
+      # - apt-get install build-essential  -y
+      - apt-get install cmake -y
+      - apt-get install git -y
+      - apt-get install libboost-chrono-dev -y
+      - apt-get install libboost-filesystem-dev -y
+      - apt-get install libboost-system-dev -y
+      - apt-get install librabbitmq-dev -y
+      - apt-get install libyaml-cpp-dev -y
+      - apt-get install rapidjson-dev -y
        
     pre_install:
       - git clone https://github.com/driplineorg/dripline-cpp --recurse-submodules
