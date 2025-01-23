@@ -12,7 +12,6 @@ build:
     python: "3.11"
   jobs:
     pre_system_dependencies:
-      - apt install cmake -y
       # - apt install quill -y not supported
       - apt-get install update -y
       - apt-get install clean -y
