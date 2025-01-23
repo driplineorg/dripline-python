@@ -13,8 +13,6 @@ build:
   jobs:
     pre_system_dependencies:
       # - apt install quill -y not supported
-      - apt-get install update -y
-      - apt-get install clean -y
       - apt-get install build-essential  -y
       - apt-get install cmake -y
       - apt-get install git -y
