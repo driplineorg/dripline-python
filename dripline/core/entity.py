@@ -7,7 +7,7 @@ import numbers
 import scarab
 
 from .endpoint import Endpoint
-from dripline.core import MsgAlert
+from dripline.core import MsgAlert, ThrowReply
 __all__ = []
 
 import logging
