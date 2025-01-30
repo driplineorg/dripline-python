@@ -1,13 +1,13 @@
 import datetime
 import functools
-import types
 
 import numbers
 
 import scarab
 
+from _dripline import MsgAlert
 from .endpoint import Endpoint
-from dripline.core import MsgAlert, ThrowReply
+from .throw_reply import ThrowReply
 __all__ = []
 
 import logging
