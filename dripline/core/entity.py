@@ -5,7 +5,7 @@ import numbers
 
 import scarab
 
-from _dripline import MsgAlert
+from _dripline.core import MsgAlert
 from .endpoint import Endpoint
 from .throw_reply import ThrowReply
 __all__ = []
