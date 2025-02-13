@@ -31,6 +31,11 @@ def _log_on_set_decoration(self, fun):
             values.update({'value_raw': args[0]})
         logger.debug('set done, now log')
         self.log_a_value(values)
+        try:
+            this_value = float(values[self._check_field])
+        except (TypeError, ValueError):
+            this_value = False
+        self._last_log_value = this_value
         return result
     return wrapper
 
@@ -58,16 +63,29 @@ class Entity(Endpoint):
     '''
     #check_on_set -> allows for more complex logic to confirm successful value updates
     #                (for example, the success condition may be measuring another endpoint)
-    def __init__(self, get_on_set=False, log_routing_key_prefix='sensor_value', log_interval=0, log_on_set=False, calibration=None, **kwargs):
+    def __init__(self,
+                 get_on_set=False,
+                 log_on_set=False,
+                 log_routing_key_prefix='sensor_value',
+                 log_interval=0,
+                 max_interval=0,
+                 max_fractional_change=0,
+                 check_field='value_cal',
+                 calibration=None,
+                 **kwargs):
         '''
         Args:
             get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
-            log_routing_key_prefix: first term in routing key used in alert messages which log values
-            log_interval: how often to log the Entity's value. If 0 then scheduled logging is disabled;
-                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments
-                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
             log_on_set: if true, always call log_a_value() immediately after on_set
                         **Note:** requires get_on_set be true, overrides must be equivalent
+            log_routing_key_prefix: first term in routing key used in alert messages which log values
+            log_interval: how often to check the Entity's value. If 0 then scheduled logging is disabled;
+                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments
+                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
+            max_interval: max allowed time interval between logging, allows usage of conditional logging.  If 0,
+                          then logging values occurs every log_interval.
+            max_fractional_change: max allowed fractional difference between subsequent values to trigger log condition.
+            check_field: result field to check, 'value_cal' or 'value_raw'
             calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
                                            @calibrate decorator, used to populate raw and calibrated values
                                            fields of a result payload. If a dictionary, the raw result is used
@@ -81,13 +99,16 @@ class Entity(Endpoint):
         # keep a reference to the on_set (possibly decorated in a subclass), needed for changing *_on_set configurations
         self.__initial_on_set = self.on_set
 
-        self._get_on_set = None
         self._log_on_set = None
         self.get_on_set = get_on_set
         self.log_on_set = log_on_set
 
         self.log_interval = log_interval
+        self._max_interval = max_interval
+        self._max_fractional_change = max_fractional_change
+        self._check_field = check_field
         self._log_action_id = None
+        self._last_log_time = None
 
     @property
     def get_on_set(self):
@@ -136,10 +157,31 @@ class Entity(Endpoint):
     def scheduled_log(self):
         logger.debug("in a scheduled log event")
         result = self.on_get()
+        try:
+            this_value = float(result[self._check_field])
+        except (TypeError, ValueError):
+            this_value = False
+        # Various checks for log condition
+        if self._last_log_time is None:
+            logger.debug("log because no last log")
+        elif (datetime.datetime.utcnow() - self._last_log_time).total_seconds() > self._max_interval:
+            logger.debug("log because too much time")
+        elif this_value is False:
+            logger.warning(f"cannot check value change for {self.name}")
+            return
+        elif ((self._last_log_value == 0 and this_value != 0) or
+              (self._last_log_value != 0 and\
+                abs((self._last_log_value - this_value)/self._last_log_value)>self._max_fractional_change)):
+            logger.debug("log because change magnitude")
+        else:
+            logger.debug("no log condition met, not logging")
+            return
+        self._last_log_value = this_value
         self.log_a_value(result)
 
     def log_a_value(self, the_value):
-        logger.debug(f"value to log is:\n{the_value}")
+        logger.info(f"value to log for {self.name} is:\n{the_value}")
+        self._last_log_time = datetime.datetime.utcnow()
         the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key=f'{self.log_routing_key_prefix}.{self.name}')
         alert_sent = self.service.send(the_alert)
 
