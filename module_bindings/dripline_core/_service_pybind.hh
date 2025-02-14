@@ -26,6 +26,7 @@ namespace dripline_pybind
                           _service_trampoline,
                           dripline::core,
                           dripline::endpoint,
+                          dripline::receiver,
                           dripline::scheduler<>,
                           scarab::cancelable
                         >( mod, "_Service", "Service binding" )
