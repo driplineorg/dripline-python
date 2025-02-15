@@ -4,6 +4,7 @@ import scarab
 from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
 from .object_creator import ObjectCreator
+from .request_sender import RequestSender
 
 import datetime
 import logging
@@ -11,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__.append('Service')
-class Service(_Service, ObjectCreator):
+class Service(_Service, ObjectCreator, RequestSender):
     '''
     The primary unit of software that connects to a broker and typically provides an interface with an instrument or other software.
 
@@ -129,6 +130,8 @@ class Service(_Service, ObjectCreator):
             auth.process_spec()
 
         _Service.__init__(self, config=scarab.to_param(config), auth=auth, make_connection=make_connection)
+
+        RequestSender.__init__(self, sender=self)
 
         # Endpoints
         self.endpoint_configs = endpoints
