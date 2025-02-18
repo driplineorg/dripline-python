@@ -7,22 +7,14 @@ Note: services using this module will require sqlalchemy (and assuming we're sti
 
 __all__ = []
 
-# std libraries
-import traceback
-
 # 3rd party libraries
-#TODO either this should be an actual dependency, or we should move the package into a plugin.
-try:
-    import sqlalchemy
-except ImportError:
-    pass
+import sqlalchemy
 
 # local imports
-from dripline.core import Service, Endpoint, ThrowReply
+from dripline.core import Endpoint
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 __all__.append('PostgreSQLInterface')
@@ -56,7 +48,6 @@ class PostgreSQLInterface():
         '''
         Connect to the postgres database using the provided information
         '''
-        logger.warning(f'auth spec: {auth.spec}')
         if not auth.has('postgres'):
             raise RuntimeError('Authentication is missing "postgres" login details')
         self._connect_to_db(self.database_server, self.database_name, auth)
@@ -155,22 +146,16 @@ class SQLTable(Endpoint):
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
-        try:
-            ins = self.table.insert().values(**insert_kv_dict)
-            if return_col_names_list:
-                ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
-            conn = self.service.engine.connect()
-            insert_result = conn.execute(ins)
-            if return_col_names_list:
-                return_values = insert_result.first()
-            else:
-                return_values = []
-        except sqlalchemy.exc.IntegrityError as err:
-            raise ThrowReply('resource_error', f"database integreity error: '{repr(err)}'")
-        except Exception as err:
-            logger.critical('received an unexpected SQL error while trying to insert:\n{}'.format(str(ins) % insert_kv_dict))
-            logger.info('traceback is:\n{}'.format(traceback.format_exc()))
-            return
+        ins = self.table.insert().values(**insert_kv_dict)
+        if return_col_names_list:
+            ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
+        conn = self.service.engine.connect()
+        insert_result = conn.execute(ins)
+        conn.commit()
+        if return_col_names_list:
+            return_values = insert_result.first()
+        else:
+            return_values = []
         return dict(zip(return_col_names_list, return_values))
 
     def do_insert(self, *args, **kwargs):
@@ -184,7 +169,8 @@ class SQLTable(Endpoint):
         # make sure that all required columns are present
         for col in self._required_insert_names:
             if not col['payload_key'] in kwargs.keys():
-                raise ThrowReply('service_error_invalid_value', f'a value for <{col}> is required!\ngot: {kwargs}')
+                raise RuntimeError(f'a value for <{col}> is required!\ngot: {kwargs}')
+                #raise ThrowReply('service_error_invalid_value', f'a value for <{col}> is required!\ngot: {kwargs}')
         # build the insert dict
         this_insert = self._default_insert_dict.copy()
         this_insert.update({self._column_map[key]:value for key,value in kwargs.items()})

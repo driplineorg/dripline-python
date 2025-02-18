@@ -6,7 +6,7 @@ import importlib.util
 import inspect
 
 import logging
-logger = logging.getLogger('dripline')
+logger = logging.getLogger(__name__)
 
 
 __all__.append('ObjectCreator')

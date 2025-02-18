@@ -27,7 +27,6 @@ class AlertConsumer(Service):
                              error. We use re.match and return the groupdict.
         '''
         Service.__init__(self, **kwargs)
-        logger.debug("in AlertConsumer init")
         self._alert_keys = ["#"] if alert_keys is None else alert_keys
         self._alert_key_parser_re= alert_key_parser_re
 
