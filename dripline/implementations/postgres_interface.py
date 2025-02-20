@@ -134,7 +134,8 @@ class SQLTable(Endpoint):
             return_cols = self.table.c
         else:
             return_cols = [sqlalchemy.text(col) for col in return_cols]
-        this_select = sqlalchemy.select(return_cols)
+
+        this_select = sqlalchemy.select(*return_cols)
         for c,v in where_eq_dict.items():
             this_select = this_select.where(getattr(self.table.c,c)==v)
         for c,v in where_lt_dict.items():
@@ -143,6 +144,7 @@ class SQLTable(Endpoint):
             this_select = this_select.where(getattr(self.table.c,c)>v)
         conn = self.service.engine.connect()
         result = conn.execute(this_select)
+        conn.commit()
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
