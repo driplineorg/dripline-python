@@ -1,7 +1,7 @@
 ARG img_user=ghcr.io/driplineorg
 ARG img_repo=dripline-cpp
 #ARG img_tag=develop
-ARG img_tag=v2.10.1
+ARG img_tag=v2.10.2
 
 FROM ${img_user}/${img_repo}:${img_tag} AS deps
 
