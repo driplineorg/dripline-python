@@ -161,8 +161,9 @@ class Service(_Service, ObjectCreator, RequestSender):
         try:
             return scarab.to_param(result)
         except Exception as e:
-            raise ThrowReply('service_error_bad_payload',
-                             f"{self.name} unable to convert result to scarab payload: {result}")
+            result_str = str(result)
+            logger.warning(f"Bad payload: [{result_str}] is not of type bool, int, float, str, or dict. Converting to str.")
+            return scarab.to_param(result_str)
 
     def do_get_request(self, a_request_message):
         logger.info("in get_request")
@@ -173,7 +174,7 @@ class Service(_Service, ObjectCreator, RequestSender):
                 logger.debug(f"specifier is: {a_specifier}")
                 an_attribute = getattr(self, a_specifier)
                 logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
-                return a_request_message.reply(payload=scarab.ParamValue(an_attribute))
+                return a_request_message.reply(payload=self.result_to_scarab_payload(an_attribute))
             except AttributeError as this_error:
                 raise ThrowReply('service_error_invalid_specifier',
                                  f"endpoint {self.name} has no attribute {a_specifier}, unable to get")
