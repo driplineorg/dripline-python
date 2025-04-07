@@ -170,10 +170,7 @@ class Service(_Service, ObjectCreator):
                 logger.debug(f"specifier is: {a_specifier}")
                 an_attribute = getattr(self, a_specifier)
                 logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
-                the_node = scarab.ParamNode()
-                the_node["values"] = scarab.ParamArray()
-                the_node["values"].push_back(scarab.ParamValue(an_attribute))
-                return a_request_message.reply(payload=the_node)
+                return a_request_message.reply(payload=self.result_to_scarab_payload(an_attribute))
             except AttributeError as this_error:
                 raise ThrowReply('service_error_invalid_specifier',
                                  f"endpoint {self.name} has no attribute {a_specifier}, unable to get")
