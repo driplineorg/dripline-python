@@ -158,8 +158,9 @@ class Service(_Service, ObjectCreator):
         try:
             return scarab.to_param(result)
         except Exception as e:
-            raise ThrowReply('service_error_bad_payload',
-                             f"{self.name} unable to convert result to scarab payload: {result}")
+            result_str = str(result)
+            logger.warning(f"Bad payload: [{result_str}] is not of type bool, int, float, str, or dict. Converting to str.")
+            return scarab.to_param(result_str)
 
     def do_get_request(self, a_request_message):
         logger.info("in get_request")
