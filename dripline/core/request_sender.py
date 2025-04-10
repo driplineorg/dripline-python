@@ -33,10 +33,12 @@ class RequestSender():
         self._receiver = Receiver()
 
 
-    def _check_lockout_key(self, lockout_key:str=None):
+    def _check_lockout_key(self, lockout_key:str | uuid.UUID =None):
         nilkey = uuid.UUID('00000000-0000-0000-0000-000000000000')
         if lockout_key is None:
             return nilkey
+        if type(lockout_key) == uuid.UUID:
+            return lockout_key
         try:
             return uuid.UUID(lockout_key)
         except ValueError:
