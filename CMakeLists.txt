@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)  # <3.5 is deprecated by CMake
-project( DriplinePy VERSION 5.0.1 )
+project( DriplinePy VERSION 5.0.0 )
 
 cmake_policy( SET CMP0074 NEW )
 
