@@ -41,6 +41,28 @@ namespace dripline_pybind
             .def_property( "auth", (scarab::authentication& (dripline::service::*)()) &dripline::service::auth, 
                            [](_service& a_service, const scarab::authentication& a_auth){a_service.auth() = a_auth;}, 
                            pybind11::return_value_policy::reference_internal )
+
+            // Notes on send() bindings
+            // The Service.send() functions are useful because they set the sender service name in the message before sending.
+            // The bound functions use lambdas because the dripline::service functions include amqp_ptr_t arguments which aren't known to pybind11.
+            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bindings to these functions are not included in the trampoline class because we're not directly overriding the C++ send() functions.
+            .def( "send",
+                  [](dripline::service& a_service, dripline::request_ptr_t a_request){return a_service.send(a_request);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "send a request message"
+                )
+            .def( "send",
+                  [](dripline::service& a_service, dripline::reply_ptr_t a_reply){return a_service.send(a_reply);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "send a reply message"
+                )
+            .def( "send",
+                  [](dripline::service& a_service, dripline::alert_ptr_t an_alert){return a_service.send(an_alert);},
+                  DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "send an alert message"
+                )
+          
             .def_property( "enable_scheduling", &dripline::service::get_enable_scheduling, &dripline::service::set_enable_scheduling )
             .def_property_readonly( "alerts_exchange", (std::string& (dripline::service::*)()) &dripline::service::alerts_exchange )
             .def_property_readonly( "requests_exchange", (std::string& (dripline::service::*)()) &dripline::service::requests_exchange )

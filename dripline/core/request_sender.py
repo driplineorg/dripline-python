@@ -13,14 +13,14 @@ class RequestSender():
     A mixin class that provides convenient methods for dripline interactions in a dripline objects.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
-    def __init__(self, sender: Core, timeout_s: int=10, confirm_retcodes: bool=True):
+    def __init__(self, sender, timeout_s: int=10, confirm_retcodes: bool=True):
         '''
         Configures an interface with the necessary parameters.
 
         Parameters
         ----------
-            sender : Core
-                Provide a Core object which will use this mixin. This object will be the one to actually send the messages as it implements the Core functions
+            sender : Core, Service, or other class that implements send(MsgRequest)
+                Provide an object that will actually send the messages as it implements the send() function
             timeout_s: int, optional
                 Time to wait for a reply, in seconds -- default is 10 s
             confirm_retcodes: bool, optional  
