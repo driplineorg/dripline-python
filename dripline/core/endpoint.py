@@ -34,8 +34,3 @@ class Endpoint(_Endpoint, RequestReceiver):
     def do_cmd_request(self, a_request_message): 
         return self._do_cmd_request(a_request_message)
     
-    def on_get(self):
-        return self._on_get()
-    
-    def on_set(self, value):
-        return self._on_set(value)

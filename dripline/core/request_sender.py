@@ -3,7 +3,6 @@ __all__ = []
 import scarab
 
 from _dripline.core import op_t, Core, Receiver, MsgRequest, MsgReply, DriplineError
-
 import uuid
 import logging
 logger = logging.getLogger(__name__)
@@ -32,27 +31,18 @@ class RequestSender():
         self.timeout_s = timeout_s
         self._receiver = Receiver()
 
-
-    def _check_lockout_key(self, lockout_key:str | uuid.UUID =None):
-        nilkey = uuid.UUID('00000000-0000-0000-0000-000000000000')
-        if lockout_key is None:
-            return nilkey
-        if type(lockout_key) == uuid.UUID:
-            return lockout_key
-        try:
-            return uuid.UUID(lockout_key)
-        except ValueError:
-            logger.warning("Lockout Key '{}' is not properly uuid formatted. Defaulting to nilkey. ".format(lockout_key))
-            return nilkey
-
-
-    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=None):
+    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key:str|uuid.UUID=None):
         '''
         internal helper method to standardize sending request messages
         '''
         a_specifier = specifier if specifier is not None else ""
         a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
-        a_request.lockout_key = self._check_lockout_key(lockout_key)
+        if lockout_key is not None:
+            try:
+                a_request.lockout_key = lockout_key
+            except RuntimeError as err:
+                err.add_note(f"Lockout key [{lockout_key}] is not uuid format compliant.")
+                raise
         receive_reply = self.sender.send(a_request)
         if not receive_reply.successful_send:
             raise DriplineError('unable to send request')
@@ -68,7 +58,7 @@ class RequestSender():
         sig_handler.remove_cancelable(self._receiver)
         return result.payload.to_python()
 
-    def get(self, endpoint: str, specifier: str=None, lockout_key=None, timeout_s: int=0) -> MsgReply:
+    def get(self, endpoint: str, specifier: str=None, lockout_key: str | uuid.UUID=None, timeout_s: int=0) -> MsgReply:
         '''
         Send a get request to an endpoint and return the reply message.
 
@@ -86,7 +76,7 @@ class RequestSender():
         result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
+    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, lockout_key: str | uuid.UUID=None, timeout_s: int | float=0) -> MsgReply:
         '''
         Send a set request to an endpoint and return the reply message.
 
@@ -107,7 +97,7 @@ class RequestSender():
         result = self._receive_reply( reply_pkg, timeout_s )
         return result
 
-    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
+    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, lockout_key: str | uuid.UUID=None, timeout_s: int | float=0) -> MsgReply:
         '''
         Send a cmd request to an endpoint and return the reply message.
 

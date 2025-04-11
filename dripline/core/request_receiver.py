@@ -47,7 +47,7 @@ class RequestReceiver():
                                  f"endpoint {self.name} has no attribute {a_specifier}, unable to get")
         else:
             logger.debug('no specifier')
-            the_value = self._on_get()
+            the_value = self.on_get()
             return a_request_message.reply(payload=self.result_to_scarab_payload(the_value))
 
     def _do_set_request(self, a_request_message):
@@ -89,7 +89,7 @@ class RequestReceiver():
                              f'A TypeError occurred while calling the requested method for endpoint {self.name}: {method_name}. Values provided may be invalid.\nOriginal error: {str(e)}')
         return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
-    def _on_get(self):
+    def on_get(self):
         '''
         placeholder method for getting the value of an endpoint.
         Implementations may override to enable OP_GET operations.
@@ -97,7 +97,7 @@ class RequestReceiver():
         '''
         raise ThrowReply('service_error_invalid_method', "{} does not implement on_get".format(self.__class__))
 
-    def _on_set(self, _value):
+    def on_set(self, _value):
         '''
         placeholder method for setting the value of an endpoint.
         Implementations may override to enable OP_SET operations.
