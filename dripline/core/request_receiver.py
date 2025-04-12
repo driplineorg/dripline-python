@@ -13,23 +13,23 @@ class RequestReceiver():
     '''
     A mixin class that provides methods for dripline responses in a dripline objects.
     Intended for use as a centralized object containing response methods in dripline. 
+
+    This class is used by Endpoint and Service to include the dripline-standard behavior 
+    for handling and responding to requests.
+
+    Any class using RequestReceiver will get the following features:
+
+    * When handling a get/set request that does *not* include a specifier, 
+      the function ``on_[get/set]()`` will be called.
+    * The default implementations of ``on_[get/set]()`` raise a `ThrowReply``;
+      If a response to get/set requests with no specifier is desired, 
+      a derived class should override these functions.
+    * When handling a cmd request, the specifier is required. 
+      The specifier provides the method name to be called.  
+      If no method exists with the name given by the specifier, an error is returned.
     '''
 
-    def result_to_scarab_payload(self, result: str):
-        """
-        Intercept result values and throw error if scarab is unable to convert to param
-        TODO: Handles global Exception case, could be more specific
-        Args:
-            result (str): request message passed
-        """
-        try:
-            return scarab.to_param(result)
-        except Exception as e:
-            result_str = str(result)
-            logger.warning(f"Bad payload: [{result_str}] is not of type bool, int, float, str, or dict. Converting to str.")
-            return scarab.to_param(result_str)
-
-    def _do_get_request(self, a_request_message):
+    def do_get_request(self, a_request_message):
         logger.info("in get_request")
         a_specifier = a_request_message.specifier.to_string()
         if (a_specifier):
@@ -42,7 +42,7 @@ class RequestReceiver():
                 the_node["values"].push_back(self.result_to_scarab_payload(an_attribute))
                 logger.debug(f"attribute '{a_specifier}' value is [{an_attribute}]")
                 return a_request_message.reply(payload=the_node)
-            except AttributeError as this_error:
+            except AttributeError:
                 raise ThrowReply('service_error_invalid_specifier',
                                  f"endpoint {self.name} has no attribute {a_specifier}, unable to get")
         else:
@@ -50,7 +50,7 @@ class RequestReceiver():
             the_value = self.on_get()
             return a_request_message.reply(payload=self.result_to_scarab_payload(the_value))
 
-    def _do_set_request(self, a_request_message):
+    def do_set_request(self, a_request_message):
 
         a_specifier = a_request_message.specifier.to_string()
         if not "values" in a_request_message.payload:
@@ -70,7 +70,7 @@ class RequestReceiver():
             result = self.on_set(new_value)
             return a_request_message.reply(payload=self.result_to_scarab_payload(result))
 
-    def _do_cmd_request(self, a_request_message):
+    def do_cmd_request(self, a_request_message):
         # Note: any command executed in this way must return a python data structure which is
         #       able to be converted to a Param object (to be returned in the reply message)
         method_name = a_request_message.specifier.to_string()
@@ -104,3 +104,18 @@ class RequestReceiver():
         Any returned object must already be a scarab::Param object
         '''
         raise ThrowReply('service_error_invalid_method', "{} does not implement on_set".format(self.__class__))
+    
+    def result_to_scarab_payload(self, result: str):
+        """
+        Intercept result values and throw error if scarab is unable to convert to param
+        TODO: Handles global Exception case, could be more specific
+        Args:
+            result (str): request message passed
+        """
+        try:
+            return scarab.to_param(result)
+        except Exception as e:
+            result_str = str(result)
+            logger.warning(f"Bad payload: [{result_str}] is not of type bool, int, float, str, or dict. Converting to str.")
+            return scarab.to_param(result_str)
+

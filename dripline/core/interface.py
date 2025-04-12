@@ -13,6 +13,8 @@ class Interface(Core, RequestSender):
     '''
     A class that provides user-friendly methods for dripline interactions in a Python interpreter.
     Intended for use as a dripline client in scripts or interactive sessions.
+
+    See :py:class:dripline.core.RequestSender for the message-sending interface.
     '''
     def __init__(self, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
         '''

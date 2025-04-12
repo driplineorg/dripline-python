@@ -1,8 +1,6 @@
 __all__ = []
 
-import scarab
 from _dripline.core import _Endpoint
-from .throw_reply import ThrowReply
 from .request_receiver import RequestReceiver
 
 import logging
@@ -24,13 +22,4 @@ class Endpoint(_Endpoint, RequestReceiver):
             name (str) : the name of the endpoint, specifies the binding key for request messages to which this object should reply
         '''
         _Endpoint.__init__(self, name)
-
-    def do_get_request(self, a_request_message): 
-        return self._do_get_request(a_request_message)
-
-    def do_set_request(self, a_request_message): 
-        return self._do_set_request(a_request_message)
-
-    def do_cmd_request(self, a_request_message): 
-        return self._do_cmd_request(a_request_message)
     
