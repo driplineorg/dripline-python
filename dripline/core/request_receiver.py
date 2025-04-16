@@ -74,11 +74,13 @@ class RequestReceiver():
         # Note: any command executed in this way must return a python data structure which is
         #       able to be converted to a Param object (to be returned in the reply message)
         method_name = a_request_message.specifier.to_string()
+        if method_name == "":
+            raise ThrowReply('service_error_invalid_method', 'No specifier was provided for an OP_CMD request')
         try:
             method_ref = getattr(self, method_name)
         except AttributeError as e:
             raise ThrowReply('service_error_invalid_method',
-                             "error getting command's corresponding method: {}".format(str(e)))
+                             f'error getting command\'s corresponding method: {str(e)}')
         the_kwargs = a_request_message.payload.to_python()
         the_args = the_kwargs.pop('values', [])
         print(f'args: {the_args} -- kwargs: {the_kwargs}')
@@ -91,16 +93,16 @@ class RequestReceiver():
 
     def on_get(self):
         '''
-        placeholder method for getting the value of an endpoint.
-        Implementations may override to enable OP_GET operations.
-        The implementation must return a value which is able to be passed to the ParamValue constructor.
+        Placeholder method for getting the value of an endpoint.
+        Implementations should override to enable OP_GET operations.
+        The implementation must return a value which is convertible to a scarab param object.
         '''
         raise ThrowReply('service_error_invalid_method', "{} does not implement on_get".format(self.__class__))
 
     def on_set(self, _value):
         '''
-        placeholder method for setting the value of an endpoint.
-        Implementations may override to enable OP_SET operations.
+        Placeholder method for setting the value of an endpoint.
+        Implementations should override to enable OP_SET operations.
         Any returned object must already be a scarab::Param object
         '''
         raise ThrowReply('service_error_invalid_method', "{} does not implement on_set".format(self.__class__))
