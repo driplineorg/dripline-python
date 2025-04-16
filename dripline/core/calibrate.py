@@ -49,10 +49,12 @@ def calibrate(cal_functions=None):
                     val_dict['value_cal'] = cal
             elif isinstance(self._calibration, dict):
                 logger.debug('calibration is dictionary, looking up value')
-                if val_dict['value_raw'] in self._calibration:
-                    val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
+                value_raw_str = str(val_dict['value_raw'])
+                if value_raw_str in self._calibration:
+                    val_dict['value_cal'] = self._calibration[str(val_dict['value_raw'])]
                 else:
-                    raise ThrowReply('service_error_invalid_value', f"raw value <{repr(val_dict['value_raw'])}> not in cal dict")
+                    raise ThrowReply('service_error_invalid_value', f"raw value <{str(val_dict['value_raw'])}> {type(val_dict['value_raw'])} not in cal dict with calibrate dict {self._calibration}")
+                logger.debug(f"formatted cal is:\n{ val_dict['value_cal'] }")
             else:
                 logger.warning('the _calibration property is of unknown type')
             return val_dict

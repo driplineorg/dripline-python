@@ -13,7 +13,7 @@ class Interface(Core):
     A class that provides user-friendly methods for dripline interactions in a Python interpreter.
     Intended for use as a dripline client in scripts or interactive sessions.
     '''
-    def __init__(self, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
+    def __init__(self, authentication_obj = None, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
         '''
         Configures an interface with the necessary parameters.
 
@@ -48,18 +48,21 @@ class Interface(Core):
         if dripline_mesh is not None:
             dripline_config.update(dripline_mesh)
 
-        dl_auth_spec = create_dripline_auth_spec()
-        auth_args = {
-            'username': {} if username is None else username,
-            'password': {} if password is None else password,
-        }
-        dl_auth_spec.merge( scarab.to_param(auth_args) )
-        auth_spec = scarab.ParamNode()
-        auth_spec.add('dripline', dl_auth_spec)
-        logger.debug(f'Loading auth spec:\n{auth_spec}')
-        auth = scarab.Authentication()
-        auth.add_groups(auth_spec)
-        auth.process_spec()
+        if authentication_obj is not None:
+            auth = authentication_obj
+        else:
+            dl_auth_spec = create_dripline_auth_spec()
+            auth_args = {
+              'username': {} if username is None else username,
+              'password': {} if password is None else password,
+            }
+            dl_auth_spec.merge( scarab.to_param(auth_args) )
+            auth_spec = scarab.ParamNode()
+            auth_spec.add('dripline', dl_auth_spec)
+            logger.debug(f'Loading auth spec:\n{auth_spec}')
+            auth = scarab.Authentication()
+            auth.add_groups(auth_spec)
+            auth.process_spec()
 
         Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
 

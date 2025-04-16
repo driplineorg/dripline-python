@@ -174,7 +174,7 @@ class Entity(Endpoint):
                 abs((self._last_log_value - this_value)/self._last_log_value)>self._max_fractional_change)):
             logger.debug("log because change magnitude")
         else:
-            logger.debug("no log condition met, not logging")
+            logger.debug("no log condition met, not logging for {self.name}")
             return
         self._last_log_value = this_value
         self.log_a_value(result)

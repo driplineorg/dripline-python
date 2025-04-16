@@ -104,6 +104,10 @@ class SQLTable(Endpoint):
         self._optional_insert_names = self._ensure_col_key_map(optional_insert_names)
         self._default_insert_dict = default_insert_values
 
+    def on_get(self):
+        result = {"default":"this is a default output"}
+        return result 
+
     def _ensure_col_key_map(self, column_list):
         to_return = []
         for a_col in column_list:
