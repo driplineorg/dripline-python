@@ -12,12 +12,12 @@ MSG_T_REQUEST = 3
 MSG_T_ALERT = 4
 MSG_T_UNKNOWN = 0xffffffff
 
-def test_op_t_to_uint():
+def test_op_t_to_int():
     item = _dripline.core.op_t
-    assert(item.to_uint(item.set) == OP_T_SET)
-    assert(item.to_uint(item.get) == OP_T_GET)
-    assert(item.to_uint(item.cmd) == OP_T_CMD)
-    assert(item.to_uint(item.unknown) == OP_T_UKW)
+    assert(item.to_int(item.set) == OP_T_SET)
+    assert(item.to_int(item.get) == OP_T_GET)
+    assert(item.to_int(item.cmd) == OP_T_CMD)
+    assert(item.to_int(item.unknown) == OP_T_UKW)
 
 def test_op_t_to_string():
     item = _dripline.core.op_t
@@ -32,7 +32,7 @@ def test_op_t_to_string():
         flag = True
     assert(flag)
 
-def test_op_t_uint_to_op_t():
+def test_op_t_int_to_op_t():
     item = _dripline.core.op_t
     assert(item.to_op_t(OP_T_SET) == item.set)
     assert(item.to_op_t(OP_T_GET) == item.get)
@@ -52,12 +52,12 @@ def test_op_t_string_to_op_t():
         flag = True
     assert(flag)
 
-def test_msg_t_to_uint():
+def test_msg_t_to_int():
     item = _dripline.core.msg_t
-    assert(item.to_uint(item.reply) == MSG_T_REPLY)
-    assert(item.to_uint(item.request) == MSG_T_REQUEST)
-    assert(item.to_uint(item.alert) == MSG_T_ALERT)
-    assert(item.to_uint(item.unknown) == MSG_T_UNKNOWN)
+    assert(item.to_int(item.reply) == MSG_T_REPLY)
+    assert(item.to_int(item.request) == MSG_T_REQUEST)
+    assert(item.to_int(item.alert) == MSG_T_ALERT)
+    assert(item.to_int(item.unknown) == MSG_T_UNKNOWN)
 
 def test_msg_t_to_string():
     item = _dripline.core.msg_t
@@ -72,7 +72,7 @@ def test_msg_t_to_string():
         flag = True
     assert(flag)
 
-def test_msg_t_uint_to_msg_t():
+def test_msg_t_int_to_msg_t():
     item = _dripline.core.msg_t
     assert(item.to_msg_t(MSG_T_REPLY) == item.reply)
     assert(item.to_msg_t(MSG_T_REQUEST) == item.request)
