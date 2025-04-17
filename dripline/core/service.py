@@ -5,7 +5,7 @@ from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
 from .object_creator import ObjectCreator
 from .request_sender import RequestSender
-from .request_receiver import RequestHandler
+from .request_handler import RequestHandler
 
 import datetime
 import logging

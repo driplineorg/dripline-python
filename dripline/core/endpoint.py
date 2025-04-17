@@ -1,7 +1,7 @@
 __all__ = []
 
 from _dripline.core import _Endpoint
-from .request_receiver import RequestHandler
+from .request_handler import RequestHandler
 
 import logging
 
