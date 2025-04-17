@@ -8,8 +8,8 @@ from .throw_reply import ThrowReply
 import logging
 logger = logging.getLogger(__name__)
 
-__all__.append("RequestReceiver")
-class RequestReceiver():
+__all__.append("RequestHandler")
+class RequestHandler():
     '''
     A mixin class that provides methods for dripline responses in a dripline objects.
     Intended for use as a centralized object containing response methods in dripline. 
@@ -17,7 +17,7 @@ class RequestReceiver():
     This class is used by Endpoint and Service to include the dripline-standard behavior 
     for handling and responding to requests.
 
-    Any class using RequestReceiver will get the following features:
+    Any class using RequestHandler will get the following features:
 
     * When handling a get/set request that does *not* include a specifier, 
       the function ``on_[get/set]()`` will be called.

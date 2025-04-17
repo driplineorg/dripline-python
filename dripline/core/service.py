@@ -5,7 +5,7 @@ from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
 from .throw_reply import ThrowReply
 from .object_creator import ObjectCreator
 from .request_sender import RequestSender
-from .request_receiver import RequestReceiver
+from .request_receiver import RequestHandler
 
 import datetime
 import logging
@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__.append('Service')
-class Service(_Service, ObjectCreator, RequestSender, RequestReceiver):
+class Service(_Service, ObjectCreator, RequestSender, RequestHandler):
     '''
     The primary unit of software that connects to a broker and typically provides an interface with an instrument or other software.
 
