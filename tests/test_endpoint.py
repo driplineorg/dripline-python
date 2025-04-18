@@ -1,5 +1,7 @@
 import scarab, dripline.core
 
+import pytest
+
 def test_endpoint_creation():
     a_name = "an_endpoint"
     an_endpoint = dripline.core.Endpoint(a_name)
@@ -28,43 +30,27 @@ def test_on_request_message():
 def test_on_reply_message():
     an_endpoint = dripline.core.Endpoint("hello")
     a_reply = dripline.core.MsgReply.create()
-    print(a_reply)
-    flag = False
-    try:
+    with pytest.raises(dripline.core.DriplineError) as excinfo:
         an_endpoint.on_reply_message(a_reply)
-    except Exception: # seems like this is not throwing an actual DriplineError, just a generic Exception. dripline.core.DriplineError
-        flag = True
-    assert(flag)
 
 def test_on_alert_message():
     an_endpoint = dripline.core.Endpoint("hello")
     an_alert = dripline.core.MsgAlert.create()
-    flag = False
-    try:
+    with pytest.raises(dripline.core.DriplineError) as excinfo:
         an_endpoint.on_alert_message(an_alert)
-    except Exception: # seems like this is not throwing an actual DriplineError, just a generic Exception. dripline.core.DriplineError
-        flag =True
-    assert(flag)
 
 def test_do_get_request_no_specifier():
     an_endpoint = dripline.core.Endpoint("hello")
     a_get_request = dripline.core.MsgRequest.create()
     flag = False
-    try:
+    with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_get_request(a_get_request)
-    except dripline.core.ThrowReply:
-        flag = True
-    assert(flag)
 
 def test_do_get_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
     a_get_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "namee", "a_receiver")
-    correct_error = False
-    try:
+    with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_get_request(a_get_request)
-    except dripline.core.ThrowReply as e:
-        correct_error = True
-    assert(correct_error)
 
 def test_do_get_request_valid_specifier():
     a_name = "an_endpoint"
@@ -83,12 +69,8 @@ def test_do_set_request_no_specifier():
     the_node.add("values", scarab.ParamArray())
     the_node["values"].push_back(scarab.ParamValue("a_better_endpoint"))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey")
-    correct_error = False
-    try:
+    with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_set_request(a_set_request)
-    except dripline.core.ThrowReply as e:
-        correct_error = True
-    assert(correct_error)
 
 def test_do_set_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
@@ -96,13 +78,8 @@ def test_do_set_request_invalid_specifier():
     the_node.add("values", scarab.ParamArray())
     the_node["values"].push_back(scarab.ParamValue("a_better_endpoint"))
     a_set_request = dripline.core.MsgRequest.create(the_node, dripline.core.op_t.set, "hey", "namee", "a_receiver")
-    correct_error = False
-    try:
+    with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_set_request(a_set_request)
-    except dripline.core.ThrowReply as e:
-        correct_error = True
-        print('content of error:\n{}'.format(dir(e)))
-    assert(correct_error)
 
 def test_do_set_request_valid_specifier():
     value1 = "an_endpoint"
@@ -125,14 +102,8 @@ def test_do_set_request_valid_specifier():
 def test_do_cmd_request_invalid_specifier():
     an_endpoint = dripline.core.Endpoint("an_endpoint")
     a_cmd_request = dripline.core.MsgRequest.create(scarab.Param(), dripline.core.op_t.cmd, "hey", "on_gett", "a_receiver")
-    correct_error = False
-    try:
+    with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_cmd_request(a_cmd_request)
-    except dripline.core.ThrowReply as e:
-        correct_error = True
-    except Exception as e:
-        print("got a [{}]".format(type(e)))
-    assert(correct_error)
 
 def test_do_cmd_request_valid_specifier():
     class AnotherEndpoint(dripline.core.Endpoint):
