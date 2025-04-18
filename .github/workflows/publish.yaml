@@ -12,16 +12,16 @@ env:
   REGISTRY_OLD: docker.io
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-#  DEV_SUFFIX: '-dev'
-#  BASE_IMAGE_TAG: 'v2.10.0'
-  BASE_IMAGE_TAG: 'hf2.10.4'
-  DEV_SUFFIX: ''
+  DEV_SUFFIX: '-dev'
+  BASE_IMAGE_TAG: 'v2.10.4'
+#  BASE_IMAGE_TAG: 'hf2.10.4'
+#  DEV_SUFFIX: ''
 
 jobs:
 
   test_docker:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       TAG: gha-test
@@ -94,7 +94,7 @@ jobs:
 
   build_and_push:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     if: |
       github.event_name == 'push' ||
