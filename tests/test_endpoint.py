@@ -42,7 +42,6 @@ def test_on_alert_message():
 def test_do_get_request_no_specifier():
     an_endpoint = dripline.core.Endpoint("hello")
     a_get_request = dripline.core.MsgRequest.create()
-    flag = False
     with pytest.raises(dripline.core.ThrowReply) as excinfo:
         a_reply = an_endpoint.do_get_request(a_get_request)
 
