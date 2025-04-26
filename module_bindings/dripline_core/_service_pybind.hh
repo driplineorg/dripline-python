@@ -49,17 +49,17 @@ namespace dripline_pybind
             //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
             // The bindings to these functions are not included in the trampoline class because we're not directly overriding the C++ send() functions.
             .def( "send",
-                  [](dripline::service& a_service, dripline::request_ptr_t a_request){return a_service.send(a_request);},
+                  [](_service& a_service, dripline::request_ptr_t a_request){return a_service.send(a_request);},
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send a request message"
                 )
             .def( "send",
-                  [](dripline::service& a_service, dripline::reply_ptr_t a_reply){return a_service.send(a_reply);},
+                  [](_service& a_service, dripline::reply_ptr_t a_reply){return a_service.send(a_reply);},
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send a reply message"
                 )
             .def( "send",
-                  [](dripline::service& a_service, dripline::alert_ptr_t an_alert){return a_service.send(an_alert);},
+                  [](_service& a_service, dripline::alert_ptr_t an_alert){return a_service.send(an_alert);},
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send an alert message"
                 )
