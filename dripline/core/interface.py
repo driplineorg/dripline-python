@@ -2,7 +2,7 @@ __all__ = []
 
 import scarab
 
-from _dripline.core import op_t, create_dripline_auth_spec, Core, DriplineConfig, Receiver, MsgRequest, MsgReply, DriplineError
+from _dripline.core import create_dripline_auth_spec, Core, DriplineConfig, Receiver
 from .request_sender import RequestSender
 
 import logging
