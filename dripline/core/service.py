@@ -150,12 +150,54 @@ class Service(_Service, ObjectCreator, RequestSender, RequestHandler):
                     logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
                     an_endpoint.start_logging()
     
-    def do_get_request(self, a_request_message): 
-        return self._do_get_request(a_request_message)
+    def do_get_request(self, a_request_message):
+        '''
+        Default function for handling an OP_GET request message addressed to this service.
 
-    def do_set_request(self, a_request_message): 
-        return self._do_set_request(a_request_message)
+        .. note: For dripline extension developers -- This function, as defined in RequestHandler, implements the characteristic 
+        dripline-python behavior for an service receiving a get request, including using the specifier to access attributes, 
+        and calling on_get() when there is no specifier.  
+        As an extension author you might typically override RequestReciever.on_get(), but leave this function alone.
 
-    def do_cmd_request(self, a_request_message): 
-        return self._do_cmd_request(a_request_message)
-    
+        .. note: For core dripline developers -- This function has to be here to correctly receive trampolined calls from 
+        the C++ base class.  It intentionally just calls the version of do_get_request() in RequestHandler.
+
+        Args:
+            a_request_message (MsgRequest): the message receveived by this service
+        '''
+
+        return RequestHandler.do_get_request(self, a_request_message)
+
+    def do_set_request(self, a_request_message):
+        '''
+        Default function for handling an OP_SET request message addressed to this service.
+
+        .. note: For dripline extension developers -- This function, as defined in RequestHandler, implements the characteristic 
+        dripline-python behavior for an service receiving a set request, including using the specifier to access attributes, 
+        and calling on_set() when there is no specifier.  
+        As an extension author you might typically override RequestReciever.on_set(), but leave this function alone.
+
+        .. note: For core dripline developers -- This function has to be here to correctly receive trampolined calls from 
+        the C++ base class.  It intentionally just calls the version of do_set_request() in RequestHandler.
+
+        Args:
+            a_request_message (MsgRequest): the message receveived by this service
+        '''
+
+        return RequestHandler.do_set_request(self, a_request_message)
+
+    def do_cmd_request(self, a_request_message):
+        '''
+        Default function for handling an OP_CMD request message addressed to this service.
+
+        .. note: For dripline extension developers -- This function, as defined in RequestHandler, implements the characteristic 
+        dripline-python behavior for an service receiving a cmd request, namesly using the specifier to call service methods.
+
+        .. note: For core dripline developers -- This function has to be here to correctly receive trampolined calls from 
+        the C++ base class.  It intentionally just calls the version of do_cmd_request() in RequestHandler.
+
+        Args:
+            a_request_message (MsgRequest): the message receveived by this service
+        '''
+
+        return RequestHandler.do_cmd_request(self, a_request_message)
