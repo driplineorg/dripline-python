@@ -23,6 +23,7 @@ namespace dripline_pybind
                           std::shared_ptr< dripline::sent_msg_pkg >
                         >( mod, "SentMessagePackage", "Data structure for sent messages" )
             .def_property_readonly( "successful_send", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_successful_send; } )
+            .def_property_readonly( "send_error_message", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_send_error_message; } )
             ;
 
         all_items.push_back( "Core" );
