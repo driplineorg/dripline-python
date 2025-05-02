@@ -1,4 +1,4 @@
-import scarab, dripline.core
+import scarab, dripline
 
 import pytest
 
@@ -10,22 +10,30 @@ def test_service_creation():
 def test_submit_request_message():
     a_name = "a_service"
     a_service = dripline.core.Service(a_name, make_connection=False)
-    a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "name", "a_receiver")
-    a_reply = a_service.submit_request_message(a_request)
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 0)
-    assert(a_reply.correlation_id == a_request.correlation_id)
-    a_reply.payload.to_python()['values'] == [a_name]
+    a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, a_name, "name", "a_receiver")
+    # Should throw a reply: on_request_message results in a reply message that gets sent; in core, since the service is offline, the reply is thrown
+    with pytest.raises(RuntimeError) as excinfo:
+        a_reply = a_service.submit_request_message(a_request)
+    assert excinfo.type is RuntimeError
+    assert "Thrown reply:" in str(excinfo.value)
+    #assert(isinstance(a_reply, dripline.core.MsgReply))
+    #assert(a_reply.return_code == 0)
+    #assert(a_reply.correlation_id == a_request.correlation_id)
+    #a_reply.payload.to_python()['values'] == [a_name]
 
 def test_on_request_message():
     a_name = "a_service"
     a_service = dripline.core.Service(a_name, make_connection=False)
-    a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, "hey", "name", "a_receiver")
-    a_reply = a_service.on_request_message(a_request)
-    assert(isinstance(a_reply, dripline.core.MsgReply))
-    assert(a_reply.return_code == 0) # 0
-    assert(a_reply.correlation_id == a_request.correlation_id)
-    a_reply.payload.to_python()['values'] == [a_name]
+    a_request = dripline.core.MsgRequest.create(scarab.ParamValue(5), dripline.core.op_t.get, a_name, "name", "a_receiver")
+    # Should throw a reply: on_request_message results in a reply message that gets sent; in core, since the service is offline, the reply is thrown
+    with pytest.raises(RuntimeError) as excinfo:
+        a_reply = a_service.on_request_message(a_request)
+    assert excinfo.type is RuntimeError
+    assert "Thrown reply:" in str(excinfo.value)
+#    assert(isinstance(a_reply, dripline.core.MsgReply))
+#    assert(a_reply.return_code == 0) # 0
+#    assert(a_reply.correlation_id == a_request.correlation_id)
+#    a_reply.payload.to_python()['values'] == [a_name]
 
 def test_on_reply_message():
     a_service = dripline.core.Service("hello", make_connection=False)
@@ -126,6 +134,7 @@ def test_do_cmd_request_valid_specifier():
 def test_send_request():
     a_service = dripline.core.Service("a_service", make_connection=False)
     a_request = dripline.core.MsgRequest.create(scarab.Param(), dripline.core.op_t.get, "hey", "on_get", "a_receiver")
-    a_sent_msg = a_service.send(a_request)
-    assert not a_sent_msg.successful_send
-    assert 'Reply code: 312 NO_ROUTE' in a_sent_msg.send_error_message
+    with pytest.raises(RuntimeError, match="Thrown request:*") as excinfo:
+        a_sent_msg = a_service.send(a_request)
+    print(f'Exception value:\n{excinfo.value}')
+    assert excinfo.type is RuntimeError
