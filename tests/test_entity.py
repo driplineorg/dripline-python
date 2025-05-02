@@ -8,5 +8,5 @@ def test_log_a_value():
     with pytest.raises(RuntimeError) as excinfo:
         a_entity.log_a_value(5)
     assert excinfo.type is RuntimeError
-    assert "Thrown alert:" in excinfo.value
-    assert "Payload: 5" in excinfo.value
+    assert "Thrown alert:" in str(excinfo.value)
+    assert "Payload: 5" in str(excinfo.value)
