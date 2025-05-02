@@ -183,7 +183,7 @@ class Entity(Endpoint):
         logger.info(f"value to log for {self.name} is:\n{the_value}")
         self._last_log_time = datetime.datetime.now(datetime.timezone.utc)
         the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key=f'{self.log_routing_key_prefix}.{self.name}')
-        alert_sent = self.service.send(the_alert)
+        _ = self.service.send(the_alert)
 
     def start_logging(self):
         if self._log_action_id is not None:
