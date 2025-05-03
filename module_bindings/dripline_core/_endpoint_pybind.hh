@@ -17,7 +17,9 @@ namespace dripline_pybind
         std::list< std::string > all_items;
 
         all_items.push_back( "_Endpoint" );
-        pybind11::classh< dripline::endpoint, _endpoint_trampoline >( mod, "_Endpoint", "Endpoint binding" )
+        pybind11::classh< dripline::endpoint,
+                          _endpoint_trampoline 
+                        >( mod, "_Endpoint", "Endpoint binding" )
             .def( pybind11::init< const std::string& >(), DL_BIND_CALL_GUARD_STREAMS )
 
             // mv_ properties

@@ -26,8 +26,7 @@ namespace dripline_pybind
             ;
 
         all_items.push_back( "Core" );
-        pybind11::class_< dripline::core,
-                          std::shared_ptr< dripline::core >
+        pybind11::classh< dripline::core
                         > t_core( mod, "Core", "lower-level class for AMQP message sending and receiving" );
 
         // bind the core class
