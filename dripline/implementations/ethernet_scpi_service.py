@@ -52,10 +52,10 @@ class EthernetSCPIService(Service):
             (ip,port) = re.findall(re_str,socket_info)[0]
             socket_info = (ip,int(port))
         if response_terminator is None or response_terminator == '':
-            raise ThrowReply('service_error_invalid_value', f"Invalid response terminator: <{repr(response_terminator)}>! Expect string")
+            raise ValueError(f"Invalid response terminator: <{repr(response_terminator)}>! Expect string")
         if not isinstance(cmd_at_reconnect, list) or len(cmd_at_reconnect)==0:
             if cmd_at_reconnect is not None:
-                raise ThrowReply('service_error_invalid_value', f"Invalid cmd_at_reconnect: <{repr(cmd_at_reconnect)}>! Expect non-zero length list")
+                raise ValueError(f"Invalid cmd_at_reconnect: <{repr(cmd_at_reconnect)}>! Expect non-zero length list")
 
         self.alock = threading.Lock()
         self.socket = socket.socket()
