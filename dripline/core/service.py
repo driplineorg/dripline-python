@@ -2,6 +2,7 @@ __all__ = []
 
 import scarab
 from _dripline.core import _Service, DriplineConfig, create_dripline_auth_spec
+from _dripline.core import MsgRequest, Receiver, op_t
 from .throw_reply import ThrowReply
 from .object_creator import ObjectCreator
 
@@ -148,6 +149,7 @@ class Service(_Service, ObjectCreator):
             logger.debug(f'Service received some kwargs that it doesn\'t handle, which will be ignored: {kwargs}')
 
         self._heartbeat_action_id = None
+        self._message_wait_ms = message_wait_ms 
         self.heartbeat_broker_s = heartbeat_broker_s
         self.rk_aliveness = rk_aliveness
         self.broker = config["dripline_mesh"]["broker"]
@@ -169,21 +171,20 @@ class Service(_Service, ObjectCreator):
     
     def scheduled_heartbeat(self):
         logger.info("in a scheduled hearbeat event")
-        command = f"dl-agent -b {self.broker} get {self.rk_aliveness} | tail -n 5"
-        Nmax = int(1)
-        for index in range(Nmax):
-            conn_queue_info = (subprocess.run([command],shell=True, capture_output=True).stdout).decode('UTF-8')
-            logger.info(f"{conn_queue_info} {index}")
-            if "NO_ROUTE" in conn_queue_info:
-                conn_queue_info = (subprocess.run([command],shell=True, capture_output=True).stdout).decode('UTF-8')
-                if index == Nmax - 1:
-                    raise ThrowReply("Failed rabbitmq connection test.")
-                else:
-                    time.sleep(3)
-            else:
-                logger.info(f"rabbitmq connection is found in this scheduler")
-                break
-
+        a_node= scarab.ParamNode()
+        a_receiver = Receiver()
+        #a_node.add('values',scarab.ParamValue('5'))
+        the_request = MsgRequest.create(a_node, op_t.get,self.rk_aliveness)
+        reply_pkg = self.send(the_request)
+        if not reply_pkg.successful_send:
+          raise ThrowReply("Failed rabbitmq connection test.")
+        sig_handler = scarab.SignalHandler()
+        sig_handler.add_cancelable(a_receiver)
+        result = a_receiver.wait_for_reply(reply_pkg, self._message_wait_ms) # receiver expects ms
+        sig_handler.remove_cancelable(a_receiver)
+        the_value = result.payload
+        logger.info(f"get {self.rk_aliveness}, result: {the_value}")
+        logger.info(f"rabbitmq connection is found in this scheduler")
 
     def start_heartbeat(self):
         if self._heartbeat_action_id is not None:
