@@ -164,7 +164,7 @@ class Entity(Endpoint):
         # Various checks for log condition
         if self._last_log_time is None:
             logger.debug("log because no last log")
-        elif (datetime.datetime.utcnow() - self._last_log_time).total_seconds() > self._max_interval:
+        elif (datetime.datetime.now(datetime.timezone.utc) - self._last_log_time).total_seconds() > self._max_interval:
             logger.debug("log because too much time")
         elif this_value is False:
             logger.warning(f"cannot check value change for {self.name}")
@@ -181,9 +181,9 @@ class Entity(Endpoint):
 
     def log_a_value(self, the_value):
         logger.info(f"value to log for {self.name} is:\n{the_value}")
-        self._last_log_time = datetime.datetime.utcnow()
+        self._last_log_time = datetime.datetime.now(datetime.timezone.utc)
         the_alert = MsgAlert.create(payload=scarab.to_param(the_value), routing_key=f'{self.log_routing_key_prefix}.{self.name}')
-        alert_sent = self.service.send(the_alert)
+        _ = self.service.send(the_alert)
 
     def start_logging(self):
         if self._log_action_id is not None:
