@@ -200,8 +200,14 @@ class HeartbeatMonitor(AlertConsumer):
                 binding = self.endpoint_name_prefix+service_name
                 self.add_child(HeartbeatTracker(service_name=service_name, name=binding))
                 self.monitoring_names[service_name] = binding
-                self.bind_key(self.requests_exchange, binding+'.#')
-                logger.debug(f'Added endpoint for unknown heartbeat from {service_name}')
+                logger.debug(f'Started monitoring hearteats from {service_name}')
+                logger.warning(f'Heartbeat monitor is currently unable to listen for requests addressed to the endpoints of new heartbeat trackers; You will not be able to send messages to {binding}')
+                # We'd like to be able to bind the new end point to the service's connection.
+                # However, we're unable to bind while the connection is being listened on.
+                # We either need a way to stop the service and restart (at which point it would bind all of the endpoints, including the new one),
+                # or we use the endpoint as an asychronous endpoint, in which case we need a way to start its thread (there isn't a separate function in dl-cpp to do this at this point).
+                #self.bind_key(self.requests_exchange, binding+'.#')
+                #logger.debug(f'Added endpoint for unknown heartbeat from {service_name}')
             return
         
         try:
