@@ -2,16 +2,19 @@ __all__ = []
 
 import scarab
 
-from _dripline.core import op_t, create_dripline_auth_spec, Core, DriplineConfig, Receiver, MsgRequest, MsgReply, DriplineError
+from _dripline.core import create_dripline_auth_spec, Core, DriplineConfig, Receiver
+from .request_sender import RequestSender
 
 import logging
 logger = logging.getLogger(__name__)
 
 __all__.append("Interface")
-class Interface(Core):
+class Interface(Core, RequestSender):
     '''
     A class that provides user-friendly methods for dripline interactions in a Python interpreter.
     Intended for use as a dripline client in scripts or interactive sessions.
+
+    See :py:class:dripline.core.RequestSender for the message-sending interface.
     '''
     def __init__(self, username: str | dict=None, password: str | dict=None, dripline_mesh: dict=None, timeout_s: int=10, confirm_retcodes: bool=True):
         '''
@@ -62,93 +65,9 @@ class Interface(Core):
         auth.process_spec()
 
         Core.__init__(self, config=scarab.to_param(dripline_config), auth=auth)
+        RequestSender.__init__(self, sender=self)
 
         self._confirm_retcode = confirm_retcodes
         self.timeout_s = timeout_s
         self._receiver = Receiver()
 
-
-    def _send_request(self, msgop, target, specifier=None, payload=None, timeout=None, lockout_key=None):
-        '''
-        internal helper method to standardize sending request messages
-        '''
-        a_specifier = specifier if specifier is not None else ""
-        a_request = MsgRequest.create(payload=scarab.to_param(payload), msg_op=msgop, routing_key=target, specifier=a_specifier)
-        a_request.lockout_key = lockout_key if lockout_key is not None else ""
-        receive_reply = self.send(a_request)
-        if not receive_reply.successful_send:
-            raise DriplineError('unable to send request')
-        return receive_reply
-
-    def _receive_reply(self, reply_pkg, timeout_s):
-        '''
-        internal helper method to standardize receiving reply messages
-        '''
-        sig_handler = scarab.SignalHandler()
-        sig_handler.add_cancelable(self._receiver)
-        result = self._receiver.wait_for_reply(reply_pkg, timeout_s * 1000) # receiver expects ms
-        sig_handler.remove_cancelable(self._receiver)
-        return result
-
-    def get(self, endpoint: str, specifier: str=None, lockout_key=None, timeout_s: int=0) -> MsgReply:
-        '''
-        Send a get request to an endpoint and return the reply message.
-
-        Parameters
-        ----------
-            endpoint: str
-                Routing key to which the request should be sent.
-            specifier: str, optional
-                Specifier to add to the request, if needed.
-            timeout_s: int | float, optional
-                Maximum time to wait for a reply in seconds (default is 0)
-                A timeout of 0 seconds means no timeout will be used.
-        '''
-        reply_pkg = self._send_request( msgop=op_t.get, target=endpoint, specifier=specifier, lockout_key=lockout_key )
-        result = self._receive_reply( reply_pkg, timeout_s )
-        return result
-
-    def set(self, endpoint: str, value: str | int | float | bool, specifier: str=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
-        '''
-        Send a set request to an endpoint and return the reply message.
-
-        Parameters
-        ----------
-            endpoint: str
-                Routing key to which the request should be sent.
-            value: str | int | float | bool
-                Value to assign in the set operation
-            specifier: str, optional
-                Specifier to add to the request, if needed.
-            timeout_s: int | float, optional
-                Maximum time to wait for a reply in seconds (default is 0)
-                A timeout of 0 seconds means no timeout will be used.
-        '''
-        payload = {'values':[value]}
-        reply_pkg = self._send_request( msgop=op_t.set, target=endpoint, specifier=specifier, payload=payload, lockout_key=lockout_key )
-        result = self._receive_reply( reply_pkg, timeout_s )
-        return result
-
-    def cmd(self, endpoint: str, specifier: str, ordered_args=None, keyed_args=None, lockout_key=None, timeout_s: int | float=0) -> MsgReply:
-        '''
-        Send a cmd request to an endpoint and return the reply message.
-
-        Parameters
-        ----------
-            endpoint: str
-                Routing key to which the request should be sent.
-            ordered_args: array, optional
-                Array of values to assign under 'values' in the payload, if any
-            keyed_args: dict, optional
-                Keyword arguments to assign to the payload, if any
-            specifier: str
-                Specifier to add to the request.  For a dripline-python endpoint, this will be the method executed.
-            timeout_s: int | float, optional
-                Maximum time to wait for a reply in seconds (default is 0)
-                A timeout of 0 seconds means no timeout will be used.
-        '''
-        payload = {'values': [] if ordered_args is None else ordered_args}
-        payload.update({} if keyed_args is None else keyed_args)
-        reply_pkg = self._send_request( msgop=op_t.cmd, target=endpoint, specifier=specifier, lockout_key=lockout_key, payload=payload )
-        result = self._receive_reply( reply_pkg, timeout_s )
-        return result

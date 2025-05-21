@@ -23,11 +23,11 @@ namespace dripline_pybind
                           std::shared_ptr< dripline::sent_msg_pkg >
                         >( mod, "SentMessagePackage", "Data structure for sent messages" )
             .def_property_readonly( "successful_send", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_successful_send; } )
+            .def_property_readonly( "send_error_message", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_send_error_message; } )
             ;
 
         all_items.push_back( "Core" );
-        pybind11::class_< dripline::core,
-                          std::shared_ptr< dripline::core >
+        pybind11::classh< dripline::core
                         > t_core( mod, "Core", "lower-level class for AMQP message sending and receiving" );
 
         // bind the core class
@@ -42,6 +42,11 @@ namespace dripline_pybind
                   pybind11::arg( "make_connection" ) = true
                 )
 
+            // Notes on send() bindings
+            // The bound functions use lambdas because the dripline::core functions include amqp_ptr_t arguments which aren't known to pybind11.
+            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bindings to these functions are not included in a trampoline class because we're not directly overriding the C++ send() functions.
+            //   Therefore calls to send() from a base-class pointer will not redirect appropriately to the derived-class versions of send().
             .def( "send",
                   [](dripline::core& a_core, dripline::request_ptr_t a_request){return a_core.send(a_request);},
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,

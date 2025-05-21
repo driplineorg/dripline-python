@@ -50,6 +50,11 @@ def test_lockout_key_roundtrip():
     lk_rt = a_request.lockout_key  # get the id back
     assert(lk_rt == random_uuid)  # test being able to set and then get the id
 
+    random_uuid_2 = uuid.uuid4()
+    a_request.lockout_key = str(random_uuid_2)  # set the id from a string
+    lk_rt_2 = a_request.lockout_key  # get the id back
+    assert(lk_rt_2 == random_uuid_2)  # test being able to set and then get the id
+
 def test_request_reply_default():
     a_request = _dripline.core.MsgRequest.create(reply_to = "a_receiver")
     a_reply = a_request.reply()
