@@ -23,10 +23,13 @@ __all__.append('HeartbeatTracker')
 class HeartbeatTracker(Endpoint):
     '''
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, service_name, **kwargs):
         '''
+        Args:
+          service_name (str): Name of the service to be monitored
         '''
         Endpoint.__init__(self, **kwargs)
+        self.service_name = service_name
         self.last_timestamp = time.time()
         self.is_active = True
         self.status = HeartbeatTracker.Status.UNKNOWN
@@ -34,7 +37,7 @@ class HeartbeatTracker(Endpoint):
     def process_heartbeat(self, timestamp):
         '''
         '''
-        logger.debug(f'New timestamp for {self.name}: {timestamp}')
+        logger.debug(f'New timestamp for {self.service_name}: {timestamp}')
         dt = datetime.fromisoformat(timestamp)
         posix_time = dt.timestamp()
         logger.debug(f'Time since epoch: {posix_time}')
@@ -47,15 +50,15 @@ class HeartbeatTracker(Endpoint):
         if self.is_active:
             if diff > self.service.critical_threshold_s:
                 # report critical
-                logger.critical(f'Missing heartbeat: {self.name}')
+                logger.critical(f'Missing heartbeat: {self.service_name}')
                 self.status = HeartbeatTracker.Status.CRITICAL
             else:
                 if diff > self.service.warning_threshold_s:
                     # report warning
-                    logger.warning(f'Missing heartbeat: {self.name}')
+                    logger.warning(f'Missing heartbeat: {self.service_name}')
                     self.status = HeartbeatTracker.Status.WARNING
                 else:
-                    logger.debug(f'Heartbeat status ok: {self.name}')
+                    logger.debug(f'Heartbeat status ok: {self.service_name}')
                     self.status = HeartbeatTracker.Status.OK
         else:
             # report inactive heartbeat received
@@ -75,14 +78,20 @@ class HeartbeatMonitor(AlertConsumer):
     An alert consumer which listens to heartbeat messages and keeps track of the time since the last was received
 
     '''
-    def __init__(self, time_between_checks_s=20, warning_threshold_s=120, critical_threshold_s=300, add_unknown_heartbeats=True, **kwargs):
+    def __init__(self, 
+                 time_between_checks_s=20, 
+                 warning_threshold_s=120, 
+                 critical_threshold_s=300, 
+                 add_unknown_heartbeats=True, 
+                 endpoint_name_prefix='hbmon_',
+                 **kwargs):
         '''
         Args:
             time_between_checks_s (int): number of seconds between heartbeat status checks
             warning_threshold_s (int): warning threshold for missing heartbeats (in seconds)
             critical_threshold_s (int): critical threshold for missing heartbeats (in seconds)
             add_unknown_heartbeats (bool): whether or not to add a new endpoint if an unknown heartbeat is received
-            socket_timeout (int): number of seconds to wait for a reply from the device before timeout.
+            endpoint_name_prefix (str): prefix added to monitored-service names for hbmon endpoints
         '''
         AlertConsumer.__init__(self, **kwargs)
 
@@ -97,6 +106,16 @@ class HeartbeatMonitor(AlertConsumer):
         self.warning_threshold_s = warning_threshold_s
         self.critical_threshold_s = critical_threshold_s
         self.add_unknown_heartbeats = add_unknown_heartbeats
+        self.endpoint_name_prefix = endpoint_name_prefix
+
+        # Fill the dictionary mapping monitoring name to service name
+        self.monitoring_names = {}
+        for an_endpoint in self.sync_children.values():
+            try:
+                self.monitoring_names[an_endpoint.service_name] = an_endpoint.name
+            except Exception as err:
+                logger.error(f'Error while attempting to fill monitoring_names: {err}')
+        logger.debug(f'Initial set of services monitored:\n{self.monitoring_names}')            
 
     def run(self):
         monitor_thread = threading.Thread(target=self.monitor_heartbeats)
@@ -175,15 +194,24 @@ class HeartbeatMonitor(AlertConsumer):
 
     def process_payload(self, a_payload, a_routing_key_data, a_message_timestamp):
         service_name = a_routing_key_data['service_name']
-        if not service_name in self.sync_children:
+        if not service_name in self.monitoring_names:
             logger.warning(f'received unexpected heartbeat;\npayload: {a_payload}\nrouting key data: {a_routing_key_data}\ntimestamp: {a_message_timestamp}')
             if self.add_unknown_heartbeats:
-                self.add_child(HeartbeatTracker(name=service_name))
-                logger.debug(f'Added endpoint for unknown heartbeat from {service_name}')
+                binding = self.endpoint_name_prefix+service_name
+                self.add_child(HeartbeatTracker(service_name=service_name, name=binding))
+                self.monitoring_names[service_name] = binding
+                logger.debug(f'Started monitoring hearteats from {service_name}')
+                logger.warning(f'Heartbeat monitor is currently unable to listen for requests addressed to the endpoints of new heartbeat trackers; You will not be able to send messages to {binding}')
+                # We'd like to be able to bind the new end point to the service's connection.
+                # However, we're unable to bind while the connection is being listened on.
+                # We either need a way to stop the service and restart (at which point it would bind all of the endpoints, including the new one),
+                # or we use the endpoint as an asychronous endpoint, in which case we need a way to start its thread (there isn't a separate function in dl-cpp to do this at this point).
+                #self.bind_key(self.requests_exchange, binding+'.#')
+                #logger.debug(f'Added endpoint for unknown heartbeat from {service_name}')
             return
         
         try:
-            self.sync_children[service_name].process_heartbeat(a_message_timestamp)
+            self.sync_children[self.monitoring_names[service_name]].process_heartbeat(a_message_timestamp)
         except Exception as err:
             logger.error(f'Unable to handle payload for heartbeat from service {service_name}: {err}')
 
