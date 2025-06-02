@@ -78,10 +78,10 @@ class SQLTable(Endpoint):
     '''
     def __init__(self, table_name,
                  schema=None,
-                 required_insert_names=[],
-                 return_col_names=[],
-                 optional_insert_names=[],
-                 default_insert_values={},
+                 required_insert_names=None,
+                 return_col_names=None,
+                 optional_insert_names=None,
+                 default_insert_values=None,
                  *args,
                 **kwargs):
         '''
@@ -95,6 +95,16 @@ class SQLTable(Endpoint):
         if not 'sqlalchemy' in globals():
             raise ImportError('SQLAlchemy not found, required for SQLTable class')
         Endpoint.__init__(self, *args, **kwargs)
+
+        if required_insert_names == None:
+            required_insert_names = []
+        if return_col_names == None:
+            return_col_names = []
+        if optional_insert_names == None:
+            optional_insert_names = []
+        if default_insert_values == None:
+            default_insert_values = {}
+
         self.table = None
         self.table_name = table_name
         self.schema = schema
@@ -119,7 +129,7 @@ class SQLTable(Endpoint):
                 raise TypeError(f"column info <{a_col}> is not of an expected type")
         return to_return
 
-    def do_select(self, return_cols=[], where_eq_dict={}, where_lt_dict={}, where_gt_dict={}):
+    def do_select(self, return_cols=None, where_eq_dict=None, where_lt_dict=None, where_gt_dict=None):
         '''
         return_cols (list of str): string names of columns, internally converted to sql reference; if evaluates as false, all columns are returned
         where_eq_dict (dict): keys are column names (str), and values are tested with '=='
@@ -134,6 +144,12 @@ class SQLTable(Endpoint):
             this_select = sqlalchemy.select(self.table)
         else:
             this_select = sqlalchemy.select(*[getattr(self.table.c,col) for col in return_cols])
+        if where_eq_dict == None:
+            where_eq_dict = {}
+        if where_lt_dict == None:
+            where_lt_dict = {}
+        if where_gt_dict == None:
+            where_gt_dict = {}
         for c,v in where_eq_dict.items():
             this_select = this_select.where(getattr(self.table.c,c)==v)
         for c,v in where_lt_dict.items():
