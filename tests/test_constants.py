@@ -1,93 +1,66 @@
-import scarab, _dripline.core
-from dripline.core import ThrowReply, DriplineError
+import dripline
+import pytest
 
-OP_T_SET = 0
-OP_T_GET = 1
-OP_T_RUN = 8
-OP_T_CMD = 9
-OP_T_UKW = 0xffffffff
-
-MSG_T_REPLY = 2
-MSG_T_REQUEST = 3
-MSG_T_ALERT = 4
-MSG_T_UNKNOWN = 0xffffffff
-
-def test_op_t_to_uint():
-    item = _dripline.core.op_t
-    assert(item.to_uint(item.set) == OP_T_SET)
-    assert(item.to_uint(item.get) == OP_T_GET)
-    assert(item.to_uint(item.cmd) == OP_T_CMD)
-    assert(item.to_uint(item.unknown) == OP_T_UKW)
+def test_op_t_to_int():
+    item = dripline.core.op_t
+    assert(item.to_int(item.set) == item.set.value)
+    assert(item.to_int(item.get) == item.get.value)
+    assert(item.to_int(item.cmd) == item.cmd.value)
+    assert(item.to_int(item.unknown) == item.unknown.value)
 
 def test_op_t_to_string():
-    item = _dripline.core.op_t
-    assert(item.to_string(item.set) == "set")
-    assert(item.to_string(item.get) == "get")
-    assert(item.to_string(item.cmd) == "cmd")
-    assert(item.to_string(item.unknown) == "unknown")
-    flag = False
-    try:
-        item.to_string(_dripline.core.msg_t.request)
-    except TypeError:
-        flag = True
-    assert(flag)
+    item = dripline.core.op_t
+    assert(item.to_string(item.set) == item.set.name)
+    assert(item.to_string(item.get) == item.get.name)
+    assert(item.to_string(item.cmd) == item.cmd.name)
+    assert(item.to_string(item.unknown) == item.unknown.name)
+    with pytest.raises(TypeError):
+        item.to_string(dripline.core.msg_t.request)
 
-def test_op_t_uint_to_op_t():
-    item = _dripline.core.op_t
-    assert(item.to_op_t(OP_T_SET) == item.set)
-    assert(item.to_op_t(OP_T_GET) == item.get)
-    assert(item.to_op_t(OP_T_CMD) == item.cmd)
-    assert(item.to_op_t(OP_T_UKW) == item.unknown)
+def test_op_t_int_to_op_t():
+    item = dripline.core.op_t
+    assert(item.to_op_t(item.set.value) == item.set)
+    assert(item.to_op_t(item.get.value) == item.get)
+    assert(item.to_op_t(item.cmd.value) == item.cmd)
+    assert(item.to_op_t(item.unknown.value) == item.unknown)
 
 def test_op_t_string_to_op_t():
-    item = _dripline.core.op_t
-    assert(item.to_op_t("set") == item.set)
-    assert(item.to_op_t("get") == item.get)
-    assert(item.to_op_t("cmd") == item.cmd)
-    assert(item.to_op_t("unknown") == item.unknown)
-    flag = False
-    try:
+    item = dripline.core.op_t
+    assert(item.to_op_t(item.set.name) == item.set)
+    assert(item.to_op_t(item.get.name) == item.get)
+    assert(item.to_op_t(item.cmd.name) == item.cmd)
+    assert(item.to_op_t(item.unknown.name) == item.unknown)
+    with pytest.raises(Exception): # TODO: check what kind of exception this raises
         item.to_op_t("hello")
-    except Exception: # seems like this is not raising an actual DriplineError, just a generic Exception
-        flag = True
-    assert(flag)
 
-def test_msg_t_to_uint():
-    item = _dripline.core.msg_t
-    assert(item.to_uint(item.reply) == MSG_T_REPLY)
-    assert(item.to_uint(item.request) == MSG_T_REQUEST)
-    assert(item.to_uint(item.alert) == MSG_T_ALERT)
-    assert(item.to_uint(item.unknown) == MSG_T_UNKNOWN)
+def test_msg_t_to_int():
+    item = dripline.core.msg_t
+    assert(item.to_int(item.reply) == item.reply.value)
+    assert(item.to_int(item.request) == item.request.value)
+    assert(item.to_int(item.alert) == item.alert.value)
+    assert(item.to_int(item.unknown) == item.unknown.value)
 
 def test_msg_t_to_string():
-    item = _dripline.core.msg_t
-    assert(item.to_string(item.reply) == "reply")
-    assert(item.to_string(item.request) == "request")
-    assert(item.to_string(item.alert) == "alert")
-    assert(item.to_string(item.unknown) == "unknown")
-    flag = False
-    try:
-        item.to_string(_dripline.core.op_t.set)
-    except TypeError:
-        flag = True
-    assert(flag)
+    item = dripline.core.msg_t
+    assert(item.to_string(item.reply) == item.reply.name)
+    assert(item.to_string(item.request) == item.request.name)
+    assert(item.to_string(item.alert) == item.alert.name)
+    assert(item.to_string(item.unknown) == item.unknown.name)
+    with pytest.raises(TypeError):
+        item.to_string(dripline.core.op_t.set)
 
-def test_msg_t_uint_to_msg_t():
-    item = _dripline.core.msg_t
-    assert(item.to_msg_t(MSG_T_REPLY) == item.reply)
-    assert(item.to_msg_t(MSG_T_REQUEST) == item.request)
-    assert(item.to_msg_t(MSG_T_ALERT) == item.alert)
-    assert(item.to_msg_t(MSG_T_UNKNOWN) == item.unknown)
+def test_msg_t_int_to_msg_t():
+    item = dripline.core.msg_t
+    assert(item.to_msg_t(item.reply.value) == item.reply)
+    assert(item.to_msg_t(item.request.value) == item.request)
+    assert(item.to_msg_t(item.alert.value) == item.alert)
+    assert(item.to_msg_t(item.unknown.value) == item.unknown)
 
 def test_msg_t_string_to_msg_t():
-    item = _dripline.core.msg_t
-    assert(item.to_msg_t("reply") == item.reply)
-    assert(item.to_msg_t("request") == item.request)
-    assert(item.to_msg_t("alert") == item.alert)
-    assert(item.to_msg_t("unknown") == item.unknown)
-    flag = False
-    try:
+    item = dripline.core.msg_t
+    assert(item.to_msg_t(item.reply.name) == item.reply)
+    assert(item.to_msg_t(item.request.name) == item.request)
+    assert(item.to_msg_t(item.alert.name) == item.alert)
+    assert(item.to_msg_t(item.unknown.name) == item.unknown)
+    with pytest.raises(Exception): # TODO: check what kind of exception this raises
         item.to_msg_t("hello")
-    except Exception: # seems like this is not raising an actual DriplineError, just a generic Exception
-        flag = True
-    assert(flag)
