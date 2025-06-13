@@ -65,8 +65,6 @@ class Service(_Service, ObjectCreator):
                  message_wait_ms=1000, heartbeat_interval_s=60, 
                  username=None, password=None, authentication_obj=None,
                  dripline_mesh=None, 
-                 heartbeat_broker_s=60,
-                 rk_aliveness="state",
                  **kwargs):
         '''
         Configures a service with the necessary parameters.
@@ -105,8 +103,6 @@ class Service(_Service, ObjectCreator):
                 Authentication information provided as a scarab.Authentication object; this will override the auth parameter.
             dripline_mesh : dict, optional
                 Provide optional dripline mesh configuration information (see dripline_config for more information)
-            heartbeat_broker_s (int): self defined scheduler interval (seconds) to check the aliveness
-            rk_aliveness (str): the routing key to check the aliveness (on_get run by default)
         '''
         # Final dripline_mesh config should be the default updated by the parameters passed by the caller
         dripline_config = DriplineConfig().to_python()
@@ -148,53 +144,6 @@ class Service(_Service, ObjectCreator):
         if kwargs:
             logger.debug(f'Service received some kwargs that it doesn\'t handle, which will be ignored: {kwargs}')
 
-        self._heartbeat_action_id = None
-        self._message_wait_ms = message_wait_ms 
-        self.heartbeat_broker_s = heartbeat_broker_s
-        self.rk_aliveness = rk_aliveness
-        self.broker = config["dripline_mesh"]["broker"]
-        self.start_heartbeat()
-
-    @property
-    def heartbeat_broker_s(self):
-         return self._heartbeat_broker_s
-    @heartbeat_broker_s.setter
-    def heartbeat_broker_s(self, new_interval):
-        if isinstance(new_interval, numbers.Number):
-            self._heartbeat_broker_s = datetime.timedelta(seconds=new_interval)
-        elif isinstance(new_interval, dict):
-            self._heartbeat_broker_s = datetime.timedelta(**new_interval)
-        elif isinstance(new_interval, datetime.timedelta):
-            self._heartbeat_broker_s = new_interval
-        else:
-            raise ThrowReply('service_error_invalid_value', f"unable to interpret a new_interval for heartbeat test of type <{type(new_interval)}>")
-    
-    def scheduled_heartbeat(self):
-        logger.info("in a scheduled hearbeat event")
-        a_node= scarab.ParamNode()
-        a_receiver = Receiver()
-        #a_node.add('values',scarab.ParamValue('5'))
-        the_request = MsgRequest.create(a_node, op_t.get,self.rk_aliveness)
-        reply_pkg = self.send(the_request)
-        if not reply_pkg.successful_send:
-          raise ThrowReply("Failed rabbitmq connection test.")
-        sig_handler = scarab.SignalHandler()
-        sig_handler.add_cancelable(a_receiver)
-        result = a_receiver.wait_for_reply(reply_pkg, self._message_wait_ms) # receiver expects ms
-        sig_handler.remove_cancelable(a_receiver)
-        the_value = result.payload
-        logger.info(f"get {self.rk_aliveness}, result: {the_value}")
-        logger.info(f"rabbitmq connection is found in this scheduler")
-
-    def start_heartbeat(self):
-        if self._heartbeat_action_id is not None:
-            self.unschedule(self._heartbeat_action_id)
-        if self.heartbeat_broker_s:
-            logger.info(f'should start heart beat connection check every {self.heartbeat_broker_s}')
-            self._heartbeat_action_id = self.schedule(self.scheduled_heartbeat, self.heartbeat_broker_s, datetime.datetime.now() + self.execution_buffer*3)
-        else:
-            raise ValueError('unable to start logging when heartbeat_broker_s evaluates false')
-        logger.debug(f'heartbeat action id is {self._heartbeat_action_id}')
 
     def add_endpoints_from_config(self):
         if self.endpoint_configs is not None:
