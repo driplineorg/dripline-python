@@ -62,7 +62,17 @@ namespace dripline_pybind
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send an alert message"
                 )
-
+            //.def_property( "address", std::static_cast< const std::string& (const dripline::core::*) >( &dripline::core::address ), [](dripline::core& a_core, const std::string& a_value){a_core.address() = a_value;} )
+            .def_property( "address", [](const dripline::core& a_core){return a_core.address();}, [](dripline::core& a_core, const std::string& a_value){a_core.address() = a_value;} )
+            .def_property( "port", &dripline::core::get_port, &dripline::core::set_port )
+            .def_property( "username", [](const dripline::core& a_core){return a_core.username();}, [](dripline::core& a_core, const std::string& a_value){a_core.username() = a_value;} )
+            .def_property( "password", [](const dripline::core& a_core){return a_core.password();}, [](dripline::core& a_core, const std::string& a_value){a_core.password() = a_value;} )
+            .def_property( "requests_exchange", [](const dripline::core& a_core){return a_core.requests_exchange();}, [](dripline::core& a_core, const std::string& a_value){a_core.requests_exchange() = a_value;} )
+            .def_property( "alerts_exchange", [](const dripline::core& a_core){return a_core.alerts_exchange();}, [](dripline::core& a_core, const std::string& a_value){a_core.alerts_exchange() = a_value;} )
+            .def_property( "heartbeat_routing_key", [](const dripline::core& a_core){return a_core.heartbeat_routing_key();}, [](dripline::core& a_core, const std::string& a_value){a_core.heartbeat_routing_key() = a_value;} )
+            .def_property( "max_payload_size", &dripline::core::get_max_payload_size, &dripline::core::set_max_payload_size )
+            .def_property( "make_connection", &dripline::core::get_make_connection, &dripline::core::set_make_connection )
+            .def_property( "max_connection_attempts", &dripline::core::get_max_connection_attempts, &dripline::core::set_max_connection_attempts )
             ;
 
         // bind core's internal types

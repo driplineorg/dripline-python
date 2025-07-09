@@ -10,5 +10,6 @@ alert_keys:
 alert_key_parser_re: 'heartbeat\.(?P<service_name>\w+)'
 
 endpoints:
-  - name: heartbeat_monitor
+  - name: hbmon_heartbeat_monitor
+    service_name: heartbeat_monitor
     module: HeartbeatTracker
