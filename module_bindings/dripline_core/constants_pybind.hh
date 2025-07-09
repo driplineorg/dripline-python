@@ -19,7 +19,7 @@ namespace dripline_pybind
                 .value( "cmd", dripline::op_t::cmd )
                 .value( "unknown", dripline::op_t::unknown )
                 // helpers for type conversion
-                .def( "to_uint", (unsigned (*)(dripline::op_t))&dripline::to_int, "Convert an op_t to integer" )
+                .def( "to_uint", (unsigned (*)(dripline::op_t))&dripline::to_uint, "Convert an op_t to integer" )
                 .def( "to_string", (std::string (*)(dripline::op_t))&dripline::to_string, "Convert an op_t to string" )
                 .def_static( "to_op_t", (dripline::op_t (*)(unsigned))&dripline::to_op_t, "Convert an integer to op_t" )
                 .def_static( "to_op_t", (dripline::op_t (*)(std::string))&dripline::to_op_t, "Convert an string to op_t" )
