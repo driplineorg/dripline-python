@@ -54,12 +54,12 @@ def _get_on_set_decoration(self, fun):
 __all__.append("Entity")
 class Entity(Endpoint):
     '''
-    Subclass of Endpoint which adds logic related to logging and confirming values.
+    Subclass of Endpoint that adds logic related to logging and confirming values.
 
     In particular, there is support for:
-    get_on_set -> setting the endpoint's value returns a get() result rather than an empty success (particularly useful for devices which may round assignment values)
-    log_on_set -> further extends get_on_set to send an alert message in addtion to returning the value in a reply
-    log_interval -> leverages the scheduler class to log the on_get result at a regular cadence
+    get_on_set -> setting the endpoint's value returns an on_get() result rather than an empty success (particularly useful for devices that may round assignment values)
+    log_on_set -> further extends get_on_set to send an logging alert message in addtion to returning the value in a reply
+    log_interval -> leverages the scheduler class to log the on_get result at a regular cadence and if the value changes significantly
     '''
     #check_on_set -> allows for more complex logic to confirm successful value updates
     #                (for example, the success condition may be measuring another endpoint)
@@ -75,21 +75,34 @@ class Entity(Endpoint):
                  **kwargs):
         '''
         Args:
-            get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
-            log_on_set: if true, always call log_a_value() immediately after on_set
+            get_on_set: bool (default is False)
+                        If true, calls to on_set() are immediately followed by an on_get(), which is returned
+            log_on_set: bool (default is False)
+                        If true, always call log_a_value() immediately after on_set()
                         **Note:** requires get_on_set be true, overrides must be equivalent
-            log_routing_key_prefix: first term in routing key used in alert messages which log values
-            log_interval: how often to check the Entity's value. If 0 then scheduled logging is disabled;
-                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments
-                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
-            max_interval: max allowed time interval between logging, allows usage of conditional logging.  If 0,
-                          then logging values occurs every log_interval.
-            max_fractional_change: max allowed fractional difference between subsequent values to trigger log condition.
-            check_field: result field to check, 'value_cal' or 'value_raw'
-            calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
-                                           @calibrate decorator, used to populate raw and calibrated values
-                                           fields of a result payload. If a dictionary, the raw result is used
-                                           to index the dict with the calibrated value being the dict's value.
+            log_routing_key_prefix: string (default is 'sensor_value')
+                                    First term in routing key used in alert messages that log values
+            log_interval: 0 (default), float, dict, datetime.timmedelta
+                          Defines how often to check the Entity's value to determine if it should be logged
+                          If 0, scheduled logging is disabled;
+                          If a number, interpreted as number of seconds; 
+                          If a dict, unpacked as arguments to the datetime.time_delta initializer; 
+                          If a datetime.timedelta, taken as the new value
+            max_interval: float
+                          Maximum time interval between logging in seconds.  
+                          Logging will take place at the next log_interval after max_interval since the last logged value.
+                          If less than log_interval, then logging values occurs every log_interval.
+            max_fractional_change: float
+                                   Fractional change in the value that will trigger the value to be logged
+                                   If 0, then any change in the value will be logged
+                                   If < 0, then the value will always be logged
+            check_field: string
+                         Field in the dict returned by `on_get() that's used to check for a change in the fractional value
+                         Typically is either 'value_cal' or 'value_raw'
+            calibration: string or dict
+                         If string, updated with raw on_get() result via str.format() in the @calibrate decorator, 
+                         used to populate raw and calibrated values fields of a result payload. 
+                         If a dictionary, the raw result is used to index the dict with the calibrated value being the dict's value.
         '''
         Endpoint.__init__(self, **kwargs)
 
