@@ -107,8 +107,10 @@ class Entity(Endpoint):
         self._max_interval = max_interval
         self._max_fractional_change = max_fractional_change
         self._check_field = check_field
+        
         self._log_action_id = None
         self._last_log_time = None
+        self._last_log_value = None
 
     @property
     def get_on_set(self):
@@ -160,22 +162,21 @@ class Entity(Endpoint):
         try:
             this_value = float(result[self._check_field])
         except (TypeError, ValueError):
-            this_value = False
-        # Various checks for log condition
-        if self._last_log_time is None:
-            logger.debug("log because no last log")
-        elif (datetime.datetime.now(datetime.timezone.utc) - self._last_log_time).total_seconds() > self._max_interval:
-            logger.debug("log because too much time")
-        elif this_value is False:
             logger.warning(f"cannot check value change for {self.name}")
             return
-        elif ((self._last_log_value == 0 and this_value != 0) or
-              (self._last_log_value != 0 and\
-                abs((self._last_log_value - this_value)/self._last_log_value)>self._max_fractional_change)):
-            logger.debug("log because change magnitude")
+
+        # Various checks for log condition
+        if self._last_log_time is None:
+            logger.debug("Logging because this is the first logged value")
+        elif (datetime.datetime.now(datetime.timezone.utc) - self._last_log_time).total_seconds() > self._max_interval:
+            logger.debug("Logging because enough time has elapsed")
+        # this condition is |x1-x0|/(|x1+x0|/2) > max_fractional_change, but safe in case the denominator is 0
+        elif 2 * abs(self._last_log_value - this_value) > self._max_fractional_change * abs(self._last_log_value + this_value):
+            logger.debug("Logging because the value has changed significantly")
         else:
-            logger.debug("no log condition met, not logging")
+            logger.debug("No log condition met, therefore not logging")
             return
+        
         self._last_log_value = this_value
         self.log_a_value(result)
 
