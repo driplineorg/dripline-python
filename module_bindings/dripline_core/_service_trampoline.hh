@@ -25,7 +25,7 @@ namespace dripline_pybind
     {
         public:
             using _service::_service; //inherit constructors
-            _service_trampoline(_service &&base) : _service(std::move(base)) {}
+            //_service_trampoline(_service &&base) : _service(std::move(base)) {}
 
             // Local overrides
             bool bind_keys() override

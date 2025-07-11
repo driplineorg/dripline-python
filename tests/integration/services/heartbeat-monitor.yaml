@@ -1,0 +1,15 @@
+name: heartbeat_monitor
+module: HeartbeatMonitor
+
+heartbeat_interval_s: 30
+warning_threshold_s: 45
+
+# AlertConsumer Inits
+alert_keys:
+  - "heartbeat.#"
+alert_key_parser_re: 'heartbeat\.(?P<service_name>\w+)'
+
+endpoints:
+  - name: hbmon_heartbeat_monitor
+    service_name: heartbeat_monitor
+    module: HeartbeatTracker

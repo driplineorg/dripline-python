@@ -19,9 +19,9 @@ namespace dripline_pybind
                 .value( "cmd", dripline::op_t::cmd )
                 .value( "unknown", dripline::op_t::unknown )
                 // helpers for type conversion
-                .def( "to_int", (int (*)(dripline::op_t))&dripline::to_int, "Convert an op_t to int" )
+                .def( "to_uint", (unsigned (*)(dripline::op_t))&dripline::to_uint, "Convert an op_t to integer" )
                 .def( "to_string", (std::string (*)(dripline::op_t))&dripline::to_string, "Convert an op_t to string" )
-                .def_static( "to_op_t", (dripline::op_t (*)(int))&dripline::to_op_t, "Convert an int to op_t" )
+                .def_static( "to_op_t", (dripline::op_t (*)(unsigned))&dripline::to_op_t, "Convert an integer to op_t" )
                 .def_static( "to_op_t", (dripline::op_t (*)(std::string))&dripline::to_op_t, "Convert an string to op_t" )
                 ;
 
@@ -33,9 +33,9 @@ namespace dripline_pybind
                 .value( "alert", dripline::msg_t::alert )
                 .value( "unknown", dripline::msg_t::unknown )
                 // helpers for type conversion
-                .def( "to_int", (int (*)(dripline::msg_t))&dripline::to_int, "Convert a msg_t to int" )
+                .def( "to_uint", (unsigned (*)(dripline::msg_t))&dripline::to_uint, "Convert a msg_t to integer" )
                 .def( "to_string", (std::string (*)(dripline::msg_t))&dripline::to_string, "Convert a msg_t to string" )
-                .def_static( "to_msg_t", (dripline::msg_t (*)(int))&dripline::to_msg_t, "Convert an int to msg_t" )
+                .def_static( "to_msg_t", (dripline::msg_t (*)(unsigned))&dripline::to_msg_t, "Convert an integer to msg_t" )
                 .def_static( "to_msg_t", (dripline::msg_t (*)(std::string))&dripline::to_msg_t, "Convert a string to msg_t" )
                 ;
 
