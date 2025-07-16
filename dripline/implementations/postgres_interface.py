@@ -141,17 +141,17 @@ class SQLTable(Endpoint):
             this_select = this_select.where(getattr(self.table.c,c)<v)
         for c,v in where_gt_dict.items():
             this_select = this_select.where(getattr(self.table.c,c)>v)
-        conn = self.service.engine.connect()
-        result = conn.execute(this_select)
+        with self.service.engine.connect() as conn:
+            result = conn.execute(this_select)
         return (result.keys(), [i for i in result])
 
     def _insert_with_return(self, insert_kv_dict, return_col_names_list):
         ins = self.table.insert().values(**insert_kv_dict)
         if return_col_names_list:
             ins = ins.returning(*[self.table.c[col_name] for col_name in return_col_names_list])
-        conn = self.service.engine.connect()
-        insert_result = conn.execute(ins)
-        conn.commit()
+        with self.service.engine.connect() as conn:
+            insert_result = conn.execute(ins)
+            conn.commit()
         if return_col_names_list:
             return_values = insert_result.first()
         else:
