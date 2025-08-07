@@ -35,7 +35,7 @@ class AlertConsumer(Service):
         to_return = Service.bind_keys(self);
         for a_key in self._alert_keys:
             logger.debug(f" binding alert key {a_key}")
-            to_return = to_return and self.bind_key("alerts", a_key)
+            to_return = to_return and self.bind_key(self.alerts_exchange, a_key)
         return to_return
 
     def on_alert_message(self, an_alert):

@@ -3,10 +3,10 @@ import pytest
 
 def test_op_t_to_int():
     item = dripline.core.op_t
-    assert(item.to_int(item.set) == item.set.value)
-    assert(item.to_int(item.get) == item.get.value)
-    assert(item.to_int(item.cmd) == item.cmd.value)
-    assert(item.to_int(item.unknown) == item.unknown.value)
+    assert(item.to_uint(item.set) == item.set.value)
+    assert(item.to_uint(item.get) == item.get.value)
+    assert(item.to_uint(item.cmd) == item.cmd.value)
+    assert(item.to_uint(item.unknown) == item.unknown.value)
 
 def test_op_t_to_string():
     item = dripline.core.op_t
@@ -35,10 +35,10 @@ def test_op_t_string_to_op_t():
 
 def test_msg_t_to_int():
     item = dripline.core.msg_t
-    assert(item.to_int(item.reply) == item.reply.value)
-    assert(item.to_int(item.request) == item.request.value)
-    assert(item.to_int(item.alert) == item.alert.value)
-    assert(item.to_int(item.unknown) == item.unknown.value)
+    assert(item.to_uint(item.reply) == item.reply.value)
+    assert(item.to_uint(item.request) == item.request.value)
+    assert(item.to_uint(item.alert) == item.alert.value)
+    assert(item.to_uint(item.unknown) == item.unknown.value)
 
 def test_msg_t_to_string():
     item = dripline.core.msg_t
