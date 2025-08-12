@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `max_interval`: if this time is exceeded since the last log entry, then it will be logged; if 0 (default), then logging occurs every `log_interval`
     - `max_fractional_change`: if the value changes by more than this since the last log entry, then it will be logged
   - The field that's checked for the `max_fractional_change` is given by `check_field`
+- FormatEntity now includes a default regex for extracting a float from device reply that may include leading and/or trailing string characters
+  - `get_reply_float` option activates this functionality
 
 ### Changed
 
