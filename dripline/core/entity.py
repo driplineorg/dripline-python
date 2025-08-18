@@ -69,6 +69,7 @@ class Entity(Endpoint):
                  log_routing_key_prefix='sensor_value',
                  log_interval=0,
                  max_interval=0,
+                 max_absolute_change=0,
                  max_fractional_change=0,
                  check_field='value_cal',
                  calibration=None,
@@ -92,10 +93,14 @@ class Entity(Endpoint):
                           Maximum time interval between logging in seconds.  
                           Logging will take place at the next log_interval after max_interval since the last logged value.
                           If less than log_interval, then logging values occurs every log_interval.
+            max_absolute_change: float
+                                 Absolute change in the numeric value that will trigger the value to be logged
+                                 If 0, then any change in the value will be logged
+                                 If < 0, then the value will always be logged (recommend instead max_interval=0)
             max_fractional_change: float
                                    Fractional change in the value that will trigger the value to be logged
                                    If 0, then any change in the value will be logged
-                                   If < 0, then the value will always be logged
+                                   If < 0, then the value will always be logged (recommend instead max_interval=0)
             check_field: string
                          Field in the dict returned by `on_get() that's used to check for a change in the fractional value
                          Typically is either 'value_cal' or 'value_raw'
@@ -118,6 +123,7 @@ class Entity(Endpoint):
 
         self.log_interval = log_interval
         self._max_interval = max_interval
+        self._max_absolute_change = max_absolute_change
         self._max_fractional_change = max_fractional_change
         self._check_field = check_field
         
@@ -174,20 +180,30 @@ class Entity(Endpoint):
         result = self.on_get()
         try:
             this_value = float(result[self._check_field])
-        except (TypeError, ValueError):
-            logger.warning(f"cannot check value change for {self.name}")
-            return
+            is_float = True
+        except ValueError:
+            is_float = False
+            this_value = result[self._check_field]
 
         # Various checks for log condition
         if self._last_log_time is None:
             logger.debug("Logging because this is the first logged value")
         elif (datetime.datetime.now(datetime.timezone.utc) - self._last_log_time).total_seconds() > self._max_interval:
             logger.debug("Logging because enough time has elapsed")
+        # Treatment of non-numeric value
+        elif not is_float:
+            if this_value != self._last_log_value:
+                logger.debug("Logging because the value has changed")
+            else:
+                logger.debug("No log condition met for string data, therefore not logging")
+                return
+        elif abs(self._last_log_value - this_value) > self._max_absolute_change:
+            logger.debug("Logging because the value has changed significantly")
         # this condition is |x1-x0|/(|x1+x0|/2) > max_fractional_change, but safe in case the denominator is 0
         elif 2 * abs(self._last_log_value - this_value) > self._max_fractional_change * abs(self._last_log_value + this_value):
-            logger.debug("Logging because the value has changed significantly")
+            logger.debug("Logging because the value has fractionally changed significantly")
         else:
-            logger.debug("No log condition met, therefore not logging")
+            logger.debug("No log condition met for numeric data, therefore not logging")
             return
         
         self._last_log_value = this_value
