@@ -54,12 +54,12 @@ def _get_on_set_decoration(self, fun):
 __all__.append("Entity")
 class Entity(Endpoint):
     '''
-    Subclass of Endpoint which adds logic related to logging and confirming values.
+    Subclass of Endpoint that adds logic related to logging and confirming values.
 
     In particular, there is support for:
-    get_on_set -> setting the endpoint's value returns a get() result rather than an empty success (particularly useful for devices which may round assignment values)
-    log_on_set -> further extends get_on_set to send an alert message in addtion to returning the value in a reply
-    log_interval -> leverages the scheduler class to log the on_get result at a regular cadence
+    get_on_set -> setting the endpoint's value returns an on_get() result rather than an empty success (particularly useful for devices that may round assignment values)
+    log_on_set -> further extends get_on_set to send an logging alert message in addtion to returning the value in a reply
+    log_interval -> leverages the scheduler class to log the on_get result at a regular cadence and if the value changes significantly
     '''
     #check_on_set -> allows for more complex logic to confirm successful value updates
     #                (for example, the success condition may be measuring another endpoint)
@@ -69,27 +69,45 @@ class Entity(Endpoint):
                  log_routing_key_prefix='sensor_value',
                  log_interval=0,
                  max_interval=0,
+                 max_absolute_change=0,
                  max_fractional_change=0,
                  check_field='value_cal',
                  calibration=None,
                  **kwargs):
         '''
         Args:
-            get_on_set: if true, calls to on_set are immediately followed by an on_get, which is returned
-            log_on_set: if true, always call log_a_value() immediately after on_set
+            get_on_set: bool (default is False)
+                        If true, calls to on_set() are immediately followed by an on_get(), which is returned
+            log_on_set: bool (default is False)
+                        If true, always call log_a_value() immediately after on_set()
                         **Note:** requires get_on_set be true, overrides must be equivalent
-            log_routing_key_prefix: first term in routing key used in alert messages which log values
-            log_interval: how often to check the Entity's value. If 0 then scheduled logging is disabled;
-                          if a number, interpreted as number of seconds; if a dict, unpacked as arguments
-                          to the datetime.time_delta initializer; if a datetime.timedelta taken as the new value
-            max_interval: max allowed time interval between logging, allows usage of conditional logging.  If 0,
-                          then logging values occurs every log_interval.
-            max_fractional_change: max allowed fractional difference between subsequent values to trigger log condition.
-            check_field: result field to check, 'value_cal' or 'value_raw'
-            calibration (string || dict) : if string, updated with raw on_get() result via str.format() in
-                                           @calibrate decorator, used to populate raw and calibrated values
-                                           fields of a result payload. If a dictionary, the raw result is used
-                                           to index the dict with the calibrated value being the dict's value.
+            log_routing_key_prefix: string (default is 'sensor_value')
+                                    First term in routing key used in alert messages that log values
+            log_interval: 0 (default), float, dict, datetime.timmedelta
+                          Defines how often to check the Entity's value to determine if it should be logged
+                          If 0, scheduled logging is disabled;
+                          If a number, interpreted as number of seconds; 
+                          If a dict, unpacked as arguments to the datetime.time_delta initializer; 
+                          If a datetime.timedelta, taken as the new value
+            max_interval: float
+                          Maximum time interval between logging in seconds.  
+                          Logging will take place at the next log_interval after max_interval since the last logged value.
+                          If less than log_interval, then logging values occurs every log_interval.
+            max_absolute_change: float
+                                 Absolute change in the numeric value that will trigger the value to be logged
+                                 If 0, then any change in the value will be logged
+                                 If < 0, then the value will always be logged (recommend instead max_interval=0)
+            max_fractional_change: float
+                                   Fractional change in the value that will trigger the value to be logged
+                                   If 0, then any change in the value will be logged
+                                   If < 0, then the value will always be logged (recommend instead max_interval=0)
+            check_field: string
+                         Field in the dict returned by `on_get() that's used to check for a change in the fractional value
+                         Typically is either 'value_cal' or 'value_raw'
+            calibration: string or dict
+                         If string, updated with raw on_get() result via str.format() in the @calibrate decorator, 
+                         used to populate raw and calibrated values fields of a result payload. 
+                         If a dictionary, the raw result is used to index the dict with the calibrated value being the dict's value.
         '''
         Endpoint.__init__(self, **kwargs)
 
@@ -105,10 +123,13 @@ class Entity(Endpoint):
 
         self.log_interval = log_interval
         self._max_interval = max_interval
+        self._max_absolute_change = max_absolute_change
         self._max_fractional_change = max_fractional_change
         self._check_field = check_field
+        
         self._log_action_id = None
         self._last_log_time = None
+        self._last_log_value = None
 
     @property
     def get_on_set(self):
@@ -159,23 +180,32 @@ class Entity(Endpoint):
         result = self.on_get()
         try:
             this_value = float(result[self._check_field])
-        except (TypeError, ValueError):
-            this_value = False
+            is_float = True
+        except ValueError:
+            is_float = False
+            this_value = result[self._check_field]
+
         # Various checks for log condition
         if self._last_log_time is None:
-            logger.debug("log because no last log")
+            logger.debug("Logging because this is the first logged value")
         elif (datetime.datetime.now(datetime.timezone.utc) - self._last_log_time).total_seconds() > self._max_interval:
-            logger.debug("log because too much time")
-        elif this_value is False:
-            logger.warning(f"cannot check value change for {self.name}")
-            return
-        elif ((self._last_log_value == 0 and this_value != 0) or
-              (self._last_log_value != 0 and\
-                abs((self._last_log_value - this_value)/self._last_log_value)>self._max_fractional_change)):
-            logger.debug("log because change magnitude")
+            logger.debug("Logging because enough time has elapsed")
+        # Treatment of non-numeric value
+        elif not is_float:
+            if this_value != self._last_log_value:
+                logger.debug("Logging because the value has changed")
+            else:
+                logger.debug("No log condition met for string data, therefore not logging")
+                return
+        elif abs(self._last_log_value - this_value) > self._max_absolute_change:
+            logger.debug("Logging because the value has changed significantly")
+        # this condition is |x1-x0|/(|x1+x0|/2) > max_fractional_change, but safe in case the denominator is 0
+        elif 2 * abs(self._last_log_value - this_value) > self._max_fractional_change * abs(self._last_log_value + this_value):
+            logger.debug("Logging because the value has fractionally changed significantly")
         else:
-            logger.debug("no log condition met, not logging")
+            logger.debug("No log condition met for numeric data, therefore not logging")
             return
+        
         self._last_log_value = this_value
         self.log_a_value(result)
 

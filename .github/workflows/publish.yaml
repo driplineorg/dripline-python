@@ -204,6 +204,16 @@ jobs:
           tags: ${{ steps.docker_meta_integration.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
+      - name: Release with a changelog
+        uses: rasmus-saks/release-a-changelog-action@v1.2.0
         if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          path: 'changelog.md'
+          title-template: 'dripline-python v{version} -- Release Notes'
+          tag-template: 'v{version}'
+
+      # This should be removed if the use of rasmus-saks/release-a-changelog-action works
+      #- name: Release
+      #  uses: softprops/action-gh-release@v2
+      #  if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
