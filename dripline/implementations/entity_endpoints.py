@@ -141,7 +141,7 @@ class FormatEntity(Entity):
             logger.debug(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
         elif self._get_reply_float:
-            result = float(re.findall("[-+]?\d+\.\d+",format(result))[0])
+            result = float(re.findall(r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?",format(result))[0])
             logger.debug(f"formatted result is {result}")
         return result
 
