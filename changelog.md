@@ -17,8 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `max_absolute_change`: if the value changes by more than this since the last log entry, then it will be logged
     - `max_fractional_change`: if the value changes fractional change is more than this since the last log entry, then it will be logged
   - The field that's checked for the `max_fractional_change` and `max_absolute_change` is given by `check_field`
-- FormatEntity now includes a default regex for extracting a float from device reply that may include leading and/or trailing string characters
-  - `get_reply_float` option activates this functionality
 
 ### Changed
 
@@ -26,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to capture how dl-py handles requests for both services and endpoints
 - Upgrade dl-cpp to v2.10.6
 - Docker build now separates the installation of dependencies into a separate stage
-
 
 ### Fixed
 

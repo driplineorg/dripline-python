@@ -96,7 +96,6 @@ class FormatEntity(Entity):
 
     def __init__(self,
                  get_str=None,
-                 get_reply_float=False,
                  set_str=None,
                  set_value_lowercase=True,
                  set_value_map=None,
@@ -109,11 +108,9 @@ class FormatEntity(Entity):
             set_value_lowercase (bool): default option to map all string set value to .lower()
                 **WARNING**: never set to False if using a set_value_map dict
             set_value_map (str||dict): inverse of calibration to map raw set value to value sent; either a dictionary or an asteval-interpretable string
-            get_reply_float (bool): apply special default formatting to get float return
             extract_raw_regex (str): regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name "value_raw" (ie r'(?P<value_raw>)' ) 
         '''
         Entity.__init__(self, **kwargs)
-        self._get_reply_float = get_reply_float
         self._get_str = get_str
         self._set_str = set_str
         self._set_value_map = set_value_map
@@ -140,9 +137,6 @@ class FormatEntity(Entity):
                 raise ThrowReply('service_error_invalid_value', 'device returned unparsable result, [{}] has no match to input regex [{}]'.format(first_result, self._extract_raw_regex))
             logger.debug(f"matches are: {matches.groupdict()}")
             result = matches.groupdict()['value_raw']
-        elif self._get_reply_float:
-            result = float(re.findall(r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?",format(result))[0])
-            logger.debug(f"formatted result is {result}")
         return result
 
     def on_set(self, value):
