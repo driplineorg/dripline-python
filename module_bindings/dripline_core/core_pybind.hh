@@ -23,11 +23,11 @@ namespace dripline_pybind
                           std::shared_ptr< dripline::sent_msg_pkg >
                         >( mod, "SentMessagePackage", "Data structure for sent messages" )
             .def_property_readonly( "successful_send", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_successful_send; } )
+            .def_property_readonly( "send_error_message", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_send_error_message; } )
             ;
 
         all_items.push_back( "Core" );
-        pybind11::class_< dripline::core,
-                          std::shared_ptr< dripline::core >
+        pybind11::classh< dripline::core
                         > t_core( mod, "Core", "lower-level class for AMQP message sending and receiving" );
 
         // bind the core class
@@ -42,6 +42,11 @@ namespace dripline_pybind
                   pybind11::arg( "make_connection" ) = true
                 )
 
+            // Notes on send() bindings
+            // The bound functions use lambdas because the dripline::core functions include amqp_ptr_t arguments which aren't known to pybind11.
+            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bindings to these functions are not included in a trampoline class because we're not directly overriding the C++ send() functions.
+            //   Therefore calls to send() from a base-class pointer will not redirect appropriately to the derived-class versions of send().
             .def( "send",
                   [](dripline::core& a_core, dripline::request_ptr_t a_request){return a_core.send(a_request);},
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
@@ -57,7 +62,17 @@ namespace dripline_pybind
                   DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
                   "send an alert message"
                 )
-
+            //.def_property( "address", std::static_cast< const std::string& (const dripline::core::*) >( &dripline::core::address ), [](dripline::core& a_core, const std::string& a_value){a_core.address() = a_value;} )
+            .def_property( "address", [](const dripline::core& a_core){return a_core.address();}, [](dripline::core& a_core, const std::string& a_value){a_core.address() = a_value;} )
+            .def_property( "port", &dripline::core::get_port, &dripline::core::set_port )
+            .def_property( "username", [](const dripline::core& a_core){return a_core.username();}, [](dripline::core& a_core, const std::string& a_value){a_core.username() = a_value;} )
+            .def_property( "password", [](const dripline::core& a_core){return a_core.password();}, [](dripline::core& a_core, const std::string& a_value){a_core.password() = a_value;} )
+            .def_property( "requests_exchange", [](const dripline::core& a_core){return a_core.requests_exchange();}, [](dripline::core& a_core, const std::string& a_value){a_core.requests_exchange() = a_value;} )
+            .def_property( "alerts_exchange", [](const dripline::core& a_core){return a_core.alerts_exchange();}, [](dripline::core& a_core, const std::string& a_value){a_core.alerts_exchange() = a_value;} )
+            .def_property( "heartbeat_routing_key", [](const dripline::core& a_core){return a_core.heartbeat_routing_key();}, [](dripline::core& a_core, const std::string& a_value){a_core.heartbeat_routing_key() = a_value;} )
+            .def_property( "max_payload_size", &dripline::core::get_max_payload_size, &dripline::core::set_max_payload_size )
+            .def_property( "make_connection", &dripline::core::get_make_connection, &dripline::core::set_make_connection )
+            .def_property( "max_connection_attempts", &dripline::core::get_max_connection_attempts, &dripline::core::set_max_connection_attempts )
             ;
 
         // bind core's internal types
