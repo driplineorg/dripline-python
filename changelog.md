@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2025-08-26
+
 ### Added
 
 - Heartbeat Monitor (implementations.HeartbeatMonitor)
@@ -14,8 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The `log_interval` is now the interval with which an entity's value is checked, not necessarily logged
   - Whether a value is logged at the `log_interval` is controlled by:
     - `max_interval`: if this time is exceeded since the last log entry, then it will be logged; if 0 (default), then logging occurs every `log_interval`
-    - `max_fractional_change`: if the value changes by more than this since the last log entry, then it will be logged
-  - The field that's checked for the `max_fractional_change` is given by `check_field`
+    - `max_absolute_change`: if the value changes by more than this since the last log entry, then it will be logged
+    - `max_fractional_change`: if the value changes fractional change is more than this since the last log entry, then it will be logged
+  - The field that's checked for the `max_fractional_change` and `max_absolute_change` is given by `check_field`
 
 ### Changed
 
@@ -23,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to capture how dl-py handles requests for both services and endpoints
 - Upgrade dl-cpp to v2.10.6
 - Docker build now separates the installation of dependencies into a separate stage
-
 
 ### Fixed
 

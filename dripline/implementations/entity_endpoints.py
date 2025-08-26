@@ -39,7 +39,7 @@ class SimpleSCPIEntity(Entity):
         '''
         Entity.__init__(self, **kwargs)
         if base_str is None:
-            raise ThrowReply('service_error_invalid_value', '<base_str> is required to __init__ SimpleSCPIEntity instance')
+            raise ValueError('<base_str> is required to __init__ SimpleSCPIEntity instance')
         else:
             self.cmd_base = base_str
 
@@ -96,7 +96,6 @@ class FormatEntity(Entity):
 
     def __init__(self,
                  get_str=None,
-                 get_reply_float=False,
                  set_str=None,
                  set_value_lowercase=True,
                  set_value_map=None,
@@ -105,7 +104,6 @@ class FormatEntity(Entity):
         '''
         Args:
             get_str (str): sent verbatim in the event of on_get; if None, getting of endpoint is disabled
-            get_reply_float (bool): apply special formatting to get return
             set_str (str): sent as set_str.format(value) in the event of on_set; if None, setting of endpoint is disabled
             set_value_lowercase (bool): default option to map all string set value to .lower()
                 **WARNING**: never set to False if using a set_value_map dict
@@ -113,17 +111,16 @@ class FormatEntity(Entity):
             extract_raw_regex (str): regular expression search pattern applied to get return. Must be constructed with an extraction group keyed with the name "value_raw" (ie r'(?P<value_raw>)' ) 
         '''
         Entity.__init__(self, **kwargs)
-        self._get_reply_float = get_reply_float
         self._get_str = get_str
         self._set_str = set_str
         self._set_value_map = set_value_map
         self._extract_raw_regex = extract_raw_regex
         self.evaluator = asteval.Interpreter()
         if set_value_map is not None and not isinstance(set_value_map, (dict,str)):
-            raise ThrowReply('service_error_invalid_value', f"Invalid set_value_map config for {self.name}; type is {type(set_value_map)} not dict")
+            raise ValueError(f"Invalid set_value_map config for {self.name}; type is {type(set_value_map)} not dict")
         self._set_value_lowercase = set_value_lowercase
         if isinstance(set_value_map, dict) and not set_value_lowercase:
-            raise ThrowReply('service_error_invalid_value', f"Invalid config option for {self.name} with set_value_map and set_value_lowercase=False")
+            raise ValueError(f"Invalid config option for {self.name} with set_value_map and set_value_lowercase=False")
 
     @calibrate()
     def on_get(self):
@@ -131,7 +128,7 @@ class FormatEntity(Entity):
             # exceptions.DriplineMethodNotSupportedError
             raise ThrowReply('message_error_invalid_method', f"endpoint '{self.name}' does not support get")
         result = self.service.send_to_device([self._get_str])
-        logger.debug(f'result is: {result}')
+        logger.debug(f'raw result is: {result}')
         if self._extract_raw_regex is not None:
             first_result = result
             matches = re.search(self._extract_raw_regex, first_result)
