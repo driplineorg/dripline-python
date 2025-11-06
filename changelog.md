@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [5.1.1] - 2025-11-05
+
+## Changed
+
+- Updated dl-cpp version to v2.10.8
+
+
 ## [5.1.0] - 2025-08-26
 
 ### Added
@@ -32,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Postgres syntax
 - Application cancelation -- can use ctrl-c or other system signals to cancel an executable
 - Alerts exchange not hard-coded in the alerts consumer
+
 
 ## [5.0.1] - 2023-03-05
 
