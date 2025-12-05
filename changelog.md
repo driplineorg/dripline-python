@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [5.1.2] - 2025-12-03
+
+## Changed
+
+- Updated dl-cpp version to v2.10.9
+
+
 ## [5.1.1] - 2025-11-05
 
 ## Changed
