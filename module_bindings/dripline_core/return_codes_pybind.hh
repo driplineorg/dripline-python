@@ -11,7 +11,6 @@
 
 namespace dripline_pybind
 {
-    LOGGER( dl_pybind_retcode, "return_codes_pybind" );
     // Macro for binding dripline-cpp return codes; note, it uses local variables defined and scoped in this header
 #define ADD_DRIPLINE_RET_CODE( cpp_name, py_name ) \
     all_items.push_back( "DL_" #py_name ); \
