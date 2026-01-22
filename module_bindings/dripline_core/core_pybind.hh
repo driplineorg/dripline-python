@@ -19,9 +19,7 @@ namespace dripline_pybind
         std::list< std::string > all_items;
 
         all_items.push_back( "SentMessagePackage" );
-        pybind11::class_< dripline::sent_msg_pkg,
-                          std::shared_ptr< dripline::sent_msg_pkg >
-                        >( mod, "SentMessagePackage", "Data structure for sent messages" )
+        pybind11::classh< dripline::sent_msg_pkg >( mod, "SentMessagePackage", "Data structure for sent messages" )
             .def_property_readonly( "successful_send", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_successful_send; } )
             .def_property_readonly( "send_error_message", [](const dripline::sent_msg_pkg& an_obj){ return an_obj.f_send_error_message; } )
             ;

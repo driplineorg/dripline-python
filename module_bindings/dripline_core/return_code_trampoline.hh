@@ -8,7 +8,7 @@
 namespace dripline_pybind
 {
 
-    class return_code_trampoline : public dripline::return_code
+    class return_code_trampoline : public dripline::return_code, public pybind11::trampoline_self_life_support
     {
         public:
             using dripline::return_code::return_code;

@@ -14,7 +14,7 @@ namespace dripline_pybind
     // Macro for binding dripline-cpp return codes; note, it uses local variables defined and scoped in this header
 #define ADD_DRIPLINE_RET_CODE( cpp_name, py_name ) \
     all_items.push_back( "DL_" #py_name ); \
-    pybind11::class_< dripline::dl_##cpp_name, dripline::return_code >( mod, "DL_" #py_name, "" ) \
+    pybind11::classh< dripline::dl_##cpp_name, dripline::return_code >( mod, "DL_" #py_name, "" ) \
         .def( pybind11::init<>() ) \
         .def_property_readonly( "value", &dripline::dl_##cpp_name::rc_value ) \
         .def_property_readonly( "name", &dripline::dl_##cpp_name::rc_name ) \
@@ -27,7 +27,7 @@ namespace dripline_pybind
         std::list< std::string > all_items;
 
         all_items.push_back( "ReturnCode" );
-        pybind11::class_< dripline::return_code, return_code_trampoline >( mod, "ReturnCode", "base class for return codes" )
+        pybind11::classh< dripline::return_code, return_code_trampoline >( mod, "ReturnCode", "base class for return codes" )
             .def( pybind11::init<>() )
             .def_property_readonly( "value", &dripline::return_code::rc_value, "return code value" )
             .def_property_readonly( "name", &dripline::return_code::rc_name, "return code name" )
