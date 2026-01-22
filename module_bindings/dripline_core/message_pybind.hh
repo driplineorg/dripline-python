@@ -8,8 +8,6 @@
 
 #include "uuid.hh"
 
-#include "logger.hh"
-
 #include "pybind11/pybind11.h"
 #include "pybind11/iostream.h"
 #include "pybind11/eval.h"
@@ -17,7 +15,6 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-LOGGER( dlog_mph, "message_pybind.hh" )
 
 namespace dripline_pybind
 {
