@@ -14,6 +14,7 @@ namespace dripline_pybind
         std::list< std::string > all_members;
 
         all_members.push_back( "DriplineConfig" );
+        // scarab::param_node uses class_, so we don't use classh here
         pybind11::class_< dripline::dripline_config, scarab::param_node >( mod, "DriplineConfig" )
             .def( pybind11::init<>(), DL_BIND_CALL_GUARD_STREAMS )
             ;

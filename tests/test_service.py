@@ -7,6 +7,14 @@ def test_service_creation():
     a_service = dripline.core.Service(a_name, make_connection=False)
     assert(a_service.name == a_name)
 
+def test_cancelation():
+    a_service = dripline.core.Service("a_service", make_connection=False)
+    assert(not a_service.is_canceled())
+    a_sighand = scarab.SignalHandler(False)
+    a_sighand.add_cancelable(a_service)
+    a_sighand.cancel_all(0)
+    assert(a_service.is_canceled())
+
 def test_submit_request_message():
     a_name = "a_service"
     a_service = dripline.core.Service(a_name, make_connection=False)

@@ -66,7 +66,7 @@ class Serve(dripline.core.ObjectCreator):
         self.handler.setLevel(verbosity)
         logger.setLevel(verbosity)
 
-        sig_handler = scarab.SignalHandler()
+        sig_handler = scarab.SignalHandler(True)
 
         # Prior to v4.8.0, service configuration information was nested within the `runtime-config` block
         # This deprecates that usage and moves everything within `runtime-config` to the top level of the configuration

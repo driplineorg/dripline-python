@@ -5,19 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Types of changes: Added, Changed, Deprecated, Removed, Fixed, Security
+
 ## [Unreleased]
+
+
+## [5.1.3] - 2026-01-22
+
+### Changed
+
+- Updated dl-cpp version to v2.10.10
+
+### Fixed
+
+- Receiver class binding switched to use smart holder; all other bindings switched to smart holder too, except where that doesn't work
 
 
 ## [5.1.2] - 2025-12-03
 
-## Changed
+### Changed
 
 - Updated dl-cpp version to v2.10.9
 
 
 ## [5.1.1] - 2025-11-05
 
-## Changed
+### Changed
 
 - Updated dl-cpp version to v2.10.8
 
