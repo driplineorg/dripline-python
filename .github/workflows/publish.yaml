@@ -13,7 +13,7 @@ env:
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
   DEV_SUFFIX: '-dev'
-  BASE_IMAGE_TAG: 'v2.10.10'
+  BASE_IMAGE_TAG: 'v2.10.11'
 #  BASE_IMAGE_TAG: 'dlcpp-hf2.10.8'
 #  DEV_SUFFIX: ''
 
