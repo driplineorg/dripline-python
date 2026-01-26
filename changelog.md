@@ -10,6 +10,13 @@ Types of changes: Added, Changed, Deprecated, Removed, Fixed, Security
 ## [Unreleased]
 
 
+## [5.1.4] - 2026-01-23
+
+### Changed
+
+- Updated dl-cpp version to v2.10.11
+
+
 ## [5.1.3] - 2026-01-22
 
 ### Changed
