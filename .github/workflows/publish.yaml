@@ -61,8 +61,6 @@ jobs:
             img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           platforms: linux/amd64
           tags: ${{ env.DL_PY_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Build Integration Tests
         id: build_int_tests
@@ -77,8 +75,6 @@ jobs:
             img_tag=${{ env.TAG }}
           platforms: linux/amd64
           tags: ${{ env.DL_PY_INT_TAG }}
-          cache-from: type=gha  
-          cache-to: type=gha,mode=max
 
       - name: Unit Tests
         run: |
@@ -193,8 +189,6 @@ jobs:
             img_tag=${{ env.BASE_IMAGE_TAG }}${{ env.DEV_SUFFIX }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha  
-          cache-to: type=gha,mode=max
 
       - name: Build and push - integration
         id: build_push_integration
@@ -209,8 +203,6 @@ jobs:
             img_tag=latest-dev
           tags: ${{ steps.docker_meta_integration.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha  
-          cache-to: type=gha,mode=max
 
       - name: Release with a changelog
         uses: rasmus-saks/release-a-changelog-action@v1.2.0
