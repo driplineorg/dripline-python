@@ -52,7 +52,7 @@ class RequestSender():
         '''
         internal helper method to standardize receiving reply messages
         '''
-        sig_handler = scarab.SignalHandler()
+        sig_handler = scarab.SignalHandler(True)
         sig_handler.add_cancelable(self._receiver)
         result = self._receiver.wait_for_reply(reply_pkg, timeout_s * 1000) # receiver expects ms
         sig_handler.remove_cancelable(self._receiver)
