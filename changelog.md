@@ -10,6 +10,13 @@ Types of changes: Added, Changed, Deprecated, Removed, Fixed, Security
 ## [Unreleased]
 
 
+## [5.1.5] - 2025-02-04
+
+### Fixed
+
+- Bug in how SignalHandler is used from RequestSender fixed
+
+
 ## [5.1.4] - 2026-01-23
 
 ### Changed
