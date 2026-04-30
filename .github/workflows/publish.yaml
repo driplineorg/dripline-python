@@ -15,20 +15,16 @@ on:
         description: "Suffix for Test Image Tag"
         required: false
         default: ""
-      dl-cpp-tag-override:
-        description: "Override the dl-cpp version tag"
-        required: false
-        default: ""
 
 env:
   REGISTRY: ghcr.io
   REGISTRY_OLD: docker.io
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-  DEV_SUFFIX: '-dev'
-  BASE_IMAGE_TAG: "${{ github.event.inputs.dl-cpp-tag-override == '' && 'v2.10.11' || github.events.inputs.dl-cpp-tag-override }}"
-#  BASE_IMAGE_TAG: 'dlcpp-hf2.10.8'
-#  DEV_SUFFIX: ''
+#  DEV_SUFFIX: '-dev'
+#  BASE_IMAGE_TAG: 'v2.10.11'
+  BASE_IMAGE_TAG: 'gha-test-hf2.10.8'
+  DEV_SUFFIX: ''
 
 jobs:
 
