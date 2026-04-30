@@ -71,7 +71,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
+          push: ${{ github.event.inputs.keep-test-image == 'true' }}
           load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./tests/integration
-          push: ${{ github.event.inputs.keep-test-image == 'true' }}
+          push: false
           load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
