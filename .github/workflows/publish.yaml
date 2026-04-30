@@ -6,6 +6,7 @@ on:
     tags: ['*']
   pull_request:
   workflow_dispatch:
+    inputs:
       keep-test-image:
         description: "Keep the Test Image (set to 'true' to keep the image)"
         required: true
