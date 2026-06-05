@@ -15,8 +15,6 @@ namespace dripline_pybind
             using dripline::service::service;
 
             //make methods public for use in overload macro
-            using dripline::service::bind_keys;
-            using dripline::core::bind_key;
             using dripline::service::on_request_message;
 
     };
@@ -28,11 +26,6 @@ namespace dripline_pybind
             //_service_trampoline(_service &&base) : _service(std::move(base)) {}
 
             // Local overrides
-            bool bind_keys() override
-            {
-                PYBIND11_OVERRIDE( bool, _service, bind_keys, );
-            }
-
             void run() override
             {
                 PYBIND11_OVERRIDE( void, _service, run, );

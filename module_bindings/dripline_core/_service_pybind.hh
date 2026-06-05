@@ -5,6 +5,7 @@
 #include "_service_trampoline.hh"
 
 #include "core.hh"
+#include "message_dispatcher.hh"
 #include "service.hh"
 
 #include "authentication.hh"
@@ -26,6 +27,7 @@ namespace dripline_pybind
                           _service_trampoline,
                           dripline::core,
                           dripline::endpoint,
+                          dripline::message_dispatcher,
                           dripline::receiver,
                           dripline::scheduler<>,
                           scarab::cancelable
@@ -45,8 +47,7 @@ namespace dripline_pybind
 
             // Notes on send() bindings
             // The Service.send() functions are useful because they set the sender service name in the message before sending.
-            // The bound functions use lambdas because the dripline::service functions include amqp_ptr_t arguments which aren't known to pybind11.
-            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bound functions use lambdas to avoid exposing rmqcpp internal types to pybind11.
             // The bindings to these functions are not included in the trampoline class because we're not directly overriding the C++ send() functions.
             .def( "send",
                   [](_service& a_service, dripline::request_ptr_t a_request){return a_service.send(a_request);},
@@ -69,20 +70,6 @@ namespace dripline_pybind
             //TODO: need to deal with lr_ptr_t to bind this
             //.def_property_readonly( "async_children", &dripline::service::async_children )
 
-            .def( "bind_keys",
-                  &_service::bind_keys,
-                  "overridable method to create all desired key bindings, overrides should still call this version",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "bind_key",
-                  // Note, need to take a service pointer so that we can accept derived types... I think
-                  [](_service* an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj->channel(), an_exchange, an_obj->name(), a_key);},
-                  pybind11::arg( "exchange" ),
-                  pybind11::arg( "key" ),
-                  "bind the service's message queue to a particular exchange and key",
-                  DL_BIND_CALL_GUARD_STREAMS
-            )
-            
             .def( "run", &dripline::service::run, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS )
             .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )

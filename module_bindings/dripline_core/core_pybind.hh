@@ -41,8 +41,7 @@ namespace dripline_pybind
                 )
 
             // Notes on send() bindings
-            // The bound functions use lambdas because the dripline::core functions include amqp_ptr_t arguments which aren't known to pybind11.
-            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bound functions use lambdas to avoid exposing rmqcpp internal types to pybind11.
             // The bindings to these functions are not included in a trampoline class because we're not directly overriding the C++ send() functions.
             //   Therefore calls to send() from a base-class pointer will not redirect appropriately to the derived-class versions of send().
             .def( "send",
@@ -71,15 +70,6 @@ namespace dripline_pybind
             .def_property( "max_payload_size", &dripline::core::get_max_payload_size, &dripline::core::set_max_payload_size )
             .def_property( "make_connection", &dripline::core::get_make_connection, &dripline::core::set_make_connection )
             .def_property( "max_connection_attempts", &dripline::core::get_max_connection_attempts, &dripline::core::set_max_connection_attempts )
-            ;
-
-        // bind core's internal types
-        pybind11::enum_<dripline::core::post_listen_status>(t_core, "PostListenStatus")
-            .value("Unknown", dripline::core::post_listen_status::unknown)
-            .value("MessageReceived", dripline::core::post_listen_status::message_received)
-            .value("Timeout", dripline::core::post_listen_status::timeout)
-            .value("SoftError", dripline::core::post_listen_status::soft_error)
-            .value("HardError", dripline::core::post_listen_status::hard_error)
             ;
 
         return all_items;
