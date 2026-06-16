@@ -28,15 +28,21 @@ class AlertConsumer(Service):
         '''
         Service.__init__(self, **kwargs)
         self._alert_keys = ["#"] if alert_keys is None else alert_keys
-        self._alert_key_parser_re= alert_key_parser_re
+        self._alert_key_parser_re = alert_key_parser_re
+        self._alerts_queue = None  # set during add_queues()
+
+    def add_queues(self):
+        logger.debug("in python's add_queues")
+        Service.add_queues(self)
+        logger.debug(f"adding ephemeral alerts queue for '{self.name}'")
+        self._alerts_queue = self.add_alerts_ephemeral_queue(self.name)
 
     def bind_keys(self):
-        logger.debug("in python's bind keys")
-        to_return = Service.bind_keys(self);
+        logger.debug("in python's bind_keys")
+        Service.bind_keys(self)
         for a_key in self._alert_keys:
-            logger.debug(f" binding alert key {a_key}")
-            to_return = to_return and self.bind_key(self.alerts_exchange, a_key)
-        return to_return
+            logger.debug(f" binding alert key '{a_key}'")
+            self.bind_alerts_key(self.name, a_key, self._alerts_queue)
 
     def on_alert_message(self, an_alert):
         logger.debug("in python's on alert")

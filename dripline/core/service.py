@@ -143,6 +143,18 @@ class Service(_Service, ObjectCreator, RequestSender, RequestHandler):
                     logger.debug("queue up start logging for '{}'".format(an_endpoint.name))
                     an_endpoint.start_logging()
     
+    def do_run_request(self, a_request_message):
+        '''
+        Default function for handling an OP_RUN request message addressed to this service.
+
+        .. note: For core dripline developers -- This function has to be here to correctly receive trampolined calls from 
+        the C++ base class.  It intentionally just calls the C++ base implementation.
+
+        Args:
+            a_request_message (MsgRequest): the message received by this service
+        '''
+        return _Service.do_run_request(self, a_request_message)
+
     def do_get_request(self, a_request_message):
         '''
         Default function for handling an OP_GET request message addressed to this service.

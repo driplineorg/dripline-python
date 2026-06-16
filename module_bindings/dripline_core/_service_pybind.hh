@@ -8,6 +8,8 @@
 #include "message_dispatcher.hh"
 #include "service.hh"
 
+#include "rmqt_queue.h"
+
 #include "authentication.hh"
 #include "param_binding_helpers.hh"
 
@@ -79,7 +81,43 @@ namespace dripline_pybind
             //.def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
 
             .def( "on_request_message", &_service::on_request_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+
+            // Message handler overrides
+            .def( "on_reply_message", &_service::on_reply_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "callback to execute when a new reply message is received; available for override" )
+            .def( "on_alert_message", &_service::on_alert_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "callback to execute when a new alert message is received; available for override" )
+
+            // Request handler overrides
+            .def( "do_run_request", &_service::do_run_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing run handling behavior" )
+            .def( "do_get_request", &_service::do_get_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing get handling behavior" )
+            .def( "do_set_request", &_service::do_set_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing set handling behavior" )
+            .def( "do_cmd_request", &_service::do_cmd_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing cmd handling behavior" )
+
+            // Service lifecycle hook overrides (called by start() in order)
+            .def( "open_channels", &_service::open_channels, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: open the AMQP connection; called first by start()" )
+            .def( "add_queues", &_service::add_queues, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: declare AMQP queues in the topology; called second by start()" )
+            .def( "bind_keys", &_service::bind_keys, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: bind routing keys to queues; called third by start()" )
+            .def( "start_threads", &_service::start_threads, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: start heartbeat and scheduler threads; called fourth by start()" )
+            .def( "stop_threads", &_service::stop_threads, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: join heartbeat and scheduler threads; called by listen() and stop()" )
+
+            // Message dispatcher override
+            .def( "submit_message", &_service::submit_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "virtual hook: dispatch an assembled Dripline message; called by the rmqcpp callback thread" )
+
+            // Note: the "queue" property is inherited from the MessageDispatcher base class
+            //       (registered in message_dispatcher_pybind.hh)
             ;
+
         return all_items;
     }
 } /* namespace dripline_pybind */

@@ -23,6 +23,18 @@ class Endpoint(_Endpoint, RequestHandler):
         '''
         _Endpoint.__init__(self, name)
 
+    def do_run_request(self, a_request_message):
+        '''
+        Default function for handling an OP_RUN request message addressed to this endpoint.
+
+        .. note: For core dripline developers -- This function has to be here to correctly receive trampolined calls from 
+        the C++ base class.  It intentionally just calls the C++ base implementation.
+
+        Args:
+            a_request_message (MsgRequest): the message received by this endpoint
+        '''
+        return _Endpoint.do_run_request(self, a_request_message)
+
     def do_get_request(self, a_request_message):
         '''
         Default function for handling an OP_GET request message addressed to this endpoint.

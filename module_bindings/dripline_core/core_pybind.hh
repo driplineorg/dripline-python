@@ -8,6 +8,8 @@
 
 #include "authentication.hh"
 
+#include "rmqt_queue.h"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
@@ -17,6 +19,13 @@ namespace dripline_pybind
     std::list< std::string>  export_core( pybind11::module& mod )
     {
         std::list< std::string > all_items;
+
+        all_items.push_back( "QueueHandle" );
+        pybind11::class_< BloombergLP::rmqt::QueueHandle >( mod, "QueueHandle",
+            "Opaque handle to an AMQP queue. "
+            "Returned by add_requests_*_queue() and add_alerts_*_queue(); "
+            "passed to bind_requests_key(), bind_alerts_key(), and the queue property." )
+            ;
 
         all_items.push_back( "SentMessagePackage" );
         pybind11::classh< dripline::sent_msg_pkg >( mod, "SentMessagePackage", "Data structure for sent messages" )
@@ -70,6 +79,54 @@ namespace dripline_pybind
             .def_property( "max_payload_size", &dripline::core::get_max_payload_size, &dripline::core::set_max_payload_size )
             .def_property( "make_connection", &dripline::core::get_make_connection, &dripline::core::set_make_connection )
             .def_property( "max_connection_attempts", &dripline::core::get_max_connection_attempts, &dripline::core::set_max_connection_attempts )
+
+            // Topology helpers (public in core)
+            .def( "open_connection",
+                  &dripline::core::open_connection,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  "Open the RabbitMQ connection and declare both exchanges in the topology. "
+                  "Must be called before any add_*_queue() or bind_*_key() call." )
+            .def( "add_requests_durable_queue",
+                  &dripline::core::add_requests_durable_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"),
+                  "Declare a durable queue on the requests exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_requests_key()." )
+            .def( "add_requests_ephemeral_queue",
+                  &dripline::core::add_requests_ephemeral_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"),
+                  "Declare an ephemeral (auto-delete) queue on the requests exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_requests_key()." )
+            .def( "add_alerts_durable_queue",
+                  &dripline::core::add_alerts_durable_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"),
+                  "Declare a durable queue on the alerts exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_alerts_key()." )
+            .def( "add_alerts_ephemeral_queue",
+                  &dripline::core::add_alerts_ephemeral_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"),
+                  "Declare an ephemeral (auto-delete) queue on the alerts exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_alerts_key()." )
+            .def( "bind_requests_key",
+                  &dripline::core::bind_requests_key,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"), pybind11::arg("routing_key"), pybind11::arg("queue"),
+                  "Bind a queue to the requests exchange with the given routing key. "
+                  "Must be called after add_requests_*_queue()." )
+            .def( "bind_alerts_key",
+                  &dripline::core::bind_alerts_key,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"), pybind11::arg("routing_key"), pybind11::arg("queue"),
+                  "Bind a queue to the alerts exchange with the given routing key. "
+                  "Must be called after add_alerts_*_queue() (or add_requests_*_queue() "
+                  "if sharing a single queue across both exchanges, as monitor does)." )
             ;
 
         return all_items;

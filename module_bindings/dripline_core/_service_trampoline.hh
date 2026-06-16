@@ -16,6 +16,7 @@ namespace dripline_pybind
 
             //make methods public for use in overload macro
             using dripline::service::on_request_message;
+            using dripline::service::submit_message;
 
     };
 
@@ -47,6 +48,10 @@ namespace dripline_pybind
             }
 
             // Overrides for virtual do_[request-type]_request
+            dripline::reply_ptr_t do_run_request( const dripline::request_ptr_t a_request ) override
+            {
+                PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_run_request, a_request );
+            }
             dripline::reply_ptr_t do_get_request( const dripline::request_ptr_t a_request ) override
             {
                 PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_get_request, a_request );
@@ -58,6 +63,32 @@ namespace dripline_pybind
             dripline::reply_ptr_t do_cmd_request( const dripline::request_ptr_t a_request ) override
             {
                 PYBIND11_OVERRIDE( dripline::reply_ptr_t, _service, do_cmd_request, a_request );
+            }
+
+            // Overrides for virtual service lifecycle hooks
+            void open_channels() override
+            {
+                PYBIND11_OVERRIDE( void, _service, open_channels, );
+            }
+            void add_queues() override
+            {
+                PYBIND11_OVERRIDE( void, _service, add_queues, );
+            }
+            void bind_keys() override
+            {
+                PYBIND11_OVERRIDE( void, _service, bind_keys, );
+            }
+            void start_threads() override
+            {
+                PYBIND11_OVERRIDE( void, _service, start_threads, );
+            }
+            void stop_threads() override
+            {
+                PYBIND11_OVERRIDE( void, _service, stop_threads, );
+            }
+            void submit_message( dripline::message_ptr_t a_message ) override
+            {
+                PYBIND11_OVERRIDE( void, _service, submit_message, a_message );
             }
 
     };

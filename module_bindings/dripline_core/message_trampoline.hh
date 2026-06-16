@@ -28,15 +28,16 @@ namespace dripline_pybind
             }
 
             // don't know if we plan to override in python, but need this method to not be pure-virtual
-            void derived_modify_amqp_message( dripline::amqp_message_ptr a_amqp_msg, AmqpClient::Table& a_properties ) const override
+            void derived_modify_amqp_message( BloombergLP::rmqt::FieldTable& a_headers ) const override
             {
-                PYBIND11_OVERRIDE_PURE( void, dripline::message, derived_modify_amqp_message, a_amqp_msg, a_properties );
+                PYBIND11_OVERRIDE_PURE( void, dripline::message, derived_modify_amqp_message, a_headers );
             }
 
             void derived_modify_message_param( scarab::param_node& a_node ) const override
             {
-                PYBIND11_OVERRIDE_PURE( void, dripline::message, derived_modify_message_body, a_node );
+                PYBIND11_OVERRIDE_PURE( void, dripline::message, derived_modify_message_param, a_node );
             }
+
 
             dripline::msg_t message_type() const override
             {
