@@ -7,11 +7,11 @@ logger = logging.getLogger(__name__)
 
 def __get_version():
     import scarab
-    import pkg_resources
+    import importlib.metadata
     #TODO: this all needs to be populated from setup.py and gita
     version = scarab.VersionSemantic()
-    logger.info('version should be: {}'.format(pkg_resources.get_distribution('dripline').version))
-    version.parse(pkg_resources.get_distribution('dripline').version)
+    logger.info('version should be: {}'.format(importlib.metadata.version('dripline')))
+    version.parse(importlib.metadata.version('dripline'))
     version.package = 'driplineorg/dripline-python'
     version.commit = 'na'
     core.add_version('dripline-python', version)
