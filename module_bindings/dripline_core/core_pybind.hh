@@ -86,34 +86,40 @@ namespace dripline_pybind
                   DL_BIND_CALL_GUARD_STREAMS,
                   "Open the RabbitMQ connection and declare both exchanges in the topology. "
                   "Must be called before any add_*_queue() or bind_*_key() call." )
-            .def( "add_requests_durable_queue",
-                  &dripline::core::add_requests_durable_queue,
+            .def( "add_requests_queue",
+                  &dripline::core::add_requests_queue,
                   DL_BIND_CALL_GUARD_STREAMS,
-                  pybind11::arg("queue_name"),
-                  "Declare a durable queue on the requests exchange. "
+                  pybind11::arg("queue_name"), 
+                  pybind11::arg("auto_delete") = false,
+                  pybind11::arg("durable") = true,
+                  pybind11::arg_v( "field_table", scarab::param_node(scarab::kwarg("x-single-active-consumer")=true), "{x-single-active-consumer=true}" ),
+                  "Declare a queue on the requests exchange. "
                   "Must be called after open_connection(). "
                   "Returns a QueueHandle to pass to bind_requests_key()." )
-            .def( "add_requests_ephemeral_queue",
-                  &dripline::core::add_requests_ephemeral_queue,
+//            .def( "add_requests_ephemeral_queue",
+//                  &dripline::core::add_requests_ephemeral_queue,
+//                  DL_BIND_CALL_GUARD_STREAMS,
+//                  pybind11::arg("queue_name"),
+//                  "Declare an ephemeral (auto-delete) queue on the requests exchange. "
+//                  "Must be called after open_connection(). "
+//                  "Returns a QueueHandle to pass to bind_requests_key()." )
+            .def( "add_alerts_queue",
+                  &dripline::core::add_alerts_queue,
                   DL_BIND_CALL_GUARD_STREAMS,
                   pybind11::arg("queue_name"),
-                  "Declare an ephemeral (auto-delete) queue on the requests exchange. "
-                  "Must be called after open_connection(). "
-                  "Returns a QueueHandle to pass to bind_requests_key()." )
-            .def( "add_alerts_durable_queue",
-                  &dripline::core::add_alerts_durable_queue,
-                  DL_BIND_CALL_GUARD_STREAMS,
-                  pybind11::arg("queue_name"),
-                  "Declare a durable queue on the alerts exchange. "
-                  "Must be called after open_connection(). "
-                  "Returns a QueueHandle to pass to bind_alerts_key()." )
-            .def( "add_alerts_ephemeral_queue",
-                  &dripline::core::add_alerts_ephemeral_queue,
-                  DL_BIND_CALL_GUARD_STREAMS,
-                  pybind11::arg("queue_name"),
-                  "Declare an ephemeral (auto-delete) queue on the alerts exchange. "
+                  pybind11::arg("auto_delete") = false,
+                  pybind11::arg("durable") = true,
+                  pybind11::arg_v( "field_table", scarab::param_node(scarab::kwarg("x-single-active-consumer")=true), "{x-single-active-consumer=true}" ),
+                  "Declare a queue on the alerts exchange. "
                   "Must be called after open_connection(). "
                   "Returns a QueueHandle to pass to bind_alerts_key()." )
+//            .def( "add_alerts_ephemeral_queue",
+//                  &dripline::core::add_alerts_ephemeral_queue,
+//                  DL_BIND_CALL_GUARD_STREAMS,
+//                  pybind11::arg("queue_name"),
+//                  "Declare an ephemeral (auto-delete) queue on the alerts exchange. "
+//                  "Must be called after open_connection(). "
+//                  "Returns a QueueHandle to pass to bind_alerts_key()." )
             .def( "bind_requests_key",
                   &dripline::core::bind_requests_key,
                   DL_BIND_CALL_GUARD_STREAMS,
