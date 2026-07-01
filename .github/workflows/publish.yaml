@@ -6,6 +6,15 @@ on:
     tags: ['*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      keep-test-image:
+        description: "Keep the Test Image (set to 'true' to keep the image)"
+        required: true
+        default: "false"
+      test-image-tag-suffix:
+        description: "Suffix for Test Image Tag"
+        required: false
+        default: ""
 
 env:
   REGISTRY: ghcr.io
