@@ -34,8 +34,8 @@ class AlertConsumer(Service):
     def add_queues(self):
         logger.debug("in python's add_queues")
         Service.add_queues(self)
-        logger.debug(f"adding ephemeral alerts queue for '{self.name}'")
-        self._alerts_queue = self.add_alerts_ephemeral_queue(self.name)
+        logger.debug(f"adding alerts queue for '{self.name}'")
+        self._alerts_queue = self.add_alerts_queue(self.name)
 
     def bind_keys(self):
         logger.debug("in python's bind_keys")

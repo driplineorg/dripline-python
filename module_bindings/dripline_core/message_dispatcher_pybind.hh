@@ -26,7 +26,7 @@ namespace dripline_pybind
                            &dripline::message_dispatcher::get_queue,
                            &dripline::message_dispatcher::set_queue,
                            "The QueueHandle for this dispatcher's AMQP queue. "
-                           "Set by add_queues() (via add_requests_ephemeral_queue()), "
+                           "Set by add_queues() (via add_requests_queue()), "
                            "and passed to start_listening() during listen()." )
 
             ;
