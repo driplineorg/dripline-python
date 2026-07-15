@@ -6,8 +6,10 @@
 #include "_endpoint_pybind.hh"
 #include "_endpoint_trampoline.hh"
 #include "error_pybind.hh"
+#include "message_dispatcher_pybind.hh"
 #include "message_pybind.hh"
 #include "receiver_pybind.hh"
+
 #include "reply_cache_pybind.hh"
 #include "return_codes_pybind.hh"
 #include "scheduler_pybind.hh"
@@ -31,7 +33,9 @@ PYBIND11_MODULE( _dripline, dripline_mod )
     all_members.splice( all_members.end(), dripline_pybind::export_error( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_message( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_receiver( dripline_core_mod ) );
+    all_members.splice( all_members.end(), dripline_pybind::export_message_dispatcher( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_return_codes( dripline_core_mod ) );
+
     all_members.splice( all_members.end(), dripline_pybind::export_scheduler( dripline_core_mod ) );
     //all_members.splice( all_members.end(), dripline_pybind::export_run_simple_service( dripline_core_mod ) );
     all_members.splice( all_members.end(), dripline_pybind::export_specifier( dripline_core_mod ) );

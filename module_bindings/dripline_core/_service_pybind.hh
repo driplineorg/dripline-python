@@ -5,7 +5,10 @@
 #include "_service_trampoline.hh"
 
 #include "core.hh"
+#include "message_dispatcher.hh"
 #include "service.hh"
+
+#include "rmqt_queue.h"
 
 #include "authentication.hh"
 #include "param_binding_helpers.hh"
@@ -26,6 +29,7 @@ namespace dripline_pybind
                           _service_trampoline,
                           dripline::core,
                           dripline::endpoint,
+                          dripline::message_dispatcher,
                           dripline::receiver,
                           dripline::scheduler<>,
                           scarab::cancelable
@@ -45,8 +49,7 @@ namespace dripline_pybind
 
             // Notes on send() bindings
             // The Service.send() functions are useful because they set the sender service name in the message before sending.
-            // The bound functions use lambdas because the dripline::service functions include amqp_ptr_t arguments which aren't known to pybind11.
-            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bound functions use lambdas to avoid exposing rmqcpp internal types to pybind11.
             // The bindings to these functions are not included in the trampoline class because we're not directly overriding the C++ send() functions.
             .def( "send",
                   [](_service& a_service, dripline::request_ptr_t a_request){return a_service.send(a_request);},
@@ -69,20 +72,6 @@ namespace dripline_pybind
             //TODO: need to deal with lr_ptr_t to bind this
             //.def_property_readonly( "async_children", &dripline::service::async_children )
 
-            .def( "bind_keys",
-                  &_service::bind_keys,
-                  "overridable method to create all desired key bindings, overrides should still call this version",
-                  DL_BIND_CALL_GUARD_STREAMS
-                )
-            .def( "bind_key",
-                  // Note, need to take a service pointer so that we can accept derived types... I think
-                  [](_service* an_obj, std::string&  an_exchange, std::string& a_key){return _service::bind_key(an_obj->channel(), an_exchange, an_obj->name(), a_key);},
-                  pybind11::arg( "exchange" ),
-                  pybind11::arg( "key" ),
-                  "bind the service's message queue to a particular exchange and key",
-                  DL_BIND_CALL_GUARD_STREAMS
-            )
-            
             .def( "run", &dripline::service::run, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
             .def( "start", &dripline::service::start, DL_BIND_CALL_GUARD_STREAMS )
             .def( "listen", &dripline::service::listen, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
@@ -92,7 +81,43 @@ namespace dripline_pybind
             //.def( "noisy_func", []() { pybind11::scoped_ostream_redirect stream(std::cout, pybind11::module::import("sys").attr("stdout"));})
 
             .def( "on_request_message", &_service::on_request_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL )
+
+            // Message handler overrides
+            .def( "on_reply_message", &_service::on_reply_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "callback to execute when a new reply message is received; available for override" )
+            .def( "on_alert_message", &_service::on_alert_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "callback to execute when a new alert message is received; available for override" )
+
+            // Request handler overrides
+            .def( "do_run_request", &_service::do_run_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing run handling behavior" )
+            .def( "do_get_request", &_service::do_get_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing get handling behavior" )
+            .def( "do_set_request", &_service::do_set_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing set handling behavior" )
+            .def( "do_cmd_request", &_service::do_cmd_request, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "overridable method for implementing cmd handling behavior" )
+
+            // Service lifecycle hook overrides (called by start() in order)
+            .def( "open_channels", &_service::open_channels, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: open the AMQP connection; called first by start()" )
+            .def( "add_queues", &_service::add_queues, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: declare AMQP queues in the topology; called second by start()" )
+            .def( "bind_keys", &_service::bind_keys, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: bind routing keys to queues; called third by start()" )
+            .def( "start_threads", &_service::start_threads, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: start heartbeat and scheduler threads; called fourth by start()" )
+            .def( "stop_threads", &_service::stop_threads, DL_BIND_CALL_GUARD_STREAMS,
+                  "virtual hook: join heartbeat and scheduler threads; called by listen() and stop()" )
+
+            // Message dispatcher override
+            .def( "submit_message", &_service::submit_message, DL_BIND_CALL_GUARD_STREAMS_AND_GIL,
+                  "virtual hook: dispatch an assembled Dripline message; called by the rmqcpp callback thread" )
+
+            // Note: the "queue" property is inherited from the MessageDispatcher base class
+            //       (registered in message_dispatcher_pybind.hh)
             ;
+
         return all_items;
     }
 } /* namespace dripline_pybind */

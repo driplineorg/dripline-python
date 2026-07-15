@@ -1,6 +1,7 @@
 ARG img_user=ghcr.io/driplineorg
 ARG img_repo=dripline-cpp
 #ARG img_tag=dlcpp-hf2.10.8
+# TODO: update to the first dripline-cpp tag built with rmqcpp (v2.10.11 was the last SimpleAmqpClient-based release)
 ARG img_tag=v2.10.11
 
 FROM ${img_user}/${img_repo}:${img_tag} AS deps

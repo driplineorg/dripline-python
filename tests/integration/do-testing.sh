@@ -20,7 +20,7 @@ trap 'cleanup ; printf "${RED}Tests Failed For Unexpected Reasons${NC}\n"' HUP I
 export DLPY_IMG_TAG=$1 
 export DLCPP_IMG_TAG=$2 
 docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml  -f docker-compose-services.yaml build
-docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml  -f docker-compose-services.yaml up -d
+docker compose -p integration -f docker-compose.yaml -f docker-compose-test.yaml  -f docker-compose-services.yaml up --exit-code-from test-core
 
 
 if [ $? -ne 0 ] ; then

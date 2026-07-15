@@ -12,9 +12,11 @@ set( PB_DRIPLINE_CORE_HEADERFILES
     dripline_core/constants_pybind.hh
     dripline_core/dripline_config_pybind.hh
     dripline_core/error_pybind.hh
+    dripline_core/message_dispatcher_pybind.hh
     dripline_core/message_pybind.hh
     dripline_core/message_virtual_pybind.hh
     dripline_core/receiver_pybind.hh
+
     dripline_core/reply_cache_pybind.hh
     dripline_core/return_codes.hh
     dripline_core/return_code_trampoline.hh

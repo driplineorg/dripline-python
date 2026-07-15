@@ -8,6 +8,8 @@
 
 #include "authentication.hh"
 
+#include "rmqt_queue.h"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/iostream.h"
@@ -17,6 +19,13 @@ namespace dripline_pybind
     std::list< std::string>  export_core( pybind11::module& mod )
     {
         std::list< std::string > all_items;
+
+        all_items.push_back( "QueueHandle" );
+        pybind11::class_< BloombergLP::rmqt::QueueHandle >( mod, "QueueHandle",
+            "Opaque handle to an AMQP queue. "
+            "Returned by add_requests_*_queue() and add_alerts_*_queue(); "
+            "passed to bind_requests_key(), bind_alerts_key(), and the queue property." )
+            ;
 
         all_items.push_back( "SentMessagePackage" );
         pybind11::classh< dripline::sent_msg_pkg >( mod, "SentMessagePackage", "Data structure for sent messages" )
@@ -41,8 +50,7 @@ namespace dripline_pybind
                 )
 
             // Notes on send() bindings
-            // The bound functions use lambdas because the dripline::core functions include amqp_ptr_t arguments which aren't known to pybind11.
-            //   Therefore when called from Python, the send process will use the default parameter, a new AMQP connection.
+            // The bound functions use lambdas to avoid exposing rmqcpp internal types to pybind11.
             // The bindings to these functions are not included in a trampoline class because we're not directly overriding the C++ send() functions.
             //   Therefore calls to send() from a base-class pointer will not redirect appropriately to the derived-class versions of send().
             .def( "send",
@@ -71,15 +79,60 @@ namespace dripline_pybind
             .def_property( "max_payload_size", &dripline::core::get_max_payload_size, &dripline::core::set_max_payload_size )
             .def_property( "make_connection", &dripline::core::get_make_connection, &dripline::core::set_make_connection )
             .def_property( "max_connection_attempts", &dripline::core::get_max_connection_attempts, &dripline::core::set_max_connection_attempts )
-            ;
 
-        // bind core's internal types
-        pybind11::enum_<dripline::core::post_listen_status>(t_core, "PostListenStatus")
-            .value("Unknown", dripline::core::post_listen_status::unknown)
-            .value("MessageReceived", dripline::core::post_listen_status::message_received)
-            .value("Timeout", dripline::core::post_listen_status::timeout)
-            .value("SoftError", dripline::core::post_listen_status::soft_error)
-            .value("HardError", dripline::core::post_listen_status::hard_error)
+            // Topology helpers (public in core)
+            .def( "open_connection",
+                  &dripline::core::open_connection,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  "Open the RabbitMQ connection and declare both exchanges in the topology. "
+                  "Must be called before any add_*_queue() or bind_*_key() call." )
+            .def( "add_requests_queue",
+                  &dripline::core::add_requests_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"), 
+                  pybind11::arg("auto_delete") = false,
+                  pybind11::arg("durable") = true,
+                  pybind11::arg_v( "field_table", scarab::param_node(scarab::kwarg("x-single-active-consumer")=true), "{x-single-active-consumer=true}" ),
+                  "Declare a queue on the requests exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_requests_key()." )
+//            .def( "add_requests_ephemeral_queue",
+//                  &dripline::core::add_requests_ephemeral_queue,
+//                  DL_BIND_CALL_GUARD_STREAMS,
+//                  pybind11::arg("queue_name"),
+//                  "Declare an ephemeral (auto-delete) queue on the requests exchange. "
+//                  "Must be called after open_connection(). "
+//                  "Returns a QueueHandle to pass to bind_requests_key()." )
+            .def( "add_alerts_queue",
+                  &dripline::core::add_alerts_queue,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"),
+                  pybind11::arg("auto_delete") = false,
+                  pybind11::arg("durable") = true,
+                  pybind11::arg_v( "field_table", scarab::param_node(scarab::kwarg("x-single-active-consumer")=true), "{x-single-active-consumer=true}" ),
+                  "Declare a queue on the alerts exchange. "
+                  "Must be called after open_connection(). "
+                  "Returns a QueueHandle to pass to bind_alerts_key()." )
+//            .def( "add_alerts_ephemeral_queue",
+//                  &dripline::core::add_alerts_ephemeral_queue,
+//                  DL_BIND_CALL_GUARD_STREAMS,
+//                  pybind11::arg("queue_name"),
+//                  "Declare an ephemeral (auto-delete) queue on the alerts exchange. "
+//                  "Must be called after open_connection(). "
+//                  "Returns a QueueHandle to pass to bind_alerts_key()." )
+            .def( "bind_requests_key",
+                  &dripline::core::bind_requests_key,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"), pybind11::arg("routing_key"), pybind11::arg("queue"),
+                  "Bind a queue to the requests exchange with the given routing key. "
+                  "Must be called after add_requests_*_queue()." )
+            .def( "bind_alerts_key",
+                  &dripline::core::bind_alerts_key,
+                  DL_BIND_CALL_GUARD_STREAMS,
+                  pybind11::arg("queue_name"), pybind11::arg("routing_key"), pybind11::arg("queue"),
+                  "Bind a queue to the alerts exchange with the given routing key. "
+                  "Must be called after add_alerts_*_queue() (or add_requests_*_queue() "
+                  "if sharing a single queue across both exchanges, as monitor does)." )
             ;
 
         return all_items;
