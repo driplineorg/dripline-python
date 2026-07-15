@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
-      TAG: gha-test
+      TAG: "gha-test${{ github.event.inputs.test-image-tag-suffix }}"
       INT_TAG: gha-int-test
 
     steps:
@@ -57,12 +57,21 @@ jobs:
         with:
           driver: docker
 
+      - name: Login to GHCR
+        # This condition should match the `push` condition in the `Build` step just below
+        if: ${{ github.event.inputs.keep-test-image == 'true' }}
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
-          push: false
+          push: ${{ github.event.inputs.keep-test-image == 'true' }}
           load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
@@ -73,7 +82,7 @@ jobs:
 
       - name: Build Integration Tests
         id: build_int_tests
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./tests/integration
           push: false
@@ -133,7 +142,7 @@ jobs:
 
       - name: Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.REGISTRY_OLD }}/driplineorg/dripline-python
@@ -150,7 +159,7 @@ jobs:
       - name: Docker meta - integration
         id: docker_meta_integration
         if: ${{ matrix.do-integration }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.REGISTRY }}/driplineorg/dripline-python
@@ -168,19 +177,19 @@ jobs:
 
       - name: Set up Docker Buildx
         id: setup_buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         with:
           buildkitd-flags: --debug
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY_OLD }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -188,7 +197,7 @@ jobs:
 
       - name: Build and push
         id: build_push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
@@ -202,7 +211,7 @@ jobs:
       - name: Build and push - integration
         id: build_push_integration
         if: ${{ matrix.do-integration }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./tests/integration
           push: ${{ github.event_name == 'push' }}  # limited to develop, main, and tags; don't push on PR
