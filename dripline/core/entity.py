@@ -176,8 +176,12 @@ class Entity(Endpoint):
             raise ThrowReply('service_error_invalid_value', f"unable to interpret a new_interval of type <{type(new_interval)}>")
 
     def scheduled_log(self):
-        logger.debug("in a scheduled log event")
-        result = self.on_get()
+        logger.debug(f"in a scheduled log event for {self.name}")
+        try:
+            result = self.on_get()
+        except ThrowReply as err:
+            logger.warning(f'scheduled log failed with error:\n{err}')
+            return
         try:
             this_value = float(result[self._check_field])
             is_float = True

@@ -49,8 +49,8 @@ def calibrate(cal_functions=None):
                     val_dict['value_cal'] = cal
             elif isinstance(self._calibration, dict):
                 logger.debug('calibration is dictionary, looking up value')
-                if val_dict['value_raw'] in self._calibration:
-                    val_dict['value_cal'] = self._calibration[val_dict['value_raw']]
+                if str(val_dict['value_raw']) in self._calibration:
+                    val_dict['value_cal'] = self._calibration[str(val_dict['value_raw'])]
                 else:
                     raise ThrowReply('service_error_invalid_value', f"raw value <{repr(val_dict['value_raw'])}> not in cal dict")
             else:
