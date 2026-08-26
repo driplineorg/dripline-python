@@ -6,6 +6,15 @@ on:
     tags: ['*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      keep-test-image:
+        description: "Keep the Test Image (set to 'true' to keep the image)"
+        required: true
+        default: "false"
+      test-image-tag-suffix:
+        description: "Suffix for Test Image Tag"
+        required: false
+        default: ""
 
 env:
   REGISTRY: ghcr.io
@@ -13,8 +22,8 @@ env:
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
   DEV_SUFFIX: '-dev'
-  BASE_IMAGE_TAG: 'v2.10.11'
-#  BASE_IMAGE_TAG: 'dlcpp-hf2.10.8'
+  BASE_IMAGE_TAG: 'v2.10.12'
+#  BASE_IMAGE_TAG: 'gha-test-hf2.10.12'
 #  DEV_SUFFIX: ''
 
 jobs:
@@ -24,7 +33,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
-      TAG: gha-test
+      TAG: "gha-test${{ github.event.inputs.test-image-tag-suffix }}"
       INT_TAG: gha-int-test
 
     steps:
@@ -48,12 +57,21 @@ jobs:
         with:
           driver: docker
 
+      - name: Login to GHCR
+        # This condition should match the `push` condition in the `Build` step just below
+        if: ${{ github.event.inputs.keep-test-image == 'true' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build
         id: build
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
+          push: ${{ github.event.inputs.keep-test-image == 'true' }}
           load: true
           build-args: |
             img_user=${{ env.BASE_IMAGE_USER }}
