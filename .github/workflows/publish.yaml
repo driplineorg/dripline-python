@@ -21,10 +21,10 @@ env:
   REGISTRY_OLD: docker.io
   BASE_IMAGE_USER: ghcr.io/driplineorg
   BASE_IMAGE_REPO: dripline-cpp
-#  DEV_SUFFIX: '-dev'
-#  BASE_IMAGE_TAG: 'v2.10.11'
-  BASE_IMAGE_TAG: 'gha-test-hf2.10.12'
-  DEV_SUFFIX: ''
+  DEV_SUFFIX: '-dev'
+  BASE_IMAGE_TAG: 'v2.10.12'
+#  BASE_IMAGE_TAG: 'gha-test-hf2.10.12'
+#  DEV_SUFFIX: ''
 
 jobs:
 
