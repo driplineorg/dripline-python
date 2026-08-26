@@ -10,6 +10,18 @@ Types of changes: Added, Changed, Deprecated, Removed, Fixed, Security
 ## [Unreleased]
 
 
+## [5.1.6] - 2026-08-26
+
+### Fixed
+
+- `scheduled_log` now performs on_get in tr/except loop to catch dl errors and not crash, instead throwing a warning and returning
+- `calibrate` now forces dict calibrations to be mapped to string, reflecting how Scarab reads and passes calibration information
+
+### Added
+
+- Added ability to keep the test Docker image
+
+
 ## [5.1.5] - 2025-02-04
 
 ### Fixed
